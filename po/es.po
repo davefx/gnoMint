@@ -1,99 +1,100 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# gnoMint
+# Copyright (C) 2006 David Marin Carreño
+# This file is distributed under the same license as the gnoMint package.
+# David Marin Carreño <davefx@gmail.com>, 2006.
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: gnoMint VERSION\n"
 "POT-Creation-Date: 2006-04-29 12:42+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2006-04-29 12:42+0200\n"
+"Last-Translator: David MarÃ­n CarreÃ±o <dmarin@dyr.es>\n"
+"Language-Team: EspaÃ±ol <es@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../gui/gnomint.glade.h:1
 msgid " "
-msgstr ""
+msgstr " "
 
 #: ../gui/gnomint.glade.h:2
 msgid "<big>CA Properties</big>\n"
-msgstr ""
+msgstr "<big>Propiedades de la AC</big>\n"
 
 #: ../gui/gnomint.glade.h:4
 msgid "<big>CA Root certificate properties</big>\n"
-msgstr ""
+msgstr "<big>Propiedades del certificado raiz de la AC</big>\n"
 
 #: ../gui/gnomint.glade.h:6
 msgid "<big>CA Root database file</big>\n"
-msgstr ""
+msgstr "<big>Fichero de base de datos de la AC</big>\n"
 
 #: ../gui/gnomint.glade.h:8
 msgid ""
 "CA Root Certificate \n"
 "Common Name (CN):"
 msgstr ""
+"Nombre común (CN) del\n"
+"certificado raiz de la AC:"
 
 #: ../gui/gnomint.glade.h:10
 msgid "CA database file"
-msgstr ""
+msgstr "Fichero de base de datos de la AC"
 
 #: ../gui/gnomint.glade.h:11
 msgid "CA properties"
-msgstr ""
+msgstr "Propiedades de la AC"
 
 #: ../gui/gnomint.glade.h:12
 msgid "City: "
-msgstr ""
+msgstr "Ciudad"
 
 #: ../gui/gnomint.glade.h:13
 msgid "Country:"
-msgstr ""
+msgstr "País"
 
 #: ../gui/gnomint.glade.h:14
 msgid "DSA"
-msgstr ""
+msgstr "DSA"
 
 #: ../gui/gnomint.glade.h:15
 msgid "New CA - gnoMint"
-msgstr ""
+msgstr "Nueva AC - gnoMint"
 
 #: ../gui/gnomint.glade.h:16
 msgid "Organization Unit:"
-msgstr ""
+msgstr "Unidad organizativa:"
 
 #: ../gui/gnomint.glade.h:17
 msgid "Organization:"
-msgstr ""
+msgstr "Organización:"
 
 #: ../gui/gnomint.glade.h:18
 msgid "Private key bit length:"
-msgstr ""
+msgstr "Longitud en bits de la clave privada:"
 
 #: ../gui/gnomint.glade.h:19
 msgid "Private key type:"
-msgstr ""
+msgstr "Tipo de clave privada:"
 
 #: ../gui/gnomint.glade.h:20
 msgid "RSA"
-msgstr ""
+msgstr "RSA"
 
 #: ../gui/gnomint.glade.h:21
 msgid "Root certificate prop"
-msgstr ""
+msgstr "Prop. de certificado raíz"
 
 #: ../gui/gnomint.glade.h:22
 msgid "State or Province name: "
-msgstr ""
+msgstr "Nombre de estado o provincia: "
 
 #: ../gui/gnomint.glade.h:23
 msgid "_New"
-msgstr ""
+msgstr "_Nuevo"
 
 #: ../gui/gnomint.glade.h:24
 msgid "gnoMint"
-msgstr ""
+msgstr "gnoMint"
+

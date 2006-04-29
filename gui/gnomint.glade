@@ -29,7 +29,7 @@
 	  <property name="visible">True</property>
 
 	  <child>
-	    <widget class="GtkImageMenuItem" id="file1">
+	    <widget class="GtkMenuItem" id="file1">
 	      <property name="visible">True</property>
 	      <property name="stock_item">GNOMEUIINFO_MENU_FILE_TREE</property>
 
@@ -40,7 +40,7 @@
 		    <widget class="GtkImageMenuItem" id="new1">
 		      <property name="visible">True</property>
 		      <property name="stock_item">GNOMEUIINFO_MENU_NEW_ITEM</property>
-		      <property name="label" translatable="yes">_Nuevo</property>
+		      <property name="label" translatable="yes">_New</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_new1_activate" last_modification_time="Sun, 16 Apr 2006 07:17:49 GMT"/>
 		    </widget>
@@ -89,7 +89,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkImageMenuItem" id="edit1">
+	    <widget class="GtkMenuItem" id="edit1">
 	      <property name="visible">True</property>
 	      <property name="stock_item">GNOMEUIINFO_MENU_EDIT_TREE</property>
 
@@ -161,19 +161,14 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkImageMenuItem" id="view1">
+	    <widget class="GtkMenuItem" id="view1">
 	      <property name="visible">True</property>
 	      <property name="stock_item">GNOMEUIINFO_MENU_VIEW_TREE</property>
-
-	      <child>
-		<widget class="GtkMenu" id="view1_menu">
-		</widget>
-	      </child>
 	    </widget>
 	  </child>
 
 	  <child>
-	    <widget class="GtkImageMenuItem" id="help1">
+	    <widget class="GtkMenuItem" id="help1">
 	      <property name="visible">True</property>
 	      <property name="stock_item">GNOMEUIINFO_MENU_HELP_TREE</property>
 
