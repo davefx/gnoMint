@@ -127,8 +127,8 @@ AC_SUBST(LDFLAGS)
 
 AC_OUTPUT([
 Makefile
-gui/Makefile
 src/Makefile
+src/gui/Makefile
 po/Makefile.in
 ])
 

@@ -1,4 +1,4 @@
-SUBDIRS = po src gui
+SUBDIRS = po src
 
 INCLUDES =
 
