@@ -4,7 +4,7 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-PKG_NAME="Mergeant"
+PKG_NAME="Gnomint"
 AUTOCONF=autoconf
 REQUIRED_AUTOCONF_VERSION=2.59
 AUTOMAKE=automake-1.9
@@ -14,7 +14,7 @@ REQUIRED_AUTOMAKE_VERSION=1.9
   && test -d $srcdir/src \
   && test -f $srcdir/src/main.c) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
-    echo " top-level Mergeant directory"
+    echo " top-level Gnomint directory"
     exit 1
 }
 
