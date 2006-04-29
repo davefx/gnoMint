@@ -1,0 +1,99 @@
+# gnoMint
+# Copyright (C) 2006 David Marin Carreño
+# This file is distributed under the same license as the gnoMint package.
+# David Marin Carreño <davefx@gmail.com>, 2006.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-04-29 10:51+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gui/gnomint.glade.h:1
+msgid " "
+msgstr ""
+
+#: ../gui/gnomint.glade.h:2
+msgid "<big>CA Properties</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:4
+msgid "<big>CA Root certificate properties</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:6
+msgid "<big>CA Root database file</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:8
+msgid ""
+"CA Root Certificate \n"
+"Common Name (CN):"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:10
+msgid "CA database file"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:11
+msgid "CA properties"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:12
+msgid "City: "
+msgstr ""
+
+#: ../gui/gnomint.glade.h:13
+msgid "Country:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:14
+msgid "DSA"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:15
+msgid "New CA - gnoMint"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:16
+msgid "Organization Unit:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:17
+msgid "Organization:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:18
+msgid "Private key bit length:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:19
+msgid "Private key type:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:20
+msgid "RSA"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:21
+msgid "Root certificate prop"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:22
+msgid "State or Province name: "
+msgstr ""
+
+#: ../gui/gnomint.glade.h:23
+msgid "_Nuevo"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:24
+msgid "gnoMint"
+msgstr ""
