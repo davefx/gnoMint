@@ -1,3 +1,5 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
 gui/gnomint.glade
+src/main.c
+src/new_ca_window.c

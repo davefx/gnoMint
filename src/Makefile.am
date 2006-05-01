@@ -5,11 +5,13 @@ INCLUDES = \
 	-I$(top_builddir) \
 	-I$(top_srcdir)/libgnomint \
 	$(GNOMINT_CFLAGS) \
-	-DGNOMINT_PIXMAPDIR=\""$(GNOMINT_Pixmapdir)"\" \
-	-DGNOMINT_UIDIR=\""$(datadir)/gnomint/ui"\"
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
+	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	-DHAVE_CONFIG_H  -DCOMPILATION_DATE=`date +%s` -g -Wall 
 
 gnomint_SOURCES = \
-	main.c 
+	main.c \
+	new_ca_window.c
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)
