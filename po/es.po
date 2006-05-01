@@ -841,7 +841,6 @@ msgid "Saint Helena"
 msgstr "Santa Elena"
 
 #: ../src/new_ca_window.c:438
-#, fuzzy
 msgid "Saint Kitts and Nevis"
 msgstr "San Cristóbal y Nieves"
 
