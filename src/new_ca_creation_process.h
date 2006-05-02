@@ -15,10 +15,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _NEW_CA_WINDOW_H_
-#define _NEW_CA_WINDOW_H_
+#ifndef _NEW_CA_CREATION_PROCESS_H_
+#define _NEW_CA_CREATION_PROCESS_H_
 
-void new_ca_window_display ();
+void new_ca_creation_process_window_display (CaCreationData * ca_creation_data);
 
 
 #endif

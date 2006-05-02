@@ -15,10 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gnome.h>
+#include <libintl.h>
+#include <gtk/gtk.h>
 #include <glade/glade.h>
 
 #include "new_ca_window.h"
+
+
+#define _(x) gettext(x)
+#define N_(x) (x) gettext_noop(x)
 
 GladeXML * main_window_xml = NULL;
 
@@ -41,7 +46,14 @@ int main (int   argc,
 	GtkWidget * widget = NULL;
 
 
+#ifdef ENABLE_NLS
+	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+	textdomain (GETTEXT_PACKAGE);
+#endif
 
+
+	g_thread_init (NULL);
 	gtk_init (&argc, &argv);
 
 	ctx = g_option_context_new (_("- A graphical Certification Authority manager"));
@@ -155,4 +167,13 @@ void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	printf ("about1 Activated\n");
+}
+
+
+gboolean on_main_window1_delete (GtkWidget *widget,
+				  GdkEvent *event,
+				  gpointer user_data)
+{
+	exit (0);
+	return TRUE;
 }

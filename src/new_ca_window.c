@@ -22,6 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ca_creation.h"
+#include "new_ca_creation_process.h"
+
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
@@ -43,10 +46,12 @@ void populate_country_combobox();
 void new_ca_window_display()
 {
 	gchar     * xml_file = NULL;
-	GtkWidget * widget = NULL;
 	
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
+	// Workaround for libglade
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET;
+
 	new_ca_window_xml = glade_xml_new (xml_file, "new_ca_window", NULL);
 	
 	g_free (xml_file);
@@ -566,7 +571,6 @@ void populate_country_combobox()
 	GtkTreeStore * new_store = NULL;
 	GtkTreeIter iter;
 	GtkCellRenderer *renderer = NULL;
-	GValue *value = NULL;
 
 	populate_country_table();
 	new_store = gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
@@ -577,22 +581,178 @@ void populate_country_combobox()
 		gtk_tree_store_set (new_store, &iter, 0, country_table[i].name, 1, country_table[i].code, -1);
 	}
 
-	gtk_combo_box_set_model (GTK_COMBO_BOX(country_combobox), new_store);
+	gtk_combo_box_set_model (GTK_COMBO_BOX(country_combobox), GTK_TREE_MODEL (new_store));
 	gtk_combo_box_entry_set_text_column (GTK_COMBO_BOX_ENTRY (country_combobox), 0);
-
-	renderer = gtk_cell_renderer_text_new ();
-	value = g_new0 (GValue, 1);
-	value = g_value_init (value, G_TYPE_STRING);
-	g_value_set_string (value, " - ");
-	g_object_set_property (G_OBJECT(renderer), "text", value);
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (country_combobox), renderer, FALSE);
 
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (country_combobox), renderer, FALSE);
 	gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_combobox), renderer, "text", 1);
 	
-
-		
                                              
+}
+
+
+
+
+
+// TAB Manage
+
+void new_ca_tab_activate (int tab_number)
+{
+	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_ca_window_xml, "new_ca_notebook"));
+	
+	gtk_notebook_set_current_page (notebook, tab_number);
+
+}
+
+void on_cn_entry_changed (GtkEditable *editable,
+			 gpointer user_data) 
+{
+	GtkButton *button = GTK_BUTTON(glade_xml_get_widget (new_ca_window_xml, "new_ca_next1"));
+
+	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
+		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
+	else
+		gtk_widget_set_sensitive (GTK_WIDGET(button), FALSE);
+		
+}
+
+void on_new_ca_next1_clicked (GtkButton *widget,
+			      gpointer user_data) 
+{
+	new_ca_tab_activate (1);
+}
+
+void on_new_ca_previous2_clicked (GtkButton *widget,
+				  gpointer user_data) 
+{
+	new_ca_tab_activate (0);
+}
+
+void on_new_ca_next2_clicked (GtkButton *widget,
+			      gpointer user_data) 
+{
+	new_ca_tab_activate (2);
+}
+
+void on_new_ca_previous3_clicked (GtkButton *widget,
+				  gpointer user_data) 
+{
+	new_ca_tab_activate (1);
+}
+
+void on_new_ca_cancel_clicked (GtkButton *widget,
+			       gpointer user_data) 
+{
+	
+	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
+
+	gtk_object_destroy(GTK_OBJECT(window));
+	
+}
+
+void on_new_ca_commit_clicked (GtkButton *widg,
+			       gpointer user_data) 
+{
+	CaCreationData *ca_creation_data = NULL;
+
+	GtkWidget *widget = NULL;
+	GtkWindow *window = NULL;
+	gint active = -1;
+	gchar *text = NULL;
+	GtkTreeModel *tree_model = NULL;
+	GtkTreeIter tree_iter;
+	
+	
+
+	ca_creation_data = g_new0 (CaCreationData, 1);
+	widget = glade_xml_get_widget (new_ca_window_xml, "country_combobox");
+	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
+
+	if (active < 0) {
+		/* The selected country is not at the list */
+		text = gtk_combo_box_get_active_text (GTK_COMBO_BOX(widget));
+		if (strlen(text) <= 0)
+			ca_creation_data->country = NULL;
+		else
+			ca_creation_data->country = g_strdup (text);
+	} else {
+		tree_model = gtk_combo_box_get_model (GTK_COMBO_BOX(widget));
+		gtk_combo_box_get_active_iter (GTK_COMBO_BOX(widget), &tree_iter);
+		gtk_tree_model_get (tree_model, &tree_iter, 1, &text, -1);
+
+		ca_creation_data->country = g_strdup (text);
+		
+	}
+		
+	widget = glade_xml_get_widget (new_ca_window_xml, "st_entry");
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->state = g_strdup (text);
+	else
+		ca_creation_data->state = NULL;
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "city_entry");
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->city = g_strdup (text);
+	else
+		ca_creation_data->city = NULL;
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "o_entry");
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->org = g_strdup (text);
+	else
+		ca_creation_data->org = NULL;
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "ou_entry");
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->ou = g_strdup (text);
+	else
+		ca_creation_data->ou = NULL;
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "cn_entry");
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->cn = g_strdup (text);
+	else
+		ca_creation_data->cn = NULL;
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "dsa_radiobutton");
+	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	ca_creation_data->key_type = active;
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "keylength_spinbutton");
+	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
+	ca_creation_data->key_bitlength = active;
+
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "months_before_expiration_spinbutton");
+	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
+	ca_creation_data->key_months_before_expiration = active;
+
+
+	widget = glade_xml_get_widget (new_ca_window_xml, "new_ca_filechooser");
+	text = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(widget));
+
+	if (text && strlen (text))
+		ca_creation_data->filename = g_strdup (text);
+	else
+		return;
+	
+
+	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
+	gtk_object_destroy(GTK_OBJECT(window));
+
+	printf ("Creating new CA\n");
+
+	new_ca_creation_process_window_display (ca_creation_data);
+	
+
+
+
+
 }
 

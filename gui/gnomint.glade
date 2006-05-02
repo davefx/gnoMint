@@ -17,6 +17,7 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <signal name="delete_event" handler="on_main_window1_delete" last_modification_time="Mon, 01 May 2006 17:58:10 GMT"/>
 
   <child>
     <widget class="GtkVBox" id="vbox1">
@@ -282,7 +283,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
-    <widget class="GtkNotebook" id="notebook1">
+    <widget class="GtkNotebook" id="new_ca_notebook">
       <property name="border_width">8</property>
       <property name="visible">True</property>
       <property name="show_tabs">False</property>
@@ -484,7 +485,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkEntry" id="entry2">
+		<widget class="GtkEntry" id="st_entry">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
@@ -505,7 +506,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkEntry" id="entry3">
+		<widget class="GtkEntry" id="city_entry">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
@@ -526,7 +527,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkEntry" id="entry4">
+		<widget class="GtkEntry" id="o_entry">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
@@ -547,7 +548,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkEntry" id="entry5">
+		<widget class="GtkEntry" id="ou_entry">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
@@ -593,7 +594,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkEntry" id="entry10">
+		<widget class="GtkEntry" id="cn_entry">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="editable">True</property>
@@ -603,6 +604,7 @@ Common Name (CN):</property>
 		  <property name="has_frame">True</property>
 		  <property name="invisible_char">*</property>
 		  <property name="activates_default">False</property>
+		  <signal name="changed" handler="on_cn_entry_changed" last_modification_time="Mon, 01 May 2006 17:30:20 GMT"/>
 		</widget>
 		<packing>
 		  <property name="left_attach">1</property>
@@ -653,7 +655,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button4">
+		<widget class="GtkButton" id="new_ca_cancel1">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -661,18 +663,21 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:41:30 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button5">
+		<widget class="GtkButton" id="new_ca_next1">
 		  <property name="visible">True</property>
+		  <property name="sensitive">False</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="label">gtk-media-next</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_next1_clicked" last_modification_time="Mon, 01 May 2006 16:30:34 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -774,7 +779,7 @@ Common Name (CN):</property>
 	    <widget class="GtkTable" id="table2">
 	      <property name="border_width">6</property>
 	      <property name="visible">True</property>
-	      <property name="n_rows">2</property>
+	      <property name="n_rows">3</property>
 	      <property name="n_columns">2</property>
 	      <property name="homogeneous">True</property>
 	      <property name="row_spacing">0</property>
@@ -835,7 +840,7 @@ Common Name (CN):</property>
 		  <property name="spacing">0</property>
 
 		  <child>
-		    <widget class="GtkRadioButton" id="radiobutton1">
+		    <widget class="GtkRadioButton" id="rsa_radiobutton">
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="label" translatable="yes">RSA</property>
@@ -854,17 +859,17 @@ Common Name (CN):</property>
 		  </child>
 
 		  <child>
-		    <widget class="GtkRadioButton" id="radiobutton2">
+		    <widget class="GtkRadioButton" id="dsa_radiobutton">
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="label" translatable="yes">DSA</property>
 		      <property name="use_underline">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
 		      <property name="focus_on_click">True</property>
-		      <property name="active">False</property>
+		      <property name="active">True</property>
 		      <property name="inconsistent">False</property>
 		      <property name="draw_indicator">True</property>
-		      <property name="group">radiobutton1</property>
+		      <property name="group">rsa_radiobutton</property>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
@@ -884,7 +889,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkSpinButton" id="spinbutton1">
+		<widget class="GtkSpinButton" id="keylength_spinbutton">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="climb_rate">1024</property>
@@ -893,13 +898,58 @@ Common Name (CN):</property>
 		  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 		  <property name="snap_to_ticks">False</property>
 		  <property name="wrap">False</property>
-		  <property name="adjustment">1024 1024 4096 1024 1024 1024</property>
+		  <property name="adjustment">2048 1024 4096 1024 1024 1024</property>
 		</widget>
 		<packing>
 		  <property name="left_attach">1</property>
 		  <property name="right_attach">2</property>
 		  <property name="top_attach">1</property>
 		  <property name="bottom_attach">2</property>
+		  <property name="y_options"></property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label27">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Months before root certificate expiration:</property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">0</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">2</property>
+		  <property name="bottom_attach">3</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options"></property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkSpinButton" id="months_before_expiration_spinbutton">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="climb_rate">1</property>
+		  <property name="digits">0</property>
+		  <property name="numeric">True</property>
+		  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+		  <property name="snap_to_ticks">False</property>
+		  <property name="wrap">False</property>
+		  <property name="adjustment">240 1 600 1 12 12</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">2</property>
+		  <property name="bottom_attach">3</property>
 		  <property name="y_options"></property>
 		</packing>
 	      </child>
@@ -930,7 +980,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button13">
+		<widget class="GtkButton" id="new_ca_cancel2">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -938,11 +988,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button14">
+		<widget class="GtkButton" id="new_ca_previous2">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -950,11 +1001,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button15">
+		<widget class="GtkButton" id="new_ca_next2">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -962,6 +1014,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_next2_clicked" last_modification_time="Mon, 01 May 2006 17:23:23 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -1060,13 +1113,13 @@ Common Name (CN):</property>
 	  </child>
 
 	  <child>
-	    <widget class="GtkFileChooserWidget" id="filechooserwidget1">
+	    <widget class="GtkFileChooserWidget" id="new_ca_filechooser">
 	      <property name="border_width">11</property>
 	      <property name="visible">True</property>
 	      <property name="action">GTK_FILE_CHOOSER_ACTION_SAVE</property>
 	      <property name="local_only">True</property>
 	      <property name="select_multiple">False</property>
-	      <property name="show_hidden">True</property>
+	      <property name="show_hidden">False</property>
 	    </widget>
 	    <packing>
 	      <property name="padding">0</property>
@@ -1094,7 +1147,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button17">
+		<widget class="GtkButton" id="new_ca_cancel3">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -1102,11 +1155,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:41:52 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button18">
+		<widget class="GtkButton" id="new_ca_previous3">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -1114,11 +1168,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_previous3_clicked" last_modification_time="Mon, 01 May 2006 17:23:04 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="button19">
+		<widget class="GtkButton" id="new_ca_commit">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -1126,6 +1181,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
+		  <signal name="clicked" handler="on_new_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -1158,6 +1214,137 @@ Common Name (CN):</property>
 	</widget>
 	<packing>
 	  <property name="type">tab</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkWindow" id="new_ca_creation_process">
+  <property name="visible">True</property>
+  <property name="title" translatable="yes">Creating new CA - gnoMint</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_CENTER</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <property name="decorated">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+
+  <child>
+    <widget class="GtkHBox" id="hbox5">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child>
+	<widget class="GtkLabel" id="label25">
+	  <property name="visible">True</property>
+	  <property name="label" translatable="yes"> </property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">False</property>
+	  <property name="justify">GTK_JUSTIFY_LEFT</property>
+	  <property name="wrap">False</property>
+	  <property name="selectable">False</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">0</property>
+	  <property name="ypad">0</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkVBox" id="vbox5">
+	  <property name="border_width">9</property>
+	  <property name="visible">True</property>
+	  <property name="homogeneous">True</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="GtkLabel" id="label24">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">Creating CA Root Certificate</property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">0.5</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkProgressBar" id="new_ca_creation_process_progressbar">
+	      <property name="visible">True</property>
+	      <property name="orientation">GTK_PROGRESS_LEFT_TO_RIGHT</property>
+	      <property name="fraction">0</property>
+	      <property name="pulse_step">0.10000000149</property>
+	      <property name="text" translatable="yes">...</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="button20">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkLabel" id="label26">
+	  <property name="visible">True</property>
+	  <property name="label" translatable="yes"> </property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">False</property>
+	  <property name="justify">GTK_JUSTIFY_LEFT</property>
+	  <property name="wrap">False</property>
+	  <property name="selectable">False</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">0</property>
+	  <property name="ypad">0</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
 	</packing>
       </child>
     </widget>

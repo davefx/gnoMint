@@ -15,10 +15,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _NEW_CA_WINDOW_H_
-#define _NEW_CA_WINDOW_H_
+#ifndef _SSL_H_
+#define _SSL_H_
 
-void new_ca_window_display ();
+#include "ca_creation.h"
 
+gint ssl_generate_rsa_keys (CaCreationData *creation_data,
+			    gchar ** private_key,
+			    gchar ** public_key);
+
+gint ssl_generate_dsa_keys (CaCreationData *creation_data,
+			    gchar ** private_key,
+			    gchar ** public_key);
+
+gint ssl_generate_rsa_self_signed_certificate (CaCreationData * creation_data, 
+					       gchar * private_key,
+					       gchar * public_key,
+					       gchar ** certificate);
+
+gint ssl_generate_dsa_self_signed_certificate (CaCreationData * creation_data, 
+					       gchar * private_key,
+					       gchar * public_key,
+					       gchar ** certificate);
 
 #endif

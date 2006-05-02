@@ -3,3 +3,5 @@
 gui/gnomint.glade
 src/main.c
 src/new_ca_window.c
+src/ca_creation.c
+src/new_ca_creation_process.c

@@ -15,10 +15,36 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _NEW_CA_WINDOW_H_
-#define _NEW_CA_WINDOW_H_
+#ifndef _CA_CREATION_H_
+#define _CA_CREATION_H_
 
-void new_ca_window_display ();
+#include <glib.h>
 
+typedef struct {
+	gchar * country;
+	gchar * state;
+	gchar * city;
+	gchar * org;
+	gchar * ou;
+	gchar * cn;
+	gchar * emailAddress;
+
+	gint key_type;
+	gint key_bitlength;
+
+	gint key_months_before_expiration;
+	
+	gchar * filename;
+} CaCreationData;
+
+GThread * ca_creation_launch_thread (CaCreationData *creation_data);
+
+
+void ca_creation_lock_status_mutex ();
+void ca_creation_unlock_status_mutex ();
+
+gint ca_creation_get_thread_status ();
+
+gchar * ca_creation_get_thread_message();
 
 #endif

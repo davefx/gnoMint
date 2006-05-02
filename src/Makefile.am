@@ -11,7 +11,10 @@ INCLUDES = \
 
 gnomint_SOURCES = \
 	main.c \
-	new_ca_window.c
+	new_ca_window.c \
+	new_ca_creation_process.c \
+	ca_creation.c \
+	ssl.c
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)

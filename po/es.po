@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnoMint VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-01 16:48+0200\n"
-"PO-Revision-Date: 2006-05-01 17:15+0200\n"
+"PO-Revision-Date: 2006-05-01 17:23+0200\n"
 "Last-Translator: David MarÃ­n CarreÃ±o <dmarin@dyr.es>\n"
 "Language-Team: EspaÃ±ol <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -106,7 +106,7 @@ msgstr "- Un gestor gráfico de Autoridades de Certificación"
 #: ../src/main.c:50
 #, c-format
 msgid "Failed to initialize: %s\n"
-msgstr "Fallo al inicializar: %s\\n"
+msgstr "Fallo al inicializar: %s\n"
 
 #: ../src/new_ca_window.c:72
 msgid "Afghanistan"
@@ -846,236 +846,236 @@ msgstr "San Cristóbal y Nieves"
 
 #: ../src/new_ca_window.c:440
 msgid "Saint Lucia"
-msgstr ""
+msgstr "Santa Lucía"
 
 #: ../src/new_ca_window.c:442
 msgid "Saint Pierre and Miquelon"
-msgstr ""
+msgstr "San Pedro y Miquelón"
 
 #: ../src/new_ca_window.c:444
 msgid "Saint Vincent and the Grenadines"
-msgstr ""
+msgstr "San Vicente y las Granadinas"
 
 #: ../src/new_ca_window.c:446
 msgid "Samoa"
-msgstr ""
+msgstr "Samoa"
 
 #: ../src/new_ca_window.c:448
 msgid "San Marino"
-msgstr ""
+msgstr "San Marino"
 
 #: ../src/new_ca_window.c:450
 msgid "Sao Tome and Principe"
-msgstr ""
+msgstr "Santo Tomé y Príncipe"
 
 #: ../src/new_ca_window.c:452
 msgid "Saudi Arabia"
-msgstr ""
+msgstr "Arabia Saudí"
 
 #: ../src/new_ca_window.c:454
 msgid "Senegal"
-msgstr ""
+msgstr "Senegal"
 
 #: ../src/new_ca_window.c:456
 msgid "Serbia and Montenegro"
-msgstr ""
+msgstr "Serbia y Montenegro"
 
 #: ../src/new_ca_window.c:458
 msgid "Seychelles"
-msgstr ""
+msgstr "Seychelles"
 
 #: ../src/new_ca_window.c:460
 msgid "Sierra Leone"
-msgstr ""
+msgstr "Sierra Leona"
 
 #: ../src/new_ca_window.c:462
 msgid "Singapore"
-msgstr ""
+msgstr "Singapur"
 
 #: ../src/new_ca_window.c:464
 msgid "Slovakia"
-msgstr ""
+msgstr "Eslovaquia"
 
 #: ../src/new_ca_window.c:466
 msgid "Slovenia"
-msgstr ""
+msgstr "Eslovenia"
 
 #: ../src/new_ca_window.c:468
 msgid "Solomon Islands"
-msgstr ""
+msgstr "Islas Salomón"
 
 #: ../src/new_ca_window.c:470
 msgid "Somalia"
-msgstr ""
+msgstr "Somalia"
 
 #: ../src/new_ca_window.c:472
 msgid "South Africa"
-msgstr ""
+msgstr "Sudáfrica"
 
 #: ../src/new_ca_window.c:474
 msgid "South Georgia and the South Sandwich Islands"
-msgstr ""
+msgstr "Georgia del sur e Islas Sandwich del sur"
 
 #: ../src/new_ca_window.c:476
 msgid "Spain"
-msgstr ""
+msgstr "España"
 
 #: ../src/new_ca_window.c:478
 msgid "Sri Lanka"
-msgstr ""
+msgstr "Sri Lanka"
 
 #: ../src/new_ca_window.c:480
 msgid "Sudan"
-msgstr ""
+msgstr "Sudán"
 
 #: ../src/new_ca_window.c:482
 msgid "Suriname"
-msgstr ""
+msgstr "Surinam"
 
 #: ../src/new_ca_window.c:484
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Svalbard y Jan Mayen"
 
 #: ../src/new_ca_window.c:486
 msgid "Swaziland"
-msgstr ""
+msgstr "Suazilandia"
 
 #: ../src/new_ca_window.c:488
 msgid "Sweden"
-msgstr ""
+msgstr "Suecia"
 
 #: ../src/new_ca_window.c:490
 msgid "Switzerland"
-msgstr ""
+msgstr "Suiza"
 
 #: ../src/new_ca_window.c:492
 msgid "Syrian Arab Republic"
-msgstr ""
+msgstr "República árabe de Siria"
 
 #: ../src/new_ca_window.c:494
 msgid "Taiwan, Province of China"
-msgstr ""
+msgstr "Taiwán, Provincia de China"
 
 #: ../src/new_ca_window.c:496
 msgid "Tajikistan"
-msgstr ""
+msgstr "Tayikistán"
 
 #: ../src/new_ca_window.c:498
 msgid "Tanzania, United Republic of"
-msgstr ""
+msgstr "Tanzania, República Unida de"
 
 #: ../src/new_ca_window.c:500
 msgid "Thailand"
-msgstr ""
+msgstr "Tailandia"
 
 #: ../src/new_ca_window.c:502
 msgid "Timor-Leste"
-msgstr ""
+msgstr "Timor Oriental"
 
 #: ../src/new_ca_window.c:504
 msgid "Togo"
-msgstr ""
+msgstr "Togo"
 
 #: ../src/new_ca_window.c:506
 msgid "Tokelau"
-msgstr ""
+msgstr "Tokelau"
 
 #: ../src/new_ca_window.c:508
 msgid "Tonga"
-msgstr ""
+msgstr "Tonga"
 
 #: ../src/new_ca_window.c:510
 msgid "Trinidad and Tobago"
-msgstr ""
+msgstr "Trinidad y Tobago"
 
 #: ../src/new_ca_window.c:512
 msgid "Tunisia"
-msgstr ""
+msgstr "Túnez"
 
 #: ../src/new_ca_window.c:514
 msgid "Turkey"
-msgstr ""
+msgstr "Turquía"
 
 #: ../src/new_ca_window.c:516
 msgid "Turkmenistan"
-msgstr ""
+msgstr "Turkmenistán"
 
 #: ../src/new_ca_window.c:518
 msgid "Turks and Caicos Islands"
-msgstr ""
+msgstr "Islas Turks y Caicos"
 
 #: ../src/new_ca_window.c:520
 msgid "Tuvalu"
-msgstr ""
+msgstr "Tuvalu"
 
 #: ../src/new_ca_window.c:522
 msgid "Uganda"
-msgstr ""
+msgstr "Uganda"
 
 #: ../src/new_ca_window.c:524
 msgid "Ukraine"
-msgstr ""
+msgstr "Ucrania"
 
 #: ../src/new_ca_window.c:526
 msgid "United Arab Emirates"
-msgstr ""
+msgstr "Emiratos Árabes Unidos"
 
 #: ../src/new_ca_window.c:528
 msgid "United Kingdom"
-msgstr ""
+msgstr "Reino Unido"
 
 #: ../src/new_ca_window.c:530
 msgid "United States"
-msgstr ""
+msgstr "Estados Unidos"
 
 #: ../src/new_ca_window.c:532
 msgid "United States Minor Outlying Islands"
-msgstr ""
+msgstr "Estados Unidos, Islas menores exteriores de"
 
 #: ../src/new_ca_window.c:534
 msgid "Uruguay"
-msgstr ""
+msgstr "Uruguay"
 
 #: ../src/new_ca_window.c:536
 msgid "Uzbekistan"
-msgstr ""
+msgstr "Uzbekistán"
 
 #: ../src/new_ca_window.c:538
 msgid "Vanuatu"
-msgstr ""
+msgstr "Vanuatu"
 
 #: ../src/new_ca_window.c:540
 msgid "Venezuela"
-msgstr ""
+msgstr "Venezuela"
 
 #: ../src/new_ca_window.c:542
 msgid "Viet Nam"
-msgstr ""
+msgstr "Vietnam"
 
 #: ../src/new_ca_window.c:544
 msgid "Virgin Islands, British"
-msgstr ""
+msgstr "Islas Vírgenes británicas"
 
 #: ../src/new_ca_window.c:546
 msgid "Virgin Islands, U.S."
-msgstr ""
+msgstr "Islas Vírgenes estadounidenses"
 
 #: ../src/new_ca_window.c:548
 msgid "Wallis and Futuna"
-msgstr ""
+msgstr "Wallis y Futuna"
 
 #: ../src/new_ca_window.c:550
 msgid "Western Sahara"
-msgstr ""
+msgstr "Sahara Occidental"
 
 #: ../src/new_ca_window.c:552
 msgid "Yemen"
-msgstr ""
+msgstr "Yemen"
 
 #: ../src/new_ca_window.c:554
 msgid "Zambia"
-msgstr ""
+msgstr "Zambia"
 
 #: ../src/new_ca_window.c:556
 msgid "Zimbabwe"
-msgstr ""
+msgstr "Zimbabue"
