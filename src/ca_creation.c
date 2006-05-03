@@ -18,6 +18,8 @@
 #include "ca_creation.h"
 #include "ssl.h"
 
+#include <sqlite.h>
+
 #include <libintl.h>
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -163,6 +165,10 @@ gint ca_creation_database_save (CaCreationData * creation_data,
 				gchar * public_key, 
 				gchar * root_certificate)
 {
-	printf ("TODO: save ca database");
-	return 1;
+	if (ca_file_create_and_open (creation_data, 
+				     private_key,
+				     root_certificate))
+		return 1;
+	else
+		return -1;
 }

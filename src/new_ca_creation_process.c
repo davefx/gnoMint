@@ -90,7 +90,3 @@ void new_ca_creation_process_window_display (CaCreationData * ca_creation_data)
 
 
 
-
-/* to remove a timer */
-//gtk_timeout_remove (timer);
-

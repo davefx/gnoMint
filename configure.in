@@ -26,18 +26,26 @@ AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "gnomint")
 AC_ISC_POSIX
 AC_PROG_CC
 AC_STDC_HEADERS
-AM_PROG_LIBTOOL
 AC_DISABLE_STATIC
+AM_PROG_LIBTOOL
 AC_PROG_INTLTOOL([0.11])
 
 dnl #######################
 dnl # Check for libssl
 dnl ########################
-AC_MSG_CHECKING(for LibSSL development files)
+AC_MSG_CHECKING(for LibSSL development files\n)
 AC_CHECK_HEADER(openssl/ssl.h, , AC_MSG_ERROR(*** cannot find ssl.h header); exit)
-AC_CHECK_LIB(ssl, SSL_library_init, , AC_MSG_ERROR(*** Cannot find ssl library))
+AC_CHECK_LIB(ssl, SSL_library_init, , AC_MSG_ERROR(*** Cannot find ssl library); exit)
 AC_CHECK_HEADER(openssl/rsa.h, , AC_MSG_ERROR(*** cannot find ssl crypto header); exit)
-AC_CHECK_LIB(crypto, RSA_new, , AC_MSG_ERROR(*** Cannot find ssl crypto library))
+AC_CHECK_LIB(crypto, RSA_new, , AC_MSG_ERROR(*** Cannot find ssl crypto library); exit)
+
+
+dnl #######################
+dnl # Check for libsqlite
+dnl ########################
+AC_MSG_CHECKING(for LibSQLite development files\n)
+AC_CHECK_HEADER(sqlite.h, , AC_MSG_ERROR(*** cannot find sqlite.h header); exit)
+AC_CHECK_LIB(sqlite, sqlite_open, , AC_MSG_ERROR(*** Cannot find sqlite library); exit)
 
 
 dnl 
