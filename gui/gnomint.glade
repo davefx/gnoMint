@@ -616,7 +616,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkComboBoxEntry" id="country_combobox">
+		<widget class="GtkComboBox" id="country_combobox">
 		  <property name="visible">True</property>
 		</widget>
 		<packing>

@@ -17,10 +17,10 @@
 
 #include "ca_creation.h"
 #include "ca_file.h"
-#include "ssl.h"
+#include "tls.h"
 
 #include <stdio.h>
-
+#include <gnutls/gnutls.h>
 #include <sqlite.h>
 
 #include <libintl.h>
@@ -35,15 +35,15 @@ gint ca_creation_thread_status = 0;
 gchar * ca_creation_message = "";
 
 gchar * ca_creation_database_save (CaCreationData * creation_data, 
-				gchar * private_key, 
-				gchar * root_certificate);
+				   gchar * private_key, 
+				   gchar * root_certificate);
 
 gpointer ca_creation_thread (gpointer data)
 {
 	CaCreationData *creation_data = (CaCreationData *) data;
 	
 	gchar * private_key = NULL;
-	EVP_PKEY * key = NULL;
+	gnutls_x509_privkey_t * ca_key = NULL;
 	gchar * root_certificate = NULL;
 	gchar * error_message = NULL;
 
@@ -53,7 +53,7 @@ gpointer ca_creation_thread (gpointer data)
 		ca_creation_message =  _("Generating new RSA key pair");
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-		error_message = ssl_generate_rsa_keys (creation_data, &private_key, &key);		
+		error_message = tls_generate_rsa_keys (creation_data, &private_key, &ca_key);		
 		if (error_message) {
 			printf ("%s\n\n", error_message);
 
@@ -75,7 +75,7 @@ gpointer ca_creation_thread (gpointer data)
 		ca_creation_message =  _("Generating new DSA key pair");
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
- 		error_message = ssl_generate_dsa_keys (creation_data, &private_key, &key);
+ 		error_message = tls_generate_dsa_keys (creation_data, &private_key, &ca_key);
 
 		if (error_message) { 
 			printf ("%s\n\n", error_message);
@@ -97,9 +97,9 @@ gpointer ca_creation_thread (gpointer data)
 
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Generating self-signed CA-Root cert");
-	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+	g_static_mutex_unlock (&ca_creation_thread_status_mutex);	
 
-	error_message = ssl_generate_self_signed_certificate (creation_data, key, &root_certificate);	
+	error_message = tls_generate_self_signed_certificate (creation_data, ca_key, &root_certificate);	
  	if (error_message) {
 		printf ("%s\n\n", error_message);
  		g_static_mutex_lock (&ca_creation_thread_status_mutex); 
@@ -112,8 +112,6 @@ gpointer ca_creation_thread (gpointer data)
  		//return error_message; 
 		return NULL;
  	} 
-
-	EVP_PKEY_free (key);
 
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Creating CA database");
@@ -138,6 +136,11 @@ gpointer ca_creation_thread (gpointer data)
 	ca_creation_thread_status = 1;
 	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 	
+	if (ca_key) {
+		gnutls_x509_privkey_deinit ((* ca_key));
+		g_free (ca_key);
+	}
+
 	return NULL;
 	
 

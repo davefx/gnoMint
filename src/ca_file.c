@@ -16,24 +16,36 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <sqlite.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "ca_file.h"
 
 #include <libintl.h>
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
+extern gchar * gnomint_current_opened_file;
+extern gboolean gnomint_current_opened_file_is_temp;
+
 sqlite * ca_db = NULL;
 
 gchar * ca_file_create_and_open (CaCreationData *creation_data, 
-				  gchar *pem_ca_private_key,
-				  gchar *pem_ca_certificate)
+				 gchar *pem_ca_private_key,
+				 gchar *pem_ca_certificate)
 {
 	gchar *sql = NULL;
 	gchar *error = NULL;
 
+	gchar *filename = NULL;
 
-	if (!(ca_db = sqlite_open(creation_data->filename, 1, NULL)))
-		return g_strdup_printf(_("Error opening filename '%s'"),creation_data->filename) ;
+	filename = strdup (tmpnam(NULL));
+
+	if (!(ca_db = sqlite_open(filename, 1, NULL)))
+		return g_strdup_printf(_("Error opening filename '%s'"), filename) ;
+
+	gnomint_current_opened_file = filename;
+	gnomint_current_opened_file_is_temp = TRUE;
 
 	if (sqlite_exec (ca_db,
 			   "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, name TEXT UNIQUE, value TEXT);",

@@ -15,34 +15,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _SSL_H_
-#define _SSL_H_
+#ifndef _TLS_H_
+#define _TLS_H_
 
 #include "ca_creation.h"
 
-#include <openssl/rsa.h>
-#include <openssl/dsa.h>
-#include <openssl/pem.h>
-#include <openssl/err.h>
-#include <openssl/bio.h>
-#include <openssl/x509.h>
-#include <openssl/conf.h>
-#include <openssl/x509v3.h>
-#ifndef OPENSSL_NO_ENGINE
-#include <openssl/engine.h>
-#endif
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 
+void tls_init ();
 
-gchar * ssl_generate_rsa_keys (CaCreationData *creation_data,
+gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 			       gchar ** private_key,
-			       EVP_PKEY ** key);
+			       gnutls_x509_privkey_t **key);
 
-gchar * ssl_generate_dsa_keys (CaCreationData *creation_data,
+gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 			       gchar ** private_key,
-			       EVP_PKEY ** key);
+			       gnutls_x509_privkey_t **key);
 
-gchar * ssl_generate_self_signed_certificate (CaCreationData * creation_data, 
-					      EVP_PKEY *key,
+gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
+					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate);
 
 #endif

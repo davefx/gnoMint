@@ -46,7 +46,6 @@ void populate_country_combobox();
 void new_ca_window_display()
 {
 	gchar     * xml_file = NULL;
-	GtkFileChooser * file_chooser = NULL;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
@@ -60,9 +59,6 @@ void new_ca_window_display()
 	glade_xml_signal_autoconnect (new_ca_window_xml); 	
 	
 	populate_country_combobox();
-
-	file_chooser = GTK_FILE_CHOOSER(glade_xml_get_widget (new_ca_window_xml, "new_ca_filechooser"));
-	gtk_file_chooser_set_do_overwrite_confirmation (file_chooser, TRUE);
 
 }
 
@@ -586,11 +582,10 @@ void populate_country_combobox()
 	}
 
 	gtk_combo_box_set_model (GTK_COMBO_BOX(country_combobox), GTK_TREE_MODEL (new_store));
-	gtk_combo_box_entry_set_text_column (GTK_COMBO_BOX_ENTRY (country_combobox), 0);
 
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (country_combobox), renderer, FALSE);
-	gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_combobox), renderer, "text", 1);
+	gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_combobox), renderer, "text", 0);
 	
                                              
 }
@@ -674,12 +669,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
 
 	if (active < 0) {
-		/* The selected country is not at the list */
-		text = gtk_combo_box_get_active_text (GTK_COMBO_BOX(widget));
-		if (strlen(text) <= 0)
 			ca_creation_data->country = NULL;
-		else
-			ca_creation_data->country = g_strdup (text);
 	} else {
 		tree_model = gtk_combo_box_get_model (GTK_COMBO_BOX(widget));
 		gtk_combo_box_get_active_iter (GTK_COMBO_BOX(widget), &tree_iter);

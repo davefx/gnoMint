@@ -20,12 +20,15 @@
 #include <glade/glade.h>
 
 #include "new_ca_window.h"
-
+#include "tls.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
 GladeXML * main_window_xml = NULL;
+
+gchar * gnomint_current_opened_file = NULL;
+gboolean gnomint_current_opened_file_is_temp = TRUE;
 
 int main (int   argc,
 	  char *argv[])
@@ -52,6 +55,9 @@ int main (int   argc,
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
+	g_set_application_name ("gnoMint");
+
+	tls_init ();
 
 	g_thread_init (NULL);
 	gtk_init (&argc, &argv);

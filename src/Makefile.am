@@ -13,7 +13,7 @@ gnomint_SOURCES = \
 	new_ca_window.c \
 	new_ca_creation_process.c \
 	ca_creation.c \
-	ssl.c \
+	tls.c \
 	ca_file.c
 
 gnomint_LDADD = \
@@ -21,5 +21,4 @@ gnomint_LDADD = \
 
 gnomint_LDFLAGS = \
 	-export-dynamic
-	
 
