@@ -46,12 +46,13 @@ void populate_country_combobox();
 void new_ca_window_display()
 {
 	gchar     * xml_file = NULL;
-	
+	GtkFileChooser * file_chooser = NULL;
+
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
 	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET;
-
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
+	tst = foo;
 	new_ca_window_xml = glade_xml_new (xml_file, "new_ca_window", NULL);
 	
 	g_free (xml_file);
@@ -59,7 +60,10 @@ void new_ca_window_display()
 	glade_xml_signal_autoconnect (new_ca_window_xml); 	
 	
 	populate_country_combobox();
-	
+
+	file_chooser = GTK_FILE_CHOOSER(glade_xml_get_widget (new_ca_window_xml, "new_ca_filechooser"));
+	gtk_file_chooser_set_do_overwrite_confirmation (file_chooser, TRUE);
+
 }
 
 static int comp_countries(const void *m1, const void *m2) {
@@ -685,6 +689,8 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 		
 	}
 		
+	printf ("Certificate country: %s\n", ca_creation_data->country);
+
 	widget = glade_xml_get_widget (new_ca_window_xml, "st_entry");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
@@ -728,25 +734,12 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	ca_creation_data->key_bitlength = active;
 
-
 	widget = glade_xml_get_widget (new_ca_window_xml, "months_before_expiration_spinbutton");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	ca_creation_data->key_months_before_expiration = active;
 
-
-	widget = glade_xml_get_widget (new_ca_window_xml, "new_ca_filechooser");
-	text = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(widget));
-
-	if (text && strlen (text))
-		ca_creation_data->filename = g_strdup (text);
-	else
-		return;
-	
-
 	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
-
-	printf ("Creating new CA\n");
 
 	new_ca_creation_process_window_display (ca_creation_data);
 	

@@ -21,7 +21,7 @@
 #include <sqlite.h>
 #include "ca_creation.h"
 
-gboolean ca_file_create_and_open (CaCreationData * creation_data, 
+gchar * ca_file_create_and_open (CaCreationData * creation_data, 
 				  gchar *pem_ca_private_key,
 				  gchar *pem_ca_certificate);
 

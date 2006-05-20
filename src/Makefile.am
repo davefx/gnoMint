@@ -19,4 +19,7 @@ gnomint_SOURCES = \
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)
 
+gnomint_LDFLAGS = \
+	-export-dynamic
+	
 

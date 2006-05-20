@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-02 17:21+0200\n"
+"POT-Creation-Date: 2006-05-06 10:50+0200\n"
 "PO-Revision-Date: 2006-05-02 17:28+0200\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Español <es@li.org>\n"
@@ -20,22 +20,18 @@ msgid " "
 msgstr " "
 
 #: ../gui/gnomint.glade.h:2
-msgid "..."
-msgstr "..."
-
-#: ../gui/gnomint.glade.h:3
 msgid "<big>CA Properties</big>\n"
 msgstr "<big>Propiedades de la AC</big>\n"
 
-#: ../gui/gnomint.glade.h:5
+#: ../gui/gnomint.glade.h:4
 msgid "<big>CA Root certificate properties</big>\n"
 msgstr "<big>Propiedades del certificado raiz de la AC</big>\n"
 
-#: ../gui/gnomint.glade.h:7
+#: ../gui/gnomint.glade.h:6
 msgid "<big>CA Root database file</big>\n"
 msgstr "<big>Fichero de base de datos de la AC</big>\n"
 
-#: ../gui/gnomint.glade.h:9
+#: ../gui/gnomint.glade.h:8
 msgid ""
 "CA Root Certificate \n"
 "Common Name (CN):"
@@ -43,75 +39,75 @@ msgstr ""
 "Nombre común (CN) del\n"
 "certificado raiz de la AC:"
 
-#: ../gui/gnomint.glade.h:11
+#: ../gui/gnomint.glade.h:10
 msgid "CA database file"
 msgstr "Fichero de base de datos de la AC"
 
-#: ../gui/gnomint.glade.h:12
+#: ../gui/gnomint.glade.h:11
 msgid "CA properties"
 msgstr "Propiedades de la AC"
 
-#: ../gui/gnomint.glade.h:13
+#: ../gui/gnomint.glade.h:12
 msgid "City: "
 msgstr "Ciudad"
 
-#: ../gui/gnomint.glade.h:14
+#: ../gui/gnomint.glade.h:13
 msgid "Country:"
 msgstr "País"
 
-#: ../gui/gnomint.glade.h:15
+#: ../gui/gnomint.glade.h:14
 msgid "Creating CA Root Certificate"
 msgstr "Creando certificado raíz de la AC"
 
-#: ../gui/gnomint.glade.h:16
+#: ../gui/gnomint.glade.h:15
 msgid "Creating new CA - gnoMint"
 msgstr "Creando nueva AC - gnoMint"
 
-#: ../gui/gnomint.glade.h:17
+#: ../gui/gnomint.glade.h:16
 msgid "DSA"
 msgstr "DSA"
 
-#: ../gui/gnomint.glade.h:18
+#: ../gui/gnomint.glade.h:17
 msgid "Months before root certificate expiration:"
 msgstr "Meses antes de la caducidad del certificado raíz:"
 
-#: ../gui/gnomint.glade.h:19
+#: ../gui/gnomint.glade.h:18
 msgid "New CA - gnoMint"
 msgstr "Nueva AC - gnoMint"
 
-#: ../gui/gnomint.glade.h:20
+#: ../gui/gnomint.glade.h:19
 msgid "Organization Unit:"
 msgstr "Unidad organizativa:"
 
-#: ../gui/gnomint.glade.h:21
+#: ../gui/gnomint.glade.h:20
 msgid "Organization:"
 msgstr "Organización:"
 
-#: ../gui/gnomint.glade.h:22
+#: ../gui/gnomint.glade.h:21
 msgid "Private key bit length:"
 msgstr "Longitud en bits de la clave privada:"
 
-#: ../gui/gnomint.glade.h:23
+#: ../gui/gnomint.glade.h:22
 msgid "Private key type:"
 msgstr "Tipo de clave privada:"
 
-#: ../gui/gnomint.glade.h:24
+#: ../gui/gnomint.glade.h:23
 msgid "RSA"
 msgstr "RSA"
 
-#: ../gui/gnomint.glade.h:25
+#: ../gui/gnomint.glade.h:24
 msgid "Root certificate prop"
 msgstr "Prop. de certificado raíz"
 
-#: ../gui/gnomint.glade.h:26
+#: ../gui/gnomint.glade.h:25
 msgid "State or Province name: "
 msgstr "Nombre de estado o provincia: "
 
-#: ../gui/gnomint.glade.h:27
+#: ../gui/gnomint.glade.h:26
 msgid "_New"
 msgstr "_Nuevo"
 
-#: ../gui/gnomint.glade.h:28
+#: ../gui/gnomint.glade.h:27
 msgid "gnoMint"
 msgstr "gnoMint"
 
@@ -1096,34 +1092,72 @@ msgstr "Zambia"
 msgid "Zimbabwe"
 msgstr "Zimbabue"
 
-#: ../src/ca_creation.c:49
+#: ../src/ca_creation.c:54
 msgid "Generating new RSA key pair"
 msgstr "Generando nuevo par de claves RSA"
 
-#: ../src/ca_creation.c:56 ../src/ca_creation.c:76
+#: ../src/ca_creation.c:61 ../src/ca_creation.c:81
 msgid "Key generation failed"
 msgstr "Error en generación de claves"
 
-#: ../src/ca_creation.c:69
+#: ../src/ca_creation.c:74
 msgid "Generating new DSA key pair"
 msgstr "Generando nuevo par de claves DSA"
 
-#: ../src/ca_creation.c:89
+#: ../src/ca_creation.c:94
 msgid "Generating self-signed CA-Root cert"
 msgstr "Generando el certificado auto-firmado raíz de la AC"
 
-#: ../src/ca_creation.c:95
+#: ../src/ca_creation.c:100
 msgid "Certificate generation failed"
 msgstr "Error en generación del certificado"
 
-#: ../src/ca_creation.c:104
+#: ../src/ca_creation.c:109
 msgid "Creating CA database"
 msgstr "Creando base de datos de la AC"
 
-#: ../src/ca_creation.c:110
+#: ../src/ca_creation.c:115
 msgid "CA database creation failed"
 msgstr "Error al crear base de datos de la AC"
 
-#: ../src/ca_creation.c:121
+#: ../src/ca_creation.c:126
 msgid "CA generated successfully"
 msgstr "AC generada con éxito"
+
+#: ../src/ssl.c:83
+#, fuzzy, c-format
+msgid "Error when generating RSA key: %s"
+msgstr "Generando nuevo par de claves RSA"
+
+#: ../src/ssl.c:125
+#, c-format
+msgid "Error when generating DSA parameters: %s"
+msgstr ""
+
+#: ../src/ssl.c:131
+#, fuzzy, c-format
+msgid "Error when generating DSA key: %s"
+msgstr "Generando nuevo par de claves DSA"
+
+#: ../src/ssl.c:194
+#, c-format
+msgid "Error when processing public key: %s"
+msgstr ""
+
+#: ../src/ssl.c:200
+#, c-format
+msgid "Error when processing private key: %s"
+msgstr ""
+
+#: ../src/ssl.c:209
+#, c-format
+msgid "Error when creating certificate: %s"
+msgstr ""
+
+#: ../src/ssl.c:215
+#, c-format
+msgid "Error when setting certificate version: %s"
+msgstr ""
+
+#~ msgid "..."
+#~ msgstr "..."

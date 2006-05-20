@@ -20,22 +20,29 @@
 
 #include "ca_creation.h"
 
-gint ssl_generate_rsa_keys (CaCreationData *creation_data,
-			    gchar ** private_key,
-			    gchar ** public_key);
+#include <openssl/rsa.h>
+#include <openssl/dsa.h>
+#include <openssl/pem.h>
+#include <openssl/err.h>
+#include <openssl/bio.h>
+#include <openssl/x509.h>
+#include <openssl/conf.h>
+#include <openssl/x509v3.h>
+#ifndef OPENSSL_NO_ENGINE
+#include <openssl/engine.h>
+#endif
 
-gint ssl_generate_dsa_keys (CaCreationData *creation_data,
-			    gchar ** private_key,
-			    gchar ** public_key);
 
-gint ssl_generate_rsa_self_signed_certificate (CaCreationData * creation_data, 
-					       gchar * private_key,
-					       gchar * public_key,
-					       gchar ** certificate);
+gchar * ssl_generate_rsa_keys (CaCreationData *creation_data,
+			       gchar ** private_key,
+			       EVP_PKEY ** key);
 
-gint ssl_generate_dsa_self_signed_certificate (CaCreationData * creation_data, 
-					       gchar * private_key,
-					       gchar * public_key,
-					       gchar ** certificate);
+gchar * ssl_generate_dsa_keys (CaCreationData *creation_data,
+			       gchar ** private_key,
+			       EVP_PKEY ** key);
+
+gchar * ssl_generate_self_signed_certificate (CaCreationData * creation_data, 
+					      EVP_PKEY *key,
+					      gchar ** certificate);
 
 #endif

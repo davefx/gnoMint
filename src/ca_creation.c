@@ -16,7 +16,10 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "ca_creation.h"
+#include "ca_file.h"
 #include "ssl.h"
+
+#include <stdio.h>
 
 #include <sqlite.h>
 
@@ -31,9 +34,8 @@ static GStaticMutex ca_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
 gint ca_creation_thread_status = 0;
 gchar * ca_creation_message = "";
 
-gint ca_creation_database_save (CaCreationData * creation_data, 
+gchar * ca_creation_database_save (CaCreationData * creation_data, 
 				gchar * private_key, 
-				gchar * public_key, 
 				gchar * root_certificate);
 
 gpointer ca_creation_thread (gpointer data)
@@ -41,9 +43,9 @@ gpointer ca_creation_thread (gpointer data)
 	CaCreationData *creation_data = (CaCreationData *) data;
 	
 	gchar * private_key = NULL;
-	gchar * public_key = NULL;
+	EVP_PKEY * key = NULL;
 	gchar * root_certificate = NULL;
-
+	gchar * error_message = NULL;
 
 	switch (creation_data->key_type){
 	case 0: /* RSA */
@@ -51,7 +53,9 @@ gpointer ca_creation_thread (gpointer data)
 		ca_creation_message =  _("Generating new RSA key pair");
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-		if (ssl_generate_rsa_keys (creation_data, &private_key, &public_key) < 0) {
+		error_message = ssl_generate_rsa_keys (creation_data, &private_key, &key);		
+		if (error_message) {
+			printf ("%s\n\n", error_message);
 
 			g_static_mutex_lock (&ca_creation_thread_status_mutex);
 
@@ -60,8 +64,8 @@ gpointer ca_creation_thread (gpointer data)
 
 			g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-
 			return NULL;
+			// return error_message;
 		}
 
 		break;
@@ -71,7 +75,10 @@ gpointer ca_creation_thread (gpointer data)
 		ca_creation_message =  _("Generating new DSA key pair");
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
- 		if (ssl_generate_dsa_keys (creation_data, &private_key, &public_key) < 0) { 
+ 		error_message = ssl_generate_dsa_keys (creation_data, &private_key, &key);
+
+		if (error_message) { 
+			printf ("%s\n\n", error_message);
 
  			g_static_mutex_lock (&ca_creation_thread_status_mutex); 
 
@@ -81,7 +88,8 @@ gpointer ca_creation_thread (gpointer data)
  			g_static_mutex_unlock (&ca_creation_thread_status_mutex); 
 
 
- 			return NULL; 
+ 			//return error_message; 
+			return NULL;
  		} 
 
 		break;
@@ -90,23 +98,29 @@ gpointer ca_creation_thread (gpointer data)
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Generating self-signed CA-Root cert");
 	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
-	
- 	if (ssl_generate_self_signed_certificate (creation_data, private_key, public_key, &root_certificate) < 0) { 
+
+	error_message = ssl_generate_self_signed_certificate (creation_data, key, &root_certificate);	
+ 	if (error_message) {
+		printf ("%s\n\n", error_message);
  		g_static_mutex_lock (&ca_creation_thread_status_mutex); 
 		
  		ca_creation_message = _("Certificate generation failed"); 
  		ca_creation_thread_status = -1; 
 		
- 		g_static_mutex_unlock (&ca_creation_thread_status_mutex); 
+ 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 		
- 		return NULL; 
+ 		//return error_message; 
+		return NULL;
  	} 
+
+	EVP_PKEY_free (key);
 
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Creating CA database");
 	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-	if (ca_creation_database_save (creation_data, private_key, public_key, root_certificate) < 0) {
+	error_message = ca_creation_database_save (creation_data, private_key, root_certificate);
+	if (error_message) {
 		g_static_mutex_lock (&ca_creation_thread_status_mutex);
 		
 		ca_creation_message = _("CA database creation failed");
@@ -160,15 +174,14 @@ gchar * ca_creation_get_thread_message()
 	return ca_creation_message;
 }
 
-gint ca_creation_database_save (CaCreationData * creation_data, 
+gchar * ca_creation_database_save (CaCreationData * creation_data, 
 				gchar * private_key, 
-				gchar * public_key, 
 				gchar * root_certificate)
 {
 	if (ca_file_create_and_open (creation_data, 
 				     private_key,
 				     root_certificate))
-		return 1;
+		return NULL;
 	else
-		return -1;
+		return "Error";
 }

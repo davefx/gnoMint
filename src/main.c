@@ -43,7 +43,7 @@ int main (int   argc,
 	};
 
 	gchar     * xml_file = NULL;
-	GtkWidget * widget = NULL;
+//	GtkWidget * widget = NULL;
 
 
 #ifdef ENABLE_NLS
@@ -79,6 +79,15 @@ int main (int   argc,
 }
 
 
+gboolean on_main_window1_delete (GtkWidget *widget,
+				  GdkEvent *event,
+				  gpointer user_data)
+{
+	exit (0);
+	return TRUE;
+}
+
+
 /*
  *
  *   FILE MENU CALLBACKS
@@ -109,7 +118,7 @@ void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	printf ("quit1 Activated\n");
+	on_main_window1_delete(NULL, NULL, NULL);
 }
 
 
@@ -170,10 +179,3 @@ void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 }
 
 
-gboolean on_main_window1_delete (GtkWidget *widget,
-				  GdkEvent *event,
-				  gpointer user_data)
-{
-	exit (0);
-	return TRUE;
-}

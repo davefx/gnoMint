@@ -32,31 +32,82 @@ GladeXML * new_ca_window_process_xml = NULL;
 gint timer=0;
 GThread * new_ca_creation_process_thread = NULL;
 
+
+void new_ca_creation_process_error_dialog (gchar *message) {
+
+   GtkWidget *dialog, *label, *widget;
+   
+   widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+
+   /* Create the widgets */
+   
+   dialog = gtk_dialog_new_with_buttons (NULL,
+                                         GTK_WINDOW(widget),
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         GTK_STOCK_CLOSE,
+                                         GTK_RESPONSE_NONE,
+                                         NULL);
+   label = gtk_label_new (message);
+   
+   /* Ensure that the dialog box is destroyed when the user responds. */
+   
+   g_signal_connect_swapped (dialog,
+                             "response", 
+                             G_CALLBACK (gtk_widget_destroy),
+                             dialog);
+
+   /* Add the label, and show everything we've added to the dialog. */
+
+   gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox),
+                      label);
+   gtk_dialog_run (GTK_DIALOG(dialog));
+
+   //g_free (message);
+}
+
 gint new_ca_creation_pulse (gpointer data)
 {
 	GtkWidget * widget = NULL;
+	gchar *error_message = NULL;
+	gint status = 0;
 
 	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
+	widget = glade_xml_get_widget (new_ca_window_process_xml, "status_message_label");
+
 	ca_creation_lock_status_mutex();
-	
-	if (strcmp(ca_creation_get_thread_message(), gtk_progress_bar_get_text(GTK_PROGRESS_BAR(widget)))) {
-		gtk_progress_bar_set_text (GTK_PROGRESS_BAR(widget), ca_creation_get_thread_message());
+
+	if (strcmp(ca_creation_get_thread_message(), gtk_label_get_text(GTK_LABEL(widget)))) {
+		gtk_label_set_text (GTK_LABEL(widget), ca_creation_get_thread_message());
 		printf ("%s\n", ca_creation_get_thread_message());
 	}
-
-	if (ca_creation_get_thread_status() != 0) {
-		g_thread_join (new_ca_creation_process_thread);
-		printf ("Finalizado proceso de creacion\n");
-		gtk_timeout_remove (timer);	       
-	}
+	
+	status = ca_creation_get_thread_status(); 
 
 	ca_creation_unlock_status_mutex();
 
+
+	if (status > 0) {
+		g_thread_join (new_ca_creation_process_thread);
+		printf ("Finalizado proceso de creacion correctamente\n");
+		gtk_timeout_remove (timer);	       
+	} else if (status < 0) {
+		error_message = (gchar *) g_thread_join (new_ca_creation_process_thread);
+		if (error_message) {
+			new_ca_creation_process_error_dialog (error_message);
+			printf ("%s\n\n", error_message);
+		}
+		gtk_timeout_remove (timer);	       
+	}
+
+
+
 	return 1;
 }
+
+
 
 
 void new_ca_creation_process_window_display (CaCreationData * ca_creation_data)
@@ -66,9 +117,6 @@ void new_ca_creation_process_window_display (CaCreationData * ca_creation_data)
 	
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
-	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET;
-
 	new_ca_window_process_xml = glade_xml_new (xml_file, "new_ca_creation_process", NULL);
 	
 	g_free (xml_file);

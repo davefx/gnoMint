@@ -34,7 +34,6 @@ typedef struct {
 
 	gint key_months_before_expiration;
 	
-	gchar * filename;
 } CaCreationData;
 
 GThread * ca_creation_launch_thread (CaCreationData *creation_data);
