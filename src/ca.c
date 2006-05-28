@@ -15,22 +15,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_FILE_H_
-#define _CA_FILE_H_
 
-#include <sqlite.h>
-#include "ca_creation.h"
+#include <glade/glade.h>
+#include <glib-object.h>
+#include <gtk/gtk.h>
+#include <libintl.h>
+#include <stdlib.h>
+#include <string.h>
 
-gchar * ca_file_create (CaCreationData * creation_data, 
-				  gchar *pem_ca_private_key,
-				  gchar *pem_ca_certificate);
+#define _(x) gettext(x)
+#define N_(x) (x) gettext_noop(x)
 
-gboolean ca_file_open (gchar *file_name);
+#include "ca_file.h"
 
-void ca_file_close ();
+extern GladeXML * main_window_xml;
+extern sqlite * ca_db;
 
-gboolean ca_file_rename_tmp_file (gchar *new_file_name);
+gboolean ca_open (gchar *filename) 
+{
+	if (! ca_file_open (filename))
+		return FALSE;
 
-gboolean ca_file_delete_tmp_file ();
 
-#endif
+}
+

@@ -15,22 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_FILE_H_
-#define _CA_FILE_H_
+#ifndef _CA_H_
+#define _CA_H_
 
-#include <sqlite.h>
-#include "ca_creation.h"
-
-gchar * ca_file_create (CaCreationData * creation_data, 
-				  gchar *pem_ca_private_key,
-				  gchar *pem_ca_certificate);
-
-gboolean ca_file_open (gchar *file_name);
-
-void ca_file_close ();
-
-gboolean ca_file_rename_tmp_file (gchar *new_file_name);
-
-gboolean ca_file_delete_tmp_file ();
+gboolean ca_open (gchar *filename);
 
 #endif

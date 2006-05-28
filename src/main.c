@@ -28,7 +28,7 @@
 GladeXML * main_window_xml = NULL;
 
 gchar * gnomint_current_opened_file = NULL;
-gboolean gnomint_current_opened_file_is_temp = TRUE;
+gchar * gnomint_temp_created_file = NULL;
 
 int main (int   argc,
 	  char *argv[])
@@ -109,12 +109,30 @@ void on_new1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	printf ("open1 Activated\n");
-}
+	gchar *filename;
 
-void on_save1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	printf ("Save1 Activated\n");
+	GtkWidget *dialog, *widget;
+	
+	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	
+	dialog = gtk_file_chooser_dialog_new (_("Open CA database"),
+					      GTK_WINDOW(widget),
+					      GTK_FILE_CHOOSER_ACTION_OPEN,
+					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					      NULL);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		gtk_widget_destroy (dialog);
+	} else {
+		gtk_widget_destroy (dialog);
+		return;
+	}		
+	
+	ca_open (filename);
+	return;
 }
 
 void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)

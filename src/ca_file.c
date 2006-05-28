@@ -26,11 +26,11 @@
 #define N_(x) (x) gettext_noop(x)
 
 extern gchar * gnomint_current_opened_file;
-extern gboolean gnomint_current_opened_file_is_temp;
+extern gchar * gnomint_temp_created_file;
 
 sqlite * ca_db = NULL;
 
-gchar * ca_file_create_and_open (CaCreationData *creation_data, 
+gchar * ca_file_create (CaCreationData *creation_data, 
 				 gchar *pem_ca_private_key,
 				 gchar *pem_ca_certificate)
 {
@@ -44,8 +44,9 @@ gchar * ca_file_create_and_open (CaCreationData *creation_data,
 	if (!(ca_db = sqlite_open(filename, 1, NULL)))
 		return g_strdup_printf(_("Error opening filename '%s'"), filename) ;
 
-	gnomint_current_opened_file = filename;
-	gnomint_current_opened_file_is_temp = TRUE;
+	if (gnomint_temp_created_file)
+		ca_file_delete_tmp_file();
+	gnomint_temp_created_file = filename;
 
 	if (sqlite_exec (ca_db,
 			   "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, name TEXT UNIQUE, value TEXT);",
@@ -78,6 +79,9 @@ gchar * ca_file_create_and_open (CaCreationData *creation_data,
 	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
 
+	sqlite_close (ca_db);
+	ca_db = NULL;
+
 	return NULL;
 
 }
@@ -86,12 +90,56 @@ gboolean ca_file_open (gchar *file_name)
 {
 	if (! (ca_db = sqlite_open(file_name, 1, NULL)))
 		return FALSE;
-	else
+	else {
+		gnomint_current_opened_file = file_name;
 		return TRUE;
+	}
 }
 
 void ca_file_close ()
 {
 	sqlite_close (ca_db);
+	ca_db = NULL;
+	if (gnomint_current_opened_file) {
+		g_free (gnomint_current_opened_file);
+		gnomint_current_opened_file = NULL;
+	}
+	       
 }
+
+gboolean ca_file_rename_tmp_file (gchar *new_file_name)
+{
+	gint result=0;
+
+	if (! gnomint_temp_created_file) 
+		return FALSE;
+	
+	result = g_rename ((const gchar *) gnomint_temp_created_file, (const gchar *) new_file_name);
+	
+	if (! result) {
+		g_free (gnomint_temp_created_file);
+		gnomint_temp_created_file = NULL;
+		gnomint_current_opened_file = new_file_name;
+		
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+gboolean ca_file_delete_tmp_file ()
+{
+	gint result=0;
+
+	if (! gnomint_temp_created_file) 
+		return FALSE;
+	
+	result = g_remove ((const gchar *) gnomint_temp_created_file);
+
+	g_free (gnomint_temp_created_file);
+	gnomint_temp_created_file = NULL;
+
+	return (! result);
+}
+
 

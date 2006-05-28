@@ -12,6 +12,7 @@ gnomint_SOURCES = \
 	main.c \
 	new_ca_window.c \
 	new_ca_creation_process.c \
+	ca.c \
 	ca_creation.c \
 	tls.c \
 	ca_file.c

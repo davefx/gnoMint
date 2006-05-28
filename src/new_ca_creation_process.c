@@ -26,6 +26,7 @@
 #define N_(x) (x) gettext_noop(x)
 
 #include "ca_creation.h"
+#include "ca_file.h"
 
 GladeXML * new_ca_window_process_xml = NULL;
 
@@ -35,35 +36,69 @@ GThread * new_ca_creation_process_thread = NULL;
 
 void new_ca_creation_process_error_dialog (gchar *message) {
 
-   GtkWidget *dialog, *label, *widget;
+   GtkWidget *dialog, *widget;
    
    widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
-
+   
    /* Create the widgets */
    
-   dialog = gtk_dialog_new_with_buttons (NULL,
-                                         GTK_WINDOW(widget),
-                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         GTK_STOCK_CLOSE,
-                                         GTK_RESPONSE_NONE,
-                                         NULL);
-   label = gtk_label_new (message);
+   dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+				    GTK_DIALOG_DESTROY_WITH_PARENT,
+				    GTK_MESSAGE_ERROR,
+				    GTK_BUTTONS_CLOSE,
+				    "%s",
+				    message);
    
-   /* Ensure that the dialog box is destroyed when the user responds. */
-   
-   g_signal_connect_swapped (dialog,
-                             "response", 
-                             G_CALLBACK (gtk_widget_destroy),
-                             dialog);
-
-   /* Add the label, and show everything we've added to the dialog. */
-
-   gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox),
-                      label);
    gtk_dialog_run (GTK_DIALOG(dialog));
-
-   //g_free (message);
+   
+   gtk_widget_destroy (dialog);
 }
+
+void new_ca_creation_process_finish (void) {
+	GtkWidget *widget = NULL, *dialog = NULL;
+	gchar *filename = NULL;
+	
+	g_thread_join (new_ca_creation_process_thread);
+	gtk_timeout_remove (timer);	       
+	timer = 0;
+	
+	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+	
+	dialog = gtk_file_chooser_dialog_new (_("Save CA database"),
+					      GTK_WINDOW(widget),
+					      GTK_FILE_CHOOSER_ACTION_SAVE,
+					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+					      NULL);
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		if (! ca_file_rename_tmp_file (filename)) {
+			gtk_widget_destroy (dialog);
+			new_ca_creation_process_error_dialog (_("Problem when saving new CA database"));
+		} else {
+			gtk_widget_destroy (dialog);
+			dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+							 GTK_DIALOG_DESTROY_WITH_PARENT,
+							 GTK_MESSAGE_INFO,
+							 GTK_BUTTONS_CLOSE,
+							 "%s",
+							 _("CA creation process finished"));
+			gtk_dialog_run (GTK_DIALOG(dialog));
+			
+			gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_widget_destroy (widget);
+			
+			ca_open (filename);
+		}
+	} else {
+		ca_file_delete_tmp_file();
+		gtk_widget_destroy (widget);
+	}
+
+}
+
 
 gint new_ca_creation_pulse (gpointer data)
 {
@@ -90,16 +125,17 @@ gint new_ca_creation_pulse (gpointer data)
 
 
 	if (status > 0) {
-		g_thread_join (new_ca_creation_process_thread);
-		printf ("Finalizado proceso de creacion correctamente\n");
-		gtk_timeout_remove (timer);	       
+		new_ca_creation_process_finish ();
 	} else if (status < 0) {
 		error_message = (gchar *) g_thread_join (new_ca_creation_process_thread);
+		gtk_timeout_remove (timer);	       
+		timer = 0;
 		if (error_message) {
 			new_ca_creation_process_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
-		gtk_timeout_remove (timer);	       
+		widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+		gtk_widget_destroy (widget);
 	}
 
 
@@ -134,6 +170,36 @@ void new_ca_creation_process_window_display (CaCreationData * ca_creation_data)
 	timer = gtk_timeout_add (100, new_ca_creation_pulse, NULL);
 
 
+}
+
+void on_cancel_creation_process_clicked (GtkButton *button,
+			      gpointer user_data) 
+{
+	
+   GtkWidget *dialog, *widget;
+
+   if (timer) {
+	   gtk_timeout_remove (timer);	       
+	   timer = 0;
+   }
+   
+   widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+
+   /* Create the widgets */
+
+   dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+				    GTK_DIALOG_DESTROY_WITH_PARENT,
+				    GTK_MESSAGE_INFO,
+				    GTK_BUTTONS_CLOSE,
+				    "%s",
+				    _("CA creation process cancelled"));
+   
+   gtk_dialog_run (GTK_DIALOG(dialog));
+
+   gtk_widget_destroy (GTK_WIDGET(dialog));
+
+   gtk_widget_destroy (widget);
+	
 }
 
 

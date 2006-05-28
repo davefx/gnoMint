@@ -181,9 +181,9 @@ gchar * ca_creation_database_save (CaCreationData * creation_data,
 				gchar * private_key, 
 				gchar * root_certificate)
 {
-	if (ca_file_create_and_open (creation_data, 
-				     private_key,
-				     root_certificate))
+	if (ca_file_create (creation_data, 
+			    private_key,
+			    root_certificate))
 		return NULL;
 	else
 		return "Error";
