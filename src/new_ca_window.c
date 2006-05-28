@@ -662,7 +662,8 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	GtkTreeModel *tree_model = NULL;
 	GtkTreeIter tree_iter;
 	
-	
+	time_t tmp;
+	struct tm * expiration_time;
 
 	ca_creation_data = g_new0 (CaCreationData, 1);
 	widget = glade_xml_get_widget (new_ca_window_xml, "country_combobox");
@@ -727,6 +728,17 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	widget = glade_xml_get_widget (new_ca_window_xml, "months_before_expiration_spinbutton");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	ca_creation_data->key_months_before_expiration = active;
+
+	tmp = time (NULL);	
+	ca_creation_data->activation = tmp;
+	
+	expiration_time = g_new (struct tm,1);
+	gmtime_r (&tmp, expiration_time);      
+	expiration_time->tm_mon = expiration_time->tm_mon + ca_creation_data->key_months_before_expiration;
+	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
+	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
+	ca_creation_data->expiration = mktime(expiration_time);
+	g_free (expiration_time);
 
 	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));

@@ -19,6 +19,7 @@
 #define _CA_CREATION_H_
 
 #include <glib.h>
+#include <time.h>
 
 typedef struct {
 	gchar * country;
@@ -33,6 +34,8 @@ typedef struct {
 	gint key_bitlength;
 
 	gint key_months_before_expiration;
+	time_t activation;
+	time_t expiration;
 	
 } CaCreationData;
 

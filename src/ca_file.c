@@ -18,6 +18,7 @@
 #include <sqlite.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "ca_file.h"
 
@@ -29,6 +30,8 @@ extern gchar * gnomint_current_opened_file;
 extern gchar * gnomint_temp_created_file;
 
 sqlite * ca_db = NULL;
+gchar * error_msg = NULL;
+
 
 gchar * ca_file_create (CaCreationData *creation_data, 
 				 gchar *pem_ca_private_key,
@@ -48,30 +51,31 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		ca_file_delete_tmp_file();
 	gnomint_temp_created_file = filename;
 
+	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+
 	if (sqlite_exec (ca_db,
 			   "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, name TEXT UNIQUE, value TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
 	}
 	if (sqlite_exec (ca_db,
-			   "CREATE TABLE certificates (id INTEGER PRIMARY KEY, serial INT UNIQUE, subject TEXT, emission TIMESTAMP, expiration TIMESTAMP, is_revoked BOOLEAN, pem TEXT);",
+			   "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, activation TIMESTAMP, expiration TIMESTAMP, is_revoked BOOLEAN, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
 	}
 	
-	if (sqlite_exec (ca_db, "INSERT INTO ca_properties VALUES (NULL, 'ca_private_key_is_in_db', 'TRUE');", NULL, NULL, &error)) {
-		return error;
-	}
-
-	if (sqlite_exec (ca_db, "INSERT INTO ca_properties VALUES (NULL, 'ca_private_key_extern_location', NULL);", NULL, NULL, &error))
-		return error;
-
-	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_private_key', '%s');", pem_ca_private_key);
+	sql = g_strdup_printf ("INSERT INTO certificates VALUES (NULL, 1, 1, '%s', '%ld', '%ld', 0, '%s', 1, '%s');", 
+			       creation_data->cn,
+			       creation_data->activation,
+			       creation_data->expiration,
+			       pem_ca_certificate,
+			       pem_ca_private_key);
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 
-	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_certificate', '%s');", pem_ca_certificate);
+	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate', '%s');", pem_ca_certificate);
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
@@ -88,9 +92,10 @@ gchar * ca_file_create (CaCreationData *creation_data,
 
 gboolean ca_file_open (gchar *file_name)
 {
-	if (! (ca_db = sqlite_open(file_name, 1, NULL)))
+	if (! (ca_db = sqlite_open(file_name, 1, &error_msg))) {
+		g_printerr ("%s\n\n", error_msg);
 		return FALSE;
-	else {
+	} else {
 		gnomint_current_opened_file = file_name;
 		return TRUE;
 	}

@@ -131,7 +131,18 @@ void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 		return;
 	}		
 	
-	ca_open (filename);
+	if (! ca_open (filename)) {
+		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+						 GTK_DIALOG_DESTROY_WITH_PARENT,
+						 GTK_MESSAGE_ERROR,
+						 GTK_BUTTONS_CLOSE,
+						 _("Problem when opening '%s' CA database"),
+						 filename);
+		
+		gtk_dialog_run (GTK_DIALOG(dialog));
+		
+		gtk_widget_destroy (dialog);
+	}
 	return;
 }
 

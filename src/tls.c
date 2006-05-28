@@ -101,11 +101,9 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 {
 	gnutls_x509_crt_t crt;
 	gint serial=1;
-	struct tm expiration_time;
 	gchar * keyid = NULL;
 	gint keyidsize = 0;
 	gint certificate_len = 0;
-	time_t tmp;
 
 	if (gnutls_x509_crt_init (&crt) < 0) {
 		return g_strdup_printf(_("Error when initializing certificate structure"));
@@ -119,17 +117,11 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate serial number"));
 	}
 
-	if (gnutls_x509_crt_set_activation_time (crt, time(NULL)) < 0) {
+	if (gnutls_x509_crt_set_activation_time (crt, creation_data->activation) < 0) {
 		return g_strdup_printf(_("Error when setting activation time"));
 	}
 
-	tmp = time (NULL);
-	gmtime_r (&tmp, &expiration_time);
-	expiration_time.tm_mon = expiration_time.tm_mon + creation_data->key_months_before_expiration;
-	expiration_time.tm_year = expiration_time.tm_year + (expiration_time.tm_mon / 12);
-	expiration_time.tm_mon = expiration_time.tm_mon % 12;	
-
-	if (gnutls_x509_crt_set_expiration_time (crt, mktime(&expiration_time)) < 0) {
+	if (gnutls_x509_crt_set_expiration_time (crt, creation_data->expiration) < 0) {
 		return g_strdup_printf(_("Error when setting expiration time"));
 	}
 

@@ -93,6 +93,7 @@ void new_ca_creation_process_finish (void) {
 			ca_open (filename);
 		}
 	} else {
+		gtk_widget_destroy (dialog);
 		ca_file_delete_tmp_file();
 		gtk_widget_destroy (widget);
 	}

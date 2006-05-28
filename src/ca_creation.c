@@ -59,7 +59,7 @@ gpointer ca_creation_thread (gpointer data)
 
 			g_static_mutex_lock (&ca_creation_thread_status_mutex);
 
-			ca_creation_message = _("Key generation failed");
+			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
 			ca_creation_thread_status = -1;
 
 			g_static_mutex_unlock (&ca_creation_thread_status_mutex);
@@ -82,7 +82,7 @@ gpointer ca_creation_thread (gpointer data)
 
  			g_static_mutex_lock (&ca_creation_thread_status_mutex); 
 
- 			ca_creation_message = _("Key generation failed"); 
+			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
  			ca_creation_thread_status = -1; 
 
  			g_static_mutex_unlock (&ca_creation_thread_status_mutex); 
@@ -104,11 +104,12 @@ gpointer ca_creation_thread (gpointer data)
 		printf ("%s\n\n", error_message);
  		g_static_mutex_lock (&ca_creation_thread_status_mutex); 
 		
- 		ca_creation_message = _("Certificate generation failed"); 
+ 		ca_creation_message = g_strdup_printf ("%s:\n%s",_("Certificate generation failed"), error_message); 
  		ca_creation_thread_status = -1; 
 		
  		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
-		
+
+		g_free (error_message);
  		//return error_message; 
 		return NULL;
  	} 
@@ -121,11 +122,13 @@ gpointer ca_creation_thread (gpointer data)
 	if (error_message) {
 		g_static_mutex_lock (&ca_creation_thread_status_mutex);
 		
-		ca_creation_message = _("CA database creation failed");
+ 		ca_creation_message = g_strdup_printf ("%s:\n%s",_("CA database creation failed"), error_message); 
 		ca_creation_thread_status = -1;
 		
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 		
+		g_free (error_message);
+
 		return NULL;
 	}
 
@@ -181,10 +184,7 @@ gchar * ca_creation_database_save (CaCreationData * creation_data,
 				gchar * private_key, 
 				gchar * root_certificate)
 {
-	if (ca_file_create (creation_data, 
-			    private_key,
-			    root_certificate))
-		return NULL;
-	else
-		return "Error";
+	return ca_file_create (creation_data, 
+			       private_key,
+			       root_certificate);
 }
