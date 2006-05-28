@@ -79,6 +79,10 @@ int main (int   argc,
 
 	glade_xml_signal_autoconnect (main_window_xml);	       	
 
+
+	if (argc >= 2)
+		ca_open (argv[1]);
+
 	gtk_main ();
 
 	return 0;
