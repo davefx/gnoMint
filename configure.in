@@ -33,11 +33,9 @@ AC_PROG_INTLTOOL([0.11])
 dnl #######################
 dnl # Check for libssl
 dnl ########################
-dnl AC_MSG_CHECKING(for LibSSL development files\n)
-dnl AC_CHECK_HEADER(openssl/ssl.h, , AC_MSG_ERROR(*** cannot find ssl.h header); exit)
-dnl AC_CHECK_LIB(ssl, SSL_library_init, , AC_MSG_ERROR(*** Cannot find ssl library); exit)
-dnl AC_CHECK_HEADER(openssl/rsa.h, , AC_MSG_ERROR(*** cannot find ssl crypto header); exit)
-dnl AC_CHECK_LIB(crypto, RSA_new, , AC_MSG_ERROR(*** Cannot find ssl crypto library); exit)
+AC_MSG_CHECKING(for gnuTLS development files\n)
+AC_CHECK_HEADER(gnutls/gnutls.h, , AC_MSG_ERROR(*** cannot find gnutls.h header); exit)
+AC_CHECK_LIB(gnutls, gnutls_global_init, , AC_MSG_ERROR(*** Cannot find gnuTLS library); exit)
 
 
 dnl #######################
@@ -113,8 +111,7 @@ PKG_CHECK_MODULES(GNOMINT,
         gtk+-2.0 >= 2.6.0 \
 	gdk-pixbuf-2.0 \
         libgnomeui-2.0 >= 2.0 \
-        libglade-2.0 >= 2.5.0 \
-	gnutls)
+        libglade-2.0 >= 2.5.0 )
 AC_SUBST(GNOMINT_CFLAGS)
 AC_SUBST(GNOMINT_LIBS)
 
