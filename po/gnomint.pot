@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-02 17:21+0200\n"
+"POT-Creation-Date: 2006-05-29 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,106 +21,184 @@ msgid " "
 msgstr ""
 
 #: ../gui/gnomint.glade.h:2
-msgid "..."
-msgstr ""
-
-#: ../gui/gnomint.glade.h:3
 msgid "<big>CA Properties</big>\n"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:5
+#: ../gui/gnomint.glade.h:4
 msgid "<big>CA Root certificate properties</big>\n"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:7
-msgid "<big>CA Root database file</big>\n"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:9
+#: ../gui/gnomint.glade.h:6
 msgid ""
 "CA Root Certificate \n"
 "Common Name (CN):"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:11
-msgid "CA database file"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:12
+#: ../gui/gnomint.glade.h:8
 msgid "CA properties"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:13
+#: ../gui/gnomint.glade.h:9
 msgid "City: "
 msgstr ""
 
-#: ../gui/gnomint.glade.h:14
+#: ../gui/gnomint.glade.h:10
 msgid "Country:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:15
+#: ../gui/gnomint.glade.h:11
 msgid "Creating CA Root Certificate"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:16
+#: ../gui/gnomint.glade.h:12
 msgid "Creating new CA - gnoMint"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:17
+#: ../gui/gnomint.glade.h:13
 msgid "DSA"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:18
+#: ../gui/gnomint.glade.h:14
 msgid "Months before root certificate expiration:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:19
+#: ../gui/gnomint.glade.h:15
 msgid "New CA - gnoMint"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:20
+#: ../gui/gnomint.glade.h:16
+msgid "New C_A"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:17
+msgid "New _Certificate"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:18
 msgid "Organization Unit:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:21
+#: ../gui/gnomint.glade.h:19
 msgid "Organization:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:22
+#: ../gui/gnomint.glade.h:20
 msgid "Private key bit length:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:23
+#: ../gui/gnomint.glade.h:21
 msgid "Private key type:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:24
+#: ../gui/gnomint.glade.h:22
 msgid "RSA"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:25
+#: ../gui/gnomint.glade.h:23
 msgid "Root certificate prop"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:26
+#: ../gui/gnomint.glade.h:24
 msgid "State or Province name: "
 msgstr ""
 
-#: ../gui/gnomint.glade.h:27
-msgid "_New"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:28
+#: ../gui/gnomint.glade.h:25
 msgid "gnoMint"
 msgstr ""
 
-#: ../src/main.c:59
+#: ../src/ca.c:136
+msgid "Serial"
+msgstr ""
+
+#: ../src/ca.c:143
+msgid "Subject"
+msgstr ""
+
+#: ../src/ca.c:151
+msgid "CA"
+msgstr ""
+
+#: ../src/ca.c:157
+msgid "Private key in DB"
+msgstr ""
+
+#: ../src/ca.c:164
+msgid "Activation"
+msgstr ""
+
+#: ../src/ca.c:171
+msgid "Expiration"
+msgstr ""
+
+#: ../src/ca_creation.c:53
+msgid "Generating new RSA key pair"
+msgstr ""
+
+#: ../src/ca_creation.c:62 ../src/ca_creation.c:85
+msgid "Key generation failed"
+msgstr ""
+
+#: ../src/ca_creation.c:75
+msgid "Generating new DSA key pair"
+msgstr ""
+
+#: ../src/ca_creation.c:99
+msgid "Generating self-signed CA-Root cert"
+msgstr ""
+
+#: ../src/ca_creation.c:107
+msgid "Certificate generation failed"
+msgstr ""
+
+#: ../src/ca_creation.c:118
+msgid "Creating CA database"
+msgstr ""
+
+#: ../src/ca_creation.c:125
+msgid "CA database creation failed"
+msgstr ""
+
+#: ../src/ca_creation.c:138
+msgid "CA generated successfully"
+msgstr ""
+
+#: ../src/ca_file.c:48
+#, c-format
+msgid "Error opening filename '%s'"
+msgstr ""
+
+#: ../src/main.c:65
 msgid "- A graphical Certification Authority manager"
 msgstr ""
 
-#: ../src/main.c:62
+#: ../src/main.c:68
 #, c-format
 msgid "Failed to initialize: %s\n"
+msgstr ""
+
+#: ../src/main.c:122
+msgid "Open CA database"
+msgstr ""
+
+#: ../src/main.c:143
+#, c-format
+msgid "Problem when opening '%s' CA database"
+msgstr ""
+
+#: ../src/new_ca_creation_process.c:67
+msgid "Save CA database"
+msgstr ""
+
+#: ../src/new_ca_creation_process.c:79
+msgid "Problem when saving new CA database"
+msgstr ""
+
+#: ../src/new_ca_creation_process.c:87
+msgid "CA creation process finished"
+msgstr ""
+
+#: ../src/new_ca_creation_process.c:196
+msgid "CA creation process cancelled"
 msgstr ""
 
 #: ../src/new_ca_window.c:77
@@ -1095,34 +1173,50 @@ msgstr ""
 msgid "Zimbabwe"
 msgstr ""
 
-#: ../src/ca_creation.c:49
-msgid "Generating new RSA key pair"
+#: ../src/tls.c:42 ../src/tls.c:74
+msgid "Error initializing private key structure."
 msgstr ""
 
-#: ../src/ca_creation.c:56 ../src/ca_creation.c:76
-msgid "Key generation failed"
+#: ../src/tls.c:47 ../src/tls.c:79
+msgid "Error creating private key."
 msgstr ""
 
-#: ../src/ca_creation.c:69
-msgid "Generating new DSA key pair"
+#: ../src/tls.c:59 ../src/tls.c:91 ../src/tls.c:204
+msgid "Error exporting private key to PEM structure."
 msgstr ""
 
-#: ../src/ca_creation.c:89
-msgid "Generating self-signed CA-Root cert"
+#: ../src/tls.c:109
+msgid "Error when initializing certificate structure"
 msgstr ""
 
-#: ../src/ca_creation.c:95
-msgid "Certificate generation failed"
+#: ../src/tls.c:113
+msgid "Error when setting certificate version"
 msgstr ""
 
-#: ../src/ca_creation.c:104
-msgid "Creating CA database"
+#: ../src/tls.c:117
+msgid "Error when setting certificate serial number"
 msgstr ""
 
-#: ../src/ca_creation.c:110
-msgid "CA database creation failed"
+#: ../src/tls.c:121
+msgid "Error when setting activation time"
 msgstr ""
 
-#: ../src/ca_creation.c:121
-msgid "CA generated successfully"
+#: ../src/tls.c:125
+msgid "Error when setting expiration time"
+msgstr ""
+
+#: ../src/tls.c:170
+msgid "Error when setting basicConstraint extension"
+msgstr ""
+
+#: ../src/tls.c:174
+msgid "Error when setting keyUsage extension"
+msgstr ""
+
+#: ../src/tls.c:184
+msgid "Error when setting subject key identifier extension"
+msgstr ""
+
+#: ../src/tls.c:193
+msgid "Error when signing self-signed certificate"
 msgstr ""

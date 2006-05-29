@@ -75,20 +75,25 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	return 0;
 }
 
-void __ca_activation_datafunc (GtkTreeViewColumn *tree_column,
-				 GtkCellRenderer *cell,
-				 GtkTreeModel *tree_model,
-				 GtkTreeIter *iter,
-				 gpointer data)
+void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
+				   GtkCellRenderer *cell,
+				   GtkTreeModel *tree_model,
+				   GtkTreeIter *iter,
+				   gpointer data)
 {
-	time_t activation_time;
-	GDate date;
-
-	gtk_tree_model_get(tree_model, iter, CA_MODEL_COLUMN_ACTIVATION, &activation_time, -1);
-
-	g_date_set_time_t (&date, activation_time);
+	time_t model_time;
+	struct tm model_time_tm;
+	gchar model_time_str[100];
+	gchar *result = NULL;
+	size_t size = 0;
 	
-	g_object_set(G_OBJECT(cell), "text", , NULL);
+	gtk_tree_model_get(tree_model, iter, GPOINTER_TO_INT(data), &model_time, -1);
+	gmtime_r (&model_time, &model_time_tm);
+	
+	size = strftime (model_time_str, 200, "%c", &model_time_tm);
+	result = strdup (model_time_str);
+
+	g_object_set(G_OBJECT(cell), "text", result, NULL);
 }
 
 gboolean ca_refresh_model () 
@@ -129,7 +134,6 @@ gboolean ca_refresh_model ()
 
 		gtk_tree_view_insert_column_with_attributes (treeview,
 							     -1, _("Serial"), renderer,
-							     "editable", FALSE,
 							     "text", CA_MODEL_COLUMN_SERIAL,
 							     NULL);
 
@@ -137,7 +141,6 @@ gboolean ca_refresh_model ()
 
 		gtk_tree_view_insert_column_with_attributes (treeview,
 							     -1, _("Subject"), renderer,
-							     "editable", FALSE,
 							     "text", CA_MODEL_COLUMN_SUBJECT,
 							     NULL);
 
@@ -146,31 +149,28 @@ gboolean ca_refresh_model ()
 
 		gtk_tree_view_insert_column_with_attributes (treeview,
 							     -1, _("CA"), renderer,
-							     "editable", FALSE,
 							     "text", CA_MODEL_COLUMN_IS_CA,
 							     NULL);
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
 		gtk_tree_view_insert_column_with_attributes (treeview,
 							     -1, _("Private key in DB"), renderer,
-							     "editable", FALSE,
 							     "text", CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB,
 							     NULL);
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
-		gtk_tree_view_insert_column_with_attributes (treeview,
-							     -1, _("Activation"), renderer,
-							     "editable", FALSE,
-							     "text", CA_MODEL_COLUMN_ACTIVATION,
-							     NULL);
+		gtk_tree_view_insert_column_with_data_func (treeview,
+							    -1, _("Activation"), renderer,
+							    __ca_tree_view_date_datafunc,
+							    GINT_TO_POINTER(CA_MODEL_COLUMN_ACTIVATION), g_free);
+
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
-		gtk_tree_view_insert_column_with_attributes (treeview,
-							     -1, _("Expiration"), renderer,
-							     "editable", FALSE,
-							     "text", CA_MODEL_COLUMN_EXPIRATION,
-							     NULL);
+		gtk_tree_view_insert_column_with_data_func (treeview,
+							    -1, _("Expiration"), renderer,
+							    __ca_tree_view_date_datafunc,
+							    GINT_TO_POINTER(CA_MODEL_COLUMN_EXPIRATION), g_free);
 
 
 	}
