@@ -45,6 +45,10 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_NUMBER=8}
 CaModelColumns;
 
+void __disable_widget (gchar *widget_name);
+void __enable_widget (gchar *widget_name);
+
+
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames)
 {
 	static gboolean ca_inserted=FALSE;
@@ -187,6 +191,12 @@ gboolean ca_open (gchar *filename)
 {
 	if (! ca_file_open (filename))
 		return FALSE;
+
+	__enable_widget ("new_certificate1");
+	__enable_widget ("save_as1");
+	__enable_widget ("properties1");
+	__enable_widget ("preferences1");
+
 
 	ca_refresh_model ();
 	

@@ -121,44 +121,6 @@
 		    <widget class="GtkMenu" id="edit1_menu">
 
 		      <child>
-			<widget class="GtkImageMenuItem" id="cut1">
-			  <property name="visible">True</property>
-			  <property name="stock_item">GNOMEUIINFO_MENU_CUT_ITEM</property>
-			  <signal name="activate" handler="on_cut1_activate" last_modification_time="Sun, 16 Apr 2006 07:17:49 GMT"/>
-			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkImageMenuItem" id="copy1">
-			  <property name="visible">True</property>
-			  <property name="stock_item">GNOMEUIINFO_MENU_COPY_ITEM</property>
-			  <signal name="activate" handler="on_copy1_activate" last_modification_time="Sun, 16 Apr 2006 07:17:49 GMT"/>
-			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkImageMenuItem" id="paste1">
-			  <property name="visible">True</property>
-			  <property name="stock_item">GNOMEUIINFO_MENU_PASTE_ITEM</property>
-			  <signal name="activate" handler="on_paste1_activate" last_modification_time="Sun, 16 Apr 2006 07:17:49 GMT"/>
-			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkImageMenuItem" id="clear1">
-			  <property name="visible">True</property>
-			  <property name="stock_item">GNOMEUIINFO_MENU_CLEAR_ITEM</property>
-			  <signal name="activate" handler="on_clear1_activate" last_modification_time="Sun, 16 Apr 2006 07:17:49 GMT"/>
-			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkSeparatorMenuItem" id="separator2">
-			  <property name="visible">True</property>
-			</widget>
-		      </child>
-
-		      <child>
 			<widget class="GtkImageMenuItem" id="properties1">
 			  <property name="visible">True</property>
 			  <property name="stock_item">GNOMEUIINFO_MENU_PROPERTIES_ITEM</property>

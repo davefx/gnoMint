@@ -29,6 +29,8 @@ gboolean ca_file_open (gchar *file_name);
 
 void ca_file_close ();
 
+gboolean ca_file_save_as (gchar *new_file_name);
+
 gboolean ca_file_rename_tmp_file (gchar *new_file_name);
 
 gboolean ca_file_delete_tmp_file ();

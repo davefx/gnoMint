@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <glib.h>
+#include <glib/gstdio.h>
 #include <sqlite.h>
 #include <stdio.h>
 #include <string.h>
@@ -112,6 +114,30 @@ void ca_file_close ()
 	       
 }
 
+gboolean ca_file_save_as (gchar *new_file_name)
+{
+	gchar * initial_file = g_strdup(gnomint_current_opened_file);
+	GMappedFile *map = NULL;
+
+	ca_file_close ();
+
+	if (! (map = g_mapped_file_new (initial_file, FALSE, NULL)))
+		return FALSE;
+
+	if (! g_file_set_contents (new_file_name, 
+				   g_mapped_file_get_contents (map),
+				   g_mapped_file_get_length (map),
+				   NULL)) {
+		g_mapped_file_free (map);
+		return FALSE;
+	}
+
+	g_mapped_file_free (map);
+
+	return ca_file_open (new_file_name);
+
+}
+
 gboolean ca_file_rename_tmp_file (gchar *new_file_name)
 {
 	gint result=0;
@@ -131,6 +157,7 @@ gboolean ca_file_rename_tmp_file (gchar *new_file_name)
 
 	return FALSE;
 }
+
 
 gboolean ca_file_delete_tmp_file ()
 {

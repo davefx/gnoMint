@@ -30,6 +30,24 @@ GladeXML * main_window_xml = NULL;
 gchar * gnomint_current_opened_file = NULL;
 gchar * gnomint_temp_created_file = NULL;
 
+void __disable_widget (gchar *widget_name)
+{
+	GtkWidget * widget = NULL;
+
+	widget = glade_xml_get_widget (main_window_xml, widget_name);
+
+	gtk_widget_set_sensitive (widget, FALSE);
+}
+
+void __enable_widget (gchar *widget_name)
+{
+	GtkWidget * widget = NULL;
+
+	widget = glade_xml_get_widget (main_window_xml, widget_name);
+
+	gtk_widget_set_sensitive (widget, TRUE);
+}
+
 int main (int   argc,
 	  char *argv[])
 {
@@ -46,7 +64,6 @@ int main (int   argc,
 	};
 
 	gchar     * xml_file = NULL;
-//	GtkWidget * widget = NULL;
 
 
 #ifdef ENABLE_NLS
@@ -79,9 +96,14 @@ int main (int   argc,
 
 	glade_xml_signal_autoconnect (main_window_xml);	       	
 
+	__disable_widget ("new_certificate1");
+	__disable_widget ("save_as1");
+	__disable_widget ("properties1");
+	__disable_widget ("preferences1");
+	
 
 	if (argc >= 2)
-		ca_open (argv[1]);
+		ca_open (g_strdup(argv[1]));
 
 	gtk_main ();
 
@@ -152,7 +174,30 @@ void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	printf ("save_as1 Activated\n");
+	gchar *filename;
+
+	GtkWidget *dialog, *widget;
+	
+	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	
+	dialog = gtk_file_chooser_dialog_new (_("Save CA database as..."),
+					      GTK_WINDOW(widget),
+					      GTK_FILE_CHOOSER_ACTION_SAVE,
+					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					      NULL);
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		gtk_widget_destroy (dialog);
+	} else {
+		gtk_widget_destroy (dialog);
+		return;
+	}		
+	
+	ca_file_save_as (filename);
+
 }
 
 void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
@@ -167,21 +212,6 @@ void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
  *   EDIT MENU CALLBACKS
  *
  */ 
-
-void on_cut1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	printf ("cut1 Activated\n");
-}
-
-void on_copy1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	printf ("copy1 Activated\n");
-}
-
-void on_paste1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	printf ("paste1 Activated\n");
-}
 
 void on_clear1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
