@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-29 11:59+0200\n"
+"POT-Creation-Date: 2006-05-30 12:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,27 +106,27 @@ msgstr ""
 msgid "gnoMint"
 msgstr ""
 
-#: ../src/ca.c:136
+#: ../src/ca.c:140
 msgid "Serial"
 msgstr ""
 
-#: ../src/ca.c:143
+#: ../src/ca.c:147
 msgid "Subject"
 msgstr ""
 
-#: ../src/ca.c:151
+#: ../src/ca.c:155
 msgid "CA"
 msgstr ""
 
-#: ../src/ca.c:157
+#: ../src/ca.c:161
 msgid "Private key in DB"
 msgstr ""
 
-#: ../src/ca.c:164
+#: ../src/ca.c:168
 msgid "Activation"
 msgstr ""
 
-#: ../src/ca.c:171
+#: ../src/ca.c:175
 msgid "Expiration"
 msgstr ""
 
@@ -162,27 +162,58 @@ msgstr ""
 msgid "CA generated successfully"
 msgstr ""
 
-#: ../src/ca_file.c:48
+#: ../src/ca_file.c:50
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr ""
 
-#: ../src/main.c:65
+#: ../src/main.c:89
 msgid "- A graphical Certification Authority manager"
 msgstr ""
 
-#: ../src/main.c:68
+#: ../src/main.c:92
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr ""
 
-#: ../src/main.c:122
+#: ../src/main.c:151
 msgid "Open CA database"
 msgstr ""
 
-#: ../src/main.c:143
+#: ../src/main.c:172
 #, c-format
 msgid "Problem when opening '%s' CA database"
+msgstr ""
+
+#: ../src/main.c:190
+msgid "Save CA database as..."
+msgstr ""
+
+#: ../src/main.c:274
+msgid ""
+"gnoMint is a program for creating and managing Certification Authorities, "
+"and their certificates"
+msgstr ""
+
+#: ../src/main.c:275
+msgid ""
+"This program is free software; you can redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 2 of the License, or (at your option) "
+"any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful, but WITHOUT "
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+"FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for "
+"more details. \n"
+"\n"
+"You should have received a copy of the GNU General Public License along with "
+"this program; if not, write to the Free Software Foundation, Inc., 51 "
+"Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
+msgstr ""
+
+#: ../src/main.c:279
+msgid "translator-credits"
 msgstr ""
 
 #: ../src/new_ca_creation_process.c:67

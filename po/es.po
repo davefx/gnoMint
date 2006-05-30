@@ -7,13 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-29 11:59+0200\n"
-"PO-Revision-Date: 2006-05-29 12:00+0100\n"
+"POT-Creation-Date: 2006-05-30 12:21+0200\n"
+"PO-Revision-Date: 2006-05-30 12:30+0100\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Español <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Spanish\n"
 
 #: ../gui/gnomint.glade.h:1
 msgid " "
@@ -107,27 +108,27 @@ msgstr "Nombre de estado o provincia: "
 msgid "gnoMint"
 msgstr "gnoMint"
 
-#: ../src/ca.c:136
+#: ../src/ca.c:140
 msgid "Serial"
 msgstr "Nº serie"
 
-#: ../src/ca.c:143
+#: ../src/ca.c:147
 msgid "Subject"
 msgstr "Titular"
 
-#: ../src/ca.c:151
+#: ../src/ca.c:155
 msgid "CA"
 msgstr "AC"
 
-#: ../src/ca.c:157
+#: ../src/ca.c:161
 msgid "Private key in DB"
 msgstr "Clave privada en BD"
 
-#: ../src/ca.c:164
+#: ../src/ca.c:168
 msgid "Activation"
 msgstr "Activación"
 
-#: ../src/ca.c:171
+#: ../src/ca.c:175
 msgid "Expiration"
 msgstr "Caducidad"
 
@@ -164,28 +165,54 @@ msgstr "Error al crear base de datos de la AC"
 msgid "CA generated successfully"
 msgstr "AC generada con éxito"
 
-#: ../src/ca_file.c:48
+#: ../src/ca_file.c:50
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr "Error al abrir fichero '%s'"
 
-#: ../src/main.c:65
+#: ../src/main.c:89
 msgid "- A graphical Certification Authority manager"
 msgstr "- Un gestor gráfico de Autoridades de Certificación"
 
-#: ../src/main.c:68
+#: ../src/main.c:92
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr "Fallo al inicializar: %s\n"
 
-#: ../src/main.c:122
+#: ../src/main.c:151
 msgid "Open CA database"
 msgstr "Abrir base de datos de AC"
 
-#: ../src/main.c:143
+#: ../src/main.c:172
 #, c-format
 msgid "Problem when opening '%s' CA database"
 msgstr "Hubo problemas al abrir la base de datos de la AC '%s'"
+
+#: ../src/main.c:190
+msgid "Save CA database as..."
+msgstr "Guardar base de datos de AC como..."
+
+#: ../src/main.c:274
+msgid "gnoMint is a program for creating and managing Certification Authorities, and their certificates"
+msgstr "gnoMint es un programa diseñado para crear y gestionar Autoridades de Certificación, así como sus certificados"
+
+#: ../src/main.c:275
+msgid ""
+"This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. \n"
+"\n"
+"You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
+msgstr ""
+"Este programa es software libre; puede distribuirlo y/o modificarlo según los términos de la Licencia Pública General GNU (GNU GPL), según fue publicada por la Free Software Foundation; en la versión 2 de la Licencia, o (a su elección) cualquier versión posterior. \n"
+"\n"
+"Este programa se distribuye con la esperanza de que sea útil, pero SIN GARANTÍA; sin ninguna garantía implícita de estar APTO PARA LACOMERCIALIZACIÓN o de IDONEIDAD PARA UN FIN DETERMINADO. Para más detalles, vea la Licencia Pública General GNU. \n"
+"\n"
+"Debería haber recibido una copia de la Licencia Pública General GNU junto con este programa; si no es así, escriba a la Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
+
+#: ../src/main.c:279
+msgid "translator-credits"
+msgstr "David Marín Carreño <davefx@gmail.com>"
 
 #: ../src/new_ca_creation_process.c:67
 msgid "Save CA database"

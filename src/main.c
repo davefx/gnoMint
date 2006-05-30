@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <libintl.h>
+#include <glib.h>
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 
@@ -24,6 +25,11 @@
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
+
+gchar * PACKAGE_AUTHORS[] = {
+	"David Marín Carreño <davefx@gmail.com>",
+	NULL
+};
 
 GladeXML * main_window_xml = NULL;
 
@@ -72,7 +78,8 @@ int main (int   argc,
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	g_set_application_name ("gnoMint");
+	g_set_application_name (PACKAGE);
+	g_set_prgname (PACKAGE);
 
 	tls_init ();
 
@@ -130,6 +137,12 @@ gboolean on_main_window1_delete (GtkWidget *widget,
 void on_new1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	new_ca_window_display();
+	
+}
+
+void on_new_certificate1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+{
+	new_cert_window_display();
 	
 }
 
@@ -244,7 +257,33 @@ void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	printf ("about1 Activated\n");
+	
+	GtkAboutDialog *dialog;
+	GtkWidget *widget;
+	
+	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	
+/* 	dialog = gtk_about_dialog_new (); */
+
+/* 	gtk_about_dialog_set_version (dialog, PACKAGE_VERSION); */
+/* 	gtk_about_dialog_set_copyright (dialog, PACKAGE_COPYRIGHT); */
+/* 	gtk_about_dialog_set_comments (dialog, _("gnoMint is a program for creating and managing Certification Authorities, and their certificates")); */
+/* 	gtk_about_dialog_set_license (dialog, _("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. \n\nYou should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.")); */
+/* 	gtk_about_dialog_set_wrap_license (dialog, TRUE); */
+/* 	gtk_about_dialog_set_website (dialog, PACKAGE_WEBSITE); */
+/* 	gtk_about_dialog_set_authors (dialog, PACKAGE_AUTHORS); */
+/* 	gtk_about_dialog_set_translator_credits (dialog, _("translator-credits")); */
+
+	gtk_show_about_dialog (GTK_WINDOW(widget), 
+			       "version", PACKAGE_VERSION,
+			       "copyright", PACKAGE_COPYRIGHT,
+			       "comments", _("gnoMint is a program for creating and managing Certification Authorities, and their certificates"),
+			       "license",  _("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. \n\nYou should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."),
+			       "wrap_license", TRUE,
+			       "website", PACKAGE_WEBSITE,
+			       "authors", PACKAGE_AUTHORS,
+			       "translator_credits", _("translator-credits"),
+			       NULL);
 }
 
 

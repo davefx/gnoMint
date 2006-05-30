@@ -6,6 +6,8 @@ INCLUDES = \
 	$(GNOMINT_CFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	-DPACKAGE_COPYRIGHT=\""$(PACKAGE_COPYRIGHT)"\" \
+	-DPACKAGE_WEBSITE=\""$(PACKAGE_WEBSITE)"\" \
 	-DHAVE_CONFIG_H  -DCOMPILATION_DATE=`date +%s` -g -Wall 
 
 gnomint_SOURCES = \
