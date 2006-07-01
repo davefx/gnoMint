@@ -38,13 +38,13 @@ typedef struct {
 CountryItem country_table[NUMBER_OF_COUNTRIES];
 
 
-GladeXML * new_ca_window_xml = NULL;
+GladeXML * new_cert_ca_window_xml = NULL;
 
 
-void _new_ca_populate_country_combobox();
+void _new_cert_ca_populate_country_combobox();
 
 
-void new_ca_window_display()
+void new_cert_ca_window_display()
 {
 	gchar     * xml_file = NULL;
 
@@ -53,13 +53,13 @@ void new_ca_window_display()
 	// Workaround for libglade
 	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 	tst = foo;
-	new_ca_window_xml = glade_xml_new (xml_file, "new_ca_window", NULL);
+	new_cert_ca_window_xml = glade_xml_new (xml_file, "new_ca_window", NULL);
 	
 	g_free (xml_file);
 	
-	glade_xml_signal_autoconnect (new_ca_window_xml); 	
+	glade_xml_signal_autoconnect (new_cert_ca_window_xml); 	
 	
-	_new_ca_populate_country_combobox();
+	_new_cert_ca_populate_country_combobox();
 
 }
 
@@ -565,7 +565,7 @@ void populate_country_table()
 	qsort (country_table, NUMBER_OF_COUNTRIES, sizeof(CountryItem), comp_countries);
 }
 
-void _new_ca_populate_country_combobox()
+void _new_cert_ca_populate_country_combobox()
 {
 	int i = 0;
 	GtkComboBox *country_combobox = NULL;
@@ -576,7 +576,7 @@ void _new_ca_populate_country_combobox()
 	populate_country_table();
 	new_store = gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 
-	country_combobox = GTK_COMBO_BOX(glade_xml_get_widget (new_ca_window_xml, "country_combobox"));
+	country_combobox = GTK_COMBO_BOX(glade_xml_get_widget (new_cert_ca_window_xml, "country_combobox"));
 	for (i=0; i<NUMBER_OF_COUNTRIES; i++) {
 		gtk_tree_store_append (new_store, &iter, NULL);
 		gtk_tree_store_set (new_store, &iter, 0, country_table[i].name, 1, country_table[i].code, -1);
@@ -597,9 +597,9 @@ void _new_ca_populate_country_combobox()
 
 // TAB Manage
 
-void new_ca_tab_activate (int tab_number)
+void new_cert_ca_tab_activate (int tab_number)
 {
-	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_ca_window_xml, "new_ca_notebook"));
+	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_notebook"));
 	
 	gtk_notebook_set_current_page (notebook, tab_number);
 
@@ -608,7 +608,7 @@ void new_ca_tab_activate (int tab_number)
 void on_cn_entry_changed (GtkEditable *editable,
 			 gpointer user_data) 
 {
-	GtkButton *button = GTK_BUTTON(glade_xml_get_widget (new_ca_window_xml, "new_ca_next1"));
+	GtkButton *button = GTK_BUTTON(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_next1"));
 
 	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
 		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
@@ -617,41 +617,41 @@ void on_cn_entry_changed (GtkEditable *editable,
 		
 }
 
-void on_new_ca_next1_clicked (GtkButton *widget,
+void on_new_cert_ca_next1_clicked (GtkButton *widget,
 			      gpointer user_data) 
 {
-	new_ca_tab_activate (1);
+	new_cert_ca_tab_activate (1);
 }
 
-void on_new_ca_previous2_clicked (GtkButton *widget,
+void on_new_cert_ca_previous2_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
-	new_ca_tab_activate (0);
+	new_cert_ca_tab_activate (0);
 }
 
-void on_new_ca_next2_clicked (GtkButton *widget,
+void on_new_cert_ca_next2_clicked (GtkButton *widget,
 			      gpointer user_data) 
 {
-	new_ca_tab_activate (2);
+	new_cert_ca_tab_activate (2);
 }
 
-void on_new_ca_previous3_clicked (GtkButton *widget,
+void on_new_cert_ca_previous3_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
-	new_ca_tab_activate (1);
+	new_cert_ca_tab_activate (1);
 }
 
-void on_new_ca_cancel_clicked (GtkButton *widget,
+void on_new_cert_ca_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	
-	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
+	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_cert_ca_window_xml, "new_ca_window"));
 
 	gtk_object_destroy(GTK_OBJECT(window));
 	
 }
 
-void on_new_ca_commit_clicked (GtkButton *widg,
+void on_new_cert_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data) 
 {
 	CaCreationData *ca_creation_data = NULL;
@@ -667,7 +667,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	struct tm * expiration_time;
 
 	ca_creation_data = g_new0 (CaCreationData, 1);
-	widget = glade_xml_get_widget (new_ca_window_xml, "country_combobox");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "country_combobox");
 	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
 
 	if (active < 0) {
@@ -683,50 +683,50 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 		
 	printf ("Certificate country: %s\n", ca_creation_data->country);
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "st_entry");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "st_entry");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		ca_creation_data->state = g_strdup (text);
 	else
 		ca_creation_data->state = NULL;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "city_entry");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "city_entry");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		ca_creation_data->city = g_strdup (text);
 	else
 		ca_creation_data->city = NULL;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "o_entry");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "o_entry");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		ca_creation_data->org = g_strdup (text);
 	else
 		ca_creation_data->org = NULL;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "ou_entry");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "ou_entry");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		ca_creation_data->ou = g_strdup (text);
 	else
 		ca_creation_data->ou = NULL;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "cn_entry");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "cn_entry");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		ca_creation_data->cn = g_strdup (text);
 	else
 		ca_creation_data->cn = NULL;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "dsa_radiobutton");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "dsa_radiobutton");
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	ca_creation_data->key_type = active;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "keylength_spinbutton");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "keylength_spinbutton");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	ca_creation_data->key_bitlength = active;
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "months_before_expiration_spinbutton");
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "months_before_expiration_spinbutton");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	ca_creation_data->key_months_before_expiration = active;
 
@@ -741,10 +741,10 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	ca_creation_data->expiration = mktime(expiration_time);
 	g_free (expiration_time);
 
-	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
+	window = GTK_WINDOW(glade_xml_get_widget (new_cert_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
 
-	new_cert_ca_creation_process_window_display (ca_creation_data);
+	new_cert_creation_process_ca_window_display (ca_creation_data);
 	
 
 

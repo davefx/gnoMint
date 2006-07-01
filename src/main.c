@@ -19,9 +19,12 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <glade/glade.h>
+#include <stdlib.h>
 
-#include "new_ca_window.h"
+#include "new_cert_window.h"
 #include "tls.h"
+#include "ca.h"
+#include "ca_file.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -136,13 +139,13 @@ gboolean on_main_window1_delete (GtkWidget *widget,
 
 void on_new1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	new_ca_window_display();
+	new_cert_ca_window_display();
 	
 }
 
 void on_new_certificate1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	new_cert_window_display();
+	new_cert_ca_window_display();
 	
 }
 
@@ -258,7 +261,7 @@ void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	
-	GtkAboutDialog *dialog;
+//	GtkAboutDialog *dialog;
 	GtkWidget *widget;
 	
 	widget = glade_xml_get_widget (main_window_xml, "main_window");

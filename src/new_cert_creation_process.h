@@ -18,7 +18,7 @@
 #ifndef _NEW_CERT_CREATION_PROCESS_H_
 #define _NEW_CERT_CREATION_PROCESS_H_
 
-void new_cert_ca_creation_process_window_display (CaCreationData * ca_creation_data);
+void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data);
 
 
 #endif

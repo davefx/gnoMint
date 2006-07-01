@@ -103,7 +103,7 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 gboolean ca_refresh_model () 
 {
 	gchar * error_str = NULL;
-	GtkTreeIter iter;
+//	GtkTreeIter iter;
 	GtkTreeStore * new_model = NULL;
 	GtkTreeView * treeview = NULL;
 	GtkCellRenderer * renderer = NULL;
@@ -181,9 +181,10 @@ gboolean ca_refresh_model ()
 
 
 
-	gtk_tree_view_set_model (treeview, new_model);
+	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(new_model));
 	ca_model = new_model;
 
+	return TRUE;
 }
 
 

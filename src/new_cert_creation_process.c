@@ -32,10 +32,10 @@
 GladeXML * new_ca_window_process_xml = NULL;
 
 gint timer=0;
-GThread * new_ca_creation_process_thread = NULL;
+GThread * new_cert_creation_process_ca_thread = NULL;
 
 
-void new_ca_creation_process_error_dialog (gchar *message) {
+void new_cert_creation_process_ca_error_dialog (gchar *message) {
 
    GtkWidget *dialog, *widget;
    
@@ -55,11 +55,11 @@ void new_ca_creation_process_error_dialog (gchar *message) {
    gtk_widget_destroy (dialog);
 }
 
-void new_ca_creation_process_finish (void) {
+void new_cert_creation_process_ca_finish (void) {
 	GtkWidget *widget = NULL, *dialog = NULL;
 	gchar *filename = NULL;
 	
-	g_thread_join (new_ca_creation_process_thread);
+	g_thread_join (new_cert_creation_process_ca_thread);
 	gtk_timeout_remove (timer);	       
 	timer = 0;
 	
@@ -77,7 +77,7 @@ void new_ca_creation_process_finish (void) {
 		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
 		if (! ca_file_rename_tmp_file (filename)) {
 			gtk_widget_destroy (dialog);
-			new_ca_creation_process_error_dialog (_("Problem when saving new CA database"));
+			new_cert_creation_process_ca_error_dialog (_("Problem when saving new CA database"));
 		} else {
 			gtk_widget_destroy (dialog);
 			dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
@@ -108,7 +108,7 @@ gint new_ca_creation_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process_progressbar");
+	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_cert_creation_process_ca_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
@@ -127,13 +127,13 @@ gint new_ca_creation_pulse (gpointer data)
 
 
 	if (status > 0) {
-		new_ca_creation_process_finish ();
+		new_cert_creation_process_ca_finish ();
 	} else if (status < 0) {
-		error_message = (gchar *) g_thread_join (new_ca_creation_process_thread);
+		error_message = (gchar *) g_thread_join (new_cert_creation_process_ca_thread);
 		gtk_timeout_remove (timer);	       
 		timer = 0;
 		if (error_message) {
-			new_ca_creation_process_error_dialog (error_message);
+			new_cert_creation_process_ca_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
 		widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
@@ -148,7 +148,7 @@ gint new_ca_creation_pulse (gpointer data)
 
 
 
-void new_ca_creation_process_window_display (CaCreationData * ca_creation_data)
+void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
@@ -161,9 +161,9 @@ void new_ca_creation_process_window_display (CaCreationData * ca_creation_data)
 	
 	glade_xml_signal_autoconnect (new_ca_window_process_xml); 	
 	
-	new_ca_creation_process_thread = ca_creation_launch_thread (ca_creation_data);
+	new_cert_creation_process_ca_thread = ca_creation_launch_thread (ca_creation_data);
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process_progressbar");
+	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_cert_creation_process_ca_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 

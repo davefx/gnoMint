@@ -35,7 +35,7 @@ gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 			       gnutls_x509_privkey_t **key)
 {
 
-	gint private_key_len = 0;
+	guint private_key_len = 0;
 
 	(*key) = g_new0 (gnutls_x509_privkey_t, 1);
 	if (gnutls_x509_privkey_init (*key) < 0) {
@@ -67,7 +67,7 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 			       gnutls_x509_privkey_t **key)
 {
 
-	gint private_key_len = 0;
+	guint private_key_len = 0;
 
 	(*key) = g_new0 (gnutls_x509_privkey_t, 1);
 	if (gnutls_x509_privkey_init (*key) < 0) {
@@ -101,9 +101,9 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 {
 	gnutls_x509_crt_t crt;
 	gint serial=1;
-	gchar * keyid = NULL;
-	gint keyidsize = 0;
-	gint certificate_len = 0;
+	guchar * keyid = NULL;
+	guint keyidsize = 0;
+	guint certificate_len = 0;
 
 	if (gnutls_x509_crt_init (&crt) < 0) {
 		return g_strdup_printf(_("Error when initializing certificate structure"));
@@ -174,11 +174,11 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 			return g_strdup_printf(_("Error when setting keyUsage extension"));
 	}
 
-	keyid = g_new0 (gchar,1);	
+	keyid = g_new0 (guchar,1);	
 	gnutls_x509_crt_get_key_id(crt, 0, keyid, &keyidsize);
 	g_free (keyid);
 
-	keyid = g_new0 (gchar,keyidsize);
+	keyid = g_new0 (guchar,keyidsize);
 	gnutls_x509_crt_get_key_id(crt, 0, keyid, &keyidsize);
 	if (gnutls_x509_crt_set_subject_key_id(crt, keyid, keyidsize) !=0) {
 		return g_strdup_printf(_("Error when setting subject key identifier extension"));

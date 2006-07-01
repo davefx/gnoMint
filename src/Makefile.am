@@ -8,12 +8,12 @@ INCLUDES = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DPACKAGE_COPYRIGHT=\""$(PACKAGE_COPYRIGHT)"\" \
 	-DPACKAGE_WEBSITE=\""$(PACKAGE_WEBSITE)"\" \
-	-DHAVE_CONFIG_H  -DCOMPILATION_DATE=`date +%s` -g -Wall 
+	-DHAVE_CONFIG_H  -DCOMPILATION_DATE=`date +%s` -g -Wall -Werror
 
 gnomint_SOURCES = \
 	main.c \
-	new_ca_window.c \
-	new_ca_creation_process.c \
+	new_cert_window.c \
+	new_cert_creation_process.c \
 	ca.c \
 	ca_creation.c \
 	tls.c \
