@@ -23,7 +23,8 @@
 #include <string.h>
 
 #include "ca_creation.h"
-#include "new_ca_creation_process.h"
+#include "new_cert_creation_process.h"
+#include "ca_file.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -40,7 +41,7 @@ CountryItem country_table[NUMBER_OF_COUNTRIES];
 GladeXML * new_ca_window_xml = NULL;
 
 
-void populate_country_combobox();
+void _new_ca_populate_country_combobox();
 
 
 void new_ca_window_display()
@@ -58,7 +59,7 @@ void new_ca_window_display()
 	
 	glade_xml_signal_autoconnect (new_ca_window_xml); 	
 	
-	populate_country_combobox();
+	_new_ca_populate_country_combobox();
 
 }
 
@@ -564,7 +565,7 @@ void populate_country_table()
 	qsort (country_table, NUMBER_OF_COUNTRIES, sizeof(CountryItem), comp_countries);
 }
 
-void populate_country_combobox()
+void _new_ca_populate_country_combobox()
 {
 	int i = 0;
 	GtkComboBox *country_combobox = NULL;
@@ -743,7 +744,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
 
-	new_ca_creation_process_window_display (ca_creation_data);
+	new_cert_ca_creation_process_window_display (ca_creation_data);
 	
 
 
