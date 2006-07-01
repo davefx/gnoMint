@@ -27,6 +27,7 @@
 
 #include "ca_creation.h"
 #include "ca_file.h"
+#include "ca.h"
 
 GladeXML * new_ca_window_process_xml = NULL;
 
