@@ -250,7 +250,7 @@
   <property name="urgency_hint">False</property>
 
   <child>
-    <widget class="GtkNotebook" id="new_ca_notebook">
+    <widget class="GtkNotebook" id="new_cert_ca_notebook">
       <property name="border_width">8</property>
       <property name="visible">True</property>
       <property name="show_tabs">False</property>
@@ -656,7 +656,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="new_ca_cancel1">
+		<widget class="GtkButton" id="new_cert_ca_cancel1">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -664,12 +664,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:41:30 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:41:30 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="new_ca_next1">
+		<widget class="GtkButton" id="new_cert_ca_next1">
 		  <property name="visible">True</property>
 		  <property name="sensitive">False</property>
 		  <property name="can_default">True</property>
@@ -678,7 +678,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_next1_clicked" last_modification_time="Mon, 01 May 2006 16:30:34 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_next1_clicked" last_modification_time="Mon, 01 May 2006 16:30:34 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -1005,7 +1005,7 @@ Common Name (CN):</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="new_ca_cancel2">
+		<widget class="GtkButton" id="new_cert_ca_cancel2">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -1013,12 +1013,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="new_ca_previous2">
+		<widget class="GtkButton" id="new_cert_ca_previous2">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -1026,12 +1026,12 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
 		</widget>
 	      </child>
 
 	      <child>
-		<widget class="GtkButton" id="new_ca_commit">
+		<widget class="GtkButton" id="new_cert_ca_commit">
 		  <property name="visible">True</property>
 		  <property name="can_default">True</property>
 		  <property name="can_focus">True</property>
@@ -1039,7 +1039,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -1187,7 +1187,7 @@ Common Name (CN):</property>
 	  </child>
 
 	  <child>
-	    <widget class="GtkProgressBar" id="new_ca_creation_process_progressbar">
+	    <widget class="GtkProgressBar" id="new_cert_creation_process_progressbar">
 	      <property name="visible">True</property>
 	      <property name="orientation">GTK_PROGRESS_LEFT_TO_RIGHT</property>
 	      <property name="fraction">0</property>
@@ -1684,7 +1684,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:41:30 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:41:30 GMT"/>
 		</widget>
 	      </child>
 
@@ -1698,7 +1698,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_next1_clicked" last_modification_time="Mon, 01 May 2006 16:30:34 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_next1_clicked" last_modification_time="Mon, 01 May 2006 16:30:34 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -2032,7 +2032,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
 		</widget>
 	      </child>
 
@@ -2045,7 +2045,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
 		</widget>
 	      </child>
 
@@ -2058,7 +2058,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
@@ -2301,7 +2301,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_cancel_clicked" last_modification_time="Mon, 01 May 2006 16:40:39 GMT"/>
 		</widget>
 	      </child>
 
@@ -2314,7 +2314,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_previous2_clicked" last_modification_time="Mon, 01 May 2006 17:23:17 GMT"/>
 		</widget>
 	      </child>
 
@@ -2327,7 +2327,7 @@ Common Name (CN):</property>
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_new_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
+		  <signal name="clicked" handler="on_new_cert_ca_commit_clicked" last_modification_time="Mon, 01 May 2006 17:25:24 GMT"/>
 		</widget>
 	      </child>
 	    </widget>

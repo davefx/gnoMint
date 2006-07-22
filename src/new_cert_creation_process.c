@@ -108,7 +108,7 @@ gint new_ca_creation_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_cert_creation_process_ca_progressbar");
+	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_cert_creation_process_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
