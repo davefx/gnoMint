@@ -22,6 +22,25 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <stdio.h>
+
+typedef struct __TlsCert {	
+	guint64 serial_number;
+
+	gchar * cn;
+	gchar * o;
+	gchar * ou;
+
+	gchar * i_cn;
+	gchar * i_o;
+	gchar * i_ou;
+
+	gchar * sha1;
+	gchar * md5;
+
+	time_t expiration_time;
+	time_t activation_time;
+} TlsCert;
 
 void tls_init ();
 
@@ -36,5 +55,11 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate);
+
+void tls_cert_free (TlsCert *);
+
+TlsCert * tls_parse_pem (const char * pem_certificate);
+
+
 
 #endif

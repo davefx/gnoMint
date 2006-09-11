@@ -15,14 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "tls.h"
-
 #include <libintl.h>
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include "tls.h"
 
 void tls_init ()
 {
@@ -100,7 +101,8 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 					      gchar ** certificate)
 {
 	gnutls_x509_crt_t crt;
-	gint serial=1;
+	guint64 sn = G_GUINT64_CONSTANT(1);
+	gchar * serial = NULL;
 	guchar * keyid = NULL;
 	guint keyidsize = 0;
 	guint certificate_len = 0;
@@ -113,9 +115,11 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
-	if (gnutls_x509_crt_set_serial (crt, &serial, sizeof (gint)) < 0) {
+	serial = g_strdup_printf ("%llX", sn);
+	if (gnutls_x509_crt_set_serial (crt, serial, strlen (serial)) < 0) {
 		return g_strdup_printf(_("Error when setting certificate serial number"));
 	}
+	g_free (serial);
 
 	if (gnutls_x509_crt_set_activation_time (crt, creation_data->activation) < 0) {
 		return g_strdup_printf(_("Error when setting activation time"));
@@ -208,4 +212,149 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 
 	return NULL;
 
+}
+
+
+TlsCert * tls_parse_pem (const char * pem_certificate)
+{
+	gnutls_datum_t pem_datum;
+	gnutls_x509_crt_t * cert = g_new0 (gnutls_x509_crt_t, 1);
+	gchar *aux;
+	gint i;
+	
+	guint size;
+
+	TlsCert *res = g_new0 (TlsCert, 1);
+
+	pem_datum.data = (unsigned char *) pem_certificate;
+	pem_datum.size = strlen(pem_certificate);
+
+	gnutls_x509_crt_init (cert);
+	gnutls_x509_crt_import (*cert, &pem_datum, GNUTLS_X509_FMT_PEM);
+
+	res->activation_time = gnutls_x509_crt_get_activation_time (*cert);
+	res->expiration_time = gnutls_x509_crt_get_expiration_time (*cert);
+
+	
+	size = 0;
+	gnutls_x509_crt_get_serial (*cert, NULL, &size);
+	aux = g_new0 (gchar, size);
+	gnutls_x509_crt_get_serial (*cert, aux, &size);
+	res->serial_number = strtoull (aux, NULL, 16);
+	g_free(aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+	res->cn = strdup (aux);
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
+	res->o = strdup (aux);
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
+	res->ou = strdup (aux);
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+	res->i_cn = strdup (aux);
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
+	res->i_o = strdup (aux);
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
+	res->i_ou = strdup (aux);
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_MD5, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_MD5, aux, &size);	
+	g_print ("%d %s\n", size, aux);
+	res->md5 = g_new0(gchar, size*3);
+	for (i=0; i<size; i++) {
+		snprintf (&res->md5[i*3], 3, "%02X", aux[i]);
+		if (i != size - 1)
+			res->md5[(i*3) + 2] = ':';
+	}
+	g_free (aux);
+	aux = NULL;
+
+	size = 0;
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA1, aux, &size);
+	aux = g_new0(gchar, size);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA1, aux, &size);
+	g_print ("%d %s\n", size, aux);
+	res->sha1 = g_new0(gchar, size*3);
+	for (i=0; i<size; i++) {
+		snprintf (&res->sha1[i*3], 3, "%02X", aux[i]);
+		if (i != size - 1)
+			res->sha1[(i*3) + 2] = ':';
+	}
+	g_free (aux);
+	aux = NULL;
+
+	gnutls_x509_crt_deinit (*cert);
+	g_free (cert);
+
+	return res;	
+	
+}
+
+void tls_cert_free (TlsCert *tlscert)
+{
+	if (tlscert->cn) {
+		g_free (tlscert->cn);
+	}	
+	if (tlscert->o) {
+		g_free (tlscert->o);
+	}	
+	if (tlscert->ou) {
+		g_free (tlscert->ou);
+	}	
+
+	if (tlscert->i_cn) {
+		g_free (tlscert->i_cn);
+	}	
+	if (tlscert->i_o) {
+		g_free (tlscert->i_o);
+	}	
+	if (tlscert->i_ou) {
+		g_free (tlscert->i_ou);
+	}	
+
+	if (tlscert->sha1) {
+		g_free (tlscert->sha1);
+	}	
+	if (tlscert->md5) {
+		g_free (tlscert->md5);
+	}	
+
+	g_free (tlscert);
 }

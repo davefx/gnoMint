@@ -66,18 +66,23 @@ gchar * ca_file_create (CaCreationData *creation_data,
 			   NULL, NULL, &error)) {
 		return error;
 	}
+	if (sqlite_exec (ca_db,
+			   "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, serial INT, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT);",
+			   NULL, NULL, &error)) {
+		return error;
+	}
 	
+	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate', '%s');", pem_ca_certificate);
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		return error;
+	g_free (sql);
+
 	sql = g_strdup_printf ("INSERT INTO certificates VALUES (NULL, 1, 1, '%s', '%ld', '%ld', 0, '%s', 1, '%s');", 
 			       creation_data->cn,
 			       creation_data->activation,
 			       creation_data->expiration,
 			       pem_ca_certificate,
 			       pem_ca_private_key);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
-		return error;
-	g_free (sql);
-
-	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate', '%s');", pem_ca_certificate);
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);

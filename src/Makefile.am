@@ -17,7 +17,8 @@ gnomint_SOURCES = \
 	ca.c \
 	ca_creation.c \
 	tls.c \
-	ca_file.c
+	ca_file.c \
+	certificate_properties.c
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)

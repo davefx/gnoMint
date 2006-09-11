@@ -261,22 +261,10 @@ void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	
-//	GtkAboutDialog *dialog;
 	GtkWidget *widget;
 	
 	widget = glade_xml_get_widget (main_window_xml, "main_window");
 	
-/* 	dialog = gtk_about_dialog_new (); */
-
-/* 	gtk_about_dialog_set_version (dialog, PACKAGE_VERSION); */
-/* 	gtk_about_dialog_set_copyright (dialog, PACKAGE_COPYRIGHT); */
-/* 	gtk_about_dialog_set_comments (dialog, _("gnoMint is a program for creating and managing Certification Authorities, and their certificates")); */
-/* 	gtk_about_dialog_set_license (dialog, _("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. \n\nYou should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.")); */
-/* 	gtk_about_dialog_set_wrap_license (dialog, TRUE); */
-/* 	gtk_about_dialog_set_website (dialog, PACKAGE_WEBSITE); */
-/* 	gtk_about_dialog_set_authors (dialog, PACKAGE_AUTHORS); */
-/* 	gtk_about_dialog_set_translator_credits (dialog, _("translator-credits")); */
-
 	gtk_show_about_dialog (GTK_WINDOW(widget), 
 			       "version", PACKAGE_VERSION,
 			       "copyright", PACKAGE_COPYRIGHT,

@@ -5,7 +5,7 @@ src/ca.c
 src/ca_creation.c
 src/ca_file.c
 src/main.c
-src/new_ca_creation_process.c
-src/new_ca_window.c
+src/new_cert_creation_process.c
+src/new_cert_window.c
 src/tls.c
 

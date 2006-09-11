@@ -28,6 +28,7 @@
 #define N_(x) (x) gettext_noop(x)
 
 #include "ca_file.h"
+#include "certificate_properties.h"
 
 extern GladeXML * main_window_xml;
 extern sqlite * ca_db;
@@ -42,7 +43,8 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_EXPIRATION=5,
       CA_MODEL_COLUMN_IS_REVOKED=6,
       CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB=7,
-      CA_MODEL_COLUMN_NUMBER=8}
+      CA_MODEL_COLUMN_PEM=8,
+      CA_MODEL_COLUMN_NUMBER=9}
 CaModelColumns;
 
 void __disable_widget (gchar *widget_name);
@@ -67,6 +69,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 			    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
 			    6, atoi(argv[CA_MODEL_COLUMN_IS_REVOKED]),
 			    7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+			    8, argv[CA_MODEL_COLUMN_PEM],
 			    -1);
 
 	if (atoi(argv[CA_MODEL_COLUMN_IS_CA]) != 0) {
@@ -94,7 +97,7 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 	gtk_tree_model_get(tree_model, iter, GPOINTER_TO_INT(data), &model_time, -1);
 	gmtime_r (&model_time, &model_time_tm);
 	
-	size = strftime (model_time_str, 200, "%c", &model_time_tm);
+	size = strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
 	result = strdup (model_time_str);
 
 	g_object_set(G_OBJECT(cell), "text", result, NULL);
@@ -119,12 +122,13 @@ gboolean ca_refresh_model ()
 	     - Expiration
 	     - Is revoked
 	     - Private key is in DB
+	     - PEM data
 	*/
 
-	new_model = gtk_tree_store_new (8, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, 
-					G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
+	new_model = gtk_tree_store_new (9, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, 
+					G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING);
 
-	sqlite_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, is_revoked, private_key_in_db FROM certificates ORDER BY id",
+	sqlite_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, is_revoked, private_key_in_db, pem FROM certificates ORDER BY id",
 		     __ca_refresh_model_add_certificate, new_model, &error_str);
 
 	treeview = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
@@ -147,10 +151,10 @@ gboolean ca_refresh_model ()
 							     -1, _("Subject"), renderer,
 							     "text", CA_MODEL_COLUMN_SUBJECT,
 							     NULL);
-
-
+		
+		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
-
+		
 		gtk_tree_view_insert_column_with_attributes (treeview,
 							     -1, _("CA"), renderer,
 							     "text", CA_MODEL_COLUMN_IS_CA,
@@ -185,6 +189,24 @@ gboolean ca_refresh_model ()
 	ca_model = new_model;
 
 	return TRUE;
+}
+
+
+void ca_certificate_activated (GtkTreeView *tree_view,
+			       GtkTreePath *path,
+			       GtkTreeViewColumn *column,
+			       gpointer user_data)
+{	
+	GValue * value = g_new0 (GValue, 1);
+	GtkTreeIter iter;
+	GtkTreeModel * tree_model = gtk_tree_view_get_model (tree_view);
+	
+	gtk_tree_model_get_iter (tree_model, &iter, path);
+	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PEM, value);	
+
+	certificate_properties_display (g_value_get_string(value));
+
+	free (value);
 }
 
 
