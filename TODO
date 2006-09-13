@@ -2,46 +2,35 @@ To-do list in Gnomint
 =====================
 
 * Fix RSA CA-generation  (OK)
-
-* Fix DSA CA-generation  
-
-* Show Certificate details (basic)
-
-* Generate RSA CSRs
-* Generate DSA CSRs
-
+* Fix DSA CA-generation  (OK)
+* Show Certificate details (basic) (OK)
+* Generate RSA CSRs (OK)
+* Generate DSA CSRs (OK)
 * Show CSR details
-
+* Export private key to file (keeping the key in database)
+* Export private key to file (Removing the key from database)
+* Export CSR to file
+* Export CSR-private key to file
+* Export Cert to file (OK)
 * After generating a CA, and CSRs, generate RSA/DSA certificates (not CA-capable)
-
-* Import CSRs
-
 * Fix problems
+* Check for memory leaks
 
 * First public release
 
 * Define CA policies
-
-* Export CA private key to file
-
-* Export CSR to file
-
-* Export CSR-private key to file
-
-* Export Cert to file
-
-* Export Cert-private key to file
+* Import CSRs
+* Secure private key data in database (now is readable opening the
+  database, without password)
 
 * Second public release
 
 * Revoke certificates
-
-* Export CRLs
+* Generate and export CRLs
 
 * Third public release
 
 * Enable CA-hierarchy construction (multi-CA database)
-
 * Import pre-existing CA
 
 * Fourth public release
