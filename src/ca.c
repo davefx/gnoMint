@@ -624,6 +624,7 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 
 			g_io_channel_unref (file);
 
+			gtk_widget_destroy (GTK_WIDGET(dialog));
 			dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 							 GTK_DIALOG_DESTROY_WITH_PARENT,
 							 GTK_MESSAGE_INFO,
@@ -633,7 +634,6 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 			gtk_dialog_run (GTK_DIALOG(dialog));
 			
 			gtk_widget_destroy (GTK_WIDGET(dialog));
-			gtk_widget_destroy (widget);
 
 		}
 
