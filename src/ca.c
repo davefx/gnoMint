@@ -35,9 +35,10 @@ extern sqlite * ca_db;
 
 GtkTreeStore * ca_model = NULL;
 gboolean cert_title_inserted = FALSE;
+GtkTreeIter * cert_parent_iter = NULL;
 GtkTreeIter * last_ca_iter = NULL;
 gboolean csr_title_inserted=FALSE;
-GtkTreeIter * last_parent_iter = NULL;
+GtkTreeIter * csr_parent_iter = NULL;
 
 
 
@@ -78,6 +79,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 				    3, _("<b>Certificates</b>"),
 				    -1);		
 		last_ca_iter = gtk_tree_iter_copy (&iter);
+		cert_parent_iter = gtk_tree_iter_copy (&iter);
 		cert_title_inserted = TRUE;
 	}
 
@@ -86,7 +88,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	gtk_tree_store_set (new_model, &iter,
 			    0, atoi(argv[CA_MODEL_COLUMN_ID]),
 			    1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-			    2, atoi(argv[CA_MODEL_COLUMN_SERIAL]),
+			    2, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
 			    3, argv[CA_MODEL_COLUMN_SUBJECT],
 			    4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
 			    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
@@ -118,12 +120,12 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 		gtk_tree_store_set (new_model, &iter,
 				    3, _("<b>Certificate Signing Requests</b>"),
 				    -1);		
-		last_parent_iter = gtk_tree_iter_copy (&iter);
+		csr_parent_iter = gtk_tree_iter_copy (&iter);
 		csr_title_inserted = TRUE;
 	}
 
 	
-	gtk_tree_store_append (new_model, &iter, last_parent_iter);
+	gtk_tree_store_append (new_model, &iter, csr_parent_iter);
 
 	gtk_tree_store_set (new_model, &iter,
 			    3, argv[CSR_MODEL_COLUMN_SUBJECT],
@@ -159,6 +161,38 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 	size = strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
 	result = strdup (model_time_str);
 
+	g_object_set(G_OBJECT(cell), "text", result, NULL);
+}
+
+
+void __ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
+				     GtkCellRenderer *cell,
+				     GtkTreeModel *tree_model,
+				     GtkTreeIter *iter,
+				     gpointer data)
+{
+	guint64 serial;
+	gchar *result = NULL;
+	gchar * aux = NULL;
+
+	gtk_tree_model_get(tree_model, iter, CA_MODEL_COLUMN_SERIAL, &serial, -1);
+
+	if (serial == 0) {
+		g_object_set (G_OBJECT(cell), "text", "", NULL);
+		return;
+	}
+
+	while (serial > 0) {
+		if (result) {
+			aux = result;
+			result = g_strdup_printf ("%02llX:%s", serial%256, aux);
+			g_free (aux);
+		} else {
+			result = g_strdup_printf ("%02llX", serial%256);
+		}
+
+		serial = serial >> 8;
+	}
 	g_object_set(G_OBJECT(cell), "text", result, NULL);
 }
 
@@ -258,13 +292,13 @@ gboolean ca_refresh_model ()
 	     - Item type
 	*/
 
-	new_model = gtk_tree_store_new (10, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, 
+	new_model = gtk_tree_store_new (10, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_UINT64, G_TYPE_STRING, 
 					G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_INT);
 
 	cert_title_inserted = FALSE;
 	last_ca_iter = NULL;
 	csr_title_inserted=FALSE;
-	last_parent_iter = NULL;
+	csr_parent_iter = NULL;
 
 	sqlite_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, is_revoked, private_key_in_db, pem FROM certificates ORDER BY id",
 		     __ca_refresh_model_add_certificate, new_model, &error_str);
@@ -300,10 +334,9 @@ gboolean ca_refresh_model ()
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
-		gtk_tree_view_insert_column_with_attributes (treeview,
-							     -1, _("Serial"), renderer,
-							     "text", CA_MODEL_COLUMN_SERIAL,
-							     NULL);
+		gtk_tree_view_insert_column_with_data_func (treeview,
+							    -1, _("Serial"), renderer,
+							    __ca_tree_view_serial_datafunc, NULL, g_free);
 		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
@@ -332,8 +365,7 @@ gboolean ca_refresh_model ()
 	return TRUE;
 }
 
-
-void ca_certificate_activated (GtkTreeView *tree_view,
+void __ca_certificate_activated (GtkTreeView *tree_view,
 			       GtkTreePath *path,
 			       GtkTreeViewColumn *column,
 			       gpointer user_data)
@@ -350,6 +382,269 @@ void ca_certificate_activated (GtkTreeView *tree_view,
 	free (value);
 }
 
+void __ca_csr_activated (GtkTreeView *tree_view,
+			       GtkTreePath *path,
+			       GtkTreeViewColumn *column,
+			       gpointer user_data)
+{	
+	GValue * value = g_new0 (GValue, 1);
+	GtkTreeIter iter;
+	GtkTreeModel * tree_model = gtk_tree_view_get_model (tree_view);
+	
+	gtk_tree_model_get_iter (tree_model, &iter, path);
+	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PEM, value);	
+
+	//csr_properties_display (g_value_get_string(value));
+
+	free (value);
+}
+
+void ca_treeview_row_activated (GtkTreeView *tree_view,
+				GtkTreePath *path,
+				GtkTreeViewColumn *column,
+				gpointer user_data)
+{
+	GtkTreePath *parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
+	if (gtk_tree_path_is_ancestor (parent, path) && gtk_tree_path_compare (parent, path)) {
+		__ca_certificate_activated (tree_view, path, column, user_data);
+	} else {
+		gtk_tree_path_free (parent);
+		
+		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
+		if (gtk_tree_path_is_ancestor (parent, path) && gtk_tree_path_compare (parent, path)) {
+			__ca_csr_activated (tree_view, path, column, user_data);
+		}
+	}
+	gtk_tree_path_free (parent);
+	
+
+
+}
+
+
+void __ca_activate_certificate_selection (GtkTreeIter *iter)
+{
+	GtkWidget *widget;
+	gboolean is_ca = FALSE;
+	gboolean pk_indb = FALSE;
+	gboolean is_revoked = FALSE;
+	
+	widget = glade_xml_get_widget (main_window_xml, "actions1");
+	gtk_widget_set_sensitive (widget, TRUE);
+	widget = glade_xml_get_widget (main_window_xml, "export1");
+	gtk_widget_set_sensitive (widget, TRUE);
+
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+			   CA_MODEL_COLUMN_IS_CA, &is_ca, 
+			   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+			   CA_MODEL_COLUMN_IS_REVOKED, &is_revoked, -1);
+	if (pk_indb) {
+		widget = glade_xml_get_widget (main_window_xml, "exportprivatekey1");
+		gtk_widget_set_sensitive (widget, TRUE);
+	}
+
+	if (! is_revoked) {
+		widget = glade_xml_get_widget (main_window_xml, "revoke1");
+		gtk_widget_set_sensitive (widget, TRUE);
+	}
+
+	widget = glade_xml_get_widget (main_window_xml, "sign1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "delete2");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+}
+
+void __ca_activate_csr_selection (GtkTreeIter *iter)
+{
+	GtkWidget *widget;
+	gboolean pk_indb = FALSE;
+	
+	widget = glade_xml_get_widget (main_window_xml, "actions1");
+	gtk_widget_set_sensitive (widget, TRUE);
+	widget = glade_xml_get_widget (main_window_xml, "export1");
+	gtk_widget_set_sensitive (widget, TRUE);
+
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, -1);
+	if (pk_indb) {
+		widget = glade_xml_get_widget (main_window_xml, "exportprivatekey1");
+		gtk_widget_set_sensitive (widget, TRUE);
+	}
+
+	widget = glade_xml_get_widget (main_window_xml, "revoke1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "sign1");
+	gtk_widget_set_sensitive (widget, TRUE);
+
+	widget = glade_xml_get_widget (main_window_xml, "delete2");
+	gtk_widget_set_sensitive (widget, TRUE);
+}
+
+void __ca_deactivate_actions ()
+{
+	GtkWidget *widget;
+	
+	widget = glade_xml_get_widget (main_window_xml, "actions1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "export1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "exportprivatekey1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "revoke1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "sign1");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "delete2");
+	gtk_widget_set_sensitive (widget, FALSE);
+}
+
+gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
+
+	GtkTreeSelection *selection = gtk_tree_view_get_selection (tree_view);
+	GtkTreeIter selection_iter;
+	GtkTreePath *parent = NULL;
+	GtkTreePath *selection_path = NULL;
+
+	if (gtk_tree_selection_count_selected_rows (selection) != 1)
+		return 0;
+
+	gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
+	if (iter)
+		(*iter) = gtk_tree_iter_copy (&selection_iter);
+
+	selection_path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
+	
+	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
+	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+		gtk_tree_path_free (parent);
+		return 1;
+	}
+
+	gtk_tree_path_free (parent);
+	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
+	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+		gtk_tree_path_free (parent);
+		return 2;
+	}
+
+	gtk_tree_path_free (parent);
+	return 0;
+}
+
+void ca_treeview_selection_change (GtkTreeView *tree_view,
+				   gpointer user_data)
+{
+	GtkTreeIter *selection_iter;
+	switch (__ca_selection_type (tree_view, &selection_iter)) {
+	case 1:
+		__ca_activate_certificate_selection (selection_iter);
+		break;
+	case 2:
+		__ca_activate_csr_selection (selection_iter);
+		break;
+	case 0:
+	default:
+		__ca_deactivate_actions();
+		break;
+	}
+}
+
+void __ca_error_dialog (gchar *message) {
+   GtkWidget *dialog, *widget;
+   
+   widget = glade_xml_get_widget (main_window_xml, "main_window1");
+   
+   /* Create the widgets */
+   
+   dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+				    GTK_DIALOG_DESTROY_WITH_PARENT,
+				    GTK_MESSAGE_ERROR,
+				    GTK_BUTTONS_CLOSE,
+				    "%s",
+				    message);
+   
+   gtk_dialog_run (GTK_DIALOG(dialog));
+   
+   gtk_widget_destroy (dialog);
+
+}
+
+void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	GtkWidget *widget = NULL;
+	GIOChannel * file = NULL;
+	gchar * filename = NULL;
+	gchar * pem = NULL;
+	GtkDialog * dialog = NULL;
+	GError * error = NULL;
+	GtkTreeIter *iter;
+
+	switch (__ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter)) {
+	case 1:
+		widget = glade_xml_get_widget (main_window_xml, "main_window1");
+		
+		dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export certificate"),
+						      GTK_WINDOW(widget),
+						      GTK_FILE_CHOOSER_ACTION_SAVE,
+						      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+						      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+						      NULL));
+		gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+
+		if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+			filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+			file = g_io_channel_new_file (filename, "w", &error);
+			if (error) {
+				gtk_widget_destroy (GTK_WIDGET(dialog));
+				__ca_error_dialog (_("There was an error while exporting certificate."));
+				return;
+			} 
+
+			gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &pem, -1);			
+			g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+			if (error) {
+				gtk_widget_destroy (GTK_WIDGET(dialog));
+				__ca_error_dialog (_("There was an error while exporting certificate."));
+				return;
+			} 
+
+			g_io_channel_shutdown (file, TRUE, &error);
+			if (error) {
+				gtk_widget_destroy (GTK_WIDGET(dialog));
+				__ca_error_dialog (_("There was an error while exporting certificate."));
+				return;
+			} 
+
+			g_io_channel_unref (file);
+
+			dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+							 GTK_DIALOG_DESTROY_WITH_PARENT,
+							 GTK_MESSAGE_INFO,
+							 GTK_BUTTONS_CLOSE,
+							 "%s",
+							 _("Certificate exported successfully")));
+			gtk_dialog_run (GTK_DIALOG(dialog));
+			
+			gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_widget_destroy (widget);
+
+		}
+
+		break;
+	case 2:
+		break;
+	case 0:
+	default:
+		break;
+	}
+}
 
 gboolean ca_open (gchar *filename) 
 {
