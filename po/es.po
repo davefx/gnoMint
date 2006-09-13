@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-02 21:11+0200\n"
-"PO-Revision-Date: 2006-08-02 21:13+0200\n"
+"POT-Creation-Date: 2006-09-12 10:30+0200\n"
+"PO-Revision-Date: 2006-09-12 10:37+0200\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,26 +21,58 @@ msgid " "
 msgstr " "
 
 #: ../gui/gnomint.glade.h:2
-msgid "<b>Certificates database</b>"
-msgstr "<b>Base de datos de certificados</b>"
+msgid "<b>Certificate fields</b>"
+msgstr "<b>Campos de certificado</b>"
 
 #: ../gui/gnomint.glade.h:3
+msgid "<b>Certificate hierarchy</b>"
+msgstr "<b>Jerarquía de certificados</b>"
+
+#: ../gui/gnomint.glade.h:4
+msgid "<b>Certificate subject</b>"
+msgstr "<b>Titular del certificado</b>"
+
+#: ../gui/gnomint.glade.h:5
+msgid "<b>Emmited by</b>"
+msgstr "<b>Emitido por</b>"
+
+#: ../gui/gnomint.glade.h:6
+msgid "<b>Field value</b>"
+msgstr "<b>Valor del campo</b>"
+
+#: ../gui/gnomint.glade.h:7
+msgid "<b>Fingerprints</b>"
+msgstr "<b>Huellas digitales</b>"
+
+#: ../gui/gnomint.glade.h:8
+msgid "<b>This certificate has been verified for the following uses:</b>"
+msgstr "<b>Este certificado ha sido validado para los siguientes usos:</b>"
+
+#: ../gui/gnomint.glade.h:9
+msgid "<b>Validity</b>"
+msgstr "<b>Validez</b>"
+
+#: ../gui/gnomint.glade.h:10
 msgid "<big>CA Properties</big>\n"
 msgstr "<big>Propiedades de la AC</big>\n"
 
-#: ../gui/gnomint.glade.h:5
+#: ../gui/gnomint.glade.h:12
 msgid "<big>CA Root certificate properties</big>\n"
 msgstr "<big>Propiedades del certificado raiz de la AC</big>\n"
 
-#: ../gui/gnomint.glade.h:7
+#: ../gui/gnomint.glade.h:14
 msgid "<big>Certificate properties</big>\n"
 msgstr "<big>Propiedades del certificado</big>\n"
 
-#: ../gui/gnomint.glade.h:9
+#: ../gui/gnomint.glade.h:16
 msgid "<big>New certificate properties</big>\n"
 msgstr "<big>Propiedades del nuevo certificado</big>\n"
 
-#: ../gui/gnomint.glade.h:11
+#: ../gui/gnomint.glade.h:18
+msgid "Activated on"
+msgstr "Activado el"
+
+#: ../gui/gnomint.glade.h:19
 msgid ""
 "CA Root Certificate \n"
 "Common Name (CN):"
@@ -48,130 +80,199 @@ msgstr ""
 "Nombre común (CN) del\n"
 "certificado raiz de la AC:"
 
-#: ../gui/gnomint.glade.h:13
+#: ../gui/gnomint.glade.h:21
 msgid "CA properties"
 msgstr "Propiedades de la AC"
 
-#: ../gui/gnomint.glade.h:14
+#: ../gui/gnomint.glade.h:22
+msgid "CACN"
+msgstr "CACN"
+
+#: ../gui/gnomint.glade.h:23
+msgid "CAO"
+msgstr "CAO"
+
+#: ../gui/gnomint.glade.h:24
+msgid "CAOU"
+msgstr "CAOU"
+
+#: ../gui/gnomint.glade.h:25
+msgid "CertActivationDate"
+msgstr "Fecha de activación"
+
+#: ../gui/gnomint.glade.h:26
+msgid "CertExpirationDate"
+msgstr "Fecha de caducidad"
+
+#: ../gui/gnomint.glade.h:27
+msgid "CertSN"
+msgstr "Núm de serie"
+
+#: ../gui/gnomint.glade.h:28
 msgid "City: "
 msgstr "Ciudad"
 
-#: ../gui/gnomint.glade.h:15
+#: ../gui/gnomint.glade.h:29
+msgid "Common Name (CN)"
+msgstr "Nombre común (CN)"
+
+#: ../gui/gnomint.glade.h:30
 msgid "Country:"
 msgstr "País"
 
-#: ../gui/gnomint.glade.h:16
+#: ../gui/gnomint.glade.h:31
 msgid "Creating CA Root Certificate"
 msgstr "Creando certificado raíz de la AC"
 
-#: ../gui/gnomint.glade.h:17
-msgid "Creating new CA - gnoMint"
-msgstr "Creando nueva AC - gnoMint"
-
-#: ../gui/gnomint.glade.h:18
+#: ../gui/gnomint.glade.h:32
 msgid "DSA"
 msgstr "DSA"
 
-#: ../gui/gnomint.glade.h:19
+#: ../gui/gnomint.glade.h:33
+msgid "Details"
+msgstr "Detalles"
+
+#: ../gui/gnomint.glade.h:34
+msgid "Expires on"
+msgstr "Caduca el"
+
+#: ../gui/gnomint.glade.h:35
+msgid "General"
+msgstr "General"
+
+#: ../gui/gnomint.glade.h:36
+msgid "MD5 fingerprint"
+msgstr "Huella digital MD5"
+
+#: ../gui/gnomint.glade.h:37
+msgid "MD5FINGERPRINT"
+msgstr "MD5FINGERPRINT"
+
+#: ../gui/gnomint.glade.h:38
 msgid "Months before certificate expiration:"
 msgstr "Meses antes de la caducidad del certificado:"
 
-#: ../gui/gnomint.glade.h:20
+#: ../gui/gnomint.glade.h:39
 msgid "Months before root certificate expiration:"
 msgstr "Meses antes de la caducidad del certificado raíz:"
 
-#: ../gui/gnomint.glade.h:21
-msgid "New CA - gnoMint"
-msgstr "Nueva AC - gnoMint"
+#: ../gui/gnomint.glade.h:40
+msgid "Organitational Unit (OU)"
+msgstr "Unidad organizativa (OU)"
 
-#: ../gui/gnomint.glade.h:22
-msgid "New C_A"
-msgstr "Nueva _AC"
+#: ../gui/gnomint.glade.h:41
+msgid "Organization (O)"
+msgstr "Organización (O)"
 
-#: ../gui/gnomint.glade.h:23
-msgid "New _Certificate"
-msgstr "Nuevo _Certificado"
-
-#: ../gui/gnomint.glade.h:24
+#: ../gui/gnomint.glade.h:42
 msgid "Organization Unit:"
 msgstr "Unidad organizativa:"
 
-#: ../gui/gnomint.glade.h:25
+#: ../gui/gnomint.glade.h:43
 msgid "Organization:"
 msgstr "Organización:"
 
-#: ../gui/gnomint.glade.h:26
+#: ../gui/gnomint.glade.h:44
+msgid "Organizational Unit (OU)"
+msgstr "Unidad organizativa (OU)"
+
+#: ../gui/gnomint.glade.h:45
 msgid ""
 "Please, insert the data corresponding to the subject of the new "
 "certificate:\n"
-msgstr "Por favor: introduzca los datos correspondientes al titular del "
-"nuevo certificado:\n"
-""
+msgstr ""
+"Por favor: introduzca los datos correspondientes al titular del nuevo "
+"certificado:\n"
 
-#: ../gui/gnomint.glade.h:28
+#: ../gui/gnomint.glade.h:47
 msgid ""
 "Please, select the Certification Authority that will create the new "
 "certificate:"
-msgstr "Por favor: seleccione la Autoridad de Certificación que se empleará para crear el nuevo certificado:"
+msgstr ""
+"Por favor: seleccione la Autoridad de Certificación que se empleará para "
+"crear el nuevo certificado:"
 
-#: ../gui/gnomint.glade.h:29
+#: ../gui/gnomint.glade.h:48
 msgid "Private key bit length:"
 msgstr "Longitud en bits de la clave privada:"
 
-#: ../gui/gnomint.glade.h:30
+#: ../gui/gnomint.glade.h:49
 msgid "Private key type:"
 msgstr "Tipo de clave privada:"
 
-#: ../gui/gnomint.glade.h:31
+#: ../gui/gnomint.glade.h:50
 msgid "RSA"
 msgstr "RSA"
 
-#: ../gui/gnomint.glade.h:32
+#: ../gui/gnomint.glade.h:51
 msgid "Root certificate prop"
 msgstr "Prop. de certificado raíz"
 
-#: ../gui/gnomint.glade.h:33
+#: ../gui/gnomint.glade.h:52
+msgid "SHA1 fingerprint"
+msgstr "Huella digital SHA1"
+
+#: ../gui/gnomint.glade.h:53
+msgid "SHA1FINGERPRINT"
+msgstr "SHA1FINGERPRINT"
+
+#: ../gui/gnomint.glade.h:54
 msgid "Select the CA to sign this new certificate"
 msgstr "Seleccione la AC para firmar este nuevo certificado"
 
-#: ../gui/gnomint.glade.h:34
+#: ../gui/gnomint.glade.h:55
+msgid "Serial number"
+msgstr "Nº de serie"
+
+#: ../gui/gnomint.glade.h:56
 msgid "State or Province name: "
 msgstr "Nombre de estado o provincia: "
 
-#: ../gui/gnomint.glade.h:35
+#: ../gui/gnomint.glade.h:57
 msgid "Subject Common Name (CN):"
-msgstr ""
-"Nombre común (CN) del titular:"
+msgstr "Nombre común (CN) del titular:"
 
-#: ../gui/gnomint.glade.h:36
-msgid "gnoMint"
-msgstr "gnoMint"
+#: ../gui/gnomint.glade.h:58
+msgid "SubjectCN"
+msgstr "NombreTitular"
 
-#: ../src/ca.c:97
-msgid "%m/%d/%Y %R"
-msgstr "%d/%m/%Y %R"
+#: ../gui/gnomint.glade.h:59
+msgid "SubjectO"
+msgstr "OrganizaciónTitular"
 
-#: ../src/ca.c:140
+#: ../gui/gnomint.glade.h:60
+msgid "SubjectOU"
+msgstr "UnidadOrganizativaTitular"
+
+#: ../gui/gnomint.glade.h:61
+msgid "gtk-close"
+msgstr "gtk-close"
+
+#: ../src/ca.c:100
+msgid "%m/%d/%Y %R GMT"
+msgstr "%d/%m/%Y %R GMT"
+
+#: ../src/ca.c:144
 msgid "Serial"
 msgstr "Nº serie"
 
-#: ../src/ca.c:147
+#: ../src/ca.c:151
 msgid "Subject"
 msgstr "Titular"
 
-#: ../src/ca.c:155
+#: ../src/ca.c:159
 msgid "CA"
 msgstr "AC"
 
-#: ../src/ca.c:161
+#: ../src/ca.c:165
 msgid "Private key in DB"
 msgstr "Clave privada en BD"
 
-#: ../src/ca.c:168
+#: ../src/ca.c:172
 msgid "Activation"
 msgstr "Activación"
 
-#: ../src/ca.c:175
+#: ../src/ca.c:179
 msgid "Expiration"
 msgstr "Caducidad"
 
@@ -234,7 +335,7 @@ msgstr "Hubo problemas al abrir la base de datos de la AC '%s'"
 msgid "Save CA database as..."
 msgstr "Guardar base de datos de AC como..."
 
-#: ../src/main.c:283
+#: ../src/main.c:271
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
@@ -242,7 +343,7 @@ msgstr ""
 "gnoMint es un programa diseñado para crear y gestionar Autoridades de "
 "Certificación, así como sus certificados"
 
-#: ../src/main.c:284
+#: ../src/main.c:272
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -272,7 +373,7 @@ msgstr ""
 "con este programa; si no es así, escriba a la Free Software Foundation, "
 "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
 
-#: ../src/main.c:288
+#: ../src/main.c:276
 msgid "translator-credits"
 msgstr "David Marín Carreño <davefx@gmail.com>"
 
@@ -1264,53 +1365,136 @@ msgstr "Zambia"
 msgid "Zimbabwe"
 msgstr "Zimbabue"
 
-#: ../src/tls.c:42 ../src/tls.c:74
+#: ../src/tls.c:43 ../src/tls.c:75
 msgid "Error initializing private key structure."
 msgstr "Error al inicializar estructura de clave privada."
 
-#: ../src/tls.c:47 ../src/tls.c:79
+#: ../src/tls.c:48 ../src/tls.c:80
 msgid "Error creating private key."
 msgstr "Error al crear clave privada."
 
-#: ../src/tls.c:59 ../src/tls.c:91 ../src/tls.c:204
+#: ../src/tls.c:60 ../src/tls.c:92 ../src/tls.c:208
 msgid "Error exporting private key to PEM structure."
 msgstr "Error al exportar clave privada a estructura PEM."
 
-#: ../src/tls.c:109
+#: ../src/tls.c:111
 msgid "Error when initializing certificate structure"
 msgstr "Error al inicializar estructura de certificado"
 
-#: ../src/tls.c:113
+#: ../src/tls.c:115
 msgid "Error when setting certificate version"
 msgstr "Error al establecer versión de certificado"
 
-#: ../src/tls.c:117
+#: ../src/tls.c:120
 msgid "Error when setting certificate serial number"
 msgstr "Error al establecer número de serie del certificado"
 
-#: ../src/tls.c:121
+#: ../src/tls.c:125
 msgid "Error when setting activation time"
 msgstr "Error al establecer fecha de activación"
 
-#: ../src/tls.c:125
+#: ../src/tls.c:129
 msgid "Error when setting expiration time"
 msgstr "Error al establecer fecha y hora de caducidad"
 
-#: ../src/tls.c:170
+#: ../src/tls.c:174
 msgid "Error when setting basicConstraint extension"
 msgstr "Error al establecer extensión basicConstraint"
 
-#: ../src/tls.c:174
+#: ../src/tls.c:178
 msgid "Error when setting keyUsage extension"
 msgstr "Error al establecer extensión keyUsage"
 
-#: ../src/tls.c:184
+#: ../src/tls.c:188
 msgid "Error when setting subject key identifier extension"
 msgstr "Error al establecer extensión identificadora de titular"
 
-#: ../src/tls.c:193
+#: ../src/tls.c:197
 msgid "Error when signing self-signed certificate"
 msgstr "Error al firmar certificado autofirmado"
+
+#: ../src/tls.c:326
+msgid "Certification Authority"
+msgstr "Autoridad de certificación"
+
+#: ../src/tls.c:331
+msgid "Digital signature"
+msgstr "Firma digital"
+
+#: ../src/tls.c:333
+msgid "Non repudiation"
+msgstr "No repudio"
+
+#: ../src/tls.c:335
+msgid "Key encipherment"
+msgstr "Cifrado de claves"
+
+#: ../src/tls.c:337
+msgid "Data encipherment"
+msgstr "Cifrado de datos"
+
+#: ../src/tls.c:339
+msgid "Key agreement"
+msgstr "Negociación de claves"
+
+#: ../src/tls.c:341
+msgid "Certificate signing"
+msgstr "Firma de certificados"
+
+#: ../src/tls.c:343
+msgid "CRL signing"
+msgstr "Firma de CRLs"
+
+#: ../src/tls.c:345
+msgid "Key encipher only"
+msgstr "Clave de sólo cifrado"
+
+#: ../src/tls.c:347
+msgid "Key decipher only"
+msgstr "Clave de sólo descifrado"
+
+#: ../src/tls.c:357
+msgid "TLS WWW Server"
+msgstr "Servidor TLS WWW"
+
+#: ../src/tls.c:359
+msgid "TLS WWW Client."
+msgstr "Cliente TLS WWW"
+
+#: ../src/tls.c:361
+msgid "Code signing"
+msgstr "Firma de código"
+
+#: ../src/tls.c:363
+msgid "Email protection"
+msgstr "Protección de correo electrónico"
+
+#: ../src/tls.c:365
+msgid "Time stamping"
+msgstr "Marcado de fecha"
+
+#: ../src/tls.c:367
+msgid "OCSP signing"
+msgstr "Firma de OCSP"
+
+#: ../src/tls.c:369
+msgid "Any purpose"
+msgstr "Cualquier propósito"
+
+#~ msgid "Creating new CA - gnoMint"
+#~ msgstr "Creando nueva AC - gnoMint"
+
+#~ msgid "New CA - gnoMint"
+#~ msgstr "Nueva AC - gnoMint"
+
+#~ msgid "New C_A"
+#~ msgstr "Nueva _AC"
+
+#~ msgid "New _Certificate"
+#~ msgstr "Nuevo _Certificado"
+
+#~ msgid "gnoMint"
+#~ msgstr "gnoMint"
 
 #~ msgid "_New"
 #~ msgstr "_Nuevo"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-30 12:21+0200\n"
+"POT-Creation-Date: 2006-09-12 10:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,112 +21,252 @@ msgid " "
 msgstr ""
 
 #: ../gui/gnomint.glade.h:2
-msgid "<big>CA Properties</big>\n"
+msgid "<b>Certificate fields</b>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:3
+msgid "<b>Certificate hierarchy</b>"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:4
-msgid "<big>CA Root certificate properties</big>\n"
+msgid "<b>Certificate subject</b>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:5
+msgid "<b>Emmited by</b>"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:6
+msgid "<b>Field value</b>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:7
+msgid "<b>Fingerprints</b>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:8
+msgid "<b>This certificate has been verified for the following uses:</b>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:9
+msgid "<b>Validity</b>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:10
+msgid "<big>CA Properties</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:12
+msgid "<big>CA Root certificate properties</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:14
+msgid "<big>Certificate properties</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:16
+msgid "<big>New certificate properties</big>\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:18
+msgid "Activated on"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:19
 msgid ""
 "CA Root Certificate \n"
 "Common Name (CN):"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:8
+#: ../gui/gnomint.glade.h:21
 msgid "CA properties"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:9
-msgid "City: "
-msgstr ""
-
-#: ../gui/gnomint.glade.h:10
-msgid "Country:"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:11
-msgid "Creating CA Root Certificate"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:12
-msgid "Creating new CA - gnoMint"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:13
-msgid "DSA"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:14
-msgid "Months before root certificate expiration:"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:15
-msgid "New CA - gnoMint"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:16
-msgid "New C_A"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:17
-msgid "New _Certificate"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:18
-msgid "Organization Unit:"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:19
-msgid "Organization:"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:20
-msgid "Private key bit length:"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:21
-msgid "Private key type:"
-msgstr ""
-
 #: ../gui/gnomint.glade.h:22
-msgid "RSA"
+msgid "CACN"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:23
-msgid "Root certificate prop"
+msgid "CAO"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:24
-msgid "State or Province name: "
+msgid "CAOU"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:25
-msgid "gnoMint"
+msgid "CertActivationDate"
 msgstr ""
 
-#: ../src/ca.c:140
+#: ../gui/gnomint.glade.h:26
+msgid "CertExpirationDate"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:27
+msgid "CertSN"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:28
+msgid "City: "
+msgstr ""
+
+#: ../gui/gnomint.glade.h:29
+msgid "Common Name (CN)"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:30
+msgid "Country:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:31
+msgid "Creating CA Root Certificate"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:32
+msgid "DSA"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:33
+msgid "Details"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:34
+msgid "Expires on"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:35
+msgid "General"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:36
+msgid "MD5 fingerprint"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:37
+msgid "MD5FINGERPRINT"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:38
+msgid "Months before certificate expiration:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:39
+msgid "Months before root certificate expiration:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:40
+msgid "Organitational Unit (OU)"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:41
+msgid "Organization (O)"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:42
+msgid "Organization Unit:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:43
+msgid "Organization:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:44
+msgid "Organizational Unit (OU)"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:45
+msgid ""
+"Please, insert the data corresponding to the subject of the new "
+"certificate:\n"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:47
+msgid ""
+"Please, select the Certification Authority that will create the new "
+"certificate:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:48
+msgid "Private key bit length:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:49
+msgid "Private key type:"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:50
+msgid "RSA"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:51
+msgid "Root certificate prop"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:52
+msgid "SHA1 fingerprint"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:53
+msgid "SHA1FINGERPRINT"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:54
+msgid "Select the CA to sign this new certificate"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:55
+msgid "Serial number"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:56
+msgid "State or Province name: "
+msgstr ""
+
+#: ../gui/gnomint.glade.h:57
+msgid "Subject Common Name (CN):"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:58
+msgid "SubjectCN"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:59
+msgid "SubjectO"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:60
+msgid "SubjectOU"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:61
+msgid "gtk-close"
+msgstr ""
+
+#: ../src/ca.c:100
+msgid "%m/%d/%Y %R GMT"
+msgstr ""
+
+#: ../src/ca.c:144
 msgid "Serial"
 msgstr ""
 
-#: ../src/ca.c:147
+#: ../src/ca.c:151
 msgid "Subject"
 msgstr ""
 
-#: ../src/ca.c:155
+#: ../src/ca.c:159
 msgid "CA"
 msgstr ""
 
-#: ../src/ca.c:161
+#: ../src/ca.c:165
 msgid "Private key in DB"
 msgstr ""
 
-#: ../src/ca.c:168
+#: ../src/ca.c:172
 msgid "Activation"
 msgstr ""
 
-#: ../src/ca.c:175
+#: ../src/ca.c:179
 msgid "Expiration"
 msgstr ""
 
@@ -167,35 +307,35 @@ msgstr ""
 msgid "Error opening filename '%s'"
 msgstr ""
 
-#: ../src/main.c:89
+#: ../src/main.c:92
 msgid "- A graphical Certification Authority manager"
 msgstr ""
 
-#: ../src/main.c:92
+#: ../src/main.c:95
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr ""
 
-#: ../src/main.c:151
+#: ../src/main.c:160
 msgid "Open CA database"
 msgstr ""
 
-#: ../src/main.c:172
+#: ../src/main.c:181
 #, c-format
 msgid "Problem when opening '%s' CA database"
 msgstr ""
 
-#: ../src/main.c:190
+#: ../src/main.c:199
 msgid "Save CA database as..."
 msgstr ""
 
-#: ../src/main.c:274
+#: ../src/main.c:271
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
 msgstr ""
 
-#: ../src/main.c:275
+#: ../src/main.c:272
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -212,1042 +352,1110 @@ msgid ""
 "Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
 msgstr ""
 
-#: ../src/main.c:279
+#: ../src/main.c:276
 msgid "translator-credits"
 msgstr ""
 
-#: ../src/new_ca_creation_process.c:67
+#: ../src/new_cert_creation_process.c:68
 msgid "Save CA database"
 msgstr ""
 
-#: ../src/new_ca_creation_process.c:79
+#: ../src/new_cert_creation_process.c:80
 msgid "Problem when saving new CA database"
 msgstr ""
 
-#: ../src/new_ca_creation_process.c:87
+#: ../src/new_cert_creation_process.c:88
 msgid "CA creation process finished"
 msgstr ""
 
-#: ../src/new_ca_creation_process.c:196
+#: ../src/new_cert_creation_process.c:197
 msgid "CA creation process cancelled"
 msgstr ""
 
-#: ../src/new_ca_window.c:77
+#: ../src/new_cert_window.c:78
 msgid "Afghanistan"
 msgstr ""
 
-#: ../src/new_ca_window.c:79
+#: ../src/new_cert_window.c:80
 msgid "Aland Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:81
+#: ../src/new_cert_window.c:82
 msgid "Albania"
 msgstr ""
 
-#: ../src/new_ca_window.c:83
+#: ../src/new_cert_window.c:84
 msgid "Algeria"
 msgstr ""
 
-#: ../src/new_ca_window.c:85
+#: ../src/new_cert_window.c:86
 msgid "American Samoa"
 msgstr ""
 
-#: ../src/new_ca_window.c:87
+#: ../src/new_cert_window.c:88
 msgid "Andorra"
 msgstr ""
 
-#: ../src/new_ca_window.c:89
+#: ../src/new_cert_window.c:90
 msgid "Angola"
 msgstr ""
 
-#: ../src/new_ca_window.c:91
+#: ../src/new_cert_window.c:92
 msgid "Anguilla"
 msgstr ""
 
-#: ../src/new_ca_window.c:93
+#: ../src/new_cert_window.c:94
 msgid "Antarctica"
 msgstr ""
 
-#: ../src/new_ca_window.c:95
+#: ../src/new_cert_window.c:96
 msgid "Antigua and Barbuda"
 msgstr ""
 
-#: ../src/new_ca_window.c:97
+#: ../src/new_cert_window.c:98
 msgid "Argentina"
 msgstr ""
 
-#: ../src/new_ca_window.c:99
+#: ../src/new_cert_window.c:100
 msgid "Armenia"
 msgstr ""
 
-#: ../src/new_ca_window.c:101
+#: ../src/new_cert_window.c:102
 msgid "Aruba"
 msgstr ""
 
-#: ../src/new_ca_window.c:103
+#: ../src/new_cert_window.c:104
 msgid "Australia"
 msgstr ""
 
-#: ../src/new_ca_window.c:105
+#: ../src/new_cert_window.c:106
 msgid "Austria"
 msgstr ""
 
-#: ../src/new_ca_window.c:107
+#: ../src/new_cert_window.c:108
 msgid "Azerbaijan"
 msgstr ""
 
-#: ../src/new_ca_window.c:109
+#: ../src/new_cert_window.c:110
 msgid "Bahamas"
 msgstr ""
 
-#: ../src/new_ca_window.c:111
+#: ../src/new_cert_window.c:112
 msgid "Bahrain"
 msgstr ""
 
-#: ../src/new_ca_window.c:113
+#: ../src/new_cert_window.c:114
 msgid "Bangladesh"
 msgstr ""
 
-#: ../src/new_ca_window.c:115
+#: ../src/new_cert_window.c:116
 msgid "Barbados"
 msgstr ""
 
-#: ../src/new_ca_window.c:117
+#: ../src/new_cert_window.c:118
 msgid "Belarus"
 msgstr ""
 
-#: ../src/new_ca_window.c:119
+#: ../src/new_cert_window.c:120
 msgid "Belgium"
 msgstr ""
 
-#: ../src/new_ca_window.c:121
+#: ../src/new_cert_window.c:122
 msgid "Belize"
 msgstr ""
 
-#: ../src/new_ca_window.c:123
+#: ../src/new_cert_window.c:124
 msgid "Benin"
 msgstr ""
 
-#: ../src/new_ca_window.c:125
+#: ../src/new_cert_window.c:126
 msgid "Bermuda"
 msgstr ""
 
-#: ../src/new_ca_window.c:127
+#: ../src/new_cert_window.c:128
 msgid "Bhutan"
 msgstr ""
 
-#: ../src/new_ca_window.c:129
+#: ../src/new_cert_window.c:130
 msgid "Bolivia"
 msgstr ""
 
-#: ../src/new_ca_window.c:131
+#: ../src/new_cert_window.c:132
 msgid "Bosnia and Herzegovina"
 msgstr ""
 
-#: ../src/new_ca_window.c:133
+#: ../src/new_cert_window.c:134
 msgid "Botswana"
 msgstr ""
 
-#: ../src/new_ca_window.c:135
+#: ../src/new_cert_window.c:136
 msgid "Bouvet Island"
 msgstr ""
 
-#: ../src/new_ca_window.c:137
+#: ../src/new_cert_window.c:138
 msgid "Brazil"
 msgstr ""
 
-#: ../src/new_ca_window.c:139
+#: ../src/new_cert_window.c:140
 msgid "British Indian Ocean Territory"
 msgstr ""
 
-#: ../src/new_ca_window.c:141
+#: ../src/new_cert_window.c:142
 msgid "Brunei Darussalam"
 msgstr ""
 
-#: ../src/new_ca_window.c:143
+#: ../src/new_cert_window.c:144
 msgid "Bulgaria"
 msgstr ""
 
-#: ../src/new_ca_window.c:145
+#: ../src/new_cert_window.c:146
 msgid "Burkina Faso"
 msgstr ""
 
-#: ../src/new_ca_window.c:147
+#: ../src/new_cert_window.c:148
 msgid "Burundi"
 msgstr ""
 
-#: ../src/new_ca_window.c:149
+#: ../src/new_cert_window.c:150
 msgid "Cambodia"
 msgstr ""
 
-#: ../src/new_ca_window.c:151
+#: ../src/new_cert_window.c:152
 msgid "Cameroon"
 msgstr ""
 
-#: ../src/new_ca_window.c:153
+#: ../src/new_cert_window.c:154
 msgid "Canada"
 msgstr ""
 
-#: ../src/new_ca_window.c:155
+#: ../src/new_cert_window.c:156
 msgid "Cape Verde"
 msgstr ""
 
-#: ../src/new_ca_window.c:157
+#: ../src/new_cert_window.c:158
 msgid "Cayman Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:159
+#: ../src/new_cert_window.c:160
 msgid "Central African Republic"
 msgstr ""
 
-#: ../src/new_ca_window.c:161
+#: ../src/new_cert_window.c:162
 msgid "Chad"
 msgstr ""
 
-#: ../src/new_ca_window.c:163
+#: ../src/new_cert_window.c:164
 msgid "Chile"
 msgstr ""
 
-#: ../src/new_ca_window.c:165
+#: ../src/new_cert_window.c:166
 msgid "China"
 msgstr ""
 
-#: ../src/new_ca_window.c:167
+#: ../src/new_cert_window.c:168
 msgid "Christmas Island"
 msgstr ""
 
-#: ../src/new_ca_window.c:169
+#: ../src/new_cert_window.c:170
 msgid "Cocos (Keeling) Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:171
+#: ../src/new_cert_window.c:172
 msgid "Colombia"
 msgstr ""
 
-#: ../src/new_ca_window.c:173
+#: ../src/new_cert_window.c:174
 msgid "Comoros"
 msgstr ""
 
-#: ../src/new_ca_window.c:175
+#: ../src/new_cert_window.c:176
 msgid "Congo"
 msgstr ""
 
-#: ../src/new_ca_window.c:177
+#: ../src/new_cert_window.c:178
 msgid "Congo, the Democratic Republic of the"
 msgstr ""
 
-#: ../src/new_ca_window.c:179
+#: ../src/new_cert_window.c:180
 msgid "Cook Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:181
+#: ../src/new_cert_window.c:182
 msgid "Costa Rica"
 msgstr ""
 
-#: ../src/new_ca_window.c:183
+#: ../src/new_cert_window.c:184
 msgid "Cote d'Ivoire"
 msgstr ""
 
-#: ../src/new_ca_window.c:185
+#: ../src/new_cert_window.c:186
 msgid "Croatia"
 msgstr ""
 
-#: ../src/new_ca_window.c:187
+#: ../src/new_cert_window.c:188
 msgid "Cuba"
 msgstr ""
 
-#: ../src/new_ca_window.c:189
+#: ../src/new_cert_window.c:190
 msgid "Cyprus"
 msgstr ""
 
-#: ../src/new_ca_window.c:191
+#: ../src/new_cert_window.c:192
 msgid "Czech Republic"
 msgstr ""
 
-#: ../src/new_ca_window.c:193
+#: ../src/new_cert_window.c:194
 msgid "Denmark"
 msgstr ""
 
-#: ../src/new_ca_window.c:195
+#: ../src/new_cert_window.c:196
 msgid "Djibouti"
 msgstr ""
 
-#: ../src/new_ca_window.c:197
+#: ../src/new_cert_window.c:198
 msgid "Dominica"
 msgstr ""
 
-#: ../src/new_ca_window.c:199
+#: ../src/new_cert_window.c:200
 msgid "Dominican Republic"
 msgstr ""
 
-#: ../src/new_ca_window.c:201
+#: ../src/new_cert_window.c:202
 msgid "Ecuador"
 msgstr ""
 
-#: ../src/new_ca_window.c:203
+#: ../src/new_cert_window.c:204
 msgid "Egypt"
 msgstr ""
 
-#: ../src/new_ca_window.c:205
+#: ../src/new_cert_window.c:206
 msgid "El Salvador"
 msgstr ""
 
-#: ../src/new_ca_window.c:207
+#: ../src/new_cert_window.c:208
 msgid "Equatorial Guinea"
 msgstr ""
 
-#: ../src/new_ca_window.c:209
+#: ../src/new_cert_window.c:210
 msgid "Eritrea"
 msgstr ""
 
-#: ../src/new_ca_window.c:211
+#: ../src/new_cert_window.c:212
 msgid "Estonia"
 msgstr ""
 
-#: ../src/new_ca_window.c:213
+#: ../src/new_cert_window.c:214
 msgid "Ethiopia"
 msgstr ""
 
-#: ../src/new_ca_window.c:215
+#: ../src/new_cert_window.c:216
 msgid "Falkland Islands (Malvinas)"
 msgstr ""
 
-#: ../src/new_ca_window.c:217
+#: ../src/new_cert_window.c:218
 msgid "Faroe Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:219
+#: ../src/new_cert_window.c:220
 msgid "Fiji"
 msgstr ""
 
-#: ../src/new_ca_window.c:221
+#: ../src/new_cert_window.c:222
 msgid "Finland"
 msgstr ""
 
-#: ../src/new_ca_window.c:223
+#: ../src/new_cert_window.c:224
 msgid "France"
 msgstr ""
 
-#: ../src/new_ca_window.c:225
+#: ../src/new_cert_window.c:226
 msgid "French Guiana"
 msgstr ""
 
-#: ../src/new_ca_window.c:227
+#: ../src/new_cert_window.c:228
 msgid "French Polynesia"
 msgstr ""
 
-#: ../src/new_ca_window.c:229
+#: ../src/new_cert_window.c:230
 msgid "French Southern Territories"
 msgstr ""
 
-#: ../src/new_ca_window.c:231
+#: ../src/new_cert_window.c:232
 msgid "Gabon"
 msgstr ""
 
-#: ../src/new_ca_window.c:233
+#: ../src/new_cert_window.c:234
 msgid "Gambia"
 msgstr ""
 
-#: ../src/new_ca_window.c:235
+#: ../src/new_cert_window.c:236
 msgid "Georgia"
 msgstr ""
 
-#: ../src/new_ca_window.c:237
+#: ../src/new_cert_window.c:238
 msgid "Germany"
 msgstr ""
 
-#: ../src/new_ca_window.c:239
+#: ../src/new_cert_window.c:240
 msgid "Ghana"
 msgstr ""
 
-#: ../src/new_ca_window.c:241
+#: ../src/new_cert_window.c:242
 msgid "Gibraltar"
 msgstr ""
 
-#: ../src/new_ca_window.c:243
+#: ../src/new_cert_window.c:244
 msgid "Greece"
 msgstr ""
 
-#: ../src/new_ca_window.c:245
+#: ../src/new_cert_window.c:246
 msgid "Greenland"
 msgstr ""
 
-#: ../src/new_ca_window.c:247
+#: ../src/new_cert_window.c:248
 msgid "Grenada"
 msgstr ""
 
-#: ../src/new_ca_window.c:249
+#: ../src/new_cert_window.c:250
 msgid "Guadeloupe"
 msgstr ""
 
-#: ../src/new_ca_window.c:251
+#: ../src/new_cert_window.c:252
 msgid "Guam"
 msgstr ""
 
-#: ../src/new_ca_window.c:253
+#: ../src/new_cert_window.c:254
 msgid "Guatemala"
 msgstr ""
 
-#: ../src/new_ca_window.c:255
+#: ../src/new_cert_window.c:256
 msgid "Guernsey"
 msgstr ""
 
-#: ../src/new_ca_window.c:257
+#: ../src/new_cert_window.c:258
 msgid "Guinea"
 msgstr ""
 
-#: ../src/new_ca_window.c:259
+#: ../src/new_cert_window.c:260
 msgid "Guinea-Bissau"
 msgstr ""
 
-#: ../src/new_ca_window.c:261
+#: ../src/new_cert_window.c:262
 msgid "Guyana"
 msgstr ""
 
-#: ../src/new_ca_window.c:263
+#: ../src/new_cert_window.c:264
 msgid "Haiti"
 msgstr ""
 
-#: ../src/new_ca_window.c:265
+#: ../src/new_cert_window.c:266
 msgid "Heard Island and Mcdonald Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:267
+#: ../src/new_cert_window.c:268
 msgid "Holy See (Vatican City State)"
 msgstr ""
 
-#: ../src/new_ca_window.c:269
+#: ../src/new_cert_window.c:270
 msgid "Honduras"
 msgstr ""
 
-#: ../src/new_ca_window.c:271
+#: ../src/new_cert_window.c:272
 msgid "Hong Kong"
 msgstr ""
 
-#: ../src/new_ca_window.c:273
+#: ../src/new_cert_window.c:274
 msgid "Hungary"
 msgstr ""
 
-#: ../src/new_ca_window.c:275
+#: ../src/new_cert_window.c:276
 msgid "Iceland"
 msgstr ""
 
-#: ../src/new_ca_window.c:277
+#: ../src/new_cert_window.c:278
 msgid "India"
 msgstr ""
 
-#: ../src/new_ca_window.c:279
+#: ../src/new_cert_window.c:280
 msgid "Indonesia"
 msgstr ""
 
-#: ../src/new_ca_window.c:281
+#: ../src/new_cert_window.c:282
 msgid "Iran, Islamic Republic of"
 msgstr ""
 
-#: ../src/new_ca_window.c:283
+#: ../src/new_cert_window.c:284
 msgid "Iraq"
 msgstr ""
 
-#: ../src/new_ca_window.c:285
+#: ../src/new_cert_window.c:286
 msgid "Ireland"
 msgstr ""
 
-#: ../src/new_ca_window.c:287
+#: ../src/new_cert_window.c:288
 msgid "Isle of Man"
 msgstr ""
 
-#: ../src/new_ca_window.c:289
+#: ../src/new_cert_window.c:290
 msgid "Israel"
 msgstr ""
 
-#: ../src/new_ca_window.c:291
+#: ../src/new_cert_window.c:292
 msgid "Italy"
 msgstr ""
 
-#: ../src/new_ca_window.c:293
+#: ../src/new_cert_window.c:294
 msgid "Jamaica"
 msgstr ""
 
-#: ../src/new_ca_window.c:295
+#: ../src/new_cert_window.c:296
 msgid "Japan"
 msgstr ""
 
-#: ../src/new_ca_window.c:297
+#: ../src/new_cert_window.c:298
 msgid "Jersey"
 msgstr ""
 
-#: ../src/new_ca_window.c:299
+#: ../src/new_cert_window.c:300
 msgid "Jordan"
 msgstr ""
 
-#: ../src/new_ca_window.c:301
+#: ../src/new_cert_window.c:302
 msgid "Kazakhstan"
 msgstr ""
 
-#: ../src/new_ca_window.c:303
+#: ../src/new_cert_window.c:304
 msgid "Kenya"
 msgstr ""
 
-#: ../src/new_ca_window.c:305
+#: ../src/new_cert_window.c:306
 msgid "Kiribati"
 msgstr ""
 
-#: ../src/new_ca_window.c:307
+#: ../src/new_cert_window.c:308
 msgid "Korea, Democratic People's Republic of"
 msgstr ""
 
-#: ../src/new_ca_window.c:309
+#: ../src/new_cert_window.c:310
 msgid "Korea, Republic of"
 msgstr ""
 
-#: ../src/new_ca_window.c:311
+#: ../src/new_cert_window.c:312
 msgid "Kuwait"
 msgstr ""
 
-#: ../src/new_ca_window.c:313
+#: ../src/new_cert_window.c:314
 msgid "Kyrgyzstan"
 msgstr ""
 
-#: ../src/new_ca_window.c:315
+#: ../src/new_cert_window.c:316
 msgid "Lao People's Democratic Republic"
 msgstr ""
 
-#: ../src/new_ca_window.c:317
+#: ../src/new_cert_window.c:318
 msgid "Latvia"
 msgstr ""
 
-#: ../src/new_ca_window.c:319
+#: ../src/new_cert_window.c:320
 msgid "Lebanon"
 msgstr ""
 
-#: ../src/new_ca_window.c:321
+#: ../src/new_cert_window.c:322
 msgid "Lesotho"
 msgstr ""
 
-#: ../src/new_ca_window.c:323
+#: ../src/new_cert_window.c:324
 msgid "Liberia"
 msgstr ""
 
-#: ../src/new_ca_window.c:325
+#: ../src/new_cert_window.c:326
 msgid "Libyan Arab Jamahiriya"
 msgstr ""
 
-#: ../src/new_ca_window.c:327
+#: ../src/new_cert_window.c:328
 msgid "Liechtenstein"
 msgstr ""
 
-#: ../src/new_ca_window.c:329
+#: ../src/new_cert_window.c:330
 msgid "Lithuania"
 msgstr ""
 
-#: ../src/new_ca_window.c:331
+#: ../src/new_cert_window.c:332
 msgid "Luxembourg"
 msgstr ""
 
-#: ../src/new_ca_window.c:333
+#: ../src/new_cert_window.c:334
 msgid "Macao"
 msgstr ""
 
-#: ../src/new_ca_window.c:335
+#: ../src/new_cert_window.c:336
 msgid "Macedonia, The Former Yugoslav Republic of"
 msgstr ""
 
-#: ../src/new_ca_window.c:337
+#: ../src/new_cert_window.c:338
 msgid "Madagascar"
 msgstr ""
 
-#: ../src/new_ca_window.c:339
+#: ../src/new_cert_window.c:340
 msgid "Malawi"
 msgstr ""
 
-#: ../src/new_ca_window.c:341
+#: ../src/new_cert_window.c:342
 msgid "Malaysia"
 msgstr ""
 
-#: ../src/new_ca_window.c:343
+#: ../src/new_cert_window.c:344
 msgid "Maldives"
 msgstr ""
 
-#: ../src/new_ca_window.c:345
+#: ../src/new_cert_window.c:346
 msgid "Mali"
 msgstr ""
 
-#: ../src/new_ca_window.c:347
+#: ../src/new_cert_window.c:348
 msgid "Malta"
 msgstr ""
 
-#: ../src/new_ca_window.c:349
+#: ../src/new_cert_window.c:350
 msgid "Marshall Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:351
+#: ../src/new_cert_window.c:352
 msgid "Martinique"
 msgstr ""
 
-#: ../src/new_ca_window.c:353
+#: ../src/new_cert_window.c:354
 msgid "Mauritania"
 msgstr ""
 
-#: ../src/new_ca_window.c:355
+#: ../src/new_cert_window.c:356
 msgid "Mauritius"
 msgstr ""
 
-#: ../src/new_ca_window.c:357
+#: ../src/new_cert_window.c:358
 msgid "Mayotte"
 msgstr ""
 
-#: ../src/new_ca_window.c:359
+#: ../src/new_cert_window.c:360
 msgid "Mexico"
 msgstr ""
 
-#: ../src/new_ca_window.c:361
+#: ../src/new_cert_window.c:362
 msgid "Micronesia, Federated States of"
 msgstr ""
 
-#: ../src/new_ca_window.c:363
+#: ../src/new_cert_window.c:364
 msgid "Moldova, Republic of"
 msgstr ""
 
-#: ../src/new_ca_window.c:365
+#: ../src/new_cert_window.c:366
 msgid "Monaco"
 msgstr ""
 
-#: ../src/new_ca_window.c:367
+#: ../src/new_cert_window.c:368
 msgid "Mongolia"
 msgstr ""
 
-#: ../src/new_ca_window.c:369
+#: ../src/new_cert_window.c:370
 msgid "Montserrat"
 msgstr ""
 
-#: ../src/new_ca_window.c:371
+#: ../src/new_cert_window.c:372
 msgid "Morocco"
 msgstr ""
 
-#: ../src/new_ca_window.c:373
+#: ../src/new_cert_window.c:374
 msgid "Mozambique"
 msgstr ""
 
-#: ../src/new_ca_window.c:375
+#: ../src/new_cert_window.c:376
 msgid "Myanmar"
 msgstr ""
 
-#: ../src/new_ca_window.c:377
+#: ../src/new_cert_window.c:378
 msgid "Namibia"
 msgstr ""
 
-#: ../src/new_ca_window.c:379
+#: ../src/new_cert_window.c:380
 msgid "Nauru"
 msgstr ""
 
-#: ../src/new_ca_window.c:381
+#: ../src/new_cert_window.c:382
 msgid "Nepal"
 msgstr ""
 
-#: ../src/new_ca_window.c:383
+#: ../src/new_cert_window.c:384
 msgid "Netherlands"
 msgstr ""
 
-#: ../src/new_ca_window.c:385
+#: ../src/new_cert_window.c:386
 msgid "Netherlands Antilles"
 msgstr ""
 
-#: ../src/new_ca_window.c:387
+#: ../src/new_cert_window.c:388
 msgid "New Caledonia"
 msgstr ""
 
-#: ../src/new_ca_window.c:389
+#: ../src/new_cert_window.c:390
 msgid "New Zealand"
 msgstr ""
 
-#: ../src/new_ca_window.c:391
+#: ../src/new_cert_window.c:392
 msgid "Nicaragua"
 msgstr ""
 
-#: ../src/new_ca_window.c:393
+#: ../src/new_cert_window.c:394
 msgid "Niger"
 msgstr ""
 
-#: ../src/new_ca_window.c:395
+#: ../src/new_cert_window.c:396
 msgid "Nigeria"
 msgstr ""
 
-#: ../src/new_ca_window.c:397
+#: ../src/new_cert_window.c:398
 msgid "Niue"
 msgstr ""
 
-#: ../src/new_ca_window.c:399
+#: ../src/new_cert_window.c:400
 msgid "Norfolk Island"
 msgstr ""
 
-#: ../src/new_ca_window.c:401
+#: ../src/new_cert_window.c:402
 msgid "Northern Mariana Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:403
+#: ../src/new_cert_window.c:404
 msgid "Norway"
 msgstr ""
 
-#: ../src/new_ca_window.c:405
+#: ../src/new_cert_window.c:406
 msgid "Oman"
 msgstr ""
 
-#: ../src/new_ca_window.c:407
+#: ../src/new_cert_window.c:408
 msgid "Pakistan"
 msgstr ""
 
-#: ../src/new_ca_window.c:409
+#: ../src/new_cert_window.c:410
 msgid "Palau"
 msgstr ""
 
-#: ../src/new_ca_window.c:411
+#: ../src/new_cert_window.c:412
 msgid "Palestinian Territory, Occupied"
 msgstr ""
 
-#: ../src/new_ca_window.c:413
+#: ../src/new_cert_window.c:414
 msgid "Panama"
 msgstr ""
 
-#: ../src/new_ca_window.c:415
+#: ../src/new_cert_window.c:416
 msgid "Papua New Guinea"
 msgstr ""
 
-#: ../src/new_ca_window.c:417
+#: ../src/new_cert_window.c:418
 msgid "Paraguay"
 msgstr ""
 
-#: ../src/new_ca_window.c:419
+#: ../src/new_cert_window.c:420
 msgid "Peru"
 msgstr ""
 
-#: ../src/new_ca_window.c:421
+#: ../src/new_cert_window.c:422
 msgid "Philippines"
 msgstr ""
 
-#: ../src/new_ca_window.c:423
+#: ../src/new_cert_window.c:424
 msgid "Pitcairn"
 msgstr ""
 
-#: ../src/new_ca_window.c:425
+#: ../src/new_cert_window.c:426
 msgid "Poland"
 msgstr ""
 
-#: ../src/new_ca_window.c:427
+#: ../src/new_cert_window.c:428
 msgid "Portugal"
 msgstr ""
 
-#: ../src/new_ca_window.c:429
+#: ../src/new_cert_window.c:430
 msgid "Puerto Rico"
 msgstr ""
 
-#: ../src/new_ca_window.c:431
+#: ../src/new_cert_window.c:432
 msgid "Qatar"
 msgstr ""
 
-#: ../src/new_ca_window.c:433
+#: ../src/new_cert_window.c:434
 msgid "Reunion"
 msgstr ""
 
-#: ../src/new_ca_window.c:435
+#: ../src/new_cert_window.c:436
 msgid "Romania"
 msgstr ""
 
-#: ../src/new_ca_window.c:437
+#: ../src/new_cert_window.c:438
 msgid "Russian Federation"
 msgstr ""
 
-#: ../src/new_ca_window.c:439
+#: ../src/new_cert_window.c:440
 msgid "Rwanda"
 msgstr ""
 
-#: ../src/new_ca_window.c:441
+#: ../src/new_cert_window.c:442
 msgid "Saint Helena"
 msgstr ""
 
-#: ../src/new_ca_window.c:443
+#: ../src/new_cert_window.c:444
 msgid "Saint Kitts and Nevis"
 msgstr ""
 
-#: ../src/new_ca_window.c:445
+#: ../src/new_cert_window.c:446
 msgid "Saint Lucia"
 msgstr ""
 
-#: ../src/new_ca_window.c:447
+#: ../src/new_cert_window.c:448
 msgid "Saint Pierre and Miquelon"
 msgstr ""
 
-#: ../src/new_ca_window.c:449
+#: ../src/new_cert_window.c:450
 msgid "Saint Vincent and the Grenadines"
 msgstr ""
 
-#: ../src/new_ca_window.c:451
+#: ../src/new_cert_window.c:452
 msgid "Samoa"
 msgstr ""
 
-#: ../src/new_ca_window.c:453
+#: ../src/new_cert_window.c:454
 msgid "San Marino"
 msgstr ""
 
-#: ../src/new_ca_window.c:455
+#: ../src/new_cert_window.c:456
 msgid "Sao Tome and Principe"
 msgstr ""
 
-#: ../src/new_ca_window.c:457
+#: ../src/new_cert_window.c:458
 msgid "Saudi Arabia"
 msgstr ""
 
-#: ../src/new_ca_window.c:459
+#: ../src/new_cert_window.c:460
 msgid "Senegal"
 msgstr ""
 
-#: ../src/new_ca_window.c:461
+#: ../src/new_cert_window.c:462
 msgid "Serbia and Montenegro"
 msgstr ""
 
-#: ../src/new_ca_window.c:463
+#: ../src/new_cert_window.c:464
 msgid "Seychelles"
 msgstr ""
 
-#: ../src/new_ca_window.c:465
+#: ../src/new_cert_window.c:466
 msgid "Sierra Leone"
 msgstr ""
 
-#: ../src/new_ca_window.c:467
+#: ../src/new_cert_window.c:468
 msgid "Singapore"
 msgstr ""
 
-#: ../src/new_ca_window.c:469
+#: ../src/new_cert_window.c:470
 msgid "Slovakia"
 msgstr ""
 
-#: ../src/new_ca_window.c:471
+#: ../src/new_cert_window.c:472
 msgid "Slovenia"
 msgstr ""
 
-#: ../src/new_ca_window.c:473
+#: ../src/new_cert_window.c:474
 msgid "Solomon Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:475
+#: ../src/new_cert_window.c:476
 msgid "Somalia"
 msgstr ""
 
-#: ../src/new_ca_window.c:477
+#: ../src/new_cert_window.c:478
 msgid "South Africa"
 msgstr ""
 
-#: ../src/new_ca_window.c:479
+#: ../src/new_cert_window.c:480
 msgid "South Georgia and the South Sandwich Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:481
+#: ../src/new_cert_window.c:482
 msgid "Spain"
 msgstr ""
 
-#: ../src/new_ca_window.c:483
+#: ../src/new_cert_window.c:484
 msgid "Sri Lanka"
 msgstr ""
 
-#: ../src/new_ca_window.c:485
+#: ../src/new_cert_window.c:486
 msgid "Sudan"
 msgstr ""
 
-#: ../src/new_ca_window.c:487
+#: ../src/new_cert_window.c:488
 msgid "Suriname"
 msgstr ""
 
-#: ../src/new_ca_window.c:489
+#: ../src/new_cert_window.c:490
 msgid "Svalbard and Jan Mayen"
 msgstr ""
 
-#: ../src/new_ca_window.c:491
+#: ../src/new_cert_window.c:492
 msgid "Swaziland"
 msgstr ""
 
-#: ../src/new_ca_window.c:493
+#: ../src/new_cert_window.c:494
 msgid "Sweden"
 msgstr ""
 
-#: ../src/new_ca_window.c:495
+#: ../src/new_cert_window.c:496
 msgid "Switzerland"
 msgstr ""
 
-#: ../src/new_ca_window.c:497
+#: ../src/new_cert_window.c:498
 msgid "Syrian Arab Republic"
 msgstr ""
 
-#: ../src/new_ca_window.c:499
+#: ../src/new_cert_window.c:500
 msgid "Taiwan, Province of China"
 msgstr ""
 
-#: ../src/new_ca_window.c:501
+#: ../src/new_cert_window.c:502
 msgid "Tajikistan"
 msgstr ""
 
-#: ../src/new_ca_window.c:503
+#: ../src/new_cert_window.c:504
 msgid "Tanzania, United Republic of"
 msgstr ""
 
-#: ../src/new_ca_window.c:505
+#: ../src/new_cert_window.c:506
 msgid "Thailand"
 msgstr ""
 
-#: ../src/new_ca_window.c:507
+#: ../src/new_cert_window.c:508
 msgid "Timor-Leste"
 msgstr ""
 
-#: ../src/new_ca_window.c:509
+#: ../src/new_cert_window.c:510
 msgid "Togo"
 msgstr ""
 
-#: ../src/new_ca_window.c:511
+#: ../src/new_cert_window.c:512
 msgid "Tokelau"
 msgstr ""
 
-#: ../src/new_ca_window.c:513
+#: ../src/new_cert_window.c:514
 msgid "Tonga"
 msgstr ""
 
-#: ../src/new_ca_window.c:515
+#: ../src/new_cert_window.c:516
 msgid "Trinidad and Tobago"
 msgstr ""
 
-#: ../src/new_ca_window.c:517
+#: ../src/new_cert_window.c:518
 msgid "Tunisia"
 msgstr ""
 
-#: ../src/new_ca_window.c:519
+#: ../src/new_cert_window.c:520
 msgid "Turkey"
 msgstr ""
 
-#: ../src/new_ca_window.c:521
+#: ../src/new_cert_window.c:522
 msgid "Turkmenistan"
 msgstr ""
 
-#: ../src/new_ca_window.c:523
+#: ../src/new_cert_window.c:524
 msgid "Turks and Caicos Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:525
+#: ../src/new_cert_window.c:526
 msgid "Tuvalu"
 msgstr ""
 
-#: ../src/new_ca_window.c:527
+#: ../src/new_cert_window.c:528
 msgid "Uganda"
 msgstr ""
 
-#: ../src/new_ca_window.c:529
+#: ../src/new_cert_window.c:530
 msgid "Ukraine"
 msgstr ""
 
-#: ../src/new_ca_window.c:531
+#: ../src/new_cert_window.c:532
 msgid "United Arab Emirates"
 msgstr ""
 
-#: ../src/new_ca_window.c:533
+#: ../src/new_cert_window.c:534
 msgid "United Kingdom"
 msgstr ""
 
-#: ../src/new_ca_window.c:535
+#: ../src/new_cert_window.c:536
 msgid "United States"
 msgstr ""
 
-#: ../src/new_ca_window.c:537
+#: ../src/new_cert_window.c:538
 msgid "United States Minor Outlying Islands"
 msgstr ""
 
-#: ../src/new_ca_window.c:539
+#: ../src/new_cert_window.c:540
 msgid "Uruguay"
 msgstr ""
 
-#: ../src/new_ca_window.c:541
+#: ../src/new_cert_window.c:542
 msgid "Uzbekistan"
 msgstr ""
 
-#: ../src/new_ca_window.c:543
+#: ../src/new_cert_window.c:544
 msgid "Vanuatu"
 msgstr ""
 
-#: ../src/new_ca_window.c:545
+#: ../src/new_cert_window.c:546
 msgid "Venezuela"
 msgstr ""
 
-#: ../src/new_ca_window.c:547
+#: ../src/new_cert_window.c:548
 msgid "Viet Nam"
 msgstr ""
 
-#: ../src/new_ca_window.c:549
+#: ../src/new_cert_window.c:550
 msgid "Virgin Islands, British"
 msgstr ""
 
-#: ../src/new_ca_window.c:551
+#: ../src/new_cert_window.c:552
 msgid "Virgin Islands, U.S."
 msgstr ""
 
-#: ../src/new_ca_window.c:553
+#: ../src/new_cert_window.c:554
 msgid "Wallis and Futuna"
 msgstr ""
 
-#: ../src/new_ca_window.c:555
+#: ../src/new_cert_window.c:556
 msgid "Western Sahara"
 msgstr ""
 
-#: ../src/new_ca_window.c:557
+#: ../src/new_cert_window.c:558
 msgid "Yemen"
 msgstr ""
 
-#: ../src/new_ca_window.c:559
+#: ../src/new_cert_window.c:560
 msgid "Zambia"
 msgstr ""
 
-#: ../src/new_ca_window.c:561
+#: ../src/new_cert_window.c:562
 msgid "Zimbabwe"
 msgstr ""
 
-#: ../src/tls.c:42 ../src/tls.c:74
+#: ../src/tls.c:43 ../src/tls.c:75
 msgid "Error initializing private key structure."
 msgstr ""
 
-#: ../src/tls.c:47 ../src/tls.c:79
+#: ../src/tls.c:48 ../src/tls.c:80
 msgid "Error creating private key."
 msgstr ""
 
-#: ../src/tls.c:59 ../src/tls.c:91 ../src/tls.c:204
+#: ../src/tls.c:60 ../src/tls.c:92 ../src/tls.c:208
 msgid "Error exporting private key to PEM structure."
 msgstr ""
 
-#: ../src/tls.c:109
+#: ../src/tls.c:111
 msgid "Error when initializing certificate structure"
 msgstr ""
 
-#: ../src/tls.c:113
+#: ../src/tls.c:115
 msgid "Error when setting certificate version"
 msgstr ""
 
-#: ../src/tls.c:117
+#: ../src/tls.c:120
 msgid "Error when setting certificate serial number"
 msgstr ""
 
-#: ../src/tls.c:121
+#: ../src/tls.c:125
 msgid "Error when setting activation time"
 msgstr ""
 
-#: ../src/tls.c:125
+#: ../src/tls.c:129
 msgid "Error when setting expiration time"
 msgstr ""
 
-#: ../src/tls.c:170
+#: ../src/tls.c:174
 msgid "Error when setting basicConstraint extension"
 msgstr ""
 
-#: ../src/tls.c:174
+#: ../src/tls.c:178
 msgid "Error when setting keyUsage extension"
 msgstr ""
 
-#: ../src/tls.c:184
+#: ../src/tls.c:188
 msgid "Error when setting subject key identifier extension"
 msgstr ""
 
-#: ../src/tls.c:193
+#: ../src/tls.c:197
 msgid "Error when signing self-signed certificate"
+msgstr ""
+
+#: ../src/tls.c:326
+msgid "Certification Authority"
+msgstr ""
+
+#: ../src/tls.c:331
+msgid "Digital signature"
+msgstr ""
+
+#: ../src/tls.c:333
+msgid "Non repudiation"
+msgstr ""
+
+#: ../src/tls.c:335
+msgid "Key encipherment"
+msgstr ""
+
+#: ../src/tls.c:337
+msgid "Data encipherment"
+msgstr ""
+
+#: ../src/tls.c:339
+msgid "Key agreement"
+msgstr ""
+
+#: ../src/tls.c:341
+msgid "Certificate signing"
+msgstr ""
+
+#: ../src/tls.c:343
+msgid "CRL signing"
+msgstr ""
+
+#: ../src/tls.c:345
+msgid "Key encipher only"
+msgstr ""
+
+#: ../src/tls.c:347
+msgid "Key decipher only"
+msgstr ""
+
+#: ../src/tls.c:357
+msgid "TLS WWW Server"
+msgstr ""
+
+#: ../src/tls.c:359
+msgid "TLS WWW Client."
+msgstr ""
+
+#: ../src/tls.c:361
+msgid "Code signing"
+msgstr ""
+
+#: ../src/tls.c:363
+msgid "Email protection"
+msgstr ""
+
+#: ../src/tls.c:365
+msgid "Time stamping"
+msgstr ""
+
+#: ../src/tls.c:367
+msgid "OCSP signing"
+msgstr ""
+
+#: ../src/tls.c:369
+msgid "Any purpose"
 msgstr ""

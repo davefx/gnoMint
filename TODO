@@ -1,11 +1,11 @@
 To-do list in Gnomint
 =====================
 
+* Fix RSA CA-generation  (OK)
 
-* Fix RSA CA-generation
-* Fix DSA CA-generation
+* Fix DSA CA-generation  
 
-* Show Certificate details
+* Show Certificate details (basic)
 
 * Generate RSA CSRs
 * Generate DSA CSRs
@@ -24,16 +24,26 @@ To-do list in Gnomint
 
 * Export CA private key to file
 
+* Export CSR to file
+
+* Export CSR-private key to file
+
 * Export Cert to file
 
 * Export Cert-private key to file
 
 * Second public release
 
+* Revoke certificates
+
+* Export CRLs
+
+* Third public release
+
 * Enable CA-hierarchy construction (multi-CA database)
 
 * Import pre-existing CA
 
-* Third public release
+* Fourth public release
 
 * Research for improvements
