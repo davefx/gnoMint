@@ -38,6 +38,8 @@ typedef struct __TlsCert {
 	gchar * sha1;
 	gchar * md5;
 
+	GList * uses;
+
 	time_t expiration_time;
 	time_t activation_time;
 } TlsCert;
@@ -55,6 +57,10 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate);
+
+gchar * tls_generate_csr (CaCreationData * creation_data, 
+			  gnutls_x509_privkey_t *key,
+			  gchar ** csr);
 
 void tls_cert_free (TlsCert *);
 

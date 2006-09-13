@@ -67,7 +67,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		return error;
 	}
 	if (sqlite_exec (ca_db,
-			   "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, serial INT, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT);",
+			   "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
 	}
@@ -179,4 +179,28 @@ gboolean ca_file_delete_tmp_file ()
 	return (! result);
 }
 
+gchar * ca_file_insert_csr (CaCreationData *creation_data, 
+			    gchar *pem_csr_private_key,
+			    gchar *pem_csr)
+{
+	gchar *sql = NULL;
+	gchar *error = NULL;
+
+	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+
+	sql = g_strdup_printf ("INSERT INTO cert_requests VALUES (NULL, '%s', '%s', 1, '%s');", 
+			       creation_data->cn,
+			       pem_csr,
+			       pem_csr_private_key);
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		return error;
+	g_free (sql);
+	
+	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		return error;
+
+	return NULL;
+
+}
 

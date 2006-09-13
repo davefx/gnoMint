@@ -20,5 +20,7 @@
 
 void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data);
 
+void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
+
 
 #endif

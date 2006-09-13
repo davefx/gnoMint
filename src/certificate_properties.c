@@ -38,6 +38,7 @@ void __certificate_properties_populate (const char *certificate_pem);
 void certificate_properties_display(const char *certificate_pem)
 {
 	gchar     * xml_file = NULL;
+	GtkWidget * widget = NULL;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
@@ -52,6 +53,8 @@ void certificate_properties_display(const char *certificate_pem)
 	
 	__certificate_properties_populate (certificate_pem);
        
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	gtk_widget_show (widget);
 }
 
 
@@ -102,6 +105,38 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "md5Label");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->md5);
 
+
+	if (g_list_length (cert->uses)) {
+		GValue * valtrue = g_new0 (GValue, 1);
+		int i;
+		
+		g_value_init (valtrue, G_TYPE_BOOLEAN);
+		g_value_set_boolean (valtrue, TRUE);
+
+		widget = glade_xml_get_widget (certificate_properties_window_xml, "certPropSeparator");
+		gtk_widget_show (widget);
+		
+		widget = glade_xml_get_widget (certificate_properties_window_xml, "vboxCertCapabilities");
+		
+		for (i = g_list_length(cert->uses) - 1; i >= 0; i--) {
+			GtkLabel *label = NULL;
+			label = GTK_LABEL(gtk_label_new ((gchar *) g_list_nth_data (cert->uses, i)));
+			gtk_misc_set_alignment (GTK_MISC(label), 0.0, 0.5);
+			gtk_box_pack_end (GTK_BOX(widget), GTK_WIDGET(label), 0, 0, 0);
+		}
+		gtk_widget_show_all (widget);
+		
+		g_free (valtrue);
+	}
+
+
+
 	tls_cert_free (cert);
+}
+
+void certificate_properties_close_clicked (const char *certificate_pem)
+{
+	GtkWidget *widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	gtk_widget_destroy (widget);
 }
 

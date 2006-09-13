@@ -145,7 +145,7 @@ void on_new1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_new_certificate1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	new_cert_ca_window_display();
+	new_cert_req_window_display();
 	
 }
 

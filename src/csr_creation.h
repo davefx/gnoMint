@@ -15,10 +15,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_H_
-#define _CA_H_
+#ifndef _CSR_CREATION_H_
+#define _CSR_CREATION_H_
 
-gboolean ca_open (gchar *filename);
-gboolean ca_refresh_model ();
+#include <glib.h>
+#include <time.h>
+
+#include "ca_creation.h"
+
+GThread * csr_creation_launch_thread (CaCreationData *creation_data);
+
+void csr_creation_lock_status_mutex ();
+void csr_creation_unlock_status_mutex ();
+
+gint csr_creation_get_thread_status ();
+
+gchar * csr_creation_get_thread_message();
 
 #endif

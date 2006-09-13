@@ -215,12 +215,81 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 }
 
 
+gchar * tls_generate_csr (CaCreationData * creation_data, 
+			  gnutls_x509_privkey_t *key,
+			  gchar ** csr)
+{
+	gnutls_x509_crq_t crq;
+	guint csr_len = 0;
+
+	if (gnutls_x509_crq_init (&crq) < 0) {
+		return g_strdup_printf(_("Error when initializing csr structure"));
+	}
+
+	if (gnutls_x509_crq_set_version (crq, 1) < 0){
+		return g_strdup_printf(_("Error when setting csr version"));
+	}
+	
+	gnutls_x509_crq_set_key (crq, (* key));
+
+	if (creation_data->country) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_COUNTRY_NAME,
+					       0, creation_data->country, strlen(creation_data->country));
+	}
+
+	if (creation_data->state) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
+					       0, creation_data->state, strlen(creation_data->state));
+	}
+	if (creation_data->city) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_LOCALITY_NAME,
+					       0, creation_data->city, strlen(creation_data->city));
+	}
+	if (creation_data->org) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_ORGANIZATION_NAME,
+					       0, creation_data->org, strlen(creation_data->org));
+	}
+	if (creation_data->ou) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
+					       0, creation_data->ou, strlen(creation_data->ou));
+	}
+	if (creation_data->cn) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME,
+					       0, creation_data->cn, strlen(creation_data->cn));	
+	}
+	
+
+	if (gnutls_x509_crq_sign(crq, (* key))) {
+		return g_strdup_printf(_("Error when signing self-signed csr"));
+	}
+	
+	/* Calculate csr length */
+	(* csr) = g_new0 (gchar, 1);	
+	gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, (* csr), &csr_len);
+	g_free (* csr);
+
+	/* Save the private key to a PEM format */
+	(* csr) = g_new0 (gchar, csr_len);	
+	if (gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, (* csr), &csr_len) < 0) {
+		return g_strdup_printf(_("Error exporting private key to PEM structure."));
+	}
+
+	gnutls_x509_crq_deinit (crq);
+
+	return NULL;
+
+}
+
+
 TlsCert * tls_parse_pem (const char * pem_certificate)
 {
 	gnutls_datum_t pem_datum;
 	gnutls_x509_crt_t * cert = g_new0 (gnutls_x509_crt_t, 1);
-	gchar *aux;
+	gchar *aux = NULL;
+	guchar *uaux = NULL;
+	guint key_usage;
 	gint i;
+	guint critical;
 	
 	guint size;
 
@@ -238,87 +307,151 @@ TlsCert * tls_parse_pem (const char * pem_certificate)
 	
 	size = 0;
 	gnutls_x509_crt_get_serial (*cert, NULL, &size);
-	aux = g_new0 (gchar, size);
-	gnutls_x509_crt_get_serial (*cert, aux, &size);
-	res->serial_number = strtoull (aux, NULL, 16);
-	g_free(aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0 (gchar, size);
+		gnutls_x509_crt_get_serial (*cert, aux, &size);
+		res->serial_number = strtoull (aux, NULL, 16);
+		g_free(aux);
+		aux = NULL;
+	}
+	
 
 	size = 0;
 	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-	res->cn = strdup (aux);
-	g_free (aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+		res->cn = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
 
 	size = 0;
 	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-	res->o = strdup (aux);
-	g_free (aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
+		res->o = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
 
 	size = 0;
 	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-	res->ou = strdup (aux);
-	g_free (aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
+		res->ou = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
 
 	size = 0;
 	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-	res->i_cn = strdup (aux);
-	g_free (aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+		res->i_cn = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
 
 	size = 0;
 	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-	res->i_o = strdup (aux);
-	g_free (aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
+		res->i_o = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
 
 	size = 0;
 	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-	res->i_ou = strdup (aux);
-	g_free (aux);
-	aux = NULL;
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
+		res->i_ou = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
 
 	size = 0;
-	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_MD5, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_MD5, aux, &size);	
-	g_print ("%d %s\n", size, aux);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_MD5, uaux, &size);
+	uaux = g_new0(guchar, size);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_MD5, uaux, &size);
 	res->md5 = g_new0(gchar, size*3);
 	for (i=0; i<size; i++) {
-		snprintf (&res->md5[i*3], 3, "%02X", aux[i]);
+		snprintf (&res->md5[i*3], 3, "%02X", uaux[i]);
 		if (i != size - 1)
 			res->md5[(i*3) + 2] = ':';
 	}
-	g_free (aux);
-	aux = NULL;
+	g_free (uaux);
+	uaux = NULL;
 
 	size = 0;
-	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA1, aux, &size);
-	aux = g_new0(gchar, size);
-	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA1, aux, &size);
-	g_print ("%d %s\n", size, aux);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA1, uaux, &size);
+	uaux = g_new0(guchar, size);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA1, uaux, &size);
 	res->sha1 = g_new0(gchar, size*3);
 	for (i=0; i<size; i++) {
-		snprintf (&res->sha1[i*3], 3, "%02X", aux[i]);
+		snprintf (&res->sha1[i*3], 3, "%02X", uaux[i]);
 		if (i != size - 1)
 			res->sha1[(i*3) + 2] = ':';
 	}
-	g_free (aux);
-	aux = NULL;
+	g_free (uaux);
+	uaux = NULL;
+
+	if (gnutls_x509_crt_get_ca_status (*cert, &critical)) {
+		res->uses = g_list_append (res->uses, _("Certification Authority"));
+	}
+
+	if (gnutls_x509_crt_get_key_usage (*cert, &key_usage, &critical) >= 0) {
+		if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
+			res->uses = g_list_append (res->uses, _("Digital signature"));
+		if (key_usage & GNUTLS_KEY_NON_REPUDIATION)
+			res->uses = g_list_append (res->uses, _("Non repudiation"));
+		if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
+			res->uses = g_list_append (res->uses, _("Key encipherment"));
+		if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
+			res->uses = g_list_append (res->uses, _("Data encipherment"));
+		if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
+			res->uses = g_list_append (res->uses, _("Key agreement"));
+		if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
+			res->uses = g_list_append (res->uses, _("Certificate signing"));
+		if (key_usage & GNUTLS_KEY_CRL_SIGN)
+			res->uses = g_list_append (res->uses, _("CRL signing"));
+		if (key_usage & GNUTLS_KEY_ENCIPHER_ONLY)
+			res->uses = g_list_append (res->uses, _("Key encipher only"));
+		if (key_usage & GNUTLS_KEY_DECIPHER_ONLY)
+			res->uses = g_list_append (res->uses, _("Key decipher only"));
+	}
+
+
+	i = 0;
+	size = 0;
+	while (gnutls_x509_crt_get_key_purpose_oid (*cert, i, aux, &size, &critical) >= 0) {
+		uaux = g_new0(guchar, size);
+		gnutls_x509_crt_get_key_purpose_oid (*cert, i, aux, &size, &critical);
+		if (strcasecmp (aux, GNUTLS_KP_TLS_WWW_SERVER) == 0)
+			res->uses = g_list_append (res->uses, _("TLS WWW Server"));
+		else if (strcasecmp (aux, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
+			res->uses = g_list_append (res->uses, _("TLS WWW Client."));
+		else if (strcasecmp (aux, GNUTLS_KP_CODE_SIGNING) == 0)
+			res->uses = g_list_append (res->uses, _("Code signing"));
+		else if (strcasecmp (aux, GNUTLS_KP_EMAIL_PROTECTION) == 0)
+			res->uses = g_list_append (res->uses, _("Email protection"));
+		else if (strcasecmp (aux, GNUTLS_KP_TIME_STAMPING) == 0)
+			res->uses = g_list_append (res->uses, _("Time stamping"));
+		else if (strcasecmp (aux, GNUTLS_KP_OCSP_SIGNING) == 0)
+			res->uses = g_list_append (res->uses, _("OCSP signing"));
+		else if (strcasecmp (aux, GNUTLS_KP_ANY) == 0)
+			res->uses = g_list_append (res->uses, _("Any purpose"));
+		g_free (uaux);
+		size = 0;
+		i++;
+
+	}		
 
 	gnutls_x509_crt_deinit (*cert);
 	g_free (cert);
