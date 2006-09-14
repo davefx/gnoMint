@@ -192,6 +192,9 @@ int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **colum
 	gchar ***result = (gchar ***) pArg;
 	int i;
 
+	if (! result)
+		return 1;
+
 	(*result) = g_new0 (gchar *, argc+1);
 	for (i = 0; i<argc; i++) {
 		(*result)[i] = g_strdup (argv[i]);
@@ -202,7 +205,7 @@ int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **colum
 
 gchar ** ca_file_get_single_row (const gchar *query, ...)
 {
-	gchar ***result = g_new0 (gchar **, 1);
+	gchar **result = NULL;
 	gchar *sql = NULL;
 	gchar * error;
 	va_list list;	
@@ -211,11 +214,11 @@ gchar ** ca_file_get_single_row (const gchar *query, ...)
 	g_vasprintf (&sql, query, list);
 	va_end (list);
 
-	sqlite_exec (ca_db, sql, __ca_file_get_single_row_cb, result, &error);
+	sqlite_exec (ca_db, sql, __ca_file_get_single_row_cb, &result, &error);
 	
 	g_free (sql);
 
-	return (*result);
+	return result;
 }
 
 gchar * ca_file_insert_cert (CertCreationData *creation_data, 
@@ -243,16 +246,22 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 			       creation_data->expiration,
 			       pem_certificate,
 			       pem_private_key);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		g_free (sql);
 		return error;
+	}
+
 	g_free (sql);
 	
 	sql = g_strdup_printf ("UPDATE ca_properties SET value='%lld' WHERE name='ca_root_last_assigned_serial';", 
 			       serial);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		g_free (sql);
 		return error;
+	}
+
 	g_free (sql);
 	
 

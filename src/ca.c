@@ -165,6 +165,8 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 	result = strdup (model_time_str);
 
 	g_object_set(G_OBJECT(cell), "text", result, NULL);
+	
+	g_free (result);
 }
 
 
@@ -197,6 +199,7 @@ void __ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
 		serial = serial >> 8;
 	}
 	g_object_set(G_OBJECT(cell), "text", result, NULL);
+	g_free (result);
 }
 
 void __ca_tree_view_is_ca_datafunc (GtkTreeViewColumn *tree_column,

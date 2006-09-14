@@ -682,7 +682,7 @@ void on_new_cert_ca_commit_clicked (GtkButton *widg,
 		gtk_tree_model_get (tree_model, &tree_iter, 1, &text, -1);
 
 		ca_creation_data->country = g_strdup (text);
-		
+		g_free (text);
 	}
 		
 	widget = glade_xml_get_widget (new_cert_ca_window_xml, "st_entry");
@@ -1056,20 +1056,23 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	aux = ca_file_get_single_row ("SELECT pem, private_key FROM certificates WHERE is_ca = 1;");
 
-	tls_generate_certificate (cert_creation_data, csr_pem, aux[0], aux[1], &certificate);
-
-	g_strfreev (aux);
-
-	aux = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id = %d;", ca_get_selected_row_id());
-
-	ca_file_insert_cert (cert_creation_data, aux[0], certificate);
-	ca_file_remove_csr (ca_get_selected_row_id());
-
-	
-
+	if (aux) {
+		tls_generate_certificate (cert_creation_data, csr_pem, aux[0], aux[1], &certificate);
+		
+		g_strfreev (aux);
+		
+		aux = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id = %d;", ca_get_selected_row_id());
+		
+		if (aux) {
+			ca_file_insert_cert (cert_creation_data, aux[0], certificate);
+			ca_file_remove_csr (ca_get_selected_row_id());
+		}
+		
+	}
+		
 	window = GTK_WINDOW(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
 	gtk_object_destroy(GTK_OBJECT(window));	
-
+	
 	ca_refresh_model();
 }
 
