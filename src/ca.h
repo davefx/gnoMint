@@ -21,5 +21,7 @@
 gboolean ca_open (gchar *filename);
 gboolean ca_refresh_model ();
 void ca_todo_callback();
+gint ca_get_selected_row_id ();
+gchar * ca_get_selected_row_pem ();
 
 #endif

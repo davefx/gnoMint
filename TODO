@@ -11,7 +11,7 @@ To-do list in Gnomint
 * Export private key to password-protected PEM-file (keeping it in database too) (OK)
 * Export CSR to file (OK)
 * Export Cert to file (OK)
-* After generating a CA, and CSRs, generate RSA/DSA certificates (with basic, not CA, capabilities)
+* After generating a CA, and CSRs, generate RSA/DSA certificates (with basic, not CA, capabilities) (OK)
 * Fix problems
 * Check for memory leaks
 

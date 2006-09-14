@@ -2,7 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
 <!-- Generado con glade3
 	Versión: 3.0.1
-	Fecha: Thu Sep 14 22:29:28 2006
+	Fecha: Fri Sep 15 00:22:57 2006
 	Usuario: davefx
 	Host: kolbe
 -->
@@ -179,6 +179,7 @@
                         <property name="sensitive">False</property>
                         <property name="label">Revo_ke</property>
                         <property name="use_underline">True</property>
+                        <signal name="activate" handler="ca_todo_callback"/>
                         <child internal-child="image">
                           <widget class="GtkImage" id="menu-item-image4">
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK</property>
@@ -233,6 +234,7 @@
                         <property name="label">gtk-about</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_about1_activate"/>
                       </widget>
                     </child>
                   </widget>
@@ -3719,7 +3721,7 @@ Common Name (CN):</property>
                   </widget>
                 </child>
                 <child>
-                  <widget class="GtkSpinButton" id="months_before_expiration_spinbutton2">
+                  <widget class="GtkSpinButton" id="months_before_expiration_spinbutton">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="adjustment">60 1 600 1 12 12</property>

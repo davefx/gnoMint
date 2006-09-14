@@ -26,6 +26,7 @@
 #include "new_cert_creation_process.h"
 #include "ca_file.h"
 #include "tls.h"
+#include "ca.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -926,7 +927,7 @@ void new_cert_window_display(gchar *csr_pem)
 	
 	g_free (xml_file);
 	
-	glade_xml_signal_autoconnect (new_cert_req_window_xml); 	
+	glade_xml_signal_autoconnect (new_cert_window_xml); 	
 	
 	widget = glade_xml_get_widget (new_cert_window_xml, "c_label");
 	gtk_label_set_text (GTK_LABEL(widget), csr_info->c);
@@ -951,7 +952,7 @@ void new_cert_window_display(gchar *csr_pem)
 
 void new_cert_tab_activate (int tab_number)
 {
-	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_cert_req_window_xml, "new_cert_notebook"));
+	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_cert_window_xml, "new_cert_notebook"));
 	
 	gtk_notebook_set_current_page (notebook, tab_number);
 
@@ -985,7 +986,7 @@ void on_new_cert_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	
-	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_cert_req_window_xml, "new_cert_window"));
+	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
 
 	gtk_object_destroy(GTK_OBJECT(window));
 	
@@ -995,17 +996,21 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data) 
 {
 	CertCreationData *cert_creation_data = NULL;
+	gchar *csr_pem = NULL;
+	
+	gchar *certificate;
 
 	GtkWidget *widget = NULL;
 	GtkWindow *window = NULL;
 	gint active = -1;
+	gchar ** aux;
 	
 	time_t tmp;
 	struct tm * expiration_time;
 
 	cert_creation_data = g_new0 (CertCreationData, 1);
 		
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "months_before_expiration_spinbutton");
+	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	cert_creation_data->key_months_before_expiration = active;
 
@@ -1020,36 +1025,51 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->expiration = mktime(expiration_time);
 	g_free (expiration_time);
 
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "digital_signature_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "digital_signature_check");
 	cert_creation_data->digital_signature = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "data_encipherment_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "data_encipherment_check");
 	cert_creation_data->data_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "digital_key_encipherment");
+	widget = glade_xml_get_widget (new_cert_window_xml, "key_encipherment");
 	cert_creation_data->key_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "non_repudiation_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "non_repudiation_check");
 	cert_creation_data->non_repudiation = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "key_agreement_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "key_agreement_check");
 	cert_creation_data->key_agreement = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "email_protection_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "email_protection_check");
 	cert_creation_data->email_protection = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "code_signing_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "code_signing_check");
 	cert_creation_data->code_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "web_client_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "webclient_check");
 	cert_creation_data->web_client = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "web_server_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "webserver_check");
 	cert_creation_data->web_server = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "time_stamping_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "time_stamping_check");
 	cert_creation_data->time_stamping = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "ocsp_signing_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "ocsp_signing_check");
 	cert_creation_data->ocsp_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_ca_window_xml, "any_purpose_check");
+	widget = glade_xml_get_widget (new_cert_window_xml, "any_purpose_check");
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 
-	window = GTK_WINDOW(glade_xml_get_widget (new_cert_req_window_xml, "new_cert_window"));
+	csr_pem = ca_get_selected_row_pem ();
+
+	aux = ca_file_get_single_row ("SELECT pem, private_key FROM certificates WHERE is_ca = 1;");
+
+	tls_generate_certificate (cert_creation_data, csr_pem, aux[0], aux[1], &certificate);
+
+	g_strfreev (aux);
+
+	aux = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id = %d;", ca_get_selected_row_id());
+
+	ca_file_insert_cert (cert_creation_data, aux[0], certificate);
+	ca_file_remove_csr (ca_get_selected_row_id());
+
+	
+
+	window = GTK_WINDOW(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
 	gtk_object_destroy(GTK_OBJECT(window));	
 
-
+	ca_refresh_model();
 }
 

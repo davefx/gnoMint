@@ -953,3 +953,26 @@ gboolean ca_open (gchar *filename)
 	return TRUE;
 }
 
+gint ca_get_selected_row_id ()
+{
+	GtkTreeIter *iter;
+	gint result;
+
+	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
+
+	type = 0;
+	return result;
+}
+
+gchar * ca_get_selected_row_pem ()
+{
+	GtkTreeIter *iter;
+	gchar * result;
+
+	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
+	
+	type = 0;
+	return result;
+}

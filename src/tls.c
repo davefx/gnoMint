@@ -329,7 +329,7 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 
 	gchar * serial;
 	gint key_usage;
-	guint certificate_len;
+	guint certificate_len = 0;
 
 	TlsCert *ca_cert_data = tls_parse_cert_pem (ca_cert_pem);
 	

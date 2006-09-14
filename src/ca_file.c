@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 
+#include "tls.h"
 #include "ca_file.h"
 
 #include <libintl.h>
@@ -88,9 +90,10 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	g_free (sql);
 
 
-	if (sqlite_exec (ca_db, "INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate_id', last_insert_rowid());", NULL, NULL, &error))
+	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_last_assigned_serial', 1);");
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
-
+	g_free (sql);
 
 	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
@@ -215,6 +218,51 @@ gchar ** ca_file_get_single_row (const gchar *query, ...)
 	return (*result);
 }
 
+gchar * ca_file_insert_cert (CertCreationData *creation_data, 
+			     gchar *pem_private_key,
+			     gchar *pem_certificate)
+{
+	gchar *sql = NULL;
+	gchar *error = NULL;
+	gchar **serialstr = NULL;
+	guint64 serial;
+
+	TlsCert *tlscert = tls_parse_cert_pem (pem_certificate);
+
+	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+
+	serialstr = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial';");
+	serial = atoll (serialstr[0]) + 1;
+	g_strfreev (serialstr);
+
+	sql = g_strdup_printf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%s', '%ld', '%ld', 0, '%s', 1, '%s');", 
+			       serial,
+			       tlscert->cn,
+			       creation_data->activation,
+			       creation_data->expiration,
+			       pem_certificate,
+			       pem_private_key);
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		sqlite_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		return error;
+	g_free (sql);
+	
+	sql = g_strdup_printf ("UPDATE ca_properties SET value='%lld' WHERE name='ca_root_last_assigned_serial';", 
+			       serial);
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		sqlite_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		return error;
+	g_free (sql);
+	
+
+	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		return error;
+
+	return NULL;
+
+}
+
 gchar * ca_file_insert_csr (CaCreationData *creation_data, 
 			    gchar *pem_csr_private_key,
 			    gchar *pem_csr)
@@ -239,6 +287,7 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 	return NULL;
 
 }
+
 
 gchar * ca_file_remove_csr (gint id)
 {
