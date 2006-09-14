@@ -72,7 +72,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		return error;
 	}
 	
-	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate', '%s');", pem_ca_certificate);
+	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate_pem', '%s');", pem_ca_certificate);
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
@@ -86,6 +86,11 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
+
+
+	if (sqlite_exec (ca_db, "INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate_id', last_insert_rowid());", NULL, NULL, &error))
+		return error;
+
 
 	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
@@ -179,6 +184,37 @@ gboolean ca_file_delete_tmp_file ()
 	return (! result);
 }
 
+int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames)
+{
+	gchar ***result = (gchar ***) pArg;
+	int i;
+
+	(*result) = g_new0 (gchar *, argc+1);
+	for (i = 0; i<argc; i++) {
+		(*result)[i] = g_strdup (argv[i]);
+	}
+
+	return 0;
+}
+
+gchar ** ca_file_get_single_row (const gchar *query, ...)
+{
+	gchar ***result = g_new0 (gchar **, 1);
+	gchar *sql = NULL;
+	gchar * error;
+	va_list list;	
+
+	va_start (list, query);
+	g_vasprintf (&sql, query, list);
+	va_end (list);
+
+	sqlite_exec (ca_db, sql, __ca_file_get_single_row_cb, result, &error);
+	
+	g_free (sql);
+
+	return (*result);
+}
+
 gchar * ca_file_insert_csr (CaCreationData *creation_data, 
 			    gchar *pem_csr_private_key,
 			    gchar *pem_csr)
@@ -193,6 +229,27 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 			       creation_data->cn,
 			       pem_csr,
 			       pem_csr_private_key);
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		return error;
+	g_free (sql);
+	
+	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		return error;
+
+	return NULL;
+
+}
+
+gchar * ca_file_remove_csr (gint id)
+{
+	gchar *sql = NULL;
+	gchar *error = NULL;
+
+	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+
+	sql = g_strdup_printf ("DELETE FROM cert_requests WHERE id = %d ;", 
+			       id);
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);

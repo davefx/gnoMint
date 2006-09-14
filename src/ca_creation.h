@@ -39,6 +39,28 @@ typedef struct {
 	
 } CaCreationData;
 
+typedef struct {
+	gint key_months_before_expiration;
+	time_t activation;
+	time_t expiration;
+	
+	guint64 serial;
+	
+	gboolean digital_signature;
+	gboolean data_encipherment;
+	gboolean key_encipherment;
+	gboolean non_repudiation;
+	gboolean key_agreement;
+
+	gboolean email_protection;
+	gboolean code_signing;
+	gboolean web_client;
+	gboolean web_server;
+	gboolean time_stamping;
+	gboolean ocsp_signing;
+	gboolean any_purpose;
+} CertCreationData;
+
 GThread * ca_creation_launch_thread (CaCreationData *creation_data);
 
 

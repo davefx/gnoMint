@@ -6,13 +6,12 @@ To-do list in Gnomint
 * Show Certificate details (basic) (OK)
 * Generate RSA CSRs (OK)
 * Generate DSA CSRs (OK)
-* Show CSR details
-* Export private key to file (keeping the key in database)
-* Export private key to file (Removing the key from database)
-* Export CSR to file
-* Export CSR-private key to file
+* Show CSR details (OK)
+* Delete CSR (OK)
+* Export private key to password-protected PEM-file (keeping it in database too) (OK)
+* Export CSR to file (OK)
 * Export Cert to file (OK)
-* After generating a CA, and CSRs, generate RSA/DSA certificates (not CA-capable)
+* After generating a CA, and CSRs, generate RSA/DSA certificates (with basic, not CA, capabilities)
 * Fix problems
 * Check for memory leaks
 
@@ -25,8 +24,10 @@ To-do list in Gnomint
 
 * Second public release
 
+* Export PKCS#12 structures.
 * Revoke certificates
 * Generate and export CRLs
+* Export private key to file (Removing the key from database)
 
 * Third public release
 
@@ -35,4 +36,5 @@ To-do list in Gnomint
 
 * Fourth public release
 
-* Research for improvements
+* Command-line client for batch operation.
+* Research for other improvements

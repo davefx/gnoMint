@@ -35,10 +35,13 @@ gboolean ca_file_rename_tmp_file (gchar *new_file_name);
 
 gboolean ca_file_delete_tmp_file ();
 
+gchar ** ca_file_get_single_row (const gchar *query, ...);
+
 gchar * ca_file_insert_csr (CaCreationData * creation_data,
 			    gchar *pem_private_key,
 			    gchar *pem_csr);
 
+gchar * ca_file_remove_csr (gint id);
 
 
 #endif

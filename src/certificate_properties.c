@@ -35,7 +35,7 @@ GladeXML * certificate_properties_window_xml = NULL;
 
 void __certificate_properties_populate (const char *certificate_pem);
 
-void certificate_properties_display(const char *certificate_pem)
+void certificate_properties_display(const char *certificate_pem, gboolean privkey_in_db)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
@@ -65,7 +65,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 	TlsCert * cert = NULL;
 	gchar model_time_str[100];
 
-	cert = tls_parse_pem (certificate_pem);
+	cert = tls_parse_cert_pem (certificate_pem);
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certActivationDateLabel");
 	gmtime_r (&cert->activation_time, &tim);

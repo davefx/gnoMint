@@ -30,10 +30,16 @@ typedef struct __TlsCert {
 	gchar * cn;
 	gchar * o;
 	gchar * ou;
+	gchar * c;
+	gchar * st;
+	gchar * l;
 
 	gchar * i_cn;
 	gchar * i_o;
 	gchar * i_ou;
+	gchar * i_c;
+	gchar * i_st;
+	gchar * i_l;
 
 	gchar * sha1;
 	gchar * md5;
@@ -43,6 +49,15 @@ typedef struct __TlsCert {
 	time_t expiration_time;
 	time_t activation_time;
 } TlsCert;
+
+typedef struct __TlsCsr {	
+	gchar * cn;
+	gchar * o;
+	gchar * ou;
+	gchar * c;
+	gchar * st;
+	gchar * l;
+} TlsCsr;
 
 void tls_init ();
 
@@ -54,6 +69,8 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key);
 
+gchar * tls_generate_pkcs8_encrypted_private_key (gchar *private_key, gchar *passphrase);
+
 gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate);
@@ -62,9 +79,17 @@ gchar * tls_generate_csr (CaCreationData * creation_data,
 			  gnutls_x509_privkey_t *key,
 			  gchar ** csr);
 
+gchar * tls_generate_certificate (CertCreationData * creation_data,
+				  gchar *csr_pem,
+				  gchar *ca_cert_pem,
+				  gchar *ca_priv_key_pem,
+				  gchar **certificate);
+
+TlsCert * tls_parse_cert_pem (const char * pem_certificate);
 void tls_cert_free (TlsCert *);
 
-TlsCert * tls_parse_pem (const char * pem_certificate);
+TlsCsr * tls_parse_csr_pem (const char * pem_csr);
+void tls_csr_free (TlsCsr *);
 
 
 

@@ -25,6 +25,7 @@
 #include "ca_creation.h"
 #include "new_cert_creation_process.h"
 #include "ca_file.h"
+#include "tls.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -40,6 +41,8 @@ CountryItem country_table[NUMBER_OF_COUNTRIES];
 
 GladeXML * new_cert_ca_window_xml = NULL;
 GladeXML * new_cert_req_window_xml = NULL;
+GladeXML * new_cert_window_xml = NULL;
+
 
 
 void _new_cert_ca_populate_country_combobox();
@@ -900,6 +903,153 @@ void on_new_req_commit_clicked (GtkButton *widg,
 	gtk_object_destroy(GTK_OBJECT(window));
 
 	new_csr_creation_process_window_display (csr_creation_data);	
+
+}
+
+
+
+
+// NEW CERTIFICATE WINDOW CALLBACKS
+
+void new_cert_window_display(gchar *csr_pem)
+{
+	gchar     * xml_file = NULL;
+	TlsCsr * csr_info = tls_parse_csr_pem (csr_pem);
+	GtkWidget * widget;
+
+	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+	 
+	// Workaround for libglade
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
+	tst = foo;
+	new_cert_window_xml = glade_xml_new (xml_file, "new_cert_window", NULL);
+	
+	g_free (xml_file);
+	
+	glade_xml_signal_autoconnect (new_cert_req_window_xml); 	
+	
+	widget = glade_xml_get_widget (new_cert_window_xml, "c_label");
+	gtk_label_set_text (GTK_LABEL(widget), csr_info->c);
+
+	widget = glade_xml_get_widget (new_cert_window_xml, "st_label");
+	gtk_label_set_text (GTK_LABEL(widget), csr_info->st);
+
+	widget = glade_xml_get_widget (new_cert_window_xml, "l_label");
+	gtk_label_set_text (GTK_LABEL(widget), csr_info->l);
+
+	widget = glade_xml_get_widget (new_cert_window_xml, "o_label");
+	gtk_label_set_text (GTK_LABEL(widget), csr_info->o);
+
+	widget = glade_xml_get_widget (new_cert_window_xml, "ou_label");
+	gtk_label_set_text (GTK_LABEL(widget), csr_info->ou);
+
+	widget = glade_xml_get_widget (new_cert_window_xml, "cn_label");
+	gtk_label_set_text (GTK_LABEL(widget), csr_info->cn);
+	
+	tls_csr_free (csr_info);
+}
+
+void new_cert_tab_activate (int tab_number)
+{
+	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_cert_req_window_xml, "new_cert_notebook"));
+	
+	gtk_notebook_set_current_page (notebook, tab_number);
+
+}
+
+void on_new_cert_next1_clicked (GtkButton *widget,
+			      gpointer user_data) 
+{
+	new_cert_tab_activate (1);
+}
+
+void on_new_cert_previous2_clicked (GtkButton *widget,
+				  gpointer user_data) 
+{
+	new_cert_tab_activate (0);
+}
+
+void on_new_cert_next2_clicked (GtkButton *widget,
+			      gpointer user_data) 
+{
+	new_cert_tab_activate (2);
+}
+
+void on_new_cert_previous3_clicked (GtkButton *widget,
+				  gpointer user_data) 
+{
+	new_cert_tab_activate (1);
+}
+
+void on_new_cert_cancel_clicked (GtkButton *widget,
+			       gpointer user_data) 
+{
+	
+	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_cert_req_window_xml, "new_cert_window"));
+
+	gtk_object_destroy(GTK_OBJECT(window));
+	
+}
+
+void on_new_cert_commit_clicked (GtkButton *widg,
+				 gpointer user_data) 
+{
+	CertCreationData *cert_creation_data = NULL;
+
+	GtkWidget *widget = NULL;
+	GtkWindow *window = NULL;
+	gint active = -1;
+	
+	time_t tmp;
+	struct tm * expiration_time;
+
+	cert_creation_data = g_new0 (CertCreationData, 1);
+		
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "months_before_expiration_spinbutton");
+	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
+	cert_creation_data->key_months_before_expiration = active;
+
+	tmp = time (NULL);	
+	cert_creation_data->activation = tmp;
+	
+	expiration_time = g_new (struct tm,1);
+	gmtime_r (&tmp, expiration_time);      
+	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
+	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
+	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
+	cert_creation_data->expiration = mktime(expiration_time);
+	g_free (expiration_time);
+
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "digital_signature_check");
+	cert_creation_data->digital_signature = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "data_encipherment_check");
+	cert_creation_data->data_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "digital_key_encipherment");
+	cert_creation_data->key_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "non_repudiation_check");
+	cert_creation_data->non_repudiation = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "key_agreement_check");
+	cert_creation_data->key_agreement = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "email_protection_check");
+	cert_creation_data->email_protection = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "code_signing_check");
+	cert_creation_data->code_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "web_client_check");
+	cert_creation_data->web_client = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "web_server_check");
+	cert_creation_data->web_server = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "time_stamping_check");
+	cert_creation_data->time_stamping = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "ocsp_signing_check");
+	cert_creation_data->ocsp_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "any_purpose_check");
+	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+
+
+	window = GTK_WINDOW(glade_xml_get_widget (new_cert_req_window_xml, "new_cert_window"));
+	gtk_object_destroy(GTK_OBJECT(window));	
+
 
 }
 

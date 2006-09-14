@@ -18,6 +18,6 @@
 #ifndef _CERTIFICATE_PROPERTIES_H_
 #define _CERTIFICATE_PROPERTIES_H_
 
-void certificate_properties_display (const char *);
+void certificate_properties_display (const char *, gboolean);
 
 #endif

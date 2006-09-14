@@ -22,7 +22,7 @@ void new_cert_ca_window_display ();
 
 void new_cert_req_window_display ();
 
-void new_cert_window_display ();
+void new_cert_window_display (char * csr_pem);
 
 
 #endif

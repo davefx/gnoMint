@@ -20,5 +20,6 @@
 
 gboolean ca_open (gchar *filename);
 gboolean ca_refresh_model ();
+void ca_todo_callback();
 
 #endif
