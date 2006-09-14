@@ -5,7 +5,7 @@ AC_INIT(gnomint, 0.1)
 PACKAGE="gnoMint"
 PACKAGE_BUGREPORT="<davefx@gmail.com>"
 PACKAGE_NAME="gnomint"
-PACKAGE_VERSION="0.1"
+PACKAGE_VERSION="0.1.0"
 PACKAGE_COPYRIGHT="(c) 2006 David Marin Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://www.sf.net/projects/gnomint"
 
