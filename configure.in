@@ -7,7 +7,7 @@ PACKAGE_BUGREPORT="<davefx@gmail.com>"
 PACKAGE_NAME="gnomint"
 PACKAGE_VERSION="0.1.0"
 PACKAGE_COPYRIGHT="(c) 2006 David Marin Carreño <davefx@gmail.com>"
-PACKAGE_WEBSITE="http://www.sf.net/projects/gnomint"
+PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
 
 AC_SUBST(PACKAGE)
 AC_SUBST(PACKAGE_BUGREPORT)
@@ -163,6 +163,7 @@ Makefile
 src/Makefile
 gui/Makefile
 po/Makefile.in
+gnomint.spec
 ])
 
 dnl

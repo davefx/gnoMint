@@ -28,3 +28,13 @@ gnomint_LDADD = \
 gnomint_LDFLAGS = \
 	-export-dynamic
 
+EXTRA_DIST = \
+	ca_creation.h \
+	ca_file.h \
+	ca.h \
+	certificate_properties.h \
+	csr_creation.h \
+	csr_properties.h \
+	new_cert_creation_process.h \
+	new_cert_window.h \
+	tls.h
