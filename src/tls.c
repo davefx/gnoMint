@@ -155,7 +155,7 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
-	serial = g_strdup_printf ("%llX", sn);
+	serial = g_strdup_printf ("%llX", (long long unsigned int) sn);
 	if (gnutls_x509_crt_set_serial (crt, serial, strlen (serial)) < 0) {
 		gnutls_x509_crt_deinit (crt);
 		return g_strdup_printf(_("Error when setting certificate serial number"));
@@ -387,7 +387,7 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
-	serial = g_strdup_printf ("%llX", creation_data->serial);
+	serial = g_strdup_printf ("%llX", (long long unsigned int) creation_data->serial);
 	if (gnutls_x509_crt_set_serial (crt, serial, strlen (serial)) < 0) {
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (crt);

@@ -190,10 +190,10 @@ void __ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
 	while (serial > 0) {
 		if (result) {
 			aux = result;
-			result = g_strdup_printf ("%02llX:%s", serial%256, aux);
+			result = g_strdup_printf ("%02llX:%s", (long long unsigned int) serial%256, aux);
 			g_free (aux);
 		} else {
-			result = g_strdup_printf ("%02llX", serial%256);
+			result = g_strdup_printf ("%02llX", (long long unsigned int) serial%256);
 		}
 
 		serial = serial >> 8;
