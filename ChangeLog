@@ -1,0 +1,139 @@
+2006-09-14  davefx
+
+	* configure.in: Uploading version 0.1
+	* src/ca.c, src/ca_file.c, src/new_cert_window.c, src/tls.c:
+	  Removed some nice memory leaks
+	* TODO, gui/gnomint.glade, po/POTFILES.in, po/es.po,
+	  po/gnomint.pot, src/ca.c, src/ca.h, src/ca_file.c,
+	  src/ca_file.h, src/new_cert_window.c, src/tls.c: Uploading first
+	  functional version 0.1-rc1. Now let's fix bugs
+	* src/csr_properties.c, src/csr_properties.h: Advancing in
+	  certificate generation completion
+	* TODO, gui/gnomint.glade, src/Makefile.am, src/ca.c, src/ca.h,
+	  src/ca_creation.h, src/ca_file.c, src/ca_file.h,
+	  src/certificate_properties.c, src/certificate_properties.h,
+	  src/new_cert_window.c, src/new_cert_window.h, src/tls.c,
+	  src/tls.h: Advancing in certificate generation completion
+
+2006-09-13  davefx
+
+	* src/ca.c: Fixing segfault when exporting certificate
+	* TODO: Updating TODO
+	* gui/gnomint.glade, src/ca.c: Allowing certificate export
+	* TODO, po/es.po, po/gnomint.pot: Updating translations
+	* certs, certs/davefx.pem: Adding personal certificate
+	* gui/Makefile.am, gui/ca-stamp-16.png, gui/ca-stamp.png,
+	  gui/gnomint.glade, gui/gnomint.png, gui/key-16.png,
+	  src/Makefile.am, src/ca.c, src/ca.h, src/ca_file.c,
+	  src/ca_file.h, src/certificate_properties.c, src/csr_creation.c,
+	  src/csr_creation.h, src/main.c, src/new_cert_creation_process.c,
+	  src/new_cert_creation_process.h, src/new_cert_window.c,
+	  src/new_cert_window.h, src/tls.c, src/tls.h: Reordering columns.
+	  Fixing ca_refresh. Expanding treeview when refreshing.
+
+2006-09-11  davefx
+
+	* TODO, configure.in, gui/gnomint.glade, po/POTFILES.in, po/es.po,
+	  src/Makefile.am, src/ca.c, src/ca_file.c,
+	  src/certificate_properties.c, src/certificate_properties.h,
+	  src/main.c, src/new_cert_creation_process.c, src/tls.c,
+	  src/tls.h: Adding TODO. Completing certificate-properties window
+
+2006-07-22  davefx
+
+	* gui/gnomint.glade, src/new_cert_creation_process.c: Fixed
+	  problems due to file renaming
+
+2006-07-01  davefx
+
+	* src/Makefile.am, src/ca.c, src/main.c,
+	  src/new_cert_creation_process.c,
+	  src/new_cert_creation_process.h, src/new_cert_window.c,
+	  src/tls.c: Fixing errors due to filename changes
+	* src/new_ca_window.c, src/new_ca_window.h, src/new_cert_window.c,
+	  src/new_cert_window.h: Renaming new_ca_window.* to
+	  new_cert_window.*
+	* src/new_ca_window.c, src/new_ca_window.h: Committing before
+	  renaming
+	* src/new_ca_creation_process.c, src/new_ca_creation_process.h,
+	  src/new_cert_creation_process.c,
+	  src/new_cert_creation_process.h: Moviendo ficheros
+	* src/new_ca_creation_process.c, src/new_ca_creation_process.h:
+	  Subiendo cambios antes de cambiar nombre
+
+2006-05-30  davefx
+
+	* configure.in, gui/gnomint.glade, po/es.po, po/gnomint.pot,
+	  src/Makefile.am, src/main.c: Adding new window for create
+	  certificates
+
+2006-05-29  davefx
+
+	* gui/gnomint.glade, src/ca.c, src/ca_file.c, src/ca_file.h,
+	  src/main.c: Activating 'Save as' feature
+	* gui/gnomint.glade, po/POTFILES.in, po/es.po, po/gnomint.pot,
+	  src/ca.c: Updating treeview. Now showing correct dates
+	* configure.in: Changing gnutls support in configure.in
+
+2006-05-28  davefx
+
+	* src/ca.c, src/main.c: Filling ca_tree_view
+	* src/ca.c, src/ca_creation.c, src/ca_creation.h, src/ca_file.c,
+	  src/main.c, src/new_ca_creation_process.c, src/new_ca_window.c,
+	  src/tls.c: Fixing some CA creation problems. Starting model
+	  initialization
+	* gui/gnomint.glade, src/Makefile.am, src/ca.c, src/ca.h,
+	  src/ca_creation.c, src/ca_file.c, src/ca_file.h, src/main.c,
+	  src/new_ca_creation_process.c: Finishing the CA creation
+	  process. Starting with CA opening process.
+
+2006-05-20  davefx
+
+	* configure.in, gui/gnomint.glade, src/Makefile.am,
+	  src/ca_creation.c, src/ca_file.c, src/main.c,
+	  src/new_ca_window.c, src/ssl.c, src/ssl.h, src/tls.c, src/tls.h:
+	  Removing OpenSSL dependency. Now gnoMint will use GnuTLS for all
+	* gui/gnomint.glade, po/POTFILES.in, po/es.po, src/Makefile.am,
+	  src/ca_creation.c, src/ca_creation.h, src/ca_file.c,
+	  src/ca_file.h, src/main.c, src/new_ca_creation_process.c,
+	  src/new_ca_window.c, src/ssl.c, src/ssl.h: Updating last changes
+
+2006-05-03  davefx
+
+	* src/ca_file.c, src/ca_file.h: Anyadiendo fichero ca_file
+	* gui/Makefile.am, gui/Makefile.in: Subiendo cambios
+	* gui/Makefile.in:
+	* configure.in, po/es.po, po/gnomint.pot, src/Makefile.am,
+	  src/ca_creation.c, src/new_ca_creation_process.c: Subiendo
+	  cambios
+
+2006-05-02  davefx
+
+	* configure.in, gui/gnomint.glade, po/POTFILES.in, po/es.po,
+	  po/gnomint.pot, src/Makefile.am, src/ca_creation.c,
+	  src/ca_creation.h, src/main.c, src/new_ca_creation_process.c,
+	  src/new_ca_creation_process.h, src/new_ca_window.c,
+	  src/new_ca_window.h, src/ssl.c, src/ssl.h: Subiendo cambios
+
+2006-05-01  davefx
+
+	* po/es.po: *** empty log message ***
+	* po/es.po: *** empty log message ***
+	* Makefile.am, configure.in, gui/gnomint.glade, po/POTFILES.in,
+	  src/Makefile.am, src/main.c, src/new_ca_window.c,
+	  src/new_ca_window.h: Subiendo avances
+
+2006-04-29  davefx
+
+	* src/main.c: Continuando
+	* gui/gnomint.glade, po/es.po, po/gnomint.pot: Actualizando
+	* po/POTFILES.in, po/gnomint.pot: Añadiendo gnomint.pot
+	* Makefile.am, configure.in, po/POTFILES.in: Subiendo cambios
+	* Makefile.am, configure.in, gui, src/gui: Trayendo de vuelta
+	* gui, po, src/gui:
+	* src/Makefile.am: Añadiendo fichero
+	* autogen.sh, src/main.c: Subiendo cambios
+	* AUTHORS, BUGS, COPYING, ChangeLog, INSTALL, Makefile.am, NEWS,
+	  README, autogen.sh, configure.in, gui, gui/gnomint.glade, src:
+	  Iniciando repositorio
+
