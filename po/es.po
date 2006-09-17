@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-15 00:19+0200\n"
-"PO-Revision-Date: 2006-09-15 00:20+0200\n"
+"POT-Creation-Date: 2006-09-16 09:10+0200\n"
+"PO-Revision-Date: 2006-09-16 09:15+0200\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgstr ""
 msgid "Activated on"
 msgstr "Activado el"
 
-#: ../gui/gnomint.glade.h:30 ../src/tls.c:664
+#: ../gui/gnomint.glade.h:30 ../src/tls.c:720
 msgid "Any purpose"
 msgstr "Cualquier propósito"
 
@@ -171,7 +171,7 @@ msgstr "Núm de serie"
 msgid "City: "
 msgstr "Ciudad"
 
-#: ../gui/gnomint.glade.h:42 ../src/tls.c:656
+#: ../gui/gnomint.glade.h:42 ../src/tls.c:712
 msgid "Code signing"
 msgstr "Firma de código"
 
@@ -191,7 +191,7 @@ msgstr "Creando certificado raíz de la AC"
 msgid "DSA"
 msgstr "DSA"
 
-#: ../gui/gnomint.glade.h:47 ../src/tls.c:632
+#: ../gui/gnomint.glade.h:47 ../src/tls.c:688
 msgid "Data encipherment"
 msgstr "Cifrado de datos"
 
@@ -199,11 +199,11 @@ msgstr "Cifrado de datos"
 msgid "Details"
 msgstr "Detalles"
 
-#: ../gui/gnomint.glade.h:49 ../src/tls.c:626
+#: ../gui/gnomint.glade.h:49 ../src/tls.c:682
 msgid "Digital signature"
 msgstr "Firma digital"
 
-#: ../gui/gnomint.glade.h:50 ../src/tls.c:658
+#: ../gui/gnomint.glade.h:50 ../src/tls.c:714
 msgid "Email protection"
 msgstr "Protección de correo electrónico"
 
@@ -215,11 +215,11 @@ msgstr "Caduca el"
 msgid "General"
 msgstr "General"
 
-#: ../gui/gnomint.glade.h:53 ../src/tls.c:634
+#: ../gui/gnomint.glade.h:53 ../src/tls.c:690
 msgid "Key agreement"
 msgstr "Negociación de claves"
 
-#: ../gui/gnomint.glade.h:54 ../src/tls.c:630
+#: ../gui/gnomint.glade.h:54 ../src/tls.c:686
 msgid "Key encipherment"
 msgstr "Cifrado de claves"
 
@@ -239,11 +239,11 @@ msgstr "Meses antes de la caducidad del certificado:"
 msgid "Months before root certificate expiration:"
 msgstr "Meses antes de la caducidad del certificado raíz:"
 
-#: ../gui/gnomint.glade.h:59 ../src/tls.c:628
+#: ../gui/gnomint.glade.h:59 ../src/tls.c:684
 msgid "Non repudiation"
 msgstr "No repudio"
 
-#: ../gui/gnomint.glade.h:60 ../src/tls.c:662
+#: ../gui/gnomint.glade.h:60 ../src/tls.c:718
 msgid "OCSP signing"
 msgstr "Firma de OCSP"
 
@@ -367,7 +367,7 @@ msgstr "Cliente WWW TLS"
 msgid "TLS Web server"
 msgstr "Servidor web TLS"
 
-#: ../gui/gnomint.glade.h:90 ../src/tls.c:660
+#: ../gui/gnomint.glade.h:90 ../src/tls.c:716
 msgid "Time stamping"
 msgstr "Marcado de fecha"
 
@@ -408,51 +408,51 @@ msgstr "<b>Solicitudes de certificación</b>"
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: ../src/ca.c:323
+#: ../src/ca.c:326
 msgid "Subject"
 msgstr "Titular"
 
-#: ../src/ca.c:342
+#: ../src/ca.c:345
 msgid "Serial"
 msgstr "Nº serie"
 
-#: ../src/ca.c:348
+#: ../src/ca.c:351
 msgid "Activation"
 msgstr "Activación"
 
-#: ../src/ca.c:355
+#: ../src/ca.c:358
 msgid "Expiration"
 msgstr "Caducidad"
 
-#: ../src/ca.c:601
+#: ../src/ca.c:604
 msgid "Export certificate"
 msgstr "Exportar certificado"
 
-#: ../src/ca.c:608
+#: ../src/ca.c:611
 msgid "Export certificate signing request"
 msgstr "Exportar solicitud de certificación"
 
-#: ../src/ca.c:623 ../src/ca.c:634 ../src/ca.c:644
+#: ../src/ca.c:626 ../src/ca.c:637 ../src/ca.c:647
 msgid "There was an error while exporting certificate."
 msgstr "Ocurrió un error al exportar el certificado"
 
-#: ../src/ca.c:625 ../src/ca.c:636 ../src/ca.c:646
+#: ../src/ca.c:628 ../src/ca.c:639 ../src/ca.c:649
 msgid "There was an error while exporting CSR."
 msgstr "Ocurrió un error al exportar la solicitud de certificación."
 
-#: ../src/ca.c:659
+#: ../src/ca.c:662
 msgid "Certificate exported successfully"
 msgstr "Certificado exportado con éxito"
 
-#: ../src/ca.c:666
+#: ../src/ca.c:669
 msgid "Certificate signing request exported successfully"
 msgstr "Solicitud de certificación exportada correctamente"
 
-#: ../src/ca.c:730
+#: ../src/ca.c:733
 msgid "Export private key"
 msgstr "Exportar clave privada."
 
-#: ../src/ca.c:747
+#: ../src/ca.c:750
 msgid ""
 "You need to supply a passphrase for protecting the exported private key, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
@@ -463,39 +463,39 @@ msgstr ""
 "ella. Esta contraseña será solicitada por cualquier aplicación que vaya a "
 "hacer uso de la clave privada."
 
-#: ../src/ca.c:750
+#: ../src/ca.c:753
 msgid "Insert passphrase:"
 msgstr "Introduzca contraseña:"
 
-#: ../src/ca.c:750
+#: ../src/ca.c:753
 msgid "Insert passphrase (confirm):"
 msgstr "Introduzca contraseña (confirmación):"
 
-#: ../src/ca.c:759 ../src/ca.c:788 ../src/ca.c:796
+#: ../src/ca.c:762 ../src/ca.c:791 ../src/ca.c:799
 msgid "There was an error while exporting private key."
 msgstr "Error al exportar clave privada."
 
-#: ../src/ca.c:772
+#: ../src/ca.c:775
 msgid "There was an error while getting private key."
 msgstr "Hubo un problema al obtener la clave privada."
 
-#: ../src/ca.c:782
+#: ../src/ca.c:785
 msgid "There was an error while password-protecting private key."
 msgstr "Hubo un error al proteger con contraseña la clave privada."
 
-#: ../src/ca.c:809
+#: ../src/ca.c:812
 msgid "Private key exported successfully"
 msgstr "Clave privada exportada con éxito"
 
-#: ../src/ca.c:879
+#: ../src/ca.c:882
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: ../src/ca.c:884
+#: ../src/ca.c:887
 msgid "To do. Feature not implemented yet."
 msgstr "Por hacer. Funcionalidad aún no implementada."
 
-#: ../src/ca.c:905
+#: ../src/ca.c:908
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr "¿Está seguro de que desea borrar esta solicitud de certificación?"
 
@@ -610,7 +610,7 @@ msgstr ""
 "\n"
 "Este programa se distribuye con la esperanza de que sea útil, pero SIN "
 "GARANTÍA; sin ninguna garantía implícita de estar APTO PARA "
-"LACOMERCIALIZACIÓN o de IDONEIDAD PARA UN FIN DETERMINADO. Para más "
+"LA COMERCIALIZACIÓN o de IDONEIDAD PARA UN FIN DETERMINADO. Para más "
 "detalles, vea la Licencia Pública General GNU. \n"
 "\n"
 "Debería haber recibido una copia de la Licencia Pública General GNU junto "
@@ -1625,96 +1625,96 @@ msgstr "Error al inicializar estructura de clave privada."
 msgid "Error creating private key."
 msgstr "Error al crear clave privada."
 
-#: ../src/tls.c:60 ../src/tls.c:92 ../src/tls.c:243 ../src/tls.c:309
-#: ../src/tls.c:460
+#: ../src/tls.c:60 ../src/tls.c:92 ../src/tls.c:256 ../src/tls.c:322
+#: ../src/tls.c:512
 msgid "Error exporting private key to PEM structure."
 msgstr "Error al exportar clave privada a estructura PEM."
 
-#: ../src/tls.c:146
+#: ../src/tls.c:150
 msgid "Error when initializing certificate structure"
 msgstr "Error al inicializar estructura de certificado"
 
-#: ../src/tls.c:150 ../src/tls.c:363
+#: ../src/tls.c:155 ../src/tls.c:387
 msgid "Error when setting certificate version"
 msgstr "Error al establecer versión de certificado"
 
-#: ../src/tls.c:155 ../src/tls.c:368
+#: ../src/tls.c:161 ../src/tls.c:396
 msgid "Error when setting certificate serial number"
 msgstr "Error al establecer número de serie del certificado"
 
-#: ../src/tls.c:160 ../src/tls.c:373
+#: ../src/tls.c:167 ../src/tls.c:405
 msgid "Error when setting activation time"
 msgstr "Error al establecer fecha de activación"
 
-#: ../src/tls.c:164 ../src/tls.c:377
+#: ../src/tls.c:172 ../src/tls.c:413
 msgid "Error when setting expiration time"
 msgstr "Error al establecer fecha y hora de caducidad"
 
-#: ../src/tls.c:209 ../src/tls.c:406
+#: ../src/tls.c:218 ../src/tls.c:446
 msgid "Error when setting basicConstraint extension"
 msgstr "Error al establecer extensión basicConstraint"
 
-#: ../src/tls.c:213 ../src/tls.c:423
+#: ../src/tls.c:223 ../src/tls.c:467
 msgid "Error when setting keyUsage extension"
 msgstr "Error al establecer extensión keyUsage"
 
-#: ../src/tls.c:223
+#: ../src/tls.c:234
 msgid "Error when setting subject key identifier extension"
 msgstr "Error al establecer extensión identificadora de titular"
 
-#: ../src/tls.c:232
+#: ../src/tls.c:244
 msgid "Error when signing self-signed certificate"
 msgstr "Error al firmar certificado autofirmado"
 
-#: ../src/tls.c:261
+#: ../src/tls.c:274
 msgid "Error when initializing csr structure"
 msgstr "Error al inicializar estructura de solicitud"
 
-#: ../src/tls.c:265
+#: ../src/tls.c:278
 msgid "Error when setting csr version"
 msgstr "Error al establecer versión de solicitud"
 
-#: ../src/tls.c:298
+#: ../src/tls.c:311
 msgid "Error when signing self-signed csr"
 msgstr "Error al firmar solicitud autofirmada"
 
-#: ../src/tls.c:355
+#: ../src/tls.c:371
 msgid "Error when initializing crt structure"
 msgstr "Error al inicializar estructura de solicitud"
 
-#: ../src/tls.c:359
+#: ../src/tls.c:379
 msgid "Error when copying data from CSR to certificate structure"
 msgstr "Error al copiar datos de solicitud a la estructura del certificado"
 
-#: ../src/tls.c:449
+#: ../src/tls.c:497
 msgid "Error when signing certificate"
 msgstr "Error al firmar certificado"
 
-#: ../src/tls.c:621
+#: ../src/tls.c:677
 msgid "Certification Authority"
 msgstr "Autoridad de certificación"
 
-#: ../src/tls.c:636
+#: ../src/tls.c:692
 msgid "Certificate signing"
 msgstr "Firma de certificados"
 
-#: ../src/tls.c:638
+#: ../src/tls.c:694
 msgid "CRL signing"
 msgstr "Firma de CRLs"
 
-#: ../src/tls.c:640
+#: ../src/tls.c:696
 msgid "Key encipher only"
 msgstr "Clave de sólo cifrado"
 
-#: ../src/tls.c:642
+#: ../src/tls.c:698
 msgid "Key decipher only"
 msgstr "Clave de sólo descifrado"
 
-#: ../src/tls.c:652
+#: ../src/tls.c:708
 msgid "TLS WWW Server"
 msgstr "Servidor TLS WWW"
 
-#: ../src/tls.c:654
+#: ../src/tls.c:710
 msgid "TLS WWW Client."
 msgstr "Cliente TLS WWW"
 

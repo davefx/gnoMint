@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-15 00:19+0200\n"
+"POT-Creation-Date: 2006-09-16 09:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -115,7 +115,7 @@ msgstr ""
 msgid "Activated on"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:30 ../src/tls.c:664
+#: ../gui/gnomint.glade.h:30 ../src/tls.c:720
 msgid "Any purpose"
 msgstr ""
 
@@ -161,7 +161,7 @@ msgstr ""
 msgid "City: "
 msgstr ""
 
-#: ../gui/gnomint.glade.h:42 ../src/tls.c:656
+#: ../gui/gnomint.glade.h:42 ../src/tls.c:712
 msgid "Code signing"
 msgstr ""
 
@@ -181,7 +181,7 @@ msgstr ""
 msgid "DSA"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:47 ../src/tls.c:632
+#: ../gui/gnomint.glade.h:47 ../src/tls.c:688
 msgid "Data encipherment"
 msgstr ""
 
@@ -189,11 +189,11 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:49 ../src/tls.c:626
+#: ../gui/gnomint.glade.h:49 ../src/tls.c:682
 msgid "Digital signature"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:50 ../src/tls.c:658
+#: ../gui/gnomint.glade.h:50 ../src/tls.c:714
 msgid "Email protection"
 msgstr ""
 
@@ -205,11 +205,11 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:53 ../src/tls.c:634
+#: ../gui/gnomint.glade.h:53 ../src/tls.c:690
 msgid "Key agreement"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:54 ../src/tls.c:630
+#: ../gui/gnomint.glade.h:54 ../src/tls.c:686
 msgid "Key encipherment"
 msgstr ""
 
@@ -229,11 +229,11 @@ msgstr ""
 msgid "Months before root certificate expiration:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:59 ../src/tls.c:628
+#: ../gui/gnomint.glade.h:59 ../src/tls.c:684
 msgid "Non repudiation"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:60 ../src/tls.c:662
+#: ../gui/gnomint.glade.h:60 ../src/tls.c:718
 msgid "OCSP signing"
 msgstr ""
 
@@ -353,7 +353,7 @@ msgstr ""
 msgid "TLS Web server"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:90 ../src/tls.c:660
+#: ../gui/gnomint.glade.h:90 ../src/tls.c:716
 msgid "Time stamping"
 msgstr ""
 
@@ -392,90 +392,90 @@ msgstr ""
 msgid "%m/%d/%Y %R GMT"
 msgstr ""
 
-#: ../src/ca.c:323
+#: ../src/ca.c:326
 msgid "Subject"
 msgstr ""
 
-#: ../src/ca.c:342
+#: ../src/ca.c:345
 msgid "Serial"
 msgstr ""
 
-#: ../src/ca.c:348
+#: ../src/ca.c:351
 msgid "Activation"
 msgstr ""
 
-#: ../src/ca.c:355
+#: ../src/ca.c:358
 msgid "Expiration"
 msgstr ""
 
-#: ../src/ca.c:601
+#: ../src/ca.c:604
 msgid "Export certificate"
 msgstr ""
 
-#: ../src/ca.c:608
+#: ../src/ca.c:611
 msgid "Export certificate signing request"
 msgstr ""
 
-#: ../src/ca.c:623 ../src/ca.c:634 ../src/ca.c:644
+#: ../src/ca.c:626 ../src/ca.c:637 ../src/ca.c:647
 msgid "There was an error while exporting certificate."
 msgstr ""
 
-#: ../src/ca.c:625 ../src/ca.c:636 ../src/ca.c:646
+#: ../src/ca.c:628 ../src/ca.c:639 ../src/ca.c:649
 msgid "There was an error while exporting CSR."
 msgstr ""
 
-#: ../src/ca.c:659
+#: ../src/ca.c:662
 msgid "Certificate exported successfully"
 msgstr ""
 
-#: ../src/ca.c:666
+#: ../src/ca.c:669
 msgid "Certificate signing request exported successfully"
 msgstr ""
 
-#: ../src/ca.c:730
+#: ../src/ca.c:733
 msgid "Export private key"
 msgstr ""
 
-#: ../src/ca.c:747
+#: ../src/ca.c:750
 msgid ""
 "You need to supply a passphrase for protecting the exported private key, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
 "by any application that will make use of the private key."
 msgstr ""
 
-#: ../src/ca.c:750
+#: ../src/ca.c:753
 msgid "Insert passphrase:"
 msgstr ""
 
-#: ../src/ca.c:750
+#: ../src/ca.c:753
 msgid "Insert passphrase (confirm):"
 msgstr ""
 
-#: ../src/ca.c:759 ../src/ca.c:788 ../src/ca.c:796
+#: ../src/ca.c:762 ../src/ca.c:791 ../src/ca.c:799
 msgid "There was an error while exporting private key."
 msgstr ""
 
-#: ../src/ca.c:772
+#: ../src/ca.c:775
 msgid "There was an error while getting private key."
 msgstr ""
 
-#: ../src/ca.c:782
+#: ../src/ca.c:785
 msgid "There was an error while password-protecting private key."
 msgstr ""
 
-#: ../src/ca.c:809
+#: ../src/ca.c:812
 msgid "Private key exported successfully"
 msgstr ""
 
-#: ../src/ca.c:879
+#: ../src/ca.c:882
 msgid "Unexpected error"
 msgstr ""
 
-#: ../src/ca.c:884
+#: ../src/ca.c:887
 msgid "To do. Feature not implemented yet."
 msgstr ""
 
-#: ../src/ca.c:905
+#: ../src/ca.c:908
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr ""
 
@@ -1590,95 +1590,95 @@ msgstr ""
 msgid "Error creating private key."
 msgstr ""
 
-#: ../src/tls.c:60 ../src/tls.c:92 ../src/tls.c:243 ../src/tls.c:309
-#: ../src/tls.c:460
+#: ../src/tls.c:60 ../src/tls.c:92 ../src/tls.c:256 ../src/tls.c:322
+#: ../src/tls.c:512
 msgid "Error exporting private key to PEM structure."
 msgstr ""
 
-#: ../src/tls.c:146
+#: ../src/tls.c:150
 msgid "Error when initializing certificate structure"
 msgstr ""
 
-#: ../src/tls.c:150 ../src/tls.c:363
+#: ../src/tls.c:155 ../src/tls.c:387
 msgid "Error when setting certificate version"
 msgstr ""
 
-#: ../src/tls.c:155 ../src/tls.c:368
+#: ../src/tls.c:161 ../src/tls.c:396
 msgid "Error when setting certificate serial number"
 msgstr ""
 
-#: ../src/tls.c:160 ../src/tls.c:373
+#: ../src/tls.c:167 ../src/tls.c:405
 msgid "Error when setting activation time"
 msgstr ""
 
-#: ../src/tls.c:164 ../src/tls.c:377
+#: ../src/tls.c:172 ../src/tls.c:413
 msgid "Error when setting expiration time"
 msgstr ""
 
-#: ../src/tls.c:209 ../src/tls.c:406
+#: ../src/tls.c:218 ../src/tls.c:446
 msgid "Error when setting basicConstraint extension"
 msgstr ""
 
-#: ../src/tls.c:213 ../src/tls.c:423
+#: ../src/tls.c:223 ../src/tls.c:467
 msgid "Error when setting keyUsage extension"
 msgstr ""
 
-#: ../src/tls.c:223
+#: ../src/tls.c:234
 msgid "Error when setting subject key identifier extension"
 msgstr ""
 
-#: ../src/tls.c:232
+#: ../src/tls.c:244
 msgid "Error when signing self-signed certificate"
 msgstr ""
 
-#: ../src/tls.c:261
+#: ../src/tls.c:274
 msgid "Error when initializing csr structure"
 msgstr ""
 
-#: ../src/tls.c:265
+#: ../src/tls.c:278
 msgid "Error when setting csr version"
 msgstr ""
 
-#: ../src/tls.c:298
+#: ../src/tls.c:311
 msgid "Error when signing self-signed csr"
 msgstr ""
 
-#: ../src/tls.c:355
+#: ../src/tls.c:371
 msgid "Error when initializing crt structure"
 msgstr ""
 
-#: ../src/tls.c:359
+#: ../src/tls.c:379
 msgid "Error when copying data from CSR to certificate structure"
 msgstr ""
 
-#: ../src/tls.c:449
+#: ../src/tls.c:497
 msgid "Error when signing certificate"
 msgstr ""
 
-#: ../src/tls.c:621
+#: ../src/tls.c:677
 msgid "Certification Authority"
 msgstr ""
 
-#: ../src/tls.c:636
+#: ../src/tls.c:692
 msgid "Certificate signing"
 msgstr ""
 
-#: ../src/tls.c:638
+#: ../src/tls.c:694
 msgid "CRL signing"
 msgstr ""
 
-#: ../src/tls.c:640
+#: ../src/tls.c:696
 msgid "Key encipher only"
 msgstr ""
 
-#: ../src/tls.c:642
+#: ../src/tls.c:698
 msgid "Key decipher only"
 msgstr ""
 
-#: ../src/tls.c:652
+#: ../src/tls.c:708
 msgid "TLS WWW Server"
 msgstr ""
 
-#: ../src/tls.c:654
+#: ../src/tls.c:710
 msgid "TLS WWW Client."
 msgstr ""
