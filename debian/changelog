@@ -1,0 +1,12 @@
+gnomint (0.1.2-1) dapper; urgency=low
+
+  * Upgrading to version 0.1.2
+
+ -- David Marín <davefx@gmail.com>  Sun, 15 Oct 2006 10:09:51 +0200
+
+gnomint (0.1.1-1) dapper; urgency=low
+
+  * Initial release
+
+ -- Joao Pinto <lamego@naconversa.com>  Sun, 17 Sep 2006 10:28:51 +0100
+

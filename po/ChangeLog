@@ -1,0 +1,66 @@
+2006-09-14  davefx
+
+	* TODO, gui/gnomint.glade, POTFILES.in, es.po, gnomint.pot,
+	  src/ca.c, src/ca.h, src/ca_file.c, src/ca_file.h,
+	  src/new_cert_window.c, src/tls.c: Uploading first functional
+	  version 0.1-rc1. Now let's fix bugs
+
+2006-09-13  davefx
+
+	* TODO, es.po, gnomint.pot: Updating translations
+
+2006-09-11  davefx
+
+	* TODO, configure.in, gui/gnomint.glade, POTFILES.in, es.po,
+	  src/Makefile.am, src/ca.c, src/ca_file.c,
+	  src/certificate_properties.c, src/certificate_properties.h,
+	  src/main.c, src/new_cert_creation_process.c, src/tls.c,
+	  src/tls.h: Adding TODO. Completing certificate-properties window
+
+2006-05-30  davefx
+
+	* configure.in, gui/gnomint.glade, es.po, gnomint.pot,
+	  src/Makefile.am, src/main.c: Adding new window for create
+	  certificates
+
+2006-05-29  davefx
+
+	* gui/gnomint.glade, POTFILES.in, es.po, gnomint.pot, src/ca.c:
+	  Updating treeview. Now showing correct dates
+
+2006-05-20  davefx
+
+	* gui/gnomint.glade, POTFILES.in, es.po, src/Makefile.am,
+	  src/ca_creation.c, src/ca_creation.h, src/ca_file.c,
+	  src/ca_file.h, src/main.c, src/new_ca_creation_process.c,
+	  src/new_ca_window.c, src/ssl.c, src/ssl.h: Updating last changes
+
+2006-05-03  davefx
+
+	* configure.in, es.po, gnomint.pot, src/Makefile.am,
+	  src/ca_creation.c, src/new_ca_creation_process.c: Subiendo
+	  cambios
+
+2006-05-02  davefx
+
+	* configure.in, gui/gnomint.glade, POTFILES.in, es.po,
+	  gnomint.pot, src/Makefile.am, src/ca_creation.c,
+	  src/ca_creation.h, src/main.c, src/new_ca_creation_process.c,
+	  src/new_ca_creation_process.h, src/new_ca_window.c,
+	  src/new_ca_window.h, src/ssl.c, src/ssl.h: Subiendo cambios
+
+2006-05-01  davefx
+
+	* es.po: *** empty log message ***
+	* es.po: *** empty log message ***
+	* Makefile.am, configure.in, gui/gnomint.glade, POTFILES.in,
+	  src/Makefile.am, src/main.c, src/new_ca_window.c,
+	  src/new_ca_window.h: Subiendo avances
+
+2006-04-29  davefx
+
+	* gui/gnomint.glade, es.po, gnomint.pot: Actualizando
+	* POTFILES.in, gnomint.pot: Añadiendo gnomint.pot
+	* Makefile.am, configure.in, POTFILES.in: Subiendo cambios
+	* gui, ., src/gui:
+

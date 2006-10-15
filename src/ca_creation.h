@@ -1,0 +1,74 @@
+//  gnoMint: a graphical interface for managing a certification authority
+//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or   
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#ifndef _CA_CREATION_H_
+#define _CA_CREATION_H_
+
+#include <glib.h>
+#include <time.h>
+
+typedef struct {
+	gchar * country;
+	gchar * state;
+	gchar * city;
+	gchar * org;
+	gchar * ou;
+	gchar * cn;
+	gchar * emailAddress;
+
+	gint key_type;
+	gint key_bitlength;
+
+	gint key_months_before_expiration;
+	time_t activation;
+	time_t expiration;
+	
+} CaCreationData;
+
+typedef struct {
+	gint key_months_before_expiration;
+	time_t activation;
+	time_t expiration;
+	
+	guint64 serial;
+	
+	gboolean digital_signature;
+	gboolean data_encipherment;
+	gboolean key_encipherment;
+	gboolean non_repudiation;
+	gboolean key_agreement;
+
+	gboolean email_protection;
+	gboolean code_signing;
+	gboolean web_client;
+	gboolean web_server;
+	gboolean time_stamping;
+	gboolean ocsp_signing;
+	gboolean any_purpose;
+} CertCreationData;
+
+GThread * ca_creation_launch_thread (CaCreationData *creation_data);
+
+
+void ca_creation_lock_status_mutex ();
+void ca_creation_unlock_status_mutex ();
+
+gint ca_creation_get_thread_status ();
+
+gchar * ca_creation_get_thread_message();
+
+#endif

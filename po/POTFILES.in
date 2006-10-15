@@ -1,0 +1,14 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+gui/gnomint.glade
+src/ca.c
+src/ca_creation.c
+src/ca_file.c
+src/certificate_properties.c
+src/csr_creation.c
+src/csr_properties.c
+src/main.c
+src/new_cert_creation_process.c
+src/new_cert_window.c
+src/tls.c
+

@@ -1,0 +1,14 @@
+Source: gnomint
+Section: unknown
+Priority: optional
+Maintainer: Joao Pinto <lamego@naconversa.com>
+Build-Depends: debhelper (>= 4.0.0), autotools-dev, libsqlite-dev
+Standards-Version: 3.6.2
+
+Package: gnomint
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsqlite0
+Description: Certification Authority management tool
+ x509 Certification Authority management tool for GTK/Gnome environments.
+ .
+ http://gnomint.sourceforge.net/

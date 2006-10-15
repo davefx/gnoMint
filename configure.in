@@ -1,0 +1,179 @@
+AC_PREREQ(2.52)
+
+AC_INIT(gnomint, 0.1.2)
+
+PACKAGE="gnoMint"
+PACKAGE_BUGREPORT="<davefx@gmail.com>"
+PACKAGE_NAME="gnomint"
+PACKAGE_VERSION="0.1.2"
+PACKAGE_COPYRIGHT="(c) 2006 David Marin Carreño <davefx@gmail.com>"
+PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
+
+AC_SUBST(PACKAGE)
+AC_SUBST(PACKAGE_BUGREPORT)
+AC_SUBST(PACKAGE_NAME)
+AC_SUBST(PACKAGE_VERSION)
+AC_SUBST(PACKAGE_COPYRIGHT)
+AC_SUBST(PACKAGE_WEBSITE)
+
+AM_INIT_AUTOMAKE($PACKAGE_NAME, $PACKAGE_VERSION)
+
+dnl Put the ACLOCAL flags in the Makefile
+ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
+
+dnl Initialize maintainer mode
+AM_MAINTAINER_MODE
+
+AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "gnomint")
+
+# Check for programs
+AC_ISC_POSIX
+AC_PROG_CC
+AC_STDC_HEADERS
+AC_DISABLE_STATIC
+AM_PROG_LIBTOOL
+AC_PROG_INTLTOOL([0.11])
+
+dnl #######################
+dnl # Check for libssl
+dnl ########################
+AC_MSG_CHECKING(for gnuTLS development files\n)
+AC_CHECK_HEADER(gnutls/gnutls.h, , AC_MSG_ERROR(*** cannot find gnutls.h header); exit)
+AC_CHECK_LIB(gnutls, gnutls_global_init, , AC_MSG_ERROR(*** Cannot find gnuTLS library); exit)
+
+
+dnl #######################
+dnl # Check for libsqlite
+dnl ########################
+AC_MSG_CHECKING(for LibSQLite development files\n)
+AC_CHECK_HEADER(sqlite.h, , AC_MSG_ERROR(*** cannot find sqlite.h header); exit)
+AC_CHECK_LIB(sqlite, sqlite_open, , AC_MSG_ERROR(*** Cannot find sqlite library); exit)
+
+
+dnl 
+dnl gtk-doc
+dnl 
+AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test -n "$LIBTOOL")
+AC_CHECK_PROG(GTKDOC, gtkdoc-mkdb, true, false)
+AM_CONDITIONAL(HAVE_GTK_DOC, $GTKDOC)
+AC_SUBST(HAVE_GTK_DOC)
+                                                                                                                     
+dnl AC_ARG_ENABLE(gtk-doc, [  --enable-gtk-doc        Use gtk-doc to build documentation [default=auto]], enable_gtk_doc="$enableval", enable_gtk_doc=auto)
+                                                                                                                     
+dnl if test x$enable_gtk_doc = xauto ; then
+dnl    if test x$GTKDOC = xtrue ; then
+dnl       enable_gtk_doc=yes
+dnl    else
+dnl       enable_gtk_doc=no
+dnl    fi
+dnl fi
+
+dnl AM_CONDITIONAL(ENABLE_GTK_DOC, test x$enable_gtk_doc = xyes)
+
+
+dnl
+dnl glib-genmarshal
+dnl
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
+if test "x$GCC" = "xyes"; then
+	CFLAGS="-Wall -Werror -O0 $CFLAGS" 
+fi
+
+CFLAGS="-Wall -Werror -O0 -g" 
+
+dnl
+dnl Scrollkeeper
+dnl
+AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
+if test x$SCROLLKEEPER_CONFIG = xno; then
+   AC_MSG_WARN(Couldn't find scrollkeeper-config -- please install the scrollkeeper package)
+else
+   SCROLLKEEPER_LOCALSTATE_DIR=`scrollkeeper-config --pkglocalstatedir`
+   AC_SUBST(SCROLLKEEPER_LOCALSTATE_DIR)
+fi
+
+AM_CONDITIONAL(HAVE_SCROLLKEEPER, test x$SCROLLKEEPER_CONFIG != xno)
+
+dnl Set PACKAGE_LOCALE_DIR in config.h.
+if test "x${prefix}" = "xNONE"; then
+  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${ac_default_prefix}/share/locale")
+else
+  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${prefix}/share/locale")
+fi
+
+
+dnl ================================================================
+dnl Gettext stuff.
+dnl ================================================================
+GETTEXT_PACKAGE=gnomint
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE")
+ALL_LINGUAS="es"
+AM_GLIB_GNU_GETTEXT
+
+PKG_CHECK_MODULES(GNOMINT, 
+	gconf-2.0 \
+        gtk+-2.0 >= 2.6.0 \
+	gdk-pixbuf-2.0 \
+        libgnomeui-2.0 >= 2.0 \
+        libglade-2.0 >= 2.5.0 )
+AC_SUBST(GNOMINT_CFLAGS)
+AC_SUBST(GNOMINT_LIBS)
+
+dnl
+dnl Check if src should be build with the debug mode
+dnl
+AC_ARG_ENABLE(debug, 
+	[  --enable-debug          debug [default=no]],
+	use_debug="Yes";
+	AC_DEFINE(debug), use_debug="No")
+
+
+
+dnl
+dnl Check if src should be build with the debug_signals mode
+dnl
+AC_ARG_ENABLE(debug-signal, 
+	[  --enable-debug-signal   debug signals sent [default=no]],
+	use_debug_sig="Yes";
+	AC_DEFINE(debug_signal), use_debug_sig="No")
+
+
+dnl
+dnl where to install various files
+dnl
+dnl just for info:
+dnl $datadir will be $prefix/share
+dnl $pkgdatadir will be $datadir/gnomint
+
+GNOMINT_Pixmapdir=${datadir}/pixmaps/${PACKAGE}
+AC_SUBST(GNOMINT_Pixmapdir)
+GNOMINT_Appdir=${datadir}/gnome/applications
+AC_SUBST(GNOMINT_Appdir)
+GNOMINT_Helpdir=${datadir}/gnome/help/${PACKAGE}
+AC_SUBST(GNOMINT_Helpdir)
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+AC_OUTPUT([
+Makefile
+src/Makefile
+gui/Makefile
+po/Makefile.in
+gnomint.spec
+])
+
+dnl
+dnl Print a little note
+dnl
+echo ""
+echo "* Install directories:"
+echo "   - Help is in " $GNOMINT_Helpdir
+echo "   - Pixmaps are in " $GNOMINT_Pixmapdir
+echo "   - .desktop entry is in " $GNOMINT_Appdir
+echo "* Compiler flags: " $CFLAGS
+echo "* Type make to build gnomint in" $prefix
+echo ""

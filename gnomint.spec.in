@@ -1,0 +1,14 @@
+Vendor: David Marín Carreño <davefx@gmail.com>
+Name: gnomint
+Version: @PACKAGE_VERSION@
+Release: 1
+
+%description
+ Certification Authority management made easy.
+
+gnoMint is a x509 Certification Authority management tool for
+GTK/Gnome environments.
+
+Summary: Graphical x509 Certification Authority management tool
+Copyright: GPL
+URL: @PACKAGE_WEBSITE@
