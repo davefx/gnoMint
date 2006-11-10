@@ -675,14 +675,15 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 }
 
 
-gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gchar *confirm_message)
+gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gchar *confirm_message, gchar *distinct_error_message, guint minimum_length)
 {
-	GtkWidget * widget = NULL;
+	GtkWidget * widget = NULL, * password_widget = NULL;
 	//GtkDialog * dialog = NULL;
 	GladeXML * dialog_xml = NULL;
 	gchar     * xml_file = NULL;
 	gint response = 0;
 	gchar *password = NULL;
+	const gchar *passwordagain = NULL;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	dialog_xml = glade_xml_new (xml_file, "get_password_dialog", NULL);
@@ -696,17 +697,36 @@ gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gc
 	widget = glade_xml_get_widget (dialog_xml, "confirm_message");
 	gtk_label_set_text (GTK_LABEL(widget), confirm_message);
 
-	widget = glade_xml_get_widget (dialog_xml, "get_password_dialog");
-	response = gtk_dialog_run(GTK_DIALOG(widget)); 
+	password_widget = glade_xml_get_widget (dialog_xml, "password_entry");
+	widget = glade_xml_get_widget (dialog_xml, "password_dialog_ok_button");
+	g_object_set_data (G_OBJECT(password_widget), "minimum_length", GINT_TO_POINTER(minimum_length));
+	g_object_set_data (G_OBJECT(password_widget), "ok_button", widget);
+
+	do {
+		gtk_widget_grab_focus (password_widget);
+
+		if (password)
+			g_free (password);
+
+		widget = glade_xml_get_widget (dialog_xml, "get_password_dialog");
+		response = gtk_dialog_run(GTK_DIALOG(widget)); 
 	
-	if (!response) {
-		gtk_widget_destroy (widget);
-		g_object_unref (G_OBJECT(dialog_xml));
-		return NULL;
-	} else {
-		widget = glade_xml_get_widget (dialog_xml, "password_entry");
-		password = g_strdup(gtk_entry_get_text (GTK_ENTRY(widget)));
-	}
+		if (!response) {
+			gtk_widget_destroy (widget);
+			g_object_unref (G_OBJECT(dialog_xml));
+			return NULL;
+		} else {
+			widget = glade_xml_get_widget (dialog_xml, "password_entry");
+			password = g_strdup(gtk_entry_get_text (GTK_ENTRY(widget)));
+			widget = glade_xml_get_widget (dialog_xml, "confirm_entry");
+			passwordagain = gtk_entry_get_text (GTK_ENTRY(widget));
+		}
+		
+		if (strcmp (password, passwordagain)) {
+			__ca_error_dialog (distinct_error_message);
+		}
+
+	} while (strcmp (password, passwordagain));
 
 	widget = glade_xml_get_widget (dialog_xml, "get_password_dialog");
 	gtk_widget_destroy (widget);
@@ -715,8 +735,20 @@ gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gc
 	return password;
 }
 
+void ca_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data)
+{
+	GtkWidget * button = GTK_WIDGET(g_object_get_data (G_OBJECT(password_entry), "ok_button"));
+	guint minimum_length = GPOINTER_TO_INT (g_object_get_data (G_OBJECT(password_entry), "minimum_length"));
 
-void __ca_export_private_pem (GtkTreeIter *iter, gint type)
+	if (strlen (gtk_entry_get_text (GTK_ENTRY(password_entry))) >= minimum_length)
+		gtk_widget_set_sensitive (button, TRUE);
+	else
+		gtk_widget_set_sensitive (button, FALSE);
+	
+}
+
+
+void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 {
 	GtkWidget *widget = NULL;
 	GIOChannel * file = NULL;
@@ -730,7 +762,7 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
 	
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export private key"),
+	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export crypted private key"),
 							  GTK_WINDOW(widget),
 							  GTK_FILE_CHOOSER_ACTION_SAVE,
 							  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -750,7 +782,8 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
 					     "so nobody else but authorized people can use it. This passphrase will be asked "
 					     "by any application that will make use of the private key."),
-					   _("Insert passphrase:"), _("Insert passphrase (confirm):"));
+					   _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
+					   _("The introduced passphrases are distinct."), 8);
 	if (! password) {
 		g_free (filename);
 		return;
@@ -779,6 +812,95 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	
 	pem = tls_generate_pkcs8_encrypted_private_key (privatekey[0], password); 
 	g_free (password);
+	g_strfreev (privatekey);
+	
+	if (!pem) {
+		__ca_error_dialog (_("There was an error while password-protecting private key."));
+		return;
+	}
+	
+	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting private key."));
+		return;
+	} 
+	g_free (pem);
+	
+	
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting private key."));
+		g_io_channel_unref (file);
+		return;
+	} 
+	
+	g_io_channel_unref (file);
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+						    GTK_DIALOG_DESTROY_WITH_PARENT,
+						    GTK_MESSAGE_INFO,
+						    GTK_BUTTONS_CLOSE,
+						    "%s",
+						    _("Private key exported successfully")));
+	gtk_dialog_run (GTK_DIALOG(dialog));
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	
+	
+}
+
+
+void __ca_export_private_pem (GtkTreeIter *iter, gint type)
+{
+	GtkWidget *widget = NULL;
+	GIOChannel * file = NULL;
+	gchar * filename = NULL;
+	GtkDialog * dialog = NULL;
+	GError * error = NULL;
+	gint id;
+	gchar ** privatekey = NULL;
+	gchar * pem = NULL;
+
+	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	
+	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export uncrypted private key"),
+							  GTK_WINDOW(widget),
+							  GTK_FILE_CHOOSER_ACTION_SAVE,
+							  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+							  NULL));
+		
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy (GTK_WIDGET(dialog));
+		return;
+	}
+
+	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	
+	file = g_io_channel_new_file (filename, "w", &error);
+	g_free (filename);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting private key."));
+		return;
+	} 
+	
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
+	if (type == 1)
+		privatekey = ca_file_get_single_row ("SELECT private_key FROM certificates WHERE id=%d", id);
+	else
+		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_req WHERE id=%d", id);
+		
+	
+	if (!privatekey) {
+		__ca_error_dialog (_("There was an error while getting private key."));
+		return;
+	}
+	
+	pem = g_strdup (privatekey[0]);
 	g_strfreev (privatekey);
 	
 	if (!pem) {
@@ -860,7 +982,16 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	}
 	
 	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2")))) {
-		/* Export private part */
+		/* Export private part (crypted) */
+		__ca_export_private_pkcs8 (iter, type);
+		gtk_widget_destroy (widget);
+		g_object_unref (G_OBJECT(dialog_xml));
+		
+		return;
+	}
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "privatepart_uncrypted_radiobutton2")))) {
+		/* Export private part (uncrypted) */
 		__ca_export_private_pem (iter, type);
 		gtk_widget_destroy (widget);
 		g_object_unref (G_OBJECT(dialog_xml));
