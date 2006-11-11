@@ -37,6 +37,9 @@ sqlite * ca_db = NULL;
 gchar * error_msg = NULL;
 
 
+#define CURRENT_GNOMINT_DB_VERSION 2
+
+
 gchar * ca_file_create (CaCreationData *creation_data, 
 				 gchar *pem_ca_private_key,
 				 gchar *pem_ca_certificate)
@@ -73,7 +76,19 @@ gchar * ca_file_create (CaCreationData *creation_data,
 			   NULL, NULL, &error)) {
 		return error;
 	}
+
+	if (sqlite_exec (ca_db,
+			   "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT);",
+			   NULL, NULL, &error)) {
+		return error;
+	}
+
 	
+	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_version', %d);", CURRENT_GNOMINT_DB_VERSION);
+	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		return error;
+	g_free (sql);
+
 	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate_pem', '%s');", pem_ca_certificate);
 	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
@@ -105,6 +120,58 @@ gchar * ca_file_create (CaCreationData *creation_data,
 
 }
 
+gboolean ca_file_check_and_update_version ()
+{
+	gchar ** result = NULL;
+	gint db_version_in_file = 0;
+	gchar * sql = NULL;
+	gchar * error;
+
+	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name = 'ca_db_version';");
+
+	if (result && result[0] && atoi(result[0]) == CURRENT_GNOMINT_DB_VERSION) {
+		g_strfreev (result);
+		return TRUE;
+	}
+
+	if (!result || !result[0]) {
+		db_version_in_file = 1;
+		if (result)
+			g_strfreev (result);
+	} else {
+		db_version_in_file = atoi(result[0]);
+		g_strfreev (result);
+	}
+
+	switch (db_version_in_file) {
+		/* Careful! This switch has not breaks, as all actions must be done for the earliest versions */
+	case 1:
+
+		if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+			return FALSE;
+
+		if (sqlite_exec (ca_db,
+				 "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT);",
+				 NULL, NULL, &error)) {
+			return FALSE;
+		}
+		
+		sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_version', %d);", 2);
+		if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+			return FALSE;
+		g_free (sql);
+		
+		if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return FALSE;
+
+	case 2:
+		/* Nothing must be done, as this is the current gnoMint db version */
+		break;
+	}
+	
+	return TRUE;
+}
+
 gboolean ca_file_open (gchar *file_name)
 {
 	if (! (ca_db = sqlite_open(file_name, 1, &error_msg))) {
@@ -112,7 +179,7 @@ gboolean ca_file_open (gchar *file_name)
 		return FALSE;
 	} else {
 		gnomint_current_opened_file = file_name;
-		return TRUE;
+		return ca_file_check_and_update_version ();
 	}
 }
 

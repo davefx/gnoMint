@@ -27,6 +27,8 @@ gchar * ca_file_create (CaCreationData * creation_data,
 
 gboolean ca_file_open (gchar *file_name);
 
+gboolean ca_file_check_and_update_version ();
+
 void ca_file_close ();
 
 gboolean ca_file_save_as (gchar *new_file_name);
