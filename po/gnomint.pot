@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-11-10 14:13+0100\n"
+"POT-Creation-Date: 2006-11-11 12:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -199,197 +199,213 @@ msgstr ""
 msgid "Digital signature"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:51 ../src/tls.c:714
+#: ../gui/gnomint.glade.h:51
+msgid "E_xport"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:52 ../src/tls.c:714
 msgid "Email protection"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:52
+#: ../gui/gnomint.glade.h:53
 msgid "Expires on"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:53
+#: ../gui/gnomint.glade.h:54
+msgid "Extrac_t private key"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:55
 msgid "General"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:54 ../src/tls.c:690
+#: ../gui/gnomint.glade.h:56 ../src/tls.c:690
 msgid "Key agreement"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:55 ../src/tls.c:686
+#: ../gui/gnomint.glade.h:57 ../src/tls.c:686
 msgid "Key encipherment"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:56
+#: ../gui/gnomint.glade.h:58
 msgid "MD5 fingerprint"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:57
+#: ../gui/gnomint.glade.h:59
 msgid "MD5FINGERPRINT"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:58
+#: ../gui/gnomint.glade.h:60
 msgid "Months before certificate expiration:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:59
+#: ../gui/gnomint.glade.h:61
 msgid "Months before root certificate expiration:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:60 ../src/tls.c:684
+#: ../gui/gnomint.glade.h:62 ../src/tls.c:684
 msgid "Non repudiation"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:61 ../src/tls.c:718
+#: ../gui/gnomint.glade.h:63 ../src/tls.c:718
 msgid "OCSP signing"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:62
+#: ../gui/gnomint.glade.h:64
 msgid "Only the private key (crypted)."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:63
+#: ../gui/gnomint.glade.h:65
 msgid "Only the private key (uncrypted)."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:64
+#: ../gui/gnomint.glade.h:66
 msgid "Only the pu_blic part."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:65
+#: ../gui/gnomint.glade.h:67
 msgid "Organitational Unit (OU)"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:66
+#: ../gui/gnomint.glade.h:68
 msgid "Organization (O)"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:67
+#: ../gui/gnomint.glade.h:69
 msgid "Organization Unit:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:68
+#: ../gui/gnomint.glade.h:70
 msgid "Organization:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:69
+#: ../gui/gnomint.glade.h:71
 msgid "Organizational Unit (OU)"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:70
+#: ../gui/gnomint.glade.h:72
 msgid "Password (confirm):"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:71
+#: ../gui/gnomint.glade.h:73
 msgid "Password:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:72
+#: ../gui/gnomint.glade.h:74
 msgid "Please, choose which part of the saved certificate you want to export:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:73
+#: ../gui/gnomint.glade.h:75
 msgid "Please, enter password"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:74
+#: ../gui/gnomint.glade.h:76
 msgid ""
 "Please, insert the data corresponding to the subject of the new "
 "certificate:\n"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:76
+#: ../gui/gnomint.glade.h:78
 msgid ""
 "Please, select the Certification Authority that will create the new "
 "certificate:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:77
+#: ../gui/gnomint.glade.h:79
 msgid "Private key bit length:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:78
+#: ../gui/gnomint.glade.h:80
 msgid "Private key type:"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:79
+#: ../gui/gnomint.glade.h:81
 msgid "RSA"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:80
-msgid "Root certificate prop"
-msgstr ""
-
-#: ../gui/gnomint.glade.h:81
-msgid "SHA1 fingerprint"
-msgstr ""
-
 #: ../gui/gnomint.glade.h:82
-msgid "SHA1FINGERPRINT"
+msgid "Revo_ke"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:83
-msgid "Select the CA to sign this new certificate"
+msgid "Root certificate prop"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:84
-msgid "Serial number"
+msgid "SHA1 fingerprint"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:85
-msgid "State or Province name: "
+msgid "SHA1FINGERPRINT"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:86
-msgid "Subject Common Name (CN):"
+msgid "Select the CA to sign this new certificate"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:87
-msgid "SubjectCN"
+msgid "Serial number"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:88
-msgid "SubjectO"
+msgid "State or Province name: "
 msgstr ""
 
 #: ../gui/gnomint.glade.h:89
-msgid "SubjectOU"
+msgid "Subject Common Name (CN):"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:90
-msgid "TLS Web client"
+msgid "SubjectCN"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:91
-msgid "TLS Web server"
+msgid "SubjectO"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:92 ../src/tls.c:716
-msgid "Time stamping"
+#: ../gui/gnomint.glade.h:92
+msgid "SubjectOU"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:93
+msgid "TLS Web client"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:94
+msgid "TLS Web server"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:95 ../src/tls.c:716
+msgid "Time stamping"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:96
 msgid ""
 "You are about to sign a Certificate Signing Request, and this way, creating "
 "a new certificate. Please check the certificate properties."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:94
+#: ../gui/gnomint.glade.h:97
 msgid "_Actions"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:95
+#: ../gui/gnomint.glade.h:98
 msgid "_Edit"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:96
+#: ../gui/gnomint.glade.h:99
 msgid "_File"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:97
+#: ../gui/gnomint.glade.h:100
 msgid "_Help"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:98
+#: ../gui/gnomint.glade.h:101
+msgid "_Sign"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:102
 msgid "label"
 msgstr ""
 
@@ -535,7 +551,7 @@ msgstr ""
 msgid "CA generated successfully"
 msgstr ""
 
-#: ../src/ca_file.c:52
+#: ../src/ca_file.c:55
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr ""

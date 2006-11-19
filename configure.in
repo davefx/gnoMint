@@ -46,8 +46,8 @@ dnl #######################
 dnl # Check for libsqlite
 dnl ########################
 AC_MSG_CHECKING(for LibSQLite development files\n)
-AC_CHECK_HEADER(sqlite.h, , AC_MSG_ERROR(*** cannot find sqlite.h header); exit)
-AC_CHECK_LIB(sqlite, sqlite_open, , AC_MSG_ERROR(*** Cannot find sqlite library); exit)
+AC_CHECK_HEADER(sqlite3.h, , AC_MSG_ERROR(*** cannot find sqlite3.h header); exit)
+AC_CHECK_LIB(sqlite3, sqlite3_open, , AC_MSG_ERROR(*** Cannot find sqlite library); exit)
 
 
 dnl 
