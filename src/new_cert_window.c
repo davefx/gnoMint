@@ -83,7 +83,7 @@ void populate_country_table()
 
 	country_table[i].name = D_("Afghanistan");
 	country_table[i++].code = "AF";
-	country_table[i].name = D_("Aland Islands");
+	country_table[i].name = D_("Åland Islands");
 	country_table[i++].code = "AX";
 	country_table[i].name = D_("Albania");
 	country_table[i++].code = "AL";
@@ -181,13 +181,13 @@ void populate_country_table()
 	country_table[i++].code = "KM";
 	country_table[i].name = D_("Congo");
 	country_table[i++].code = "CG";
-	country_table[i].name = D_("Congo, the Democratic Republic of the");
+	country_table[i].name = D_("Congo, The Democratic Republic of the");
 	country_table[i++].code = "CD";
 	country_table[i].name = D_("Cook Islands");
 	country_table[i++].code = "CK";
 	country_table[i].name = D_("Costa Rica");
 	country_table[i++].code = "CR";
-	country_table[i].name = D_("Cote d\'Ivoire");
+	country_table[i].name = D_("Côte d\'Ivoire");
 	country_table[i++].code = "CI";
 	country_table[i].name = D_("Croatia");
 	country_table[i++].code = "HR";
@@ -339,7 +339,7 @@ void populate_country_table()
 	country_table[i++].code = "LU";
 	country_table[i].name = D_("Macao");
 	country_table[i++].code = "MO";
-	country_table[i].name = D_("Macedonia, The Former Yugoslav Republic of");
+	country_table[i].name = D_("Macedonia, Republic of");
 	country_table[i++].code = "MK";
 	country_table[i].name = D_("Madagascar");
 	country_table[i++].code = "MG";
@@ -503,7 +503,7 @@ void populate_country_table()
 	country_table[i++].code = "CH";
 	country_table[i].name = D_("Syrian Arab Republic");
 	country_table[i++].code = "SY";
-	country_table[i].name = D_("Taiwan, Province of China");
+	country_table[i].name = D_("Taiwan");
 	country_table[i++].code = "TW";
 	country_table[i].name = D_("Tajikistan");
 	country_table[i++].code = "TJ";
