@@ -18,7 +18,7 @@
 #ifndef _CA_FILE_H_
 #define _CA_FILE_H_
 
-#include <sqlite.h>
+#include <sqlite3.h>
 #include "ca_creation.h"
 
 gchar * ca_file_create (CaCreationData * creation_data, 

@@ -17,7 +17,7 @@
 
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -33,8 +33,7 @@
 extern gchar * gnomint_current_opened_file;
 extern gchar * gnomint_temp_created_file;
 
-sqlite * ca_db = NULL;
-gchar * error_msg = NULL;
+sqlite3 * ca_db = NULL;
 
 
 #define CURRENT_GNOMINT_DB_VERSION 2
@@ -51,33 +50,33 @@ gchar * ca_file_create (CaCreationData *creation_data,
 
 	filename = strdup (tmpnam(NULL));
 
-	if (!(ca_db = sqlite_open(filename, 1, NULL)))
+	if (sqlite3_open (filename, &ca_db))
 		return g_strdup_printf(_("Error opening filename '%s'"), filename) ;
 
 	if (gnomint_temp_created_file)
 		ca_file_delete_tmp_file();
 	gnomint_temp_created_file = filename;
 
-	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	if (sqlite_exec (ca_db,
+	if (sqlite3_exec (ca_db,
 			   "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, name TEXT UNIQUE, value TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
 	}
-	if (sqlite_exec (ca_db,
+	if (sqlite3_exec (ca_db,
 			   "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, activation TIMESTAMP, expiration TIMESTAMP, is_revoked BOOLEAN, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
 	}
-	if (sqlite_exec (ca_db,
+	if (sqlite3_exec (ca_db,
 			   "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
 	}
 
-	if (sqlite_exec (ca_db,
+	if (sqlite3_exec (ca_db,
 			   "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT);",
 			   NULL, NULL, &error)) {
 		return error;
@@ -85,12 +84,12 @@ gchar * ca_file_create (CaCreationData *creation_data,
 
 	
 	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_version', %d);", CURRENT_GNOMINT_DB_VERSION);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 
 	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_certificate_pem', '%s');", pem_ca_certificate);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 
@@ -100,20 +99,20 @@ gchar * ca_file_create (CaCreationData *creation_data,
 			       creation_data->expiration,
 			       pem_ca_certificate,
 			       pem_ca_private_key);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 
 
 	sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_last_assigned_serial', 1);");
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 
-	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
 
-	sqlite_close (ca_db);
+	sqlite3_close (ca_db);
 	ca_db = NULL;
 
 	return NULL;
@@ -147,21 +146,21 @@ gboolean ca_file_check_and_update_version ()
 		/* Careful! This switch has not breaks, as all actions must be done for the earliest versions */
 	case 1:
 
-		if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 			return FALSE;
 
-		if (sqlite_exec (ca_db,
+		if (sqlite3_exec (ca_db,
 				 "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT);",
 				 NULL, NULL, &error)) {
 			return FALSE;
 		}
 		
 		sql = g_strdup_printf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_version', %d);", 2);
-		if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 			return FALSE;
 		g_free (sql);
 		
-		if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 			return FALSE;
 
 	case 2:
@@ -174,8 +173,8 @@ gboolean ca_file_check_and_update_version ()
 
 gboolean ca_file_open (gchar *file_name)
 {
-	if (! (ca_db = sqlite_open(file_name, 1, &error_msg))) {
-		g_printerr ("%s\n\n", error_msg);
+	if (sqlite3_open(file_name, &ca_db)) {
+		g_printerr ("%s\n\n", sqlite3_errmsg(ca_db));
 		return FALSE;
 	} else {
 		gnomint_current_opened_file = file_name;
@@ -185,7 +184,7 @@ gboolean ca_file_open (gchar *file_name)
 
 void ca_file_close ()
 {
-	sqlite_close (ca_db);
+	sqlite3_close (ca_db);
 	ca_db = NULL;
 	if (gnomint_current_opened_file) {
 		g_free (gnomint_current_opened_file);
@@ -289,7 +288,7 @@ gchar ** ca_file_get_single_row (const gchar *query, ...)
 	g_vasprintf (&sql, query, list);
 	va_end (list);
 
-	sqlite_exec (ca_db, sql, __ca_file_get_single_row_cb, &result, &error);
+	sqlite3_exec (ca_db, sql, __ca_file_get_single_row_cb, &result, &error);
 	
 	g_free (sql);
 
@@ -307,7 +306,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	TlsCert *tlscert = tls_parse_cert_pem (pem_certificate);
 
-	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
 	serialstr = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial';");
@@ -321,8 +320,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 			       creation_data->expiration,
 			       pem_certificate,
 			       pem_private_key);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error)) {
-		sqlite_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 		g_free (sql);
 		return error;
 	}
@@ -331,8 +330,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	
 	sql = g_strdup_printf ("UPDATE ca_properties SET value='%lld' WHERE name='ca_root_last_assigned_serial';", 
 			       serial);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error)) {
-		sqlite_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 		g_free (sql);
 		return error;
 	}
@@ -340,7 +339,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	g_free (sql);
 	
 
-	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
 
 	return NULL;
@@ -354,18 +353,18 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 	gchar *sql = NULL;
 	gchar *error = NULL;
 
-	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
 	sql = g_strdup_printf ("INSERT INTO cert_requests VALUES (NULL, '%s', '%s', 1, '%s');", 
 			       creation_data->cn,
 			       pem_csr,
 			       pem_csr_private_key);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 	
-	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
 
 	return NULL;
@@ -378,16 +377,16 @@ gchar * ca_file_remove_csr (gint id)
 	gchar *sql = NULL;
 	gchar *error = NULL;
 
-	if (sqlite_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
 	sql = g_strdup_printf ("DELETE FROM cert_requests WHERE id = %d ;", 
 			       id);
-	if (sqlite_exec (ca_db, sql, NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);
 	
-	if (sqlite_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
 
 	return NULL;

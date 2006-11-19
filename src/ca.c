@@ -22,7 +22,7 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -35,7 +35,7 @@
 #include "new_cert_window.h"
 
 extern GladeXML * main_window_xml;
-extern sqlite * ca_db;
+extern sqlite3 * ca_db;
 
 GtkTreeStore * ca_model = NULL;
 gboolean cert_title_inserted = FALSE;
@@ -307,10 +307,10 @@ gboolean ca_refresh_model ()
 	csr_title_inserted=FALSE;
 	csr_parent_iter = NULL;
 
-	sqlite_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, is_revoked, private_key_in_db, pem FROM certificates ORDER BY id",
+	sqlite3_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, is_revoked, private_key_in_db, pem FROM certificates ORDER BY id",
 		     __ca_refresh_model_add_certificate, new_model, &error_str);
 
-	sqlite_exec (ca_db, "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
+	sqlite3_exec (ca_db, "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
 		     __ca_refresh_model_add_csr, new_model, &error_str);
 
 	treeview = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));

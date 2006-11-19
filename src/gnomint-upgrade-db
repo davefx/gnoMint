@@ -1,0 +1,50 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]
+    then
+    echo 
+    echo "gnoMint database converter"
+    echo "by David Marin <davefx@gmail.com>"
+    echo " "
+    echo " Sintax: $0 ( -h | --help | gnoMint-db.filename ) "
+    echo " "
+    echo " `basename $0` converts an old (pre 0.1.4 version) gnoMint "
+    echo " database (based in sqlite2) into a new database compatible with "
+    echo " gnoMint 0.1.4 and newer, based in sqlite3"
+    echo
+fi
+
+if [ ! `which sqlite` ]
+    then
+    echo "Sorry, but sqlite program (version 2) is required for make the "
+    echo "conversion. Please install it."
+    exit
+fi
+
+if [ ! `which sqlite3` ]
+    then
+    echo "Sorry, but sqlite3 program is required for make the conversion. Please"
+    echo "install it."
+    exit
+fi
+
+if [ ! -e $1 ]
+    then
+    echo "Sorry, the given file '$1' doesn't exist."
+    exit
+fi
+
+if [ \( ! -r $1 \) -o \( ! -w $1 \) ]
+    then
+    echo "Sorry. You don't have enough permissions for reading and/or writing"
+    echo "the given file."
+    exit
+fi
+
+TMPFILE=`mktemp`
+echo .dump | sqlite $1 > $TMPFILE || (echo "There was a problem while extracting data from file."; echo "Conversion process cancelled"; exit)
+mv $1 $1.bak
+cat $TMPFILE | sqlite3 $1 && rm $TMPFILE
+echo "File converted successfully."
+
+

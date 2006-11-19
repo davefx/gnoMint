@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 #include <libintl.h>
 #define _(x) gettext(x)

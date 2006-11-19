@@ -1,4 +1,6 @@
-bin_PROGRAMS = gnomint
+bin_PROGRAMS = gnomint 
+
+bin_SCRIPTS = gnomint-upgrade-db
 
 INCLUDES = \
 	-I$(top_srcdir) \
