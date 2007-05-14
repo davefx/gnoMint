@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	}
 
 	if (sqlite3_exec (ca_db,
-			   "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT);",
+			   "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (ca_id, name));",
 			   NULL, NULL, &error)) {
 		return error;
 	}
@@ -150,7 +150,7 @@ gboolean ca_file_check_and_update_version ()
 			return FALSE;
 
 		if (sqlite3_exec (ca_db,
-				 "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT);",
+				 "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (ca_id, name));",
 				 NULL, NULL, &error)) {
 			return FALSE;
 		}

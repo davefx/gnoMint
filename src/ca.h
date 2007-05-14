@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,5 +23,6 @@ gboolean ca_refresh_model ();
 void ca_todo_callback();
 gint ca_get_selected_row_id ();
 gchar * ca_get_selected_row_pem ();
+void ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
 
 #endif

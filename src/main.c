@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -236,12 +236,12 @@ void on_clear1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	printf ("properties1 Activated\n");
+	ca_treeview_row_activated (NULL, NULL, NULL, NULL);
 }
 
 void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	printf ("Preferences1 Activated\n");
+
 }
 
 
@@ -276,5 +276,3 @@ void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 			       "translator_credits", _("translator-credits"),
 			       NULL);
 }
-
-

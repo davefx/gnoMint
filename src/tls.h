@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -86,6 +86,7 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 				  gchar **certificate);
 
 TlsCert * tls_parse_cert_pem (const char * pem_certificate);
+gboolean tls_is_ca_pem (const char * pem_certificate);
 void tls_cert_free (TlsCert *);
 
 TlsCsr * tls_parse_csr_pem (const char * pem_csr);

@@ -21,6 +21,7 @@ gnomint_SOURCES = \
 	tls.c \
 	ca_file.c \
 	certificate_properties.c \
+	ca_policy.c \
 	csr_creation.c \
 	csr_properties.c 
 
@@ -34,6 +35,7 @@ EXTRA_DIST = \
 	ca_creation.h \
 	ca_file.h \
 	ca.h \
+	ca_policy.h \
 	certificate_properties.h \
 	csr_creation.h \
 	csr_properties.h \

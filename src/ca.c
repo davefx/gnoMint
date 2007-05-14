@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -417,6 +417,22 @@ void ca_treeview_row_activated (GtkTreeView *tree_view,
 				GtkTreeViewColumn *column,
 				gpointer user_data)
 {
+	if (tree_view == NULL) {
+			GtkTreeSelection *selection;
+			GtkTreeIter selection_iter;
+		
+			tree_view = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
+			selection = gtk_tree_view_get_selection (tree_view);
+		
+			if (gtk_tree_selection_count_selected_rows (selection) != 1)
+				return;
+		
+			gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
+			path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
+
+			
+	}
+	
 	GtkTreePath *parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
 	if (gtk_tree_path_is_ancestor (parent, path) && gtk_tree_path_compare (parent, path)) {
 		__ca_certificate_activated (tree_view, path, column, user_data);
@@ -430,8 +446,6 @@ void ca_treeview_row_activated (GtkTreeView *tree_view,
 	}
 	gtk_tree_path_free (parent);
 	
-
-
 }
 
 

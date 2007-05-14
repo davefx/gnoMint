@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,22 +23,21 @@
 #include <string.h>
 
 #include "tls.h"
-
+#include "ca_policy.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
-
-
-
 GladeXML * certificate_properties_window_xml = NULL;
 
-void __certificate_properties_populate (const char *certificate_pem);
+guint64 __certificate_properties_populate (const char *certificate_pem);
 
 void certificate_properties_display(const char *certificate_pem, gboolean privkey_in_db)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
+	guint64    serial_number = 0;
+
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
@@ -51,21 +50,34 @@ void certificate_properties_display(const char *certificate_pem, gboolean privke
 	
 	glade_xml_signal_autoconnect (certificate_properties_window_xml); 	
 	
-	__certificate_properties_populate (certificate_pem);
+	serial_number = __certificate_properties_populate (certificate_pem);
        
+	if (! tls_is_ca_pem (certificate_pem)) {
+		widget = glade_xml_get_widget (certificate_properties_window_xml, "notebook2");
+		gtk_notebook_remove_page (GTK_NOTEBOOK(widget), 2);
+	} else {
+		ca_policy_populate (serial_number);
+	}
+
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+
+	g_object_set_data (G_OBJECT(widget), "cert_serial_number", g_strdup_printf("%llu",serial_number));
+
 	gtk_widget_show (widget);
 }
 
 
-void __certificate_properties_populate (const char *certificate_pem)
+guint64 __certificate_properties_populate (const char *certificate_pem)
 {
 	GtkWidget *widget = NULL;
 	struct tm tim;
 	TlsCert * cert = NULL;
 	gchar model_time_str[100];
+	guint64 serial_number;
 
 	cert = tls_parse_cert_pem (certificate_pem);
+
+	serial_number = cert->serial_number;
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certActivationDateLabel");
 	gmtime_r (&cert->activation_time, &tim);
@@ -132,6 +144,8 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 
 	tls_cert_free (cert);
+	
+	return serial_number;
 }
 
 void certificate_properties_close_clicked (const char *certificate_pem)
