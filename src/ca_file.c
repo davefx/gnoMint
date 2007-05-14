@@ -358,10 +358,16 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	sql = g_strdup_printf ("INSERT INTO cert_requests VALUES (NULL, '%s', '%s', 1, '%s');", 
-			       creation_data->cn,
-			       pem_csr,
-			       pem_csr_private_key);
+	if (pem_csr_private_key)
+		sql = g_strdup_printf ("INSERT INTO cert_requests VALUES (NULL, '%s', '%s', 1, '%s');", 
+				       creation_data->cn,
+				       pem_csr,
+				       pem_csr_private_key);
+	else
+		sql = g_strdup_printf ("INSERT INTO cert_requests VALUES (NULL, '%s', '%s', 0, NULL);", 
+				       creation_data->cn,
+				       pem_csr);
+
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	g_free (sql);

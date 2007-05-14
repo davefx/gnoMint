@@ -1130,8 +1130,86 @@ gboolean ca_import (gchar *filename)
 	// We start to check each type of file, in PEM and DER
 	// formats, for see if some of them matches with the actual file
 
-	// Certificate request
+	gboolean successful_import = FALSE;
 
+	// Certificate request
+	gnutls_x509_crq_t crq;
+	gnutls_datum_t file_datum;
+
+	gchar *aux = NULL;
+
+	GError *error = NULL;
+	
+	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
+	
+	if (error) {
+		__ca_error_dialog (_(error->message));
+		return FALSE;
+	}
+
+	file_datum.size = g_mapped_file_get_length (mapped_file);
+	file_datum.data = g_new0 (guchar, file_datum.size);
+	memcpy (file_datum.data, g_mapped_file_get_contents (mapped_file), file_datum.size);
+	
+	g_mapped_file_free (mapped_file);
+
+	// Trying to import a Certificate Signing Request in PEM format
+
+	if (gnutls_x509_crq_init (&crq) < 0)
+		return FALSE;
+
+	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_PEM) == 0) {
+		CaCreationData * creation_data = g_new0(CaCreationData, 1);
+		gchar * pem_csr;
+		guint size;
+
+		size = 0;
+		gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+		if (size) {
+			aux = g_new0(gchar, size);
+			gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+			creation_data->cn = strdup (aux);
+			g_free (aux);
+			aux = NULL;
+		}	        
+
+		pem_csr = (gchar *) file_datum.data; 
+
+		ca_file_insert_csr (creation_data, NULL, pem_csr);
+		
+		successful_import = TRUE;
+		
+	}
+
+	// Trying to import a Certificate Signing Request in DER format
+
+	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
+		CaCreationData * creation_data = g_new0(CaCreationData, 1);
+		gchar * pem_csr;
+		guint size;
+
+		size = 0;
+		gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+		if (size) {
+			aux = g_new0(gchar, size);
+			gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
+			creation_data->cn = strdup (aux);
+			g_free (aux);
+			aux = NULL;
+		}	        
+
+		size = 0;
+		gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, pem_csr, &size)  ; 
+		if (size) {
+			pem_csr = g_new0(gchar, size);
+			gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, pem_csr, &size);
+			
+		}
+
+		ca_file_insert_csr (creation_data, NULL, pem_csr);
+
+		successful_import = TRUE;
+	}
 
 	// Certificate list
 
@@ -1143,8 +1221,15 @@ gboolean ca_import (gchar *filename)
 	
 	// PKCS7 structure
 	
-	ca_todo_callback ();
-	
+	g_free (file_datum.data);
+
+
+	if (successful_import) {
+		ca_refresh_model();
+	} else {
+		__ca_error_dialog (_("Couldn't find any supported format in the given file"));
+	}
+
 	return TRUE;
 
 }
