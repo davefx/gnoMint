@@ -288,6 +288,8 @@ gchar ** ca_file_get_single_row (const gchar *query, ...)
 	g_vasprintf (&sql, query, list);
 	va_end (list);
 
+	g_assert (ca_db);
+
 	sqlite3_exec (ca_db, sql, __ca_file_get_single_row_cb, &result, &error);
 	
 	g_free (sql);
