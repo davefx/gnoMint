@@ -1,6 +1,68 @@
+2007-05-14  davefx
+
+	* [r64] configure.in, gui/gnomint.glade, po/es.po,
+	  src/Makefile.am, src/ca.c, src/ca.h, src/ca_creation.c,
+	  src/ca_creation.h, src/ca_file.c, src/ca_file.h,
+	  src/ca_policy.c, src/ca_policy.h, src/certificate_properties.c,
+	  src/certificate_properties.h, src/csr_creation.c,
+	  src/csr_creation.h, src/csr_properties.c, src/csr_properties.h,
+	  src/main.c, src/new_cert_creation_process.c,
+	  src/new_cert_creation_process.h, src/new_cert_window.c,
+	  src/new_cert_window.h, src/tls.c, src/tls.h: Adding support for
+	  stablishing a set of policies for certificate generation
+
+2006-11-19  davefx
+
+	* [r63] src/new_cert_window.c: Fixing some typo problems in
+	  country names
+
+	* [r62] configure.in, gui/gnomint.glade, po/es.po, po/gnomint.pot,
+	  src/new_cert_window.c: Updating country list, so now it uses
+	  iso_3166 translation. Bug reported by Florian K. Steinel
+
+	* [r61] src/Makefile.am, src/ca.c, src/ca_creation.c,
+	  src/ca_file.c, src/ca_file.h, src/csr_creation.c,
+	  src/gnomint-upgrade-db: Supporting SQLite 3 now, as SQLite 2 is
+	  deprecated. Adding tool-script for converting existing databases
+
+2006-11-11  davefx
+
+	* [r60] src/ca_file.c, src/ca_file.h: Updating DB
+	  version to 2, with support for CA policies. Adding support for
+	  upgrading from earlier DB versions.
+
+2006-11-10  davefx
+
+	* [r59] tags/0.1.3: Releasing 0.1.3 version
+
+	* [r58] configure.in: Releasing 0.1.3 version
+
+	* [r57] gui/gnomint.glade, po/es.po, po/gnomint.pot, src/ca.c: *
+	  Allowing uncrypted private key export. * Requiring minimum
+	  length for private-key export passphrase * Checking confirmation
+	  for private-key export passphrase * Fixing focus grab when
+	  asking for passphrase * Updated Spanish translation
+
+	* [r56] autogen.sh: Replacing /bin/sh by /bin/bash, fixing
+	  Ubuntu/Debian error as they link /bin/sh to /bin/dash instead of
+	  /bin/bash
+
 2006-10-15  davefx
 
+	* [r55] AUTHORS, BUGS, COPYING, ChangeLog, INSTALL, MAINTAINERS,
+	  Makefile.am, NEWS, README, TODO, autogen.sh, certs,
+	  configure.in, debian, .spec.in, gui, po, src, AUTHORS, BUGS,
+	  COPYING, ChangeLog, INSTALL, MAINTAINERS, Makefile.am, NEWS,
+	  README, TODO, autogen.sh, certs, configure.in, debian,
+	  gnomint.spec.in, gui, po, src: Moving everything to trunk
+	  directory
+
+	* [r54] tags: Adding directory for gnomint tags
+
+	* [r53] trunk: Adding directory for main gnomint trunk
+
 	* [r52] debian/changelog: Updating to version 0.1.2
+
 	* [r51] ChangeLog, debian, debian/changelog, debian/compat,
 	  debian/conffiles.ex, debian/control, debian/copyright,
 	  debian/cron.d.ex, debian/dirs, debian/docs,
@@ -13,7 +75,10 @@
 	  debian/rules, debian/watch.ex: Adding debian directory for
 	  creating debian/ubuntu package (patch provided by João Pinto
 	  <lamego.pingo@gmail.com>)
-	* [r50] ChangeLog, configure.in: Updating version before to release
+
+	* [r50] ChangeLog, configure.in: Updating version before to
+	release
+
 	* [r49] ChangeLog, src/ca_file.c: Fixing bug when saving CA
 	  database if /tmp was in a different partition (g_rename doesn't
 	  work for moving files from a partition to another one)
@@ -22,6 +87,7 @@
 
 	* [r48] ChangeLog, configure.in: Removing gtk-doc option: it's
 	  non-sense
+
 	* [r47] po/ChangeLog, po/es.po, po/gnomint.pot: Updating
 	  translation files
 
@@ -38,14 +104,18 @@
 2006-09-14  davefx
 
 	* [r44] configure.in: Uploading version 0.1
+
 	* [r43] src/ca.c, src/ca_file.c, src/new_cert_window.c, src/tls.c:
 	  Removed some nice memory leaks
+
 	* [r42] TODO, gui/gnomint.glade, po/POTFILES.in, po/es.po,
 	  po/gnomint.pot, src/ca.c, src/ca.h, src/ca_file.c,
 	  src/ca_file.h, src/new_cert_window.c, src/tls.c: Uploading first
 	  functional version 0.1-rc1. Now let's fix bugs
+
 	* [r41] src/csr_properties.c, src/csr_properties.h: Advancing in
 	  certificate generation completion
+
 	* [r40] TODO, gui/gnomint.glade, src/Makefile.am, src/ca.c,
 	  src/ca.h, src/ca_creation.h, src/ca_file.c, src/ca_file.h,
 	  src/certificate_properties.c, src/certificate_properties.h,
@@ -55,10 +125,15 @@
 2006-09-13  davefx
 
 	* [r39] src/ca.c: Fixing segfault when exporting certificate
+
 	* [r38] TODO: Updating TODO
+
 	* [r37] gui/gnomint.glade, src/ca.c: Allowing certificate export
+
 	* [r36] TODO, po/es.po, po/gnomint.pot: Updating translations
+
 	* [r35] certs, certs/davefx.pem: Adding personal certificate
+
 	* [r34] gui/Makefile.am, gui/ca-stamp-16.png, gui/ca-stamp.png,
 	  gui/gnomint.glade, gui/gnomint.png, gui/key-16.png,
 	  src/Makefile.am, src/ca.c, src/ca.h, src/ca_file.c,
@@ -87,14 +162,18 @@
 	  src/new_cert_creation_process.c,
 	  src/new_cert_creation_process.h, src/new_cert_window.c,
 	  src/tls.c: Fixing errors due to filename changes
+
 	* [r30] src/new_ca_window.c, src/new_ca_window.h,
 	  src/new_cert_window.c, src/new_cert_window.h: Renaming
 	  new_ca_window.* to new_cert_window.*
+
 	* [r29] src/new_ca_window.c, src/new_ca_window.h: Committing
 	  before renaming
+
 	* [r28] src/new_ca_creation_process.c,
 	  src/new_ca_creation_process.h, src/new_cert_creation_process.c,
 	  src/new_cert_creation_process.h: Moviendo ficheros
+
 	* [r27] src/new_ca_creation_process.c,
 	  src/new_ca_creation_process.h: Subiendo cambios antes de cambiar
 	  nombre
@@ -109,22 +188,26 @@
 
 	* [r25] gui/gnomint.glade, src/ca.c, src/ca_file.c, src/ca_file.h,
 	  src/main.c: Activating 'Save as' feature
+
 	* [r24] gui/gnomint.glade, po/POTFILES.in, po/es.po,
 	  po/gnomint.pot, src/ca.c: Updating treeview. Now showing correct
 	  dates
+
 	* [r23] configure.in: Changing gnutls support in configure.in
 
 2006-05-28  davefx
 
 	* [r22] src/ca.c, src/main.c: Filling ca_tree_view
+
 	* [r21] src/ca.c, src/ca_creation.c, src/ca_creation.h,
 	  src/ca_file.c, src/main.c, src/new_ca_creation_process.c,
 	  src/new_ca_window.c, src/tls.c: Fixing some CA creation
-	  problems. Starting model initialization
+	  problems.  Starting model initialization
+
 	* [r20] gui/gnomint.glade, src/Makefile.am, src/ca.c, src/ca.h,
 	  src/ca_creation.c, src/ca_file.c, src/ca_file.h, src/main.c,
 	  src/new_ca_creation_process.c: Finishing the CA creation
-	  process. Starting with CA opening process.
+	  process.  Starting with CA opening process.
 
 2006-05-20  davefx
 
@@ -132,6 +215,7 @@
 	  src/ca_creation.c, src/ca_file.c, src/main.c,
 	  src/new_ca_window.c, src/ssl.c, src/ssl.h, src/tls.c, src/tls.h:
 	  Removing OpenSSL dependency. Now gnoMint will use GnuTLS for all
+
 	* [r18] gui/gnomint.glade, po/POTFILES.in, po/es.po,
 	  src/Makefile.am, src/ca_creation.c, src/ca_creation.h,
 	  src/ca_file.c, src/ca_file.h, src/main.c,
@@ -141,8 +225,11 @@
 2006-05-03  davefx
 
 	* [r17] src/ca_file.c, src/ca_file.h: Anyadiendo fichero ca_file
+
 	* [r16] gui/Makefile.am, gui/Makefile.in: Subiendo cambios
+
 	* [r15] gui/Makefile.in:
+
 	* [r14] configure.in, po/es.po, po/gnomint.pot, src/Makefile.am,
 	  src/ca_creation.c, src/new_ca_creation_process.c: Subiendo
 	  cambios
@@ -158,7 +245,9 @@
 2006-05-01  davefx
 
 	* [r12] po/es.po: *** empty log message ***
+
 	* [r11] po/es.po: *** empty log message ***
+
 	* [r10] Makefile.am, configure.in, gui/gnomint.glade,
 	  po/POTFILES.in, src/Makefile.am, src/main.c,
 	  src/new_ca_window.c, src/new_ca_window.h: Subiendo avances
@@ -166,13 +255,21 @@
 2006-04-29  davefx
 
 	* [r9] src/main.c: Continuando
+
 	* [r8] gui/gnomint.glade, po/es.po, po/gnomint.pot: Actualizando
+
 	* [r7] po/POTFILES.in, po/gnomint.pot: Añadiendo gnomint.pot
+
 	* [r6] Makefile.am, configure.in, po/POTFILES.in: Subiendo cambios
+
 	* [r5] Makefile.am, configure.in, gui, src/gui: Trayendo de vuelta
+
 	* [r4] gui, po, src/gui:
+
 	* [r3] src/Makefile.am: Añadiendo fichero
+
 	* [r2] autogen.sh, src/main.c: Subiendo cambios
+
 	* [r1] AUTHORS, BUGS, COPYING, ChangeLog, INSTALL, Makefile.am,
 	  NEWS, README, autogen.sh, configure.in, gui, gui/gnomint.glade,
 	  src: Iniciando repositorio
