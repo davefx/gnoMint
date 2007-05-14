@@ -1124,3 +1124,28 @@ gchar * ca_get_selected_row_pem ()
 	type = 0;
 	return result;
 }
+
+gboolean ca_import (gchar *filename) 
+{	
+	// We start to check each type of file, in PEM and DER
+	// formats, for see if some of them matches with the actual file
+
+	// Certificate request
+
+
+	// Certificate list
+
+	// Single certificate
+
+	// Private key without password
+
+	// Certificate revocation list
+	
+	// PKCS7 structure
+	
+	ca_todo_callback ();
+	
+	return TRUE;
+
+}
+
