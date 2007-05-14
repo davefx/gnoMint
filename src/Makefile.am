@@ -32,6 +32,7 @@ gnomint_LDFLAGS = \
 	-export-dynamic
 
 EXTRA_DIST = \
+	gnomint-upgrade-db \
 	ca_creation.h \
 	ca_file.h \
 	ca.h \
