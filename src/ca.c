@@ -815,7 +815,7 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	if (type == 1)
 		privatekey = ca_file_get_single_row ("SELECT private_key FROM certificates WHERE id=%d", id);
 	else
-		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_req WHERE id=%d", id);
+		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id=%d", id);
 		
 	
 	if (!privatekey) {
@@ -906,7 +906,7 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	if (type == 1)
 		privatekey = ca_file_get_single_row ("SELECT private_key FROM certificates WHERE id=%d", id);
 	else
-		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_req WHERE id=%d", id);
+		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id=%d", id);
 		
 	
 	if (!privatekey) {
