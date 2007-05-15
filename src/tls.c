@@ -911,6 +911,16 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 		aux = NULL;
 	}
 
+	size = 0;
+	gnutls_x509_crq_get_dn (*csr, aux, &size);
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crq_get_dn (*csr, aux, &size);
+		res->dn = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
+
 	gnutls_x509_crq_deinit (*csr);
 	g_free (csr);
 
@@ -939,6 +949,10 @@ void tls_csr_free (TlsCsr *tlscsr)
 	}	
 	if (tlscsr->l) {
 		g_free (tlscsr->l);
+	}	
+
+	if (tlscsr->dn) {
+		g_free (tlscsr->dn);
 	}	
 
 	g_free (tlscsr);
