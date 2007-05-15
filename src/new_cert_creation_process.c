@@ -255,6 +255,7 @@ gint new_csr_creation_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
+	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
 
 	widget = glade_xml_get_widget (new_ca_window_process_xml, "status_message_label");
