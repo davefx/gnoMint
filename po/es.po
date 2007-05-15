@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-14 14:19+0200\n"
-"PO-Revision-Date: 2007-05-14 14:20+0200\n"
+"POT-Creation-Date: 2007-05-15 13:00+0200\n"
+"PO-Revision-Date: 2007-05-15 12:58+0200\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: ../gui/gnomint.glade.h:1
 msgid " "
@@ -162,7 +162,7 @@ msgstr ""
 msgid "Activated on"
 msgstr "Activado el"
 
-#: ../gui/gnomint.glade.h:39 ../src/tls.c:718
+#: ../gui/gnomint.glade.h:39 ../src/tls.c:739
 msgid "Any purpose"
 msgstr "Cualquier propósito"
 
@@ -198,7 +198,7 @@ msgstr "CAO"
 msgid "CAOU"
 msgstr "CAOU"
 
-#: ../gui/gnomint.glade.h:48 ../src/tls.c:692
+#: ../gui/gnomint.glade.h:48 ../src/tls.c:713
 msgid "CRL signing"
 msgstr "Firma de CRLs"
 
@@ -214,11 +214,11 @@ msgstr "Fecha de caducidad"
 msgid "CertSN"
 msgstr "Núm de serie"
 
-#: ../gui/gnomint.glade.h:52 ../src/tls.c:690
+#: ../gui/gnomint.glade.h:52 ../src/tls.c:711
 msgid "Certificate signing"
 msgstr "Firma de certificados"
 
-#: ../gui/gnomint.glade.h:53 ../src/tls.c:675
+#: ../gui/gnomint.glade.h:53 ../src/tls.c:696
 msgid "Certification Authority"
 msgstr "Autoridad de certificación"
 
@@ -226,7 +226,7 @@ msgstr "Autoridad de certificación"
 msgid "City: "
 msgstr "Ciudad"
 
-#: ../gui/gnomint.glade.h:55 ../src/tls.c:710
+#: ../gui/gnomint.glade.h:55 ../src/tls.c:731
 msgid "Code signing"
 msgstr "Firma de código"
 
@@ -246,7 +246,7 @@ msgstr "Creando certificado raíz de la AC"
 msgid "DSA"
 msgstr "DSA"
 
-#: ../gui/gnomint.glade.h:60 ../src/tls.c:686
+#: ../gui/gnomint.glade.h:60 ../src/tls.c:707
 msgid "Data encipherment"
 msgstr "Cifrado de datos"
 
@@ -254,7 +254,7 @@ msgstr "Cifrado de datos"
 msgid "Details"
 msgstr "Detalles"
 
-#: ../gui/gnomint.glade.h:62 ../src/tls.c:680
+#: ../gui/gnomint.glade.h:62 ../src/tls.c:701
 msgid "Digital signature"
 msgstr "Firma digital"
 
@@ -262,7 +262,7 @@ msgstr "Firma digital"
 msgid "E_xport"
 msgstr "E_xportar"
 
-#: ../gui/gnomint.glade.h:64 ../src/tls.c:712
+#: ../gui/gnomint.glade.h:64 ../src/tls.c:733
 msgid "Email protection"
 msgstr "Protección de correo electrónico"
 
@@ -278,11 +278,11 @@ msgstr "Ex_traer clave privada"
 msgid "General"
 msgstr "General"
 
-#: ../gui/gnomint.glade.h:68 ../src/tls.c:688
+#: ../gui/gnomint.glade.h:68 ../src/tls.c:709
 msgid "Key agreement"
 msgstr "Negociación de claves"
 
-#: ../gui/gnomint.glade.h:69 ../src/tls.c:684
+#: ../gui/gnomint.glade.h:69 ../src/tls.c:705
 msgid "Key encipherment"
 msgstr "Cifrado de claves"
 
@@ -312,11 +312,11 @@ msgstr "Meses antes de la caducidad del certificado raíz:"
 msgid "New _Certificate Request"
 msgstr "Nueva _solicitud de certificación"
 
-#: ../gui/gnomint.glade.h:76 ../src/tls.c:682
+#: ../gui/gnomint.glade.h:76 ../src/tls.c:703
 msgid "Non repudiation"
 msgstr "No repudio"
 
-#: ../gui/gnomint.glade.h:77 ../src/tls.c:716
+#: ../gui/gnomint.glade.h:77 ../src/tls.c:737
 msgid "OCSP signing"
 msgstr "Firma de OCSP"
 
@@ -448,7 +448,7 @@ msgstr "Cliente WWW TLS"
 msgid "TLS Web server"
 msgstr "Servidor web TLS"
 
-#: ../gui/gnomint.glade.h:109 ../src/tls.c:714
+#: ../gui/gnomint.glade.h:109 ../src/tls.c:735
 msgid "Time stamping"
 msgstr "Marcado de fecha"
 
@@ -477,14 +477,18 @@ msgid "_Help"
 msgstr "Ay_uda"
 
 #: ../gui/gnomint.glade.h:115
+msgid "_Import"
+msgstr "I_mportar"
+
+#: ../gui/gnomint.glade.h:116
 msgid "_New CA"
 msgstr "_Nueva AC"
 
-#: ../gui/gnomint.glade.h:116
+#: ../gui/gnomint.glade.h:117
 msgid "_Sign"
 msgstr "_Firmar"
 
-#: ../gui/gnomint.glade.h:117
+#: ../gui/gnomint.glade.h:118
 msgid "label"
 msgstr "etiqueta"
 
@@ -601,6 +605,23 @@ msgstr "Por hacer. Funcionalidad aún no implementada."
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr "¿Está seguro de que desea borrar esta solicitud de certificación?"
 
+#: ../src/ca.c:1183
+#, c-format
+msgid ""
+"Couldn't import the certificate request. \n"
+"The database returned this error: \n"
+"\n"
+"'%s'"
+msgstr ""
+"No se pudo importar la solicitud de certificación. \n"
+"La base de datos devolvió el siguiente error: \n"
+"\n"
+"'%s'"
+
+#: ../src/ca.c:1239
+msgid "Couldn't find any supported format in the given file"
+msgstr "No se encontró ningún formato soportado en el fichero proporcionado"
+
 #: ../src/ca_creation.c:53 ../src/csr_creation.c:53
 msgid "Generating new RSA key pair"
 msgstr "Generando nuevo par de claves RSA"
@@ -634,7 +655,7 @@ msgstr "Error al crear base de datos de la AC"
 msgid "CA generated successfully"
 msgstr "AC generada con éxito"
 
-#: ../src/ca_file.c:54
+#: ../src/ca_file.c:56
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr "Error al abrir fichero '%s'"
@@ -681,7 +702,16 @@ msgstr "Hubo problemas al abrir la base de datos de la AC '%s'"
 msgid "Save CA database as..."
 msgstr "Guardar base de datos de AC como..."
 
-#: ../src/main.c:271
+#: ../src/main.c:229
+msgid "Select PEM file to import"
+msgstr "Seleccione fichero PEM a importar"
+
+#: ../src/main.c:250
+#, c-format
+msgid "Problem when importing '%s' file"
+msgstr "Hubo problemas al importar el fichero '%s'"
+
+#: ../src/main.c:313
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
@@ -689,7 +719,7 @@ msgstr ""
 "gnoMint es un programa diseñado para crear y gestionar Autoridades de "
 "Certificación, así como sus certificados"
 
-#: ../src/main.c:272
+#: ../src/main.c:314
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -719,31 +749,31 @@ msgstr ""
 "con este programa; si no es así, escriba a la Free Software Foundation, "
 "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
 
-#: ../src/main.c:276
+#: ../src/main.c:318
 msgid "translator-credits"
 msgstr "David Marín Carreño <davefx@gmail.com>"
 
-#: ../src/new_cert_creation_process.c:69
+#: ../src/new_cert_creation_process.c:70
 msgid "Save CA database"
 msgstr "Guardar base de datos de AC"
 
-#: ../src/new_cert_creation_process.c:81
+#: ../src/new_cert_creation_process.c:82
 msgid "Problem when saving new CA database"
 msgstr "Problema al guardar nueva base de datos de AC"
 
-#: ../src/new_cert_creation_process.c:89
+#: ../src/new_cert_creation_process.c:93
 msgid "CA creation process finished"
 msgstr "Proceso de creación de la AC finalizado"
 
-#: ../src/new_cert_creation_process.c:197
+#: ../src/new_cert_creation_process.c:215
 msgid "Creation process cancelled"
 msgstr "Proceso de creación cancelado"
 
-#: ../src/new_cert_creation_process.c:225
+#: ../src/new_cert_creation_process.c:243
 msgid "CSR creation process finished"
 msgstr "Proceso de creación de solicitud finalizado"
 
-#: ../src/new_cert_creation_process.c:289
+#: ../src/new_cert_creation_process.c:308
 msgid "Creating Certificate Signing Request"
 msgstr "Creando solicitud de certificación"
 
@@ -820,19 +850,19 @@ msgstr "Error al copiar datos de solicitud a la estructura del certificado"
 msgid "Error when signing certificate"
 msgstr "Error al firmar certificado"
 
-#: ../src/tls.c:694
+#: ../src/tls.c:715
 msgid "Key encipher only"
 msgstr "Clave de sólo cifrado"
 
-#: ../src/tls.c:696
+#: ../src/tls.c:717
 msgid "Key decipher only"
 msgstr "Clave de sólo descifrado"
 
-#: ../src/tls.c:706
+#: ../src/tls.c:727
 msgid "TLS WWW Server"
 msgstr "Servidor TLS WWW"
 
-#: ../src/tls.c:708
+#: ../src/tls.c:729
 msgid "TLS WWW Client."
 msgstr "Cliente TLS WWW"
 

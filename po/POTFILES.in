@@ -4,6 +4,7 @@ gui/gnomint.glade
 src/ca.c
 src/ca_creation.c
 src/ca_file.c
+src/ca_policy.c
 src/certificate_properties.c
 src/csr_creation.c
 src/csr_properties.c
