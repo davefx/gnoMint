@@ -33,6 +33,7 @@ typedef struct __TlsCert {
 	gchar * c;
 	gchar * st;
 	gchar * l;
+	gchar * dn;
 
 	gchar * i_cn;
 	gchar * i_o;
@@ -40,6 +41,7 @@ typedef struct __TlsCert {
 	gchar * i_c;
 	gchar * i_st;
 	gchar * i_l;
+	gchar * i_dn;
 
 	gchar * sha1;
 	gchar * md5;

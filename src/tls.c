@@ -585,6 +585,17 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 		aux = NULL;
 	}
 
+
+	size = 0;
+	gnutls_x509_crt_get_dn (*cert, aux, &size);
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_dn (*cert, aux, &size);
+		res->dn = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
+
 	size = 0;
 	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
 	if (size) {
@@ -611,6 +622,16 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
 		res->i_ou = strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
+
+	size = 0;
+	gnutls_x509_crt_get_issuer_dn (*cert, aux, &size);
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_issuer_dn (*cert, aux, &size);
+		res->i_dn = strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -777,6 +798,9 @@ void tls_cert_free (TlsCert *tlscert)
 	if (tlscert->l) {
 		g_free (tlscert->l);
 	}	
+	if (tlscert->dn) {
+		g_free (tlscert->dn);
+	}	
 
 	if (tlscert->i_cn) {
 		g_free (tlscert->i_cn);
@@ -795,6 +819,9 @@ void tls_cert_free (TlsCert *tlscert)
 	}	
 	if (tlscert->i_l) {
 		g_free (tlscert->i_l);
+	}	
+	if (tlscert->i_dn) {
+		g_free (tlscert->i_dn);
 	}	
 
 	if (tlscert->sha1) {
