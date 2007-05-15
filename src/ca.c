@@ -1162,6 +1162,7 @@ gboolean ca_import (gchar *filename)
 		CaCreationData * creation_data = g_new0(CaCreationData, 1);
 		gchar * pem_csr;
 		guint size;
+		gchar * error_msg;
 
 		size = 0;
 		gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
@@ -1174,9 +1175,17 @@ gboolean ca_import (gchar *filename)
 		}	        
 
 		pem_csr = (gchar *) file_datum.data; 
-
-		ca_file_insert_csr (creation_data, NULL, pem_csr);
 		
+		error_msg = ca_file_insert_csr (creation_data, NULL, pem_csr);
+
+		
+		if (error_msg) {
+			gchar *message = g_strdup_printf (_("Couldn't import the certificate request. \n"
+							    "The database returned this error: \n\n'%s'"),
+							  error_msg);
+			__ca_error_dialog (message);
+			g_free (message);
+		}
 		successful_import = TRUE;
 		
 	}
