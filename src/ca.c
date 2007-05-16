@@ -1161,7 +1161,7 @@ gboolean ca_import (gchar *filename)
 	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_PEM) == 0) {
 		CaCreationData * creation_data = g_new0(CaCreationData, 1);
 		gchar * pem_csr;
-		guint size;
+		size_t size;
 		gchar * error_msg;
 
 		size = 0;

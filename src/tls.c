@@ -530,7 +530,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	gint i;
 	guint critical;
 	
-	guint size;
+	size_t size;
 
 	TlsCert *res = g_new0 (TlsCert, 1);
 
@@ -841,7 +841,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	gnutls_x509_crq_t * csr = g_new0 (gnutls_x509_crq_t, 1);
 	gchar *aux = NULL;
 	
-	guint size;
+	size_t size;
 
 	TlsCsr *res = g_new0 (TlsCsr, 1);
 
