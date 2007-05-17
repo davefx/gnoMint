@@ -1195,7 +1195,7 @@ gboolean ca_import (gchar *filename)
 	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
 		CaCreationData * creation_data = g_new0(CaCreationData, 1);
 		gchar * pem_csr;
-		guint size;
+		size_t size;
 
 		size = 0;
 		gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
