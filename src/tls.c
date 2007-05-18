@@ -36,7 +36,7 @@ gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 			       gnutls_x509_privkey_t **key)
 {
 
-	guint private_key_len = 0;
+	size_t private_key_len = 0;
 
 	(*key) = g_new0 (gnutls_x509_privkey_t, 1);
 	if (gnutls_x509_privkey_init (*key) < 0) {
@@ -68,7 +68,7 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 			       gnutls_x509_privkey_t **key)
 {
 
-	guint private_key_len = 0;
+	size_t private_key_len = 0;
 
 	(*key) = g_new0 (gnutls_x509_privkey_t, 1);
 	if (gnutls_x509_privkey_init (*key) < 0) {
@@ -100,7 +100,7 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 {
 	gnutls_datum_t pem_datum;
 	gchar *pkcs8_private_key = NULL;
-	guint pkcs8_private_key_len = 0;
+	size_t pkcs8_private_key_len = 0;
 	gnutls_x509_privkey_t key;
 	gint errorcode;
 
@@ -143,8 +143,8 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 	guint64 sn = G_GUINT64_CONSTANT(1);
 	gchar * serial = NULL;
 	guchar * keyid = NULL;
-	guint keyidsize = 0;
-	guint certificate_len = 0;
+	size_t keyidsize = 0;
+	size_t certificate_len = 0;
 
 	if (gnutls_x509_crt_init (&crt) < 0) {
 		return g_strdup_printf(_("Error when initializing certificate structure"));
@@ -268,7 +268,7 @@ gchar * tls_generate_csr (CaCreationData * creation_data,
 			  gchar ** csr)
 {
 	gnutls_x509_crq_t crq;
-	guint csr_len = 0;
+	size_t csr_len = 0;
 
 	if (gnutls_x509_crq_init (&crq) < 0) {
 		return g_strdup_printf(_("Error when initializing csr structure"));
@@ -342,7 +342,7 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 
 	gchar * serial;
 	gint key_usage;
-	guint certificate_len = 0;
+	size_t certificate_len = 0;
 
 	TlsCert *ca_cert_data = tls_parse_cert_pem (ca_cert_pem);
 	
@@ -526,9 +526,9 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	gnutls_x509_crt_t * cert = g_new0 (gnutls_x509_crt_t, 1);
 	gchar *aux = NULL;
 	guchar *uaux = NULL;
-	guint key_usage;
+	size_t key_usage;
 	gint i;
-	guint critical;
+	size_t critical;
 	
 	size_t size;
 
