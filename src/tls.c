@@ -526,9 +526,9 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	gnutls_x509_crt_t * cert = g_new0 (gnutls_x509_crt_t, 1);
 	gchar *aux = NULL;
 	guchar *uaux = NULL;
-	size_t key_usage;
+	guint key_usage;
 	gint i;
-	size_t critical;
+	guint critical;
 	
 	size_t size;
 
