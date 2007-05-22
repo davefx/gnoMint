@@ -61,7 +61,8 @@ void certificate_properties_display(const char *certificate_pem, gboolean privke
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
 
-	g_object_set_data (G_OBJECT(widget), "cert_serial_number", g_strdup_printf("%llu",serial_number));
+	g_object_set_data (G_OBJECT(widget), "cert_serial_number", g_strdup_printf("%" G_GUINT64_FORMAT, 
+										   serial_number));
 
 	gtk_widget_show (widget);
 }
@@ -90,7 +91,7 @@ guint64 __certificate_properties_populate (const char *certificate_pem)
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSNLabel");	
-	snprintf (model_time_str, 100, "%llu", cert->serial_number);
+	snprintf (model_time_str, 100, "%" G_GUINT64_FORMAT, cert->serial_number);
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSubjectCNLabel");	

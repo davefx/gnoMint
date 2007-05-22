@@ -49,7 +49,8 @@ void ca_policy_populate (guint64 ca_id)
 	gint value;
 	GHashTable *policy_table = g_hash_table_new (g_str_hash, g_str_equal);	
 
-	gchar * query = g_strdup_printf ("SELECT ca_id, name, value FROM ca_policies WHERE ca_id=%llu;", ca_id);
+	gchar * query = g_strdup_printf ("SELECT ca_id, name, value FROM ca_policies WHERE ca_id=%"
+					 G_GUINT64_FORMAT ";", ca_id);
 
 	sqlite3_exec (ca_db, query,
 		      __ca_policy_populate_step, policy_table, &error_str);
