@@ -859,6 +859,7 @@ Common Name (CN):</property>
   <widget class="GtkWindow" id="new_ca_creation_process">
     <property name="visible">True</property>
     <property name="title">Creating new CA - gnoMint</property>
+    <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
@@ -1881,6 +1882,7 @@ Common Name (CN):</property>
   </widget>
   <widget class="GtkWindow" id="certificate_properties_dialog">
     <property name="title">Certificate properties - gnoMint</property>
+    <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
@@ -3542,6 +3544,7 @@ Common Name (CN):</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="get_password_dialog">
+    <property name="modal">True</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
@@ -3658,9 +3661,11 @@ Common Name (CN):</property>
   </widget>
   <widget class="GtkWindow" id="csr_properties_dialog">
     <property name="title">CSR properties - gnoMint</property>
+    <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="urgency_hint">True</property>
     <child>
       <widget class="GtkVBox" id="vbox21">
         <property name="visible">True</property>
@@ -3870,6 +3875,7 @@ Common Name (CN):</property>
                 <property name="visible">True</property>
                 <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
+                <signal name="clicked" handler="csr_properties_close_clicked"/>
               </widget>
             </child>
           </widget>

@@ -22,6 +22,7 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/pkcs12.h>
 #include <stdio.h>
 
 typedef struct __TlsCert {	
@@ -73,6 +74,8 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 			       gnutls_x509_privkey_t **key);
 
 gchar * tls_generate_pkcs8_encrypted_private_key (gchar *private_key, gchar *passphrase);
+
+gnutls_datum_t * tls_generate_pkcs12 (gchar *certificate, gchar *private_key, gchar *passphrase);
 
 gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,

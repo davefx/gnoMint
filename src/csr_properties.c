@@ -85,7 +85,9 @@ void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 
 void csr_properties_close_clicked (const char *csr_pem)
 {
-	GtkWidget *widget = glade_xml_get_widget (csr_properties_window_xml, "csr_properties_dialog");
+        GtkWidget *widget = NULL;
+	widget = glade_xml_get_widget (csr_properties_window_xml, "csr_properties_dialog");
+	g_assert (widget);
 	gtk_widget_destroy (widget);
 }
 

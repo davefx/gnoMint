@@ -551,6 +551,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
 	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
 		gtk_tree_path_free (parent);
+		/* It's a certificate */
 		return 1;
 	}
 
@@ -558,6 +559,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
 	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
 		gtk_tree_path_free (parent);
+		/* It's a CSR */
 		return 2;
 	}
 
@@ -954,6 +956,115 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 }
 
 
+void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
+{
+	GtkWidget *widget = NULL;
+	GIOChannel * file = NULL;
+	gchar * filename = NULL;
+	gchar * password = NULL;
+	GtkDialog * dialog = NULL;
+	GError * error = NULL;
+	gint id;
+	gchar ** privatekey = NULL;
+        gnutls_datum_t * pkcs12_datum = NULL;
+
+	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	
+	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new 
+			       (_("Export whole certificate in PKCS#12 package"),
+				GTK_WINDOW(widget),
+				GTK_FILE_CHOOSER_ACTION_SAVE,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+				GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+				NULL));
+	
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy (GTK_WIDGET(dialog));
+		return;
+	}
+
+	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	
+	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported certificate, "
+					     "so nobody else but authorized people can use it. This passphrase will be asked "
+					     "by any application that will import the certificate."),
+					   _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
+					   _("The introduced passphrases are distinct."), 8);
+	if (! password) {
+		g_free (filename);
+		return;
+	}
+	
+	file = g_io_channel_new_file (filename, "w", &error);
+	g_free (filename);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting certificate."));
+		g_free (password);
+		return;
+	} 
+	
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
+	if (type == 1)
+		privatekey = ca_file_get_single_row ("SELECT private_key, pem FROM certificates WHERE id=%d", id);
+	else
+                privatekey = NULL;
+		
+	
+	if (!privatekey) {
+		__ca_error_dialog (_("There was an error while getting the certificate and private key from the internal database."));
+		g_free (password);
+		return;
+	}
+	
+	pkcs12_datum = tls_generate_pkcs12 (privatekey[1], privatekey[0], password); 
+	g_free (password);
+	g_strfreev (privatekey);
+	
+	if (!pkcs12_datum) {
+		__ca_error_dialog (_("There was an error while generating the PKCS#12 package."));
+		return;
+	}
+	
+        g_io_channel_set_encoding (file, NULL, NULL);
+
+	g_io_channel_write_chars (file, (gchar *) pkcs12_datum->data, pkcs12_datum->size, NULL, &error);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting the certificate."));
+                g_free (pkcs12_datum->data);
+                g_free (pkcs12_datum);
+		return;
+	} 
+        g_free (pkcs12_datum->data);
+	g_free (pkcs12_datum);
+	
+	
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting the certificate."));
+		g_io_channel_unref (file);
+		return;
+	} 
+	
+	g_io_channel_unref (file);
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+						    GTK_DIALOG_DESTROY_WITH_PARENT,
+						    GTK_MESSAGE_INFO,
+						    GTK_BUTTONS_CLOSE,
+						    "%s",
+						    _("Certificate exported successfully")));
+	gtk_dialog_run (GTK_DIALOG(dialog));
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	
+	
+}
+
+
 void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GtkWidget * widget = NULL;
@@ -971,10 +1082,29 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	glade_xml_signal_autoconnect (dialog_xml); 	
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &has_pk_in_db, -1);			
-	if (has_pk_in_db) {
-		widget = glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2");
-		gtk_widget_set_sensitive (widget, TRUE);
+
+	widget = glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2");
+	gtk_widget_set_sensitive (widget, has_pk_in_db);
+
+	if (type == 2) {
+ 	        widget = glade_xml_get_widget (dialog_xml, "export_certificate_dialog");
+		gtk_window_set_title (GTK_WINDOW(widget), _("Export CSR - gnoMint"));
+
+		widget = glade_xml_get_widget (dialog_xml, "label2");
+		gtk_label_set_text (GTK_LABEL(widget), _("Please, choose which part of the saved Certificate Signing Request you want to export:"));
+
+		widget = glade_xml_get_widget (dialog_xml, "label5");
+		gtk_label_set_markup (GTK_LABEL(widget), _("<i>Export the Certificate Signing Request to a public file, in PEM format.</i>"));
+
+		widget = glade_xml_get_widget (dialog_xml, "label15");
+		gtk_label_set_markup (GTK_LABEL(widget), _("<i>Export the saved private key to a PKCS#8 password-protected file. This file should only be accessed by the subject of the Certificate SSigning Request.</i>"));
+
+	        widget = glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3");
+		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
+	        widget = glade_xml_get_widget (dialog_xml, "label19");
+		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
 	}
+	
 
 	widget = glade_xml_get_widget (dialog_xml, "export_certificate_dialog");
 
@@ -1015,9 +1145,9 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	
 	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3")))) {
 		/* Export PKCS#12 structure */
-		ca_todo_callback ();
-/* 			gtk_widget_destroy (widget); */
-/* 			g_object_unref (G_OBJECT(dialog_xml)); */
+		__ca_export_pkcs12 (iter, type);
+		gtk_widget_destroy (widget);
+		g_object_unref (G_OBJECT(dialog_xml));
 		
 		return;
 	}

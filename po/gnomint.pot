@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-15 13:00+0200\n"
+"POT-Creation-Date: 2007-07-17 15:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -471,8 +471,8 @@ msgstr ""
 msgid "<b>Certificate Signing Requests</b>"
 msgstr ""
 
-#: ../src/ca.c:164 ../src/certificate_properties.c:84
-#: ../src/certificate_properties.c:89
+#: ../src/ca.c:164 ../src/certificate_properties.c:85
+#: ../src/certificate_properties.c:90
 msgid "%m/%d/%Y %R GMT"
 msgstr ""
 
@@ -492,87 +492,121 @@ msgstr ""
 msgid "Expiration"
 msgstr ""
 
-#: ../src/ca.c:618
+#: ../src/ca.c:620
 msgid "Export certificate"
 msgstr ""
 
-#: ../src/ca.c:625
+#: ../src/ca.c:627
 msgid "Export certificate signing request"
 msgstr ""
 
-#: ../src/ca.c:640 ../src/ca.c:651 ../src/ca.c:661
+#: ../src/ca.c:642 ../src/ca.c:653 ../src/ca.c:663 ../src/ca.c:1004
 msgid "There was an error while exporting certificate."
 msgstr ""
 
-#: ../src/ca.c:642 ../src/ca.c:653 ../src/ca.c:663
+#: ../src/ca.c:644 ../src/ca.c:655 ../src/ca.c:665
 msgid "There was an error while exporting CSR."
 msgstr ""
 
-#: ../src/ca.c:676
+#: ../src/ca.c:678
 msgid "Certificate exported successfully"
 msgstr ""
 
-#: ../src/ca.c:683
+#: ../src/ca.c:685
 msgid "Certificate signing request exported successfully"
 msgstr ""
 
-#: ../src/ca.c:779
+#: ../src/ca.c:781
 msgid "Export crypted private key"
 msgstr ""
 
-#: ../src/ca.c:796
+#: ../src/ca.c:798
 msgid ""
 "You need to supply a passphrase for protecting the exported private key, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
 "by any application that will make use of the private key."
 msgstr ""
 
-#: ../src/ca.c:799
+#: ../src/ca.c:801 ../src/ca.c:994
 msgid "Insert passphrase (8 characters or more):"
 msgstr ""
 
-#: ../src/ca.c:799
+#: ../src/ca.c:801 ../src/ca.c:994
 msgid "Insert passphrase (confirm):"
 msgstr ""
 
-#: ../src/ca.c:800
+#: ../src/ca.c:802 ../src/ca.c:995
 msgid "The introduced passphrases are distinct."
 msgstr ""
 
-#: ../src/ca.c:809 ../src/ca.c:838 ../src/ca.c:846 ../src/ca.c:901
-#: ../src/ca.c:927 ../src/ca.c:935
+#: ../src/ca.c:811 ../src/ca.c:840 ../src/ca.c:848 ../src/ca.c:903
+#: ../src/ca.c:929 ../src/ca.c:937 ../src/ca.c:1033 ../src/ca.c:1041
 msgid "There was an error while exporting private key."
 msgstr ""
 
-#: ../src/ca.c:822 ../src/ca.c:913
+#: ../src/ca.c:824 ../src/ca.c:915 ../src/ca.c:1017
 msgid "There was an error while getting private key."
 msgstr ""
 
-#: ../src/ca.c:832 ../src/ca.c:921
+#: ../src/ca.c:834 ../src/ca.c:923 ../src/ca.c:1027
 msgid "There was an error while password-protecting private key."
 msgstr ""
 
-#: ../src/ca.c:859 ../src/ca.c:948
+#: ../src/ca.c:861 ../src/ca.c:950 ../src/ca.c:1054
 msgid "Private key exported successfully"
 msgstr ""
 
-#: ../src/ca.c:881
+#: ../src/ca.c:883
 msgid "Export uncrypted private key"
 msgstr ""
 
-#: ../src/ca.c:1027
+#: ../src/ca.c:974
+msgid "Export whole certificate in PKCS#12 package"
+msgstr ""
+
+#: ../src/ca.c:991
+msgid ""
+"You need to supply a passphrase for protecting the exported certificate, so "
+"nobody else but authorized people can use it. This passphrase will be asked "
+"by any application that will import the certificate."
+msgstr ""
+
+#: ../src/ca.c:1086
+msgid "Export CSR - gnoMint"
+msgstr ""
+
+#: ../src/ca.c:1089
+msgid ""
+"Please, choose which part of the saved Certificate Signing Request you want "
+"to export:"
+msgstr ""
+
+#: ../src/ca.c:1092
+msgid ""
+"<i>Export the Certificate Signing Request to a public file, in PEM format.</"
+"i>"
+msgstr ""
+
+#: ../src/ca.c:1095
+msgid ""
+"<i>Export the saved private key to a PKCS#8 password-protected file. This "
+"file should only be accessed by the subject of the Certificate SSigning "
+"Request.</i>"
+msgstr ""
+
+#: ../src/ca.c:1152
 msgid "Unexpected error"
 msgstr ""
 
-#: ../src/ca.c:1032
+#: ../src/ca.c:1157
 msgid "To do. Feature not implemented yet."
 msgstr ""
 
-#: ../src/ca.c:1053
+#: ../src/ca.c:1178
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr ""
 
-#: ../src/ca.c:1183
+#: ../src/ca.c:1308
 #, c-format
 msgid ""
 "Couldn't import the certificate request. \n"
@@ -581,7 +615,7 @@ msgid ""
 "'%s'"
 msgstr ""
 
-#: ../src/ca.c:1239
+#: ../src/ca.c:1364
 msgid "Couldn't find any supported format in the given file"
 msgstr ""
 

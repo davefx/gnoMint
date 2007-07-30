@@ -134,6 +134,211 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 	return pkcs8_private_key;
 }
 
+gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, gchar *passphrase)
+{
+        gnutls_datum_t pem_datum, cert_datum, pkcs8_pkey_datum, key_id_datum;
+        gnutls_datum_t * pkcs12_datum; 
+	gchar *pkcs8_private_key = NULL;
+	size_t pkcs8_private_key_len = 0;
+        gchar *cert_der = NULL;
+        size_t cert_der_len = 0;
+        guchar* key_id = NULL;
+        size_t key_id_size = 0;
+	gnutls_x509_privkey_t key;
+        gnutls_x509_crt_t crt;
+        gnutls_pkcs12_t pkcs12;
+        gnutls_pkcs12_bag_t bag, key_bag;
+	gint errorcode;
+
+        gchar *friendly_name;
+        guint friendly_name_size = 0;
+        
+        gint ret, bag_index;
+        gchar *pkcs12_struct = NULL;
+        guint pkcs12_struct_size = 0;
+
+
+        /* First of all, we need to generate a PKCS8 structure holding the private key */
+
+	pem_datum.data = (unsigned char *) pem_private_key;
+	pem_datum.size = strlen(pem_private_key);
+
+	if (gnutls_x509_privkey_init (&key) < 0) {
+		return NULL;
+	}
+
+        if (gnutls_x509_crt_init (&crt) < 0) {
+                return NULL;
+        }
+
+	/* Import PEM private key into internal structure. */
+	if (gnutls_x509_privkey_import (key, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+		gnutls_x509_privkey_deinit (key);
+		gnutls_x509_crt_deinit (crt);
+		return NULL;
+	}
+
+	/* Calculate pkcs8 length */
+	pkcs8_private_key = g_new0 (gchar, 1);
+	errorcode = gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
+	g_free (pkcs8_private_key);
+
+	/* Save the private key to a DER format */
+	pkcs8_private_key = g_new0 (gchar, pkcs8_private_key_len);	
+	if (gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len) < 0) {
+		gnutls_x509_privkey_deinit (key);
+		gnutls_x509_crt_deinit (crt);
+		return NULL;
+	}
+
+        pkcs8_pkey_datum.data = (unsigned char *) pkcs8_private_key;
+        pkcs8_pkey_datum.size = pkcs8_private_key_len;
+
+        /* Now, we convert the given PEM certificate into DER format */
+        pem_datum.data = (unsigned char *) pem_cert;
+        pem_datum.size = strlen(pem_cert);
+
+	/* Import PEM certificate into internal structure. */
+	if (gnutls_x509_crt_import (crt, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+		gnutls_x509_privkey_deinit (key);
+		gnutls_x509_crt_deinit (crt);
+		return NULL;
+	}
+
+	/* Calculate DER cert length */
+	cert_der = g_new0 (gchar, 1);
+	errorcode = gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_DER, cert_der, &cert_der_len);
+	g_free (cert_der);
+
+	/* Save the private key to a DER format */
+	cert_der = g_new0 (gchar, cert_der_len);	
+	if (gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_DER, cert_der, &cert_der_len) < 0) {
+		gnutls_x509_privkey_deinit (key);
+		gnutls_x509_crt_deinit (crt);
+		return NULL;
+	}
+        cert_datum.data = (unsigned char *) cert_der;
+        cert_datum.size = cert_der_len;
+
+  
+        /* We obtain a unique ID, from the key_id from the certificate private key.
+         */
+        key_id = g_new0 (guchar, 1);
+        errorcode = gnutls_x509_privkey_get_key_id(key, 0, key_id, &key_id_size);
+        g_free (key_id);
+
+        key_id = g_new0 (guchar, key_id_size);
+        if (gnutls_x509_privkey_get_key_id(key, 0, key_id, &key_id_size) < 0) {
+                gnutls_x509_privkey_deinit (key);
+                gnutls_x509_crt_deinit (crt);
+                return NULL;
+        }
+
+        key_id_datum.data = (unsigned char *) key_id;
+        key_id_datum.size = key_id_size;
+
+
+        /* We create two helper bags, which hold the certificate,
+         * and the (encrypted) key.
+         */
+
+        gnutls_pkcs12_bag_init (&bag);
+        gnutls_pkcs12_bag_init (&key_bag);
+
+        ret = gnutls_pkcs12_bag_set_data (bag, GNUTLS_BAG_CERTIFICATE, &cert_datum);
+        if (ret < 0) {
+                gnutls_x509_privkey_deinit (key);
+                gnutls_x509_crt_deinit (crt);
+
+                return NULL;
+        }
+
+        /* ret now holds the bag's index.
+         */
+        bag_index = ret;
+
+        /* Associate a friendly name with the given certificate. Used
+         * by browsers.
+         */
+        friendly_name = g_new0 (gchar, 1);
+        gnutls_x509_crt_get_dn (crt, friendly_name, &friendly_name_size);
+        g_free (friendly_name);
+
+        friendly_name = g_new0 (gchar, friendly_name_size);
+        gnutls_x509_crt_get_dn (crt, friendly_name, &friendly_name_size);
+        
+        gnutls_pkcs12_bag_set_friendly_name (bag, bag_index, friendly_name);
+
+
+        gnutls_x509_privkey_deinit (key);
+        gnutls_x509_crt_deinit (crt);
+
+
+        /* Associate the certificate with the key using a unique key
+         * ID.
+         */
+        gnutls_pkcs12_bag_set_key_id (bag, bag_index, &key_id_datum);
+
+        /* use weak encryption for the certificate. 
+         */
+        gnutls_pkcs12_bag_encrypt (bag, passphrase, GNUTLS_PKCS_USE_PKCS12_RC2_40);
+
+        /* Now the key.
+         */
+
+        ret = gnutls_pkcs12_bag_set_data (key_bag,
+                                          GNUTLS_BAG_PKCS8_ENCRYPTED_KEY,
+                                          &pkcs8_pkey_datum);
+        if (ret < 0) {
+            return NULL;
+        }
+
+        /* Note that since the PKCS #8 key is already encrypted we don't
+         * bother encrypting that bag.
+         */
+        bag_index = ret;
+
+        gnutls_pkcs12_bag_set_friendly_name (key_bag, bag_index, friendly_name);
+
+        gnutls_pkcs12_bag_set_key_id (key_bag, bag_index, &key_id_datum);
+
+
+        /* The bags were filled. Now create the PKCS #12 structure.
+         */
+        gnutls_pkcs12_init (&pkcs12);
+
+        /* Insert the two bags in the PKCS #12 structure.
+         */
+
+        gnutls_pkcs12_set_bag (pkcs12, bag);
+        gnutls_pkcs12_set_bag (pkcs12, key_bag);
+
+
+        /* Generate a message authentication code for the PKCS #12
+         * structure.
+         */
+        gnutls_pkcs12_generate_mac (pkcs12, passphrase);
+
+        pkcs12_struct = g_new0 (gchar, 1);
+        ret = gnutls_pkcs12_export (pkcs12, GNUTLS_X509_FMT_DER, pkcs12_struct,
+                                    &pkcs12_struct_size);
+        g_free (pkcs12_struct);
+
+        pkcs12_struct = g_new0 (gchar, pkcs12_struct_size);
+        ret = gnutls_pkcs12_export (pkcs12, GNUTLS_X509_FMT_DER, pkcs12_struct,
+                                    &pkcs12_struct_size);        
+
+        gnutls_pkcs12_bag_deinit (bag);
+        gnutls_pkcs12_bag_deinit (key_bag);
+        gnutls_pkcs12_deinit (pkcs12);
+
+        pkcs12_datum = g_new0 (gnutls_datum_t, 1);
+        pkcs12_datum->data = (unsigned char *) pkcs12_struct;
+        pkcs12_datum->size = pkcs12_struct_size;
+
+        return pkcs12_datum;
+}
+
 
 gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,
