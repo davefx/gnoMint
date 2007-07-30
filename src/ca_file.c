@@ -1,11 +1,13 @@
 //  gnoMint: a graphical interface for managing a certification authority
 //  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or modify
+//  This file is part of gnoMint.
+//
+//  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or   
 //  (at your option) any later version.
-//7
+//
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of 
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
@@ -36,12 +38,12 @@ extern gchar * gnomint_temp_created_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 3
+#define CURRENT_GNOMINT_DB_VERSION 4
 
 
 gchar * ca_file_create (CaCreationData *creation_data, 
-				 gchar *pem_ca_private_key,
-				 gchar *pem_ca_certificate)
+                        gchar *pem_ca_private_key,
+                        gchar *pem_ca_certificate)
 {
 	gchar *sql = NULL;
 	gchar *error = NULL;
@@ -63,24 +65,32 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		return error;
 
 	if (sqlite3_exec (ca_db,
-			   "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, name TEXT UNIQUE, value TEXT);",
-			   NULL, NULL, &error)) {
+                          "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, name TEXT UNIQUE, value TEXT);",
+                          NULL, NULL, &error)) {
 		return error;
 	}
 	if (sqlite3_exec (ca_db,
-			   "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, activation TIMESTAMP, expiration TIMESTAMP, is_revoked BOOLEAN, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT, dn TEXT, parent_dn TEXT);",
-			   NULL, NULL, &error)) {
+                          "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT, dn TEXT, parent_dn TEXT);",
+                          NULL, NULL, &error)) {
 		return error;
 	}
 	if (sqlite3_exec (ca_db,
-			   "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT, dn TEXT UNIQUE);",
-			   NULL, NULL, &error)) {
+                          "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT, dn TEXT UNIQUE);",
+                          NULL, NULL, &error)) {
 		return error;
 	}
 
 	if (sqlite3_exec (ca_db,
-			   "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (ca_id, name));",
-			   NULL, NULL, &error)) {
+                          "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (ca_id, name));",
+                          NULL, NULL, &error)) {
+		return error;
+	}
+
+	if (sqlite3_exec (ca_db,
+                          "CREATE TABLE ca_crl (id INTEGER PRIMARY KEY, ca_id INTEGER, crl_version INTEGER, "
+                          "date TIMESTAMP, UNIQUE (ca_id, crl_version));",
+                          NULL, NULL, &error)) {
+                fprintf (stderr, "%s\n", error);
 		return error;
 	}
 
@@ -95,7 +105,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		return error;
 	sqlite3_free (sql);
 
-	sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 1, 1, '%q', '%ld', '%ld', 0, '%q', 1, '%q','%q','%q');", 
+	sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 1, 1, '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q');", 
 			       creation_data->cn,
 			       creation_data->activation,
 			       creation_data->expiration,
@@ -155,39 +165,33 @@ gboolean ca_file_check_and_update_version ()
 	case 1:
 
 		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
-			printf ("1-0 %s\n", error);
 			return FALSE;
 		}
 
 		if (sqlite3_exec (ca_db,
-				 "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (ca_id, name));",
-				 NULL, NULL, &error)) {
-			printf ("1-1 %s\n", error);
+                                  "CREATE TABLE ca_policies (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (ca_id, name));",
+                                  NULL, NULL, &error)) {
 			return FALSE;
 		}
 		
 		sql = sqlite3_mprintf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_version', %d);", 2);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
-			printf ("1-2 %s\n", error);
 			return FALSE;
 		}
 		sqlite3_free (sql);
 		
 		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error)) {
-			printf ("1-3 %s\n", error);
 			return FALSE;
 		}
 
 	case 2:
 		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)){
-			printf ("2-0 %s\n", error);
 			return FALSE;
 		}
 
 		if (sqlite3_exec (ca_db,
 				  "ALTER TABLE certificates ADD dn TEXT; ALTER TABLE certificates ADD parent_dn TEXT;",
 				  NULL, NULL, &error)){
-			printf ("2-1 %s\n", error);
 			return FALSE;
 		}
 
@@ -201,7 +205,6 @@ gboolean ca_file_check_and_update_version ()
 					       &rows,
 					       &cols,
 					       &error)) {
-				printf ("2-2 %s\n", error);
 				return FALSE;
 			}
 			for (i = 0; i < rows; i++) {
@@ -210,7 +213,6 @@ gboolean ca_file_check_and_update_version ()
 						       tls_cert->dn, tls_cert->i_dn, cert_table[(i*2)+2]);
 
 				if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
-					printf ("2-3-%u %s\n", i, error);
 					return FALSE;
 				}
 
@@ -225,28 +227,24 @@ gboolean ca_file_check_and_update_version ()
 		if (sqlite3_exec (ca_db,
 				  "CREATE TABLE cert_requests_new (id INTEGER PRIMARY KEY, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT, dn TEXT UNIQUE);",
 				  NULL, NULL, &error)){
-			printf ("2-4 %s\n", error);
 			return FALSE;
 		}
 		
 		if (sqlite3_exec (ca_db,
 				  "INSERT OR REPLACE INTO cert_requests_new SELECT *, NULL FROM cert_requests;",
 				  NULL, NULL, &error)){
-			printf ("2-5 %s\n", error);
 			return FALSE;
 		}
 		
 		if (sqlite3_exec (ca_db,
 				  "DROP TABLE cert_requests;",
 				  NULL, NULL, &error)){
-			printf ("2-6 %s\n", error);
 			return FALSE;
 		}
 
 		if (sqlite3_exec (ca_db,
 				  "ALTER TABLE cert_requests_new RENAME TO cert_requests;",
 				  NULL, NULL, &error)){
-			printf ("2-7 %s\n", error);
 			return FALSE;
 		}
 
@@ -260,7 +258,6 @@ gboolean ca_file_check_and_update_version ()
 					       &rows,
 					       &cols,
 					       &error)) {
-				printf ("2-8 %s\n", error);
 				return FALSE;
 			}
 			for (i = 0; i < rows; i++) {
@@ -269,7 +266,6 @@ gboolean ca_file_check_and_update_version ()
 						       tls_csr->dn, csr_table[(i*2)+2]);
 
 				if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
-					printf ("2-9-%u %s\n", i, error);
 					return FALSE;
 				}
 
@@ -283,18 +279,66 @@ gboolean ca_file_check_and_update_version ()
 		
 		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version';", 3);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
-			printf ("2-10 %s\n", error);
 			return FALSE;
 		}
 		sqlite3_free (sql);
 		
 		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error)){
-			printf ("2-11 %s\n", error);
 			return FALSE;
 		}
 
 
 	case 3:
+                
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)){
+			return FALSE;
+		}
+                
+                if (sqlite3_exec (ca_db,
+                                  "CREATE TABLE certificates_new (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, private_key TEXT, dn TEXT, parent_dn TEXT);",
+                                  NULL, NULL, &error)) {
+                        return FALSE;
+                }
+
+		if (sqlite3_exec (ca_db,
+				  "INSERT OR REPLACE INTO certificates_new SELECT id, is_ca, serial, subject, activation, expiration, NULL, pem, private_key_in_db, private_key, dn, parent_dn FROM certificates;",
+				  NULL, NULL, &error)){
+			return FALSE;
+		}
+		
+		if (sqlite3_exec (ca_db,
+				  "DROP TABLE certificates;",
+				  NULL, NULL, &error)){
+			return FALSE;
+		}
+
+		if (sqlite3_exec (ca_db,
+				  "ALTER TABLE certificates_new RENAME TO certificates;",
+				  NULL, NULL, &error)){
+			return FALSE;
+		}
+
+		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version';", 4);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+			return FALSE;
+		}
+		sqlite3_free (sql);
+		
+
+
+                if (sqlite3_exec (ca_db,
+                                  "CREATE TABLE ca_crl (id INTEGER PRIMARY KEY, ca_id INTEGER, crl_version INTEGER, "
+                                  "date TIMESTAMP, UNIQUE (ca_id, version));",
+                                  NULL, NULL, &error)) {
+                        return FALSE;
+                }
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error)){
+			return FALSE;
+		}
+
+
+        case 4:
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -425,6 +469,9 @@ gchar ** ca_file_get_single_row (const gchar *query, ...)
 	
 	sqlite3_free (sql);
 
+        if (error)
+                fprintf (stderr, "%s\n", error);
+
 	return result;
 }
 
@@ -447,7 +494,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	g_strfreev (serialstr);
 
 	if (pem_private_key)
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%q', '%ld', '%ld', 0, '%q', 1, '%q', '%q', '%q');", 
+		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%q', '%ld', '%ld', NULL, '%q', 1, '%q', '%q', '%q');", 
 				       serial,
 				       tlscert->cn,
 				       creation_data->activation,
@@ -457,7 +504,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       tlscert->dn,
 				       tlscert->i_dn);
 	else
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%q', '%ld', '%ld', 0, '%q', 0, NULL, '%q', '%q');", 
+		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q');", 
 				       serial,
 				       tlscert->cn,
 				       creation_data->activation,
@@ -557,5 +604,115 @@ gchar * ca_file_remove_csr (gint id)
 
 	return NULL;
 
+}
+
+gchar * ca_file_revoke_crt (gint id)
+{
+	gchar *sql = NULL;
+	gchar *error = NULL;
+
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+
+        fprintf (stderr, "%ld\n", time(NULL));
+
+	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %d ;", 
+			       time(NULL),
+                               id);
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
+		return error;
+	sqlite3_free (sql);
+	
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		return error;
+
+	return NULL;
+
+}
+
+
+int __ca_file_get_revoked_certs_add_certificate (void *pArg, int argc, char **argv, char **columnNames)
+{
+        GList **p_list = (GList **) pArg;
+        GList *list = (* p_list);
+
+        // Pem of the revoked certificate
+        list = g_list_prepend (list, g_strdup(argv[0]));
+
+        // Revocation time
+        list = g_list_prepend (list, g_strdup(argv[1]));
+
+        *p_list =  list;
+
+        return 0;
+}
+
+GList * ca_file_get_revoked_certs ()
+{
+        GList * list = NULL;
+        gchar * error_str = NULL;
+        
+        sqlite3_exec (ca_db,
+                      "SELECT pem,revocation FROM certificates "
+                      "WHERE revocation IS NOT NULL "
+                      "AND expiration > strftime('%s','now') ORDER BY id",
+                      __ca_file_get_revoked_certs_add_certificate, &list, &error_str);
+        
+        if (error_str) {
+                fprintf (stderr, "%s\n", error_str);
+                return NULL;
+        }
+        list = g_list_reverse (list);
+
+        return list;
+
+}
+
+gint ca_file_begin_new_crl_transaction (gint ca_id, time_t timestamp)
+{
+        gchar * sql;
+        gchar **last_crl;
+        gint next_crl_version;
+        gchar *error;
+
+        last_crl = ca_file_get_single_row ("SELECT crl_version FROM ca_crl WHERE ca_id=%u", ca_id);
+        if (! last_crl)
+                next_crl_version = 1;
+        else {
+                next_crl_version = atoi (last_crl[0]) + 1;
+                g_strfreev (last_crl);
+        }
+        
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return 0;
+
+        sql = sqlite3_mprintf ("INSERT INTO ca_crl VALUES (NULL, %u, %u, %u);",
+                               ca_id, next_crl_version, timestamp);
+
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+                sqlite3_free (sql);
+                fprintf (stderr, "%s\n", error);
+		return 0;        
+        }
+
+        sqlite3_free (sql);
+        
+        return next_crl_version;
+
+}
+
+void ca_file_commit_new_crl_transaction ()
+{
+        gchar *error;
+
+        sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error);
+
+}
+
+void ca_file_rollback_new_crl_transaction ()
+{
+        gchar *error;
+
+	sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);
 }
 

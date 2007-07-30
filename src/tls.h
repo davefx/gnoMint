@@ -1,9 +1,11 @@
 //  gnoMint: a graphical interface for managing a certification authority
 //  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or modify
+//  This file is part of gnoMint.
+//
+//  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or   
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
@@ -98,6 +100,11 @@ void tls_cert_free (TlsCert *);
 TlsCsr * tls_parse_csr_pem (const char * pem_csr);
 void tls_csr_free (TlsCsr *);
 
-
+gchar * tls_generate_crl (GList * revoked_certs, 
+                          guchar *ca_pem, 
+                          guchar *ca_private_key,
+                          gint crl_version,
+                          time_t current_timestamp,
+                          time_t next_crl_timestamp);
 
 #endif

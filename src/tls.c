@@ -1,9 +1,11 @@
 //  gnoMint: a graphical interface for managing a certification authority
 //  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or modify
+//  This file is part of gnoMint.
+//
+//  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or   
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
@@ -1161,4 +1163,99 @@ void tls_csr_free (TlsCsr *tlscsr)
 	}	
 
 	g_free (tlscsr);
+}
+
+gchar * tls_generate_crl (GList * revoked_certs, 
+                          guchar *ca_pem, 
+                          guchar *ca_private_key,
+                          gint crl_version,
+                          time_t current_timestamp,
+                          time_t next_crl_timestamp)
+{
+        gnutls_datum_t pem_datum;
+
+        gnutls_x509_crl_t crl;
+        gnutls_x509_crt_t rcrt;
+        guchar *certificate_pem;
+        time_t revocation;
+
+        gnutls_x509_crt_t ca_crt;
+        gnutls_x509_privkey_t ca_pkey;
+
+        GList *cursor = NULL;
+
+        gchar *result = NULL;
+        guint result_size = 0;
+        
+        gnutls_x509_crl_init (&crl);
+        
+        cursor = g_list_first (revoked_certs);
+        
+        while (cursor) {
+                gnutls_datum_t pem_datum;
+
+                certificate_pem = cursor->data;
+                cursor = g_list_next (cursor);
+                
+                revocation = atol (cursor->data);
+                cursor = g_list_next (cursor);
+
+                gnutls_x509_crt_init (&rcrt);
+                pem_datum.data = certificate_pem;
+                pem_datum.size = strlen((gchar *) certificate_pem);
+                
+                if (gnutls_x509_crt_import (rcrt, &pem_datum, GNUTLS_X509_FMT_PEM)) {
+                        return NULL;
+                }
+                                        
+                if (gnutls_x509_crl_set_crt (crl, rcrt, revocation))
+                        return NULL;
+
+                gnutls_x509_crt_deinit (rcrt);
+        }
+
+        fprintf (stderr, "Number of certificates in CRL: %d", gnutls_x509_crl_get_crt_count (crl));
+        
+        if (gnutls_x509_crl_set_version (crl, crl_version))
+                return NULL;
+
+        if (gnutls_x509_crl_set_this_update (crl, current_timestamp))
+                return NULL;
+
+        if (next_crl_timestamp)
+                if (gnutls_x509_crl_set_next_update (crl, next_crl_timestamp))
+                        return NULL;
+
+        gnutls_x509_crt_init (&ca_crt);
+
+        pem_datum.data = ca_pem;
+        pem_datum.size = strlen((gchar *)ca_pem);
+        
+        if (gnutls_x509_crt_import (ca_crt, &pem_datum, GNUTLS_X509_FMT_PEM))
+                return NULL;
+        
+        gnutls_x509_privkey_init (&ca_pkey);
+
+        pem_datum.data = ca_private_key;
+        pem_datum.size = strlen((gchar *) ca_private_key);
+
+        if (gnutls_x509_privkey_import (ca_pkey, &pem_datum, GNUTLS_X509_FMT_PEM))
+                return NULL;
+        
+        if (gnutls_x509_crl_sign (crl, ca_crt, ca_pkey))
+                return NULL;
+        
+        gnutls_x509_privkey_deinit (ca_pkey);
+        gnutls_x509_crt_deinit (ca_crt);
+
+        result = g_new0 (gchar, 0);
+        if (gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, result, &result_size))
+                return NULL;
+        g_free (result);
+
+        result = g_new0 (gchar, result_size);
+        if (gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, result, &result_size))
+                return NULL;
+        
+        return result;
 }

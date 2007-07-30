@@ -1,9 +1,11 @@
 //  gnoMint: a graphical interface for managing a certification authority
 //  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or modify
+//  This file is part of gnoMint.
+//
+//  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or   
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
@@ -50,6 +52,13 @@ gchar * ca_file_insert_csr (CaCreationData * creation_data,
 			    gchar *pem_private_key,
 			    gchar *pem_csr);
 gchar * ca_file_remove_csr (gint id);
+gchar * ca_file_revoke_crt (gint id);
+
+GList * ca_file_get_revoked_certs (void);
+
+gint ca_file_begin_new_crl_transaction (gint ca_id, time_t timestamp);
+void ca_file_commit_new_crl_transaction ();
+void ca_file_rollback_new_crl_transaction ();
 
 
 #endif

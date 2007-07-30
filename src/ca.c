@@ -1,9 +1,11 @@
 //  gnoMint: a graphical interface for managing a certification authority
 //  Copyright (C) 2006,2007 David Marín Carreño <davefx@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or modify
+//  This file is part of gnoMint.
+//
+//  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or   
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
@@ -44,7 +46,8 @@ GtkTreeIter * last_ca_iter = NULL;
 gboolean csr_title_inserted=FALSE;
 GtkTreeIter * csr_parent_iter = NULL;
 
-
+gboolean view_csr = TRUE;
+gboolean view_rcrt = TRUE;
 
 enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_IS_CA=1,
@@ -52,19 +55,19 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_SUBJECT=3,
       CA_MODEL_COLUMN_ACTIVATION=4,
       CA_MODEL_COLUMN_EXPIRATION=5,
-      CA_MODEL_COLUMN_IS_REVOKED=6,
+      CA_MODEL_COLUMN_REVOCATION=6,
       CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB=7,
       CA_MODEL_COLUMN_PEM=8,
       CA_MODEL_COLUMN_ITEM_TYPE=9,
       CA_MODEL_COLUMN_NUMBER=10}
-CaModelColumns;
+        CaModelColumns;
 
 enum {CSR_MODEL_COLUMN_ID=0,
       CSR_MODEL_COLUMN_SUBJECT=1,
       CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB=2,
       CSR_MODEL_COLUMN_PEM=3,
       CSR_MODEL_COLUMN_NUMBER=4}
-CsrModelColumns;
+        CsrModelColumns;
 
 void __disable_widget (gchar *widget_name);
 void __enable_widget (gchar *widget_name);
@@ -87,19 +90,38 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 
 	gtk_tree_store_append (new_model, &iter, last_ca_iter);
 
-	gtk_tree_store_set (new_model, &iter,
-			    0, atoi(argv[CA_MODEL_COLUMN_ID]),
-			    1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-			    2, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
-			    3, argv[CA_MODEL_COLUMN_SUBJECT],
-			    4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
-			    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
-			    6, atoi(argv[CA_MODEL_COLUMN_IS_REVOKED]),
-			    7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-			    8, argv[CA_MODEL_COLUMN_PEM],
-			    9, 0,
-			    -1);
+        if (! argv[CA_MODEL_COLUMN_REVOCATION])        
+                gtk_tree_store_set (new_model, &iter,
+                                    0, atoi(argv[CA_MODEL_COLUMN_ID]),
+                                    1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
+                                    2, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
+                                    3, argv[CA_MODEL_COLUMN_SUBJECT],
+                                    4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
+                                    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
+                                    6, 0,
+                                    7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+                                    8, argv[CA_MODEL_COLUMN_PEM],
+                                    9, 0,
+                                    -1);
+        else {
+                gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>", 
+                                                                   argv[CA_MODEL_COLUMN_SUBJECT]);
 
+                gtk_tree_store_set (new_model, &iter,
+                                    0, atoi(argv[CA_MODEL_COLUMN_ID]),
+                                    1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
+                                    2, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
+                                    3, revoked_subject,
+                                    4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
+                                    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
+                                    6, atoi(argv[CA_MODEL_COLUMN_REVOCATION]),
+                                    7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+                                    8, argv[CA_MODEL_COLUMN_PEM],
+                                    9, 0,
+                                    -1);
+
+                g_free (revoked_subject);
+        }
 
 	// For now, we only support one only CA
 	if (atoi(argv[CA_MODEL_COLUMN_IS_CA]) != 0) {
@@ -110,6 +132,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 
 	return 0;
 }
+
 
 
 int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames)
@@ -158,7 +181,7 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 		g_object_set (G_OBJECT(cell), "text", "", NULL);
 		return;
 	}
-		
+	
 	gmtime_r (&model_time, &model_time_tm);
 	
 	size = strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
@@ -203,10 +226,10 @@ void __ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
 }
 
 void __ca_tree_view_is_ca_datafunc (GtkTreeViewColumn *tree_column,
-			       GtkCellRenderer *cell,
-			       GtkTreeModel *tree_model,
-			       GtkTreeIter *iter,
-			       gpointer data)
+                                    GtkCellRenderer *cell,
+                                    GtkTreeModel *tree_model,
+                                    GtkTreeIter *iter,
+                                    gpointer data)
 {
 	gboolean is_ca;
 	gchar *file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "ca-stamp-16.png", NULL);
@@ -281,25 +304,27 @@ gboolean ca_refresh_model ()
 	GtkTreeStore * new_model = NULL;
 	GtkTreeView * treeview = NULL;
 	GtkCellRenderer * renderer = NULL;
-
+        GtkTreeViewColumn * column = NULL;
+                 
+        guint columns_number;
 
 	g_assert (ca_db != NULL);
 
 	/* Models have these columns: 
-	     - Id
-	     - Is CA
-	     - Serial
-	     - Subject
-	     - Activation
-	     - Expiration
-	     - Is revoked
-	     - Private key is in DB
-	     - PEM data
-	     - Item type
+           - Id
+           - Is CA
+           - Serial
+           - Subject
+           - Activation
+           - Expiration
+           - Is revoked
+           - Private key is in DB
+           - PEM data
+           - Item type
 	*/
 
 	new_model = gtk_tree_store_new (10, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_UINT64, G_TYPE_STRING, 
-					G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_INT);
+					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_INT);
 
 	cert_title_inserted = FALSE;
 	cert_parent_iter = NULL;
@@ -307,37 +332,69 @@ gboolean ca_refresh_model ()
 	csr_title_inserted=FALSE;
 	csr_parent_iter = NULL;
 
-	sqlite3_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, is_revoked, private_key_in_db, pem FROM certificates ORDER BY id",
-		     __ca_refresh_model_add_certificate, new_model, &error_str);
-
-	sqlite3_exec (ca_db, "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
-		     __ca_refresh_model_add_csr, new_model, &error_str);
+        if (view_rcrt) 
+          sqlite3_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates ORDER BY id", __ca_refresh_model_add_certificate, new_model, &error_str);
+        else
+          sqlite3_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates WHERE revocation IS NULL ORDER BY id", __ca_refresh_model_add_certificate, new_model, &error_str);
+          
+        if (view_csr)
+          sqlite3_exec 
+            (ca_db, 
+             "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
+             __ca_refresh_model_add_csr, new_model, &error_str);
 
 	treeview = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
 
 	if (ca_model) {
+                GList * column_list;
 		g_object_unref (ca_model);		
+
+                // Remove revocation column
+                column_list = gtk_tree_view_get_columns (treeview);
+                columns_number = g_list_length (column_list);
+                g_list_free (column_list);
+        
+                
 	} else {
+/*                 GtkTooltips * table_tooltips = gtk_tooltips_new(); */
+                guint column_number;
+          
 		/* There's no model assigned to the treeview yet, so we add its columns */
 		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
-		gtk_tree_view_insert_column_with_attributes (treeview,
-							     -1, _("Subject"), renderer,
-							     "markup", CA_MODEL_COLUMN_SUBJECT,
-							     NULL);
+		column_number = gtk_tree_view_insert_column_with_attributes (treeview,
+                                                                             -1, _("Subject"), renderer,
+                                                                             "markup", CA_MODEL_COLUMN_SUBJECT,
+                                                                             NULL);
 		
+/*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
+/*                                       _("Subject of the certificate or request"),  */
+/*                                       _("This is the distingished name (DN) of the certificate or request")); */
+
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
 		
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, "", renderer,
-							    __ca_tree_view_is_ca_datafunc, NULL, NULL);
+		column_number = gtk_tree_view_insert_column_with_data_func (treeview,
+                                                                            -1, "", renderer,
+                                                                            __ca_tree_view_is_ca_datafunc, 
+                                                                            NULL, NULL);
+
+/*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
+/*                                       _("It's a CA certificate"),  */
+/*                                       _("An icon in this column shows that the certificate is able to generate and sign " */
+/*                                         "new certificates.")); */
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
 
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, "", renderer,
-							    __ca_tree_view_private_key_in_db_datafunc, NULL, NULL);
+		column_number = gtk_tree_view_insert_column_with_data_func (treeview,
+                                                                            -1, "", renderer,
+                                                                            __ca_tree_view_private_key_in_db_datafunc, 
+                                                                            NULL, NULL);
+
+/*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
+/*                                       _("Private key kept in internal database"),  */
+/*                                       _("An icon in this column shows that the private key related to the certificate " */
+/*                                         "is kept in the gnoMint database.")); */
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
@@ -359,10 +416,20 @@ gboolean ca_refresh_model ()
 							    __ca_tree_view_date_datafunc,
 							    GINT_TO_POINTER(CA_MODEL_COLUMN_EXPIRATION), g_free);
 
+                renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
+                
+                columns_number = gtk_tree_view_insert_column_with_data_func (treeview,
+                                                                             -1, _("Revocation"), renderer,
+                                                                             __ca_tree_view_date_datafunc,
+                                                                             GINT_TO_POINTER(CA_MODEL_COLUMN_REVOCATION), 
+                                                                             g_free);
+                
 
 	}
 
+        column = gtk_tree_view_get_column(treeview, columns_number - 1);
 
+        gtk_tree_view_column_set_visible (column, view_rcrt);        
 
 	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(new_model));
 	ca_model = new_model;
@@ -373,9 +440,9 @@ gboolean ca_refresh_model ()
 }
 
 void __ca_certificate_activated (GtkTreeView *tree_view,
-			       GtkTreePath *path,
-			       GtkTreeViewColumn *column,
-			       gpointer user_data)
+                                 GtkTreePath *path,
+                                 GtkTreeViewColumn *column,
+                                 gpointer user_data)
 {	
 	GValue * valuestr = g_new0 (GValue, 1);
 	GValue * valuebool = g_new0 (GValue, 1);
@@ -393,9 +460,9 @@ void __ca_certificate_activated (GtkTreeView *tree_view,
 }
 
 void __ca_csr_activated (GtkTreeView *tree_view,
-			       GtkTreePath *path,
-			       GtkTreeViewColumn *column,
-			       gpointer user_data)
+                         GtkTreePath *path,
+                         GtkTreeViewColumn *column,
+                         gpointer user_data)
 {	
 	GValue * value = g_new0 (GValue, 1);
 	GValue * valuebool = g_new0 (GValue, 1);
@@ -418,17 +485,17 @@ void ca_treeview_row_activated (GtkTreeView *tree_view,
 				gpointer user_data)
 {
 	if (tree_view == NULL) {
-			GtkTreeSelection *selection;
-			GtkTreeIter selection_iter;
+                GtkTreeSelection *selection;
+                GtkTreeIter selection_iter;
 		
-			tree_view = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
-			selection = gtk_tree_view_get_selection (tree_view);
+                tree_view = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
+                selection = gtk_tree_view_get_selection (tree_view);
 		
-			if (gtk_tree_selection_count_selected_rows (selection) != 1)
-				return;
+                if (gtk_tree_selection_count_selected_rows (selection) != 1)
+                        return;
 		
-			gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
-			path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
+                gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
+                path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
 
 			
 	}
@@ -454,7 +521,7 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
 	GtkWidget *widget;
 	gboolean is_ca = FALSE;
 	gboolean pk_indb = FALSE;
-	gboolean is_revoked = FALSE;
+	gint is_revoked = FALSE;
 	
 	widget = glade_xml_get_widget (main_window_xml, "actions1");
 	gtk_widget_set_sensitive (widget, TRUE);
@@ -464,16 +531,14 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
 			   CA_MODEL_COLUMN_IS_CA, &is_ca, 
 			   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-			   CA_MODEL_COLUMN_IS_REVOKED, &is_revoked, -1);
+			   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
 	if (pk_indb) {
 		widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
 		gtk_widget_set_sensitive (widget, TRUE);
 	}
 
-	if (! is_revoked) {
-		widget = glade_xml_get_widget (main_window_xml, "revoke1");
-		gtk_widget_set_sensitive (widget, TRUE);
-	}
+        widget = glade_xml_get_widget (main_window_xml, "revoke1");
+        gtk_widget_set_sensitive (widget, (! is_revoked));
 
 	widget = glade_xml_get_widget (main_window_xml, "sign1");
 	gtk_widget_set_sensitive (widget, FALSE);
@@ -586,22 +651,22 @@ void ca_treeview_selection_change (GtkTreeView *tree_view,
 }
 
 void __ca_error_dialog (gchar *message) {
-   GtkWidget *dialog, *widget;
+        GtkWidget *dialog, *widget;
    
-   widget = glade_xml_get_widget (main_window_xml, "main_window1");
+        widget = glade_xml_get_widget (main_window_xml, "main_window1");
    
-   /* Create the widgets */
+        /* Create the widgets */
    
-   dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-				    GTK_DIALOG_DESTROY_WITH_PARENT,
-				    GTK_MESSAGE_ERROR,
-				    GTK_BUTTONS_CLOSE,
-				    "%s",
-				    message);
+        dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         GTK_MESSAGE_ERROR,
+                                         GTK_BUTTONS_CLOSE,
+                                         "%s",
+                                         message);
    
-   gtk_dialog_run (GTK_DIALOG(dialog));
+        gtk_dialog_run (GTK_DIALOG(dialog));
    
-   gtk_widget_destroy (dialog);
+        gtk_widget_destroy (dialog);
 
 }
 
@@ -645,53 +710,55 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 			return;
 		} 
 
-			gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &pem, -1);			
-			g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-			if (error) {
-				gtk_widget_destroy (GTK_WIDGET(dialog));
-				if (type == 1)
-					__ca_error_dialog (_("There was an error while exporting certificate."));
-				else
-					__ca_error_dialog (_("There was an error while exporting CSR."));
-				return;
-			} 
+                gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &pem, -1);			
+                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+                if (error) {
+                        gtk_widget_destroy (GTK_WIDGET(dialog));
+                        if (type == 1)
+                                __ca_error_dialog (_("There was an error while exporting certificate."));
+                        else
+                                __ca_error_dialog (_("There was an error while exporting CSR."));
+                        return;
+                } 
 
-			g_io_channel_shutdown (file, TRUE, &error);
-			if (error) {
-				gtk_widget_destroy (GTK_WIDGET(dialog));
-				if (type == 1)
-					__ca_error_dialog (_("There was an error while exporting certificate."));
-				else
-					__ca_error_dialog (_("There was an error while exporting CSR."));
-				return;
-			} 
+                g_io_channel_shutdown (file, TRUE, &error);
+                if (error) {
+                        gtk_widget_destroy (GTK_WIDGET(dialog));
+                        if (type == 1)
+                                __ca_error_dialog (_("There was an error while exporting certificate."));
+                        else
+                                __ca_error_dialog (_("There was an error while exporting CSR."));
+                        return;
+                } 
 
-			g_io_channel_unref (file);
+                g_io_channel_unref (file);
 
-			gtk_widget_destroy (GTK_WIDGET(dialog));
-			if (type == 1)
-				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-									    GTK_DIALOG_DESTROY_WITH_PARENT,
-									    GTK_MESSAGE_INFO,
-									    GTK_BUTTONS_CLOSE,
-									    "%s",
-									    _("Certificate exported successfully")));
-			else
-				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-									    GTK_DIALOG_DESTROY_WITH_PARENT,
-									    GTK_MESSAGE_INFO,
-									    GTK_BUTTONS_CLOSE,
-									    "%s",
-									    _("Certificate signing request exported successfully")));
-			gtk_dialog_run (GTK_DIALOG(dialog));
+                gtk_widget_destroy (GTK_WIDGET(dialog));
+                if (type == 1)
+                        dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+                                                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                                    GTK_MESSAGE_INFO,
+                                                                    GTK_BUTTONS_CLOSE,
+                                                                    "%s",
+                                                                    _("Certificate exported successfully")));
+                else
+                        dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+                                                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                                    GTK_MESSAGE_INFO,
+                                                                    GTK_BUTTONS_CLOSE,
+                                                                    "%s",
+                                                                    _("Certificate signing request exported successfully")));
+                gtk_dialog_run (GTK_DIALOG(dialog));
 			
-			gtk_widget_destroy (GTK_WIDGET(dialog));
+                gtk_widget_destroy (GTK_WIDGET(dialog));
 
-		}
+        }
 }
 
 
-gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gchar *confirm_message, gchar *distinct_error_message, guint minimum_length)
+gchar * ca_dialog_get_password (gchar *info_message, 
+                                gchar *password_message, gchar *confirm_message, 
+                                gchar *distinct_error_message, guint minimum_length)
 {
 	GtkWidget * widget = NULL, * password_widget = NULL;
 	//GtkDialog * dialog = NULL;
@@ -715,7 +782,8 @@ gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gc
 
 	password_widget = glade_xml_get_widget (dialog_xml, "password_entry");
 	widget = glade_xml_get_widget (dialog_xml, "password_dialog_ok_button");
-	g_object_set_data (G_OBJECT(password_widget), "minimum_length", GINT_TO_POINTER(minimum_length));
+	g_object_set_data (G_OBJECT(password_widget), "minimum_length", 
+                           GINT_TO_POINTER(minimum_length));
 	g_object_set_data (G_OBJECT(password_widget), "ok_button", widget);
 
 	do {
@@ -754,7 +822,8 @@ gchar * ca_dialog_get_password (gchar *info_message, gchar *password_message, gc
 void ca_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data)
 {
 	GtkWidget * button = GTK_WIDGET(g_object_get_data (G_OBJECT(password_entry), "ok_button"));
-	guint minimum_length = GPOINTER_TO_INT (g_object_get_data (G_OBJECT(password_entry), "minimum_length"));
+	guint minimum_length = GPOINTER_TO_INT (g_object_get_data (G_OBJECT(password_entry), 
+                                                                   "minimum_length"));
 
 	if (strlen (gtk_entry_get_text (GTK_ENTRY(password_entry))) >= minimum_length)
 		gtk_widget_set_sensitive (button, TRUE);
@@ -1082,7 +1151,6 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	glade_xml_signal_autoconnect (dialog_xml); 	
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &has_pk_in_db, -1);			
-
 	widget = glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2");
 	gtk_widget_set_sensitive (widget, has_pk_in_db);
 
@@ -1091,18 +1159,25 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 		gtk_window_set_title (GTK_WINDOW(widget), _("Export CSR - gnoMint"));
 
 		widget = glade_xml_get_widget (dialog_xml, "label2");
-		gtk_label_set_text (GTK_LABEL(widget), _("Please, choose which part of the saved Certificate Signing Request you want to export:"));
+		gtk_label_set_text 
+                        (GTK_LABEL(widget), 
+                         _("Please, choose which part of the saved Certificate Signing Request you want to export:"));
 
 		widget = glade_xml_get_widget (dialog_xml, "label5");
-		gtk_label_set_markup (GTK_LABEL(widget), _("<i>Export the Certificate Signing Request to a public file, in PEM format.</i>"));
+		gtk_label_set_markup 
+                        (GTK_LABEL(widget), 
+                         _("<i>Export the Certificate Signing Request to a public file, in PEM format.</i>"));
 
 		widget = glade_xml_get_widget (dialog_xml, "label15");
-		gtk_label_set_markup (GTK_LABEL(widget), _("<i>Export the saved private key to a PKCS#8 password-protected file. This file should only be accessed by the subject of the Certificate SSigning Request.</i>"));
+		gtk_label_set_markup 
+                        (GTK_LABEL(widget), 
+                         _("<i>Export the saved private key to a PKCS#8 password-protected file. This file should only be accessed by the subject of the Certificate Signing Request.</i>"));
 
 	        widget = glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3");
 		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
 	        widget = glade_xml_get_widget (dialog_xml, "label19");
 		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
+
 	}
 	
 
@@ -1161,6 +1236,47 @@ void ca_todo_callback ()
 {
 	__ca_error_dialog (_("To do. Feature not implemented yet."));
 }
+
+
+void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	GtkWidget * widget = NULL;
+	GtkDialog * dialog = NULL;
+        gchar * errmsg = NULL;
+	GtkTreeIter *iter;	
+	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gint response = 0;
+	gint id = 0;
+
+	if (type == 2)
+		return;
+	
+	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+						    GTK_DIALOG_DESTROY_WITH_PARENT,
+						    GTK_MESSAGE_QUESTION,
+						    GTK_BUTTONS_YES_NO,
+						    "%s",
+						    _("Are you sure you want to revoke this certificate?")));
+
+	response = gtk_dialog_run(dialog);
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+
+	if (response == GTK_RESPONSE_NO) {
+		return;
+	}
+
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
+        errmsg = ca_file_revoke_crt (id);
+	if (errmsg) {
+                __ca_error_dialog (_(errmsg));
+
+        }
+
+	ca_refresh_model ();
+  
+}
+
 
 void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
@@ -1373,3 +1489,139 @@ gboolean ca_import (gchar *filename)
 
 }
 
+gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+{
+        view_csr = gtk_check_menu_item_get_active (button);
+        ca_refresh_model ();
+        return TRUE;
+}
+
+gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+{
+        view_rcrt = gtk_check_menu_item_get_active (button);
+
+        ca_refresh_model ();
+        return TRUE;
+}
+
+void __ca_gfree_gfunc (gpointer data, gpointer user_data)
+{
+        g_free (data);
+}
+
+void ca_generate_crl (GtkTreeIter *iter, gint type)
+{
+	GtkWidget *widget = NULL;
+	GIOChannel * file = NULL;
+	gchar * filename = NULL;
+	GtkDialog * dialog = NULL;
+	GError * error = NULL;
+	gchar * pem = NULL;
+        GList * revoked_certs = NULL;
+        gchar ** ca_data = NULL;
+        gint crl_version = 0;
+        time_t timestamp;
+
+	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	
+	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export Certificate Revocation List"),
+							  GTK_WINDOW(widget),
+							  GTK_FILE_CHOOSER_ACTION_SAVE,
+							  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+							  NULL));
+		
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy (GTK_WIDGET(dialog));
+		return;
+	}
+
+	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	
+	file = g_io_channel_new_file (filename, "w", &error);
+	g_free (filename);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting CRL."));
+		return;
+	} 
+	
+        revoked_certs = ca_file_get_revoked_certs ();
+	
+	if (!revoked_certs) {
+		__ca_error_dialog (_("There was an error while getting revoked certificates."));
+		return;
+	}
+	
+	ca_data = ca_file_get_single_row ("SELECT pem, private_key FROM certificates WHERE is_ca = 1;");        
+
+        timestamp = time (NULL);
+
+        crl_version = ca_file_begin_new_crl_transaction (1, timestamp);
+
+        if (ca_data) {
+
+                pem = tls_generate_crl (revoked_certs, 
+                                        (guchar *) ca_data[0], 
+                                        (guchar *) ca_data[1],
+                                        crl_version,
+                                        timestamp,
+                                        0);                
+                
+
+		g_strfreev (ca_data);
+
+                if (!pem) {
+                        __ca_error_dialog (_("There was an error while generating CRL."));
+                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
+                        g_list_free (revoked_certs);
+                        ca_file_rollback_new_crl_transaction ();
+                        return;
+                }
+                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+
+                if (error) {
+                        __ca_error_dialog (_("There was an error while writing CRL."));
+                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
+                        g_list_free (revoked_certs);
+                        ca_file_rollback_new_crl_transaction ();
+                        return;
+                } 
+                g_free (pem);
+
+	} else {
+                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
+                        g_list_free (revoked_certs);
+                        ca_file_rollback_new_crl_transaction ();
+                        return;
+        }
+        
+        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
+        g_list_free (revoked_certs);
+	
+        ca_file_commit_new_crl_transaction ();
+		
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		__ca_error_dialog (_("There was an error while exporting CRL."));
+		g_io_channel_unref (file);
+		return;
+	} 
+	
+	g_io_channel_unref (file);
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+						    GTK_DIALOG_DESTROY_WITH_PARENT,
+						    GTK_MESSAGE_INFO,
+						    GTK_BUTTONS_CLOSE,
+						    "%s",
+						    _("CRL generated successfully")));
+	gtk_dialog_run (GTK_DIALOG(dialog));
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	
+	
+}
