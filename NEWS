@@ -1,0 +1,74 @@
+* Version 0.3.1 (2007.11.01)
+
+- FEATURE: now, PKCS#12 structures can be exported, so certificates
+  created in gnoMint can be easily imported in other programs as web
+  browsers, or mail clients.
+
+- FEATURE: gnoMint is able to revoke certificates, and generate the
+  corresponding Certificate Revocation Lists (CRLs).
+
+- FEATURE: gnoMint license has changed to GNU-GPLv3.
+
+- FIX: Fixed a lot of compilation errors in x86-64 architecture.
+
+- FIX: Fixing internal serial number in created certificates.
+
+
+* Version 0.1.5 (2007.05.15)
+
+- FEATURE: gnoMint can import the public part of Certificate Signing
+  Requests made by other applications as long as they are formatted in
+  PEM or in DER formats. This way, gnoMint now is able to make
+  certificates for remote people or systems that can create their CSRs
+  with other instances of gnoMint or other software.
+
+- FEATURE: gnoMint DB format version 3. This version of database
+  format ensures that there won't be two or more CSRs in the database
+  with the same Distinguished Name (DN).
+
+- FIX: Now the private key of CSRs can be exported without errors.
+
+- FIX: A just created CA has a default policy so it will be able to
+  create useful certificates without change its default properties.
+
+- FIX: Some UI bugs are corrected: some label alignments now look OK,
+  and the progress bar again moves while creating certificates or
+  CSRs.
+
+* Version 0.1.4 (2007.05.14)
+
+- FEATURE: It allows defining policies for each Certification
+  Authorities in the database, so as all the new certificates signed
+  by the CA have common properties (uses, purposes and validity time).
+
+- FEATURE: It requires SQLite3, for proper UTF-8 support. Due to this
+  change, all the pre 0.1.4 databases must be converted to a new
+  format. A conversion script is included in the package.
+
+
+* Version 0.1.3 (2006.11.10)
+
+- FEATURE: it allows exporting uncrypted private keys (useful for
+  unattended SSL/TLS servers).
+
+- FEATURE: it requires a minimum length (8 characters) for private-key
+  export passphrase (so OpenSSL can import this keys)
+
+- FIX: checks that passphrase and confirmation are the same in
+  private-key export passphrase
+
+- FIX: The focus is grabbed correctly when asking for passphrase, so
+  no mouse action is needed.
+
+* Version 0.1.2 (2006.10.15)
+
+- FIX: version 0.1.1 couldn't save the certification authority
+  database if the new file and /tmp were in different partitions.
+
+* Version 0.1.1 (2006.09.17)
+
+- FIX: version 0.1.0 couldn't be compiled on 64-bit architectures due to an type-conversion error
+
+* Version 0.1.0 (2006.09.15)
+
+- Initial version
