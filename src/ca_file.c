@@ -475,6 +475,18 @@ gchar ** ca_file_get_single_row (const gchar *query, ...)
 	return result;
 }
 
+guint64 ca_file_get_last_serial ()
+{
+	gchar **serialstr = NULL;
+	guint64 serial;
+
+	serialstr = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial';");
+	serial = atoll (serialstr[0]);
+	g_strfreev (serialstr);
+
+	return serial;
+}
+
 gchar * ca_file_insert_cert (CertCreationData *creation_data, 
 			     gchar *pem_private_key,
 			     gchar *pem_certificate)

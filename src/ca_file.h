@@ -43,6 +43,7 @@ gboolean ca_file_delete_tmp_file ();
 
 gchar ** ca_file_get_single_row (const gchar *query, ...);
 
+guint64 ca_file_get_last_serial ();
 
 gchar * ca_file_insert_cert (CertCreationData * creation_data,
 			     gchar *pem_private_key,

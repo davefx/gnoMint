@@ -105,6 +105,7 @@ void new_cert_creation_process_ca_finish (void) {
 			ca_id = atoll(row[0]);
 			
 			ca_policy_set (ca_id, "MONTHS_TO_EXPIRE", 60);
+			ca_policy_set (ca_id, "HOURS_BETWEEN_CRL_UPDATES", 24);
 			ca_policy_set (ca_id, "DIGITAL_SIGNATURE", 1);
 			ca_policy_set (ca_id, "KEY_ENCIPHERMENT", 1);
 			ca_policy_set (ca_id, "KEY_AGREEMENT", 1);

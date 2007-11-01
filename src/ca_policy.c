@@ -57,6 +57,10 @@ void ca_policy_populate (guint64 ca_id)
 	sqlite3_exec (ca_db, query,
 		      __ca_policy_populate_step, policy_table, &error_str);
 
+	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "hours_between_crl_updates_spinbutton");
+	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
+
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "MONTHS_TO_EXPIRE"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "months_before_expiration_spinbutton2");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
@@ -151,7 +155,7 @@ void ca_policy_set (guint64 ca_id, gchar *property_name, guint value)
 }
 
 
-void ca_policy_spin_button_change (gpointer spin_button, gpointer userdata)
+void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata)
 {
 	guint64 serial_number;
 	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
@@ -168,6 +172,26 @@ void ca_policy_spin_button_change (gpointer spin_button, gpointer userdata)
 
 	
 	ca_policy_set (serial_number, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
+
+}
+
+void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer userdata)
+{
+	guint64 serial_number;
+	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	gchar * cert_serial_number = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_serial_number");
+
+	if (! cert_serial_number)
+		return;
+
+	if (! spin_button)
+		return;
+
+
+	serial_number = atoll (cert_serial_number);
+
+	
+	ca_policy_set (serial_number, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
 
 }
 

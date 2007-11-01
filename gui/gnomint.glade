@@ -347,6 +347,7 @@
         <child>
           <widget class="GtkScrolledWindow" id="scrolledwindow6">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
             <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
             <property name="shadow_type">GTK_SHADOW_IN</property>
@@ -605,6 +606,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -614,6 +616,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -628,6 +631,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-next</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_next1_clicked"/>
                   </widget>
                   <packing>
@@ -643,7 +647,6 @@ Common Name (CN):</property>
             </child>
           </widget>
           <packing>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -656,7 +659,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="type">tab</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -761,6 +763,7 @@ Common Name (CN):</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">RSA</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -774,6 +777,7 @@ Common Name (CN):</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">DSA</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
@@ -835,6 +839,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -844,6 +849,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -857,6 +863,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-previous</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_previous2_clicked"/>
                   </widget>
                   <packing>
@@ -870,6 +877,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-ok</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_commit_clicked"/>
                   </widget>
                   <packing>
@@ -885,7 +893,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
           </packing>
         </child>
         <child>
@@ -898,7 +905,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -971,6 +977,7 @@ Common Name (CN):</property>
                 <property name="can_focus">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_cancel_creation_process_clicked"/>
               </widget>
               <packing>
@@ -1024,7 +1031,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="type">tab</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -1125,6 +1131,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -1134,6 +1141,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -1148,6 +1156,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-next</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_next1_clicked"/>
                   </widget>
                   <packing>
@@ -1164,7 +1173,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
           </packing>
         </child>
         <child>
@@ -1177,7 +1185,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -1439,6 +1446,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -1448,6 +1456,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -1461,6 +1470,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-previous</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                   <packing>
                     <property name="position">2</property>
@@ -1474,6 +1484,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-next</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_next1_clicked"/>
                   </widget>
                   <packing>
@@ -1490,7 +1501,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">2</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -1504,7 +1514,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">2</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -1609,6 +1618,7 @@ Common Name (CN):</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">RSA</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -1622,6 +1632,7 @@ Common Name (CN):</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">DSA</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -1682,6 +1693,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -1691,6 +1703,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -1704,6 +1717,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-previous</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_previous2_clicked"/>
                   </widget>
                   <packing>
@@ -1717,6 +1731,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-ok</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_commit_clicked"/>
                   </widget>
                   <packing>
@@ -1732,7 +1747,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">3</property>
-            <property name="tab_expand">False</property>
           </packing>
         </child>
         <child>
@@ -1745,7 +1759,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">3</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -1859,6 +1872,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -1868,6 +1882,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -1881,6 +1896,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-previous</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_previous2_clicked"/>
                   </widget>
                   <packing>
@@ -1894,6 +1910,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-ok</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_ca_commit_clicked"/>
                   </widget>
                   <packing>
@@ -1909,7 +1926,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">4</property>
-            <property name="tab_expand">False</property>
           </packing>
         </child>
         <child>
@@ -1922,7 +1938,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">4</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -2394,9 +2409,6 @@ Common Name (CN):</property>
                   </packing>
                 </child>
               </widget>
-              <packing>
-                <property name="tab_expand">False</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkLabel" id="label81">
@@ -2407,7 +2419,6 @@ Common Name (CN):</property>
               </widget>
               <packing>
                 <property name="type">tab</property>
-                <property name="tab_expand">False</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -2431,6 +2442,7 @@ Common Name (CN):</property>
                 <child>
                   <widget class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="shadow_type">GTK_SHADOW_IN</property>
@@ -2461,6 +2473,7 @@ Common Name (CN):</property>
                 <child>
                   <widget class="GtkScrolledWindow" id="scrolledwindow4">
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="shadow_type">GTK_SHADOW_IN</property>
@@ -2491,6 +2504,7 @@ Common Name (CN):</property>
                 <child>
                   <widget class="GtkScrolledWindow" id="scrolledwindow5">
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="shadow_type">GTK_SHADOW_IN</property>
@@ -2508,7 +2522,6 @@ Common Name (CN):</property>
               </widget>
               <packing>
                 <property name="position">1</property>
-                <property name="tab_expand">False</property>
               </packing>
             </child>
             <child>
@@ -2521,7 +2534,6 @@ Common Name (CN):</property>
               <packing>
                 <property name="type">tab</property>
                 <property name="position">1</property>
-                <property name="tab_expand">False</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -2568,7 +2580,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="adjustment">60 1 600 1 12 12</property>
                         <property name="climb_rate">1</property>
                         <property name="numeric">True</property>
-                        <signal name="value_changed" handler="ca_policy_spin_button_change"/>
+                        <signal name="value_changed" handler="ca_policy_expiration_spin_button_change"/>
                       </widget>
                       <packing>
                         <property name="position">1</property>
@@ -2579,6 +2591,39 @@ Please, define the maximum set of properties for the certificates that this CA w
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkHBox" id="hbox7">
+                    <property name="visible">True</property>
+                    <property name="border_width">8</property>
+                    <child>
+                      <widget class="GtkLabel" id="label24">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="yalign">0</property>
+                        <property name="label" translatable="yes">Hours between CRL updates:</property>
+                        <property name="wrap">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSpinButton" id="hours_between_crl_updates_spinbutton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="adjustment">24 1 8760 24 168 168</property>
+                        <property name="climb_rate">1</property>
+                        <property name="numeric">True</property>
+                        <signal name="value_changed" handler="ca_policy_crl_update_spin_button_change"/>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
@@ -2593,74 +2638,26 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="n_rows">4</property>
                         <property name="n_columns">2</property>
                         <child>
-                          <widget class="GtkCheckButton" id="crl_signing_check5">
+                          <widget class="GtkCheckButton" id="ca_check2">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">CRL signing</property>
+                            <property name="label" translatable="yes">Certification Authority</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
-                          <packing>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                          </packing>
                         </child>
                         <child>
-                          <widget class="GtkCheckButton" id="cert_signing_check2">
+                          <widget class="GtkCheckButton" id="key_agreement_check2">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Certificate signing</property>
+                            <property name="label" translatable="yes">Key agreement</property>
                             <property name="use_underline">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="non_repudiation_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Non repudiation</property>
-                            <property name="use_underline">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="key_encipherment_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Key encipherment</property>
-                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="data_encipherment_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Data encipherment</property>
-                            <property name="use_underline">True</property>
-                            <property name="active">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
                             <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
                           </packing>
@@ -2670,6 +2667,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Digital signature</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2680,27 +2678,82 @@ Please, define the maximum set of properties for the certificates that this CA w
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkCheckButton" id="key_agreement_check2">
+                          <widget class="GtkCheckButton" id="data_encipherment_check2">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Key agreement</property>
+                            <property name="label" translatable="yes">Data encipherment</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
                           <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
                             <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkCheckButton" id="ca_check2">
+                          <widget class="GtkCheckButton" id="key_encipherment_check2">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Certification Authority</property>
+                            <property name="label" translatable="yes">Key encipherment</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="non_repudiation_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Non repudiation</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="cert_signing_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Certificate signing</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="crl_signing_check5">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">CRL signing</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                          </packing>
                         </child>
                       </widget>
                     </child>
@@ -2720,7 +2773,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
@@ -2735,100 +2788,6 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="n_rows">4</property>
                         <property name="n_columns">2</property>
                         <child>
-                          <widget class="GtkCheckButton" id="email_protection_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Email protection</property>
-                            <property name="use_underline">True</property>
-                            <property name="active">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="code_signing_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Code signing</property>
-                            <property name="use_underline">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="webclient_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">TLS Web client</property>
-                            <property name="use_underline">True</property>
-                            <property name="active">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="webserver_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">TLS Web server</property>
-                            <property name="use_underline">True</property>
-                            <property name="active">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="time_stamping_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Time stamping</property>
-                            <property name="use_underline">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="any_purpose_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Any purpose</property>
-                            <property name="use_underline">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="top_attach">3</property>
-                            <property name="bottom_attach">4</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkCheckButton" id="ocsp_signing_check2">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">OCSP signing</property>
-                            <property name="use_underline">True</property>
-                            <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
-                          </packing>
-                        </child>
-                        <child>
                           <widget class="GtkLabel" id="label100">
                             <property name="visible">True</property>
                             <property name="xalign">0</property>
@@ -2839,6 +2798,107 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="right_attach">2</property>
                             <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="ocsp_signing_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">OCSP signing</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="any_purpose_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Any purpose</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="top_attach">3</property>
+                            <property name="bottom_attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="time_stamping_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Time stamping</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="webserver_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">TLS Web server</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="webclient_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">TLS Web client</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="code_signing_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Code signing</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkCheckButton" id="email_protection_check2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Email protection</property>
+                            <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
                           </packing>
                         </child>
                       </widget>
@@ -2857,13 +2917,12 @@ Please, define the maximum set of properties for the certificates that this CA w
                     </child>
                   </widget>
                   <packing>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </widget>
               <packing>
                 <property name="position">2</property>
-                <property name="tab_expand">False</property>
               </packing>
             </child>
             <child>
@@ -2876,7 +2935,6 @@ Please, define the maximum set of properties for the certificates that this CA w
               <packing>
                 <property name="type">tab</property>
                 <property name="position">2</property>
-                <property name="tab_expand">False</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -2892,6 +2950,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                 <property name="visible">True</property>
                 <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="certificate_properties_close_clicked"/>
               </widget>
             </child>
@@ -3141,6 +3200,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -3150,6 +3210,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -3164,6 +3225,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-next</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_next1_clicked"/>
                   </widget>
                   <packing>
@@ -3179,7 +3241,6 @@ Common Name (CN):</property>
             </child>
           </widget>
           <packing>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -3192,7 +3253,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="type">tab</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -3267,6 +3327,7 @@ Common Name (CN):</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">RSA</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -3280,6 +3341,7 @@ Common Name (CN):</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">DSA</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
@@ -3341,6 +3403,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -3350,6 +3413,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -3363,6 +3427,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-previous</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_previous2_clicked"/>
                   </widget>
                   <packing>
@@ -3376,6 +3441,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-ok</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_commit_clicked"/>
                   </widget>
                   <packing>
@@ -3391,7 +3457,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
           </packing>
         </child>
         <child>
@@ -3404,7 +3469,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -3445,6 +3509,7 @@ Common Name (CN):</property>
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Only the pu_blic part.</property>
                     <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
                   </widget>
@@ -3471,6 +3536,7 @@ Common Name (CN):</property>
                     <property name="sensitive">False</property>
                     <property name="label" translatable="yes">Only the private key (crypted).</property>
                     <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">publicpart_radiobutton1</property>
                   </widget>
@@ -3499,6 +3565,7 @@ Common Name (CN):</property>
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Only the private key (uncrypted).</property>
                     <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">publicpart_radiobutton1</property>
                   </widget>
@@ -3527,6 +3594,7 @@ Common Name (CN):</property>
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Both parts.</property>
                     <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">publicpart_radiobutton1</property>
                   </widget>
@@ -3569,6 +3637,7 @@ Common Name (CN):</property>
                 <property name="visible">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
             </child>
             <child>
@@ -3684,6 +3753,7 @@ Common Name (CN):</property>
                 <property name="visible">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
               </widget>
             </child>
             <child>
@@ -3878,7 +3948,6 @@ Common Name (CN):</property>
                 </child>
               </widget>
               <packing>
-                <property name="tab_expand">False</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -3891,7 +3960,6 @@ Common Name (CN):</property>
               </widget>
               <packing>
                 <property name="type">tab</property>
-                <property name="tab_expand">False</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -3908,7 +3976,6 @@ Common Name (CN):</property>
               <packing>
                 <property name="type">tab</property>
                 <property name="position">1</property>
-                <property name="tab_expand">False</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -3924,6 +3991,7 @@ Common Name (CN):</property>
                 <property name="visible">True</property>
                 <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="csr_properties_close_clicked"/>
               </widget>
             </child>
@@ -4169,6 +4237,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -4178,6 +4247,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -4191,6 +4261,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-next</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_next1_clicked"/>
                   </widget>
                   <packing>
@@ -4206,7 +4277,6 @@ Common Name (CN):</property>
             </child>
           </widget>
           <packing>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -4219,7 +4289,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="type">tab</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -4286,6 +4355,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Digital signature</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4295,6 +4365,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Data encipherment</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4310,6 +4381,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Key encipherment</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4323,6 +4395,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Non repudiation</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -4335,6 +4408,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Key agreement</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4392,6 +4466,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Email protection</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4407,6 +4482,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Code signing</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -4419,6 +4495,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">TLS Web client</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4432,6 +4509,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">TLS Web server</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4441,6 +4519,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Time stamping</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -4453,6 +4532,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Any purpose</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -4465,6 +4545,7 @@ Common Name (CN):</property>
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">OCSP signing</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
@@ -4528,6 +4609,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-help</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                   </widget>
                 </child>
                 <child>
@@ -4537,6 +4619,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_cancel_clicked"/>
                   </widget>
                   <packing>
@@ -4550,6 +4633,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-previous</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_previous2_clicked"/>
                   </widget>
                   <packing>
@@ -4563,6 +4647,7 @@ Common Name (CN):</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-ok</property>
                     <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_commit_clicked"/>
                   </widget>
                   <packing>
@@ -4578,7 +4663,6 @@ Common Name (CN):</property>
           </widget>
           <packing>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
           </packing>
         </child>
         <child>
@@ -4591,7 +4675,6 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">1</property>
-            <property name="tab_expand">False</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>

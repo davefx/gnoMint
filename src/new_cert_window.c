@@ -628,6 +628,8 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 
+	cert_creation_data->serial = ca_file_get_last_serial () + 1;
+
 	csr_pem = ca_get_selected_row_pem ();
 
 	aux = ca_file_get_single_row ("SELECT pem, private_key FROM certificates WHERE is_ca = 1;");

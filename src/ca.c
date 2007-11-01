@@ -30,6 +30,7 @@
 #define N_(x) (x) gettext_noop(x)
 
 #include "ca.h"
+#include "ca_policy.h"
 #include "ca_file.h"
 #include "certificate_properties.h"
 #include "csr_properties.h"
@@ -1555,7 +1556,7 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 		return;
 	}
 	
-	ca_data = ca_file_get_single_row ("SELECT pem, private_key FROM certificates WHERE is_ca = 1;");        
+	ca_data = ca_file_get_single_row ("SELECT pem, private_key, serial FROM certificates WHERE is_ca = 1;");        
 
         timestamp = time (NULL);
 
@@ -1568,7 +1569,7 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
                                         (guchar *) ca_data[1],
                                         crl_version,
                                         timestamp,
-                                        0);                
+                                        timestamp + (3600 * ca_policy_get (atoll(ca_data[2]), "HOURS_BETWEEN_CRL_UPDATES")));           
                 
 
 		g_strfreev (ca_data);
