@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-30 20:27+0200\n"
-"PO-Revision-Date: 2007-07-30 20:30+0200\n"
+"POT-Creation-Date: 2007-11-01 23:03+0100\n"
+"PO-Revision-Date: 2007-11-01 23:06+0100\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -290,97 +290,101 @@ msgstr "Generar _CRL"
 msgid "Generate the current Certificate Revocation List"
 msgstr "Generar lista actual de certificados revocados (CRL)"
 
-#: ../gui/gnomint.glade.h:71 ../src/tls.c:916
+#: ../gui/gnomint.glade.h:71
+msgid "Hours between CRL updates:"
+msgstr "Nº de horas entre actualizaciones consecutivas de CRL:"
+
+#: ../gui/gnomint.glade.h:72 ../src/tls.c:916
 msgid "Key agreement"
 msgstr "Negociación de claves"
 
-#: ../gui/gnomint.glade.h:72 ../src/tls.c:912
+#: ../gui/gnomint.glade.h:73 ../src/tls.c:912
 msgid "Key encipherment"
 msgstr "Cifrado de claves"
 
-#: ../gui/gnomint.glade.h:73
+#: ../gui/gnomint.glade.h:74
 msgid "MD5 fingerprint"
 msgstr "Huella digital MD5"
 
-#: ../gui/gnomint.glade.h:74
+#: ../gui/gnomint.glade.h:75
 msgid "MD5FINGERPRINT"
 msgstr "MD5FINGERPRINT"
 
-#: ../gui/gnomint.glade.h:75
+#: ../gui/gnomint.glade.h:76
 msgid ""
 "Maximum number of months before expiration of the new generated certificates:"
 msgstr ""
 "Máximo número de meses antes de la caducidad de los nuevos certificados:"
 
-#: ../gui/gnomint.glade.h:76
+#: ../gui/gnomint.glade.h:77
 msgid "Months before certificate expiration:"
 msgstr "Meses antes de la caducidad del certificado:"
 
-#: ../gui/gnomint.glade.h:77
+#: ../gui/gnomint.glade.h:78
 msgid "Months before root certificate expiration:"
 msgstr "Meses antes de la caducidad del certificado raíz:"
 
-#: ../gui/gnomint.glade.h:78
+#: ../gui/gnomint.glade.h:79
 msgid "New _Certificate Request"
 msgstr "Nueva _solicitud de certificación"
 
-#: ../gui/gnomint.glade.h:79 ../src/tls.c:910
+#: ../gui/gnomint.glade.h:80 ../src/tls.c:910
 msgid "Non repudiation"
 msgstr "No repudio"
 
-#: ../gui/gnomint.glade.h:80 ../src/tls.c:944
+#: ../gui/gnomint.glade.h:81 ../src/tls.c:944
 msgid "OCSP signing"
 msgstr "Firma de OCSP"
 
-#: ../gui/gnomint.glade.h:81
+#: ../gui/gnomint.glade.h:82
 msgid "Only the private key (crypted)."
 msgstr "Sólo la clave privada (cifrada)."
 
-#: ../gui/gnomint.glade.h:82
+#: ../gui/gnomint.glade.h:83
 msgid "Only the private key (uncrypted)."
 msgstr "Sólo la clave privada (sin cifrar)."
 
-#: ../gui/gnomint.glade.h:83
+#: ../gui/gnomint.glade.h:84
 msgid "Only the pu_blic part."
 msgstr "Sólo la parte pú_blica."
 
-#: ../gui/gnomint.glade.h:84
+#: ../gui/gnomint.glade.h:85
 msgid "Organitational Unit (OU)"
 msgstr "Unidad organizativa (OU)"
 
-#: ../gui/gnomint.glade.h:85
+#: ../gui/gnomint.glade.h:86
 msgid "Organization (O)"
 msgstr "Organización (O)"
 
-#: ../gui/gnomint.glade.h:86
+#: ../gui/gnomint.glade.h:87
 msgid "Organization Unit:"
 msgstr "Unidad organizativa:"
 
-#: ../gui/gnomint.glade.h:87
+#: ../gui/gnomint.glade.h:88
 msgid "Organization:"
 msgstr "Organización:"
 
-#: ../gui/gnomint.glade.h:88
+#: ../gui/gnomint.glade.h:89
 msgid "Organizational Unit (OU)"
 msgstr "Unidad organizativa (OU)"
 
-#: ../gui/gnomint.glade.h:89
+#: ../gui/gnomint.glade.h:90
 msgid "Password (confirm):"
 msgstr "Contraseña (confirmar):"
 
-#: ../gui/gnomint.glade.h:90
+#: ../gui/gnomint.glade.h:91
 msgid "Password:"
 msgstr "Contraseña:"
 
-#: ../gui/gnomint.glade.h:91
+#: ../gui/gnomint.glade.h:92
 msgid "Please, choose which part of the saved certificate you want to export:"
 msgstr "Seleccione qué parte almacenada del certificado desea exportar:"
 
-#: ../gui/gnomint.glade.h:92
+#: ../gui/gnomint.glade.h:93
 msgid "Please, enter password"
 msgstr "Introduzca la contraseña"
 
-#: ../gui/gnomint.glade.h:93
+#: ../gui/gnomint.glade.h:94
 msgid ""
 "Please, insert the data corresponding to the subject of the new "
 "certificate:\n"
@@ -388,7 +392,7 @@ msgstr ""
 "Por favor: introduzca los datos correspondientes al titular del nuevo "
 "certificado:\n"
 
-#: ../gui/gnomint.glade.h:95
+#: ../gui/gnomint.glade.h:96
 msgid ""
 "Please, select the Certification Authority that will create the new "
 "certificate:"
@@ -396,75 +400,75 @@ msgstr ""
 "Por favor: seleccione la Autoridad de Certificación que se empleará para "
 "crear el nuevo certificado:"
 
-#: ../gui/gnomint.glade.h:96
+#: ../gui/gnomint.glade.h:97
 msgid "Private key bit length:"
 msgstr "Longitud en bits de la clave privada:"
 
-#: ../gui/gnomint.glade.h:97
+#: ../gui/gnomint.glade.h:98
 msgid "Private key type:"
 msgstr "Tipo de clave privada:"
 
-#: ../gui/gnomint.glade.h:98
+#: ../gui/gnomint.glade.h:99
 msgid "RSA"
 msgstr "RSA"
 
-#: ../gui/gnomint.glade.h:99
+#: ../gui/gnomint.glade.h:100
 msgid "Revo_ke"
 msgstr "Revo_car"
 
-#: ../gui/gnomint.glade.h:100
+#: ../gui/gnomint.glade.h:101
 msgid "Root certificate prop"
 msgstr "Prop. de certificado raíz"
 
-#: ../gui/gnomint.glade.h:101
+#: ../gui/gnomint.glade.h:102
 msgid "SHA1 fingerprint"
 msgstr "Huella digital SHA1"
 
-#: ../gui/gnomint.glade.h:102
+#: ../gui/gnomint.glade.h:103
 msgid "SHA1FINGERPRINT"
 msgstr "SHA1FINGERPRINT"
 
-#: ../gui/gnomint.glade.h:103
+#: ../gui/gnomint.glade.h:104
 msgid "Select the CA to sign this new certificate"
 msgstr "Seleccione la AC para firmar este nuevo certificado"
 
-#: ../gui/gnomint.glade.h:104
+#: ../gui/gnomint.glade.h:105
 msgid "Serial number"
 msgstr "Nº de serie"
 
-#: ../gui/gnomint.glade.h:105
+#: ../gui/gnomint.glade.h:106
 msgid "State or Province name: "
 msgstr "Nombre de estado o provincia: "
 
-#: ../gui/gnomint.glade.h:106
+#: ../gui/gnomint.glade.h:107
 msgid "Subject Common Name (CN):"
 msgstr "Nombre común (CN) del titular:"
 
-#: ../gui/gnomint.glade.h:107
+#: ../gui/gnomint.glade.h:108
 msgid "SubjectCN"
 msgstr "NombreTitular"
 
-#: ../gui/gnomint.glade.h:108
+#: ../gui/gnomint.glade.h:109
 msgid "SubjectO"
 msgstr "OrganizaciónTitular"
 
-#: ../gui/gnomint.glade.h:109
+#: ../gui/gnomint.glade.h:110
 msgid "SubjectOU"
 msgstr "UnidadOrganizativaTitular"
 
-#: ../gui/gnomint.glade.h:110
+#: ../gui/gnomint.glade.h:111
 msgid "TLS Web client"
 msgstr "Cliente WWW TLS"
 
-#: ../gui/gnomint.glade.h:111
+#: ../gui/gnomint.glade.h:112
 msgid "TLS Web server"
 msgstr "Servidor web TLS"
 
-#: ../gui/gnomint.glade.h:112 ../src/tls.c:942
+#: ../gui/gnomint.glade.h:113 ../src/tls.c:942
 msgid "Time stamping"
 msgstr "Marcado de fecha"
 
-#: ../gui/gnomint.glade.h:113
+#: ../gui/gnomint.glade.h:114
 msgid ""
 "You are about to sign a Certificate Signing Request, and this way, creating "
 "a new certificate. Please check the certificate properties."
@@ -472,112 +476,108 @@ msgstr ""
 "Se va a proceder a la firma de una solicitud de certificación, creándose así "
 "un nuevo certificado. Por favor, compruebe las propiedades de éste."
 
-#: ../gui/gnomint.glade.h:114
+#: ../gui/gnomint.glade.h:115
 msgid "_Actions"
 msgstr "A_cciones"
 
-#: ../gui/gnomint.glade.h:115
+#: ../gui/gnomint.glade.h:116
 msgid "_Edit"
 msgstr "_Editar"
 
-#: ../gui/gnomint.glade.h:116
+#: ../gui/gnomint.glade.h:117
 msgid "_File"
 msgstr "_Archivo"
 
-#: ../gui/gnomint.glade.h:117
+#: ../gui/gnomint.glade.h:118
 msgid "_Help"
 msgstr "Ay_uda"
 
-#: ../gui/gnomint.glade.h:118
+#: ../gui/gnomint.glade.h:119
 msgid "_Import"
 msgstr "I_mportar"
 
-#: ../gui/gnomint.glade.h:119
+#: ../gui/gnomint.glade.h:120
 msgid "_New CA"
 msgstr "_Nueva AC"
 
-#: ../gui/gnomint.glade.h:120
+#: ../gui/gnomint.glade.h:121
 msgid "_Revoked Certificates"
 msgstr "Certificados _revocados"
 
-#: ../gui/gnomint.glade.h:121
+#: ../gui/gnomint.glade.h:122
 msgid "_Sign"
 msgstr "_Firmar"
 
-#: ../gui/gnomint.glade.h:122
+#: ../gui/gnomint.glade.h:123
 msgid "_View"
 msgstr "_Ver"
 
-#: ../gui/gnomint.glade.h:123
+#: ../gui/gnomint.glade.h:124
 msgid "label"
 msgstr "etiqueta"
 
-#: ../gui/gnomint.glade.h:124
-msgid "menuitem4"
-msgstr ""
-
-#: ../src/ca.c:84
+#: ../src/ca.c:85
 msgid "<b>Certificates</b>"
 msgstr "<b>Certificados</b>"
 
-#: ../src/ca.c:146
+#: ../src/ca.c:147
 msgid "<b>Certificate Signing Requests</b>"
 msgstr "<b>Solicitudes de certificación</b>"
 
-#: ../src/ca.c:187 ../src/certificate_properties.c:87
+#: ../src/ca.c:188 ../src/certificate_properties.c:87
 #: ../src/certificate_properties.c:92
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: ../src/ca.c:367
+#: ../src/ca.c:368
 msgid "Subject"
 msgstr "Titular"
 
-#: ../src/ca.c:402
+#: ../src/ca.c:403
 msgid "Serial"
 msgstr "Nº serie"
 
-#: ../src/ca.c:408
+#: ../src/ca.c:409
 msgid "Activation"
 msgstr "Activación"
 
-#: ../src/ca.c:415
+#: ../src/ca.c:416
 msgid "Expiration"
 msgstr "Caducidad"
 
-#: ../src/ca.c:422
+#: ../src/ca.c:423
 msgid "Revocation"
 msgstr "Revocación"
 
-#: ../src/ca.c:685
+#: ../src/ca.c:686
 msgid "Export certificate"
 msgstr "Exportar certificado"
 
-#: ../src/ca.c:692
+#: ../src/ca.c:693
 msgid "Export certificate signing request"
 msgstr "Exportar solicitud de certificación"
 
-#: ../src/ca.c:707 ../src/ca.c:718 ../src/ca.c:728 ../src/ca.c:1073
+#: ../src/ca.c:708 ../src/ca.c:719 ../src/ca.c:729 ../src/ca.c:1074
 msgid "There was an error while exporting certificate."
 msgstr "Ocurrió un error al exportar el certificado"
 
-#: ../src/ca.c:709 ../src/ca.c:720 ../src/ca.c:730
+#: ../src/ca.c:710 ../src/ca.c:721 ../src/ca.c:731
 msgid "There was an error while exporting CSR."
 msgstr "Ocurrió un error al exportar la solicitud de certificación."
 
-#: ../src/ca.c:743 ../src/ca.c:1128
+#: ../src/ca.c:744 ../src/ca.c:1129
 msgid "Certificate exported successfully"
 msgstr "Certificado exportado con éxito"
 
-#: ../src/ca.c:750
+#: ../src/ca.c:751
 msgid "Certificate signing request exported successfully"
 msgstr "Solicitud de certificación exportada correctamente"
 
-#: ../src/ca.c:850
+#: ../src/ca.c:851
 msgid "Export crypted private key"
 msgstr "Exportar clave privada cifrada."
 
-#: ../src/ca.c:867
+#: ../src/ca.c:868
 msgid ""
 "You need to supply a passphrase for protecting the exported private key, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
@@ -588,44 +588,44 @@ msgstr ""
 "ella. Esta contraseña será solicitada por cualquier aplicación que vaya a "
 "hacer uso de la clave privada."
 
-#: ../src/ca.c:870 ../src/ca.c:1063
+#: ../src/ca.c:871 ../src/ca.c:1064
 msgid "Insert passphrase (8 characters or more):"
 msgstr "Introduzca contraseña (8 o más caracteres):"
 
-#: ../src/ca.c:870 ../src/ca.c:1063
+#: ../src/ca.c:871 ../src/ca.c:1064
 msgid "Insert passphrase (confirm):"
 msgstr "Introduzca contraseña (confirmación):"
 
-#: ../src/ca.c:871 ../src/ca.c:1064
+#: ../src/ca.c:872 ../src/ca.c:1065
 msgid "The introduced passphrases are distinct."
 msgstr "Las contraseñas introducidas son distintas."
 
-#: ../src/ca.c:880 ../src/ca.c:909 ../src/ca.c:917 ../src/ca.c:972
-#: ../src/ca.c:998 ../src/ca.c:1006
+#: ../src/ca.c:881 ../src/ca.c:910 ../src/ca.c:918 ../src/ca.c:973
+#: ../src/ca.c:999 ../src/ca.c:1007
 msgid "There was an error while exporting private key."
 msgstr "Error al exportar clave privada."
 
-#: ../src/ca.c:893 ../src/ca.c:984
+#: ../src/ca.c:894 ../src/ca.c:985
 msgid "There was an error while getting private key."
 msgstr "Hubo un problema al obtener la clave privada."
 
-#: ../src/ca.c:903 ../src/ca.c:992
+#: ../src/ca.c:904 ../src/ca.c:993
 msgid "There was an error while password-protecting private key."
 msgstr "Hubo un error al proteger con contraseña la clave privada."
 
-#: ../src/ca.c:930 ../src/ca.c:1019
+#: ../src/ca.c:931 ../src/ca.c:1020
 msgid "Private key exported successfully"
 msgstr "Clave privada exportada con éxito"
 
-#: ../src/ca.c:952
+#: ../src/ca.c:953
 msgid "Export uncrypted private key"
 msgstr "Exportar clave privada sin cifrar."
 
-#: ../src/ca.c:1043
+#: ../src/ca.c:1044
 msgid "Export whole certificate in PKCS#12 package"
 msgstr "Exportar todo el certificado en un paquete PKCS#12"
 
-#: ../src/ca.c:1060
+#: ../src/ca.c:1061
 msgid ""
 "You need to supply a passphrase for protecting the exported certificate, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
@@ -636,7 +636,7 @@ msgstr ""
 "ella. Esta contraseña será solicitada por cualquier aplicación que vaya a "
 "importar el certificado."
 
-#: ../src/ca.c:1086
+#: ../src/ca.c:1087
 msgid ""
 "There was an error while getting the certificate and private key from the "
 "internal database."
@@ -644,19 +644,19 @@ msgstr ""
 "Hubo un problema al obtener el certificado y la clave privada de la base de "
 "datos interna."
 
-#: ../src/ca.c:1096
+#: ../src/ca.c:1097
 msgid "There was an error while generating the PKCS#12 package."
 msgstr "Hubo un problema al generar el fichero PKCS#12"
 
-#: ../src/ca.c:1104 ../src/ca.c:1115
+#: ../src/ca.c:1105 ../src/ca.c:1116
 msgid "There was an error while exporting the certificate."
 msgstr "Ocurrió un error al exportar el certificado."
 
-#: ../src/ca.c:1159
+#: ../src/ca.c:1160
 msgid "Export CSR - gnoMint"
 msgstr "Exportar solicitud de certificación - gnoMint"
 
-#: ../src/ca.c:1164
+#: ../src/ca.c:1165
 msgid ""
 "Please, choose which part of the saved Certificate Signing Request you want "
 "to export:"
@@ -664,7 +664,7 @@ msgstr ""
 "Seleccione qué parte almacenada de la solicitud de certificación desea "
 "exportar:"
 
-#: ../src/ca.c:1169
+#: ../src/ca.c:1170
 msgid ""
 "<i>Export the Certificate Signing Request to a public file, in PEM format.</"
 "i>"
@@ -672,7 +672,7 @@ msgstr ""
 "<i>Exporta la solicitud de certificación a un fichero público en formato "
 "PEM</i>"
 
-#: ../src/ca.c:1174
+#: ../src/ca.c:1175
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the Certificate Signing "
@@ -682,23 +682,23 @@ msgstr ""
 "clave. Este fichero sólo debería ser accesible para el titular de la "
 "soliticud de certificación.</i>"
 
-#: ../src/ca.c:1232
+#: ../src/ca.c:1233
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: ../src/ca.c:1237
+#: ../src/ca.c:1238
 msgid "To do. Feature not implemented yet."
 msgstr "Por hacer. Funcionalidad aún no implementada."
 
-#: ../src/ca.c:1260
+#: ../src/ca.c:1261
 msgid "Are you sure you want to revoke this certificate?"
 msgstr "¿Está seguro de que desea revocar este certificado?"
 
-#: ../src/ca.c:1299
+#: ../src/ca.c:1300
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr "¿Está seguro de que desea borrar esta solicitud de certificación?"
 
-#: ../src/ca.c:1429
+#: ../src/ca.c:1430
 #, c-format
 msgid ""
 "Couldn't import the certificate request. \n"
@@ -711,31 +711,31 @@ msgstr ""
 "\n"
 "'%s'"
 
-#: ../src/ca.c:1485
+#: ../src/ca.c:1486
 msgid "Couldn't find any supported format in the given file"
 msgstr "No se encontró ningún formato soportado en el fichero proporcionado"
 
-#: ../src/ca.c:1527
+#: ../src/ca.c:1528
 msgid "Export Certificate Revocation List"
 msgstr "Exportar lista de certificados revocados (CRL)"
 
-#: ../src/ca.c:1547 ../src/ca.c:1608
+#: ../src/ca.c:1548 ../src/ca.c:1609
 msgid "There was an error while exporting CRL."
 msgstr "Ocurrió un error al exportar la CRL"
 
-#: ../src/ca.c:1554
+#: ../src/ca.c:1555
 msgid "There was an error while getting revoked certificates."
 msgstr "Ocurrió un error al obtener los certificados revocados."
 
-#: ../src/ca.c:1577
+#: ../src/ca.c:1578
 msgid "There was an error while generating CRL."
 msgstr "Ocurrió un error al generar la CRL."
 
-#: ../src/ca.c:1586
+#: ../src/ca.c:1587
 msgid "There was an error while writing CRL."
 msgstr "Ocurrió un error al escribir la CRL."
 
-#: ../src/ca.c:1621
+#: ../src/ca.c:1622
 msgid "CRL generated successfully"
 msgstr "CRL generada con éxito"
 
@@ -882,88 +882,106 @@ msgstr "Problema al guardar nueva base de datos de AC"
 msgid "CA creation process finished"
 msgstr "Proceso de creación de la AC finalizado"
 
-#: ../src/new_cert_creation_process.c:217
+#: ../src/new_cert_creation_process.c:218
 msgid "Creation process cancelled"
 msgstr "Proceso de creación cancelado"
 
-#: ../src/new_cert_creation_process.c:245
+#: ../src/new_cert_creation_process.c:246
 msgid "CSR creation process finished"
 msgstr "Proceso de creación de solicitud finalizado"
 
-#: ../src/new_cert_creation_process.c:310
+#: ../src/new_cert_creation_process.c:311
 msgid "Creating Certificate Signing Request"
 msgstr "Creando solicitud de certificación"
 
 #: ../src/tls.c:45 ../src/tls.c:77
+#, c-format
 msgid "Error initializing private key structure."
 msgstr "Error al inicializar estructura de clave privada."
 
 #: ../src/tls.c:50 ../src/tls.c:82
+#, c-format
 msgid "Error creating private key."
 msgstr "Error al crear clave privada."
 
 #: ../src/tls.c:62 ../src/tls.c:94 ../src/tls.c:463 ../src/tls.c:529
 #: ../src/tls.c:719
+#, c-format
 msgid "Error exporting private key to PEM structure."
 msgstr "Error al exportar clave privada a estructura PEM."
 
 #: ../src/tls.c:357
+#, c-format
 msgid "Error when initializing certificate structure"
 msgstr "Error al inicializar estructura de certificado"
 
 #: ../src/tls.c:362 ../src/tls.c:594
+#, c-format
 msgid "Error when setting certificate version"
 msgstr "Error al establecer versión de certificado"
 
 #: ../src/tls.c:368 ../src/tls.c:603
+#, c-format
 msgid "Error when setting certificate serial number"
 msgstr "Error al establecer número de serie del certificado"
 
 #: ../src/tls.c:374 ../src/tls.c:612
+#, c-format
 msgid "Error when setting activation time"
 msgstr "Error al establecer fecha de activación"
 
 #: ../src/tls.c:379 ../src/tls.c:620
+#, c-format
 msgid "Error when setting expiration time"
 msgstr "Error al establecer fecha y hora de caducidad"
 
 #: ../src/tls.c:425 ../src/tls.c:653
+#, c-format
 msgid "Error when setting basicConstraint extension"
 msgstr "Error al establecer extensión basicConstraint"
 
 #: ../src/tls.c:430 ../src/tls.c:674
+#, c-format
 msgid "Error when setting keyUsage extension"
 msgstr "Error al establecer extensión keyUsage"
 
 #: ../src/tls.c:441
+#, c-format
 msgid "Error when setting subject key identifier extension"
 msgstr "Error al establecer extensión identificadora de titular"
 
 #: ../src/tls.c:451
+#, c-format
 msgid "Error when signing self-signed certificate"
 msgstr "Error al firmar certificado autofirmado"
 
 #: ../src/tls.c:481
+#, c-format
 msgid "Error when initializing csr structure"
 msgstr "Error al inicializar estructura de solicitud"
 
 #: ../src/tls.c:485
+#, c-format
 msgid "Error when setting csr version"
 msgstr "Error al establecer versión de solicitud"
 
 #: ../src/tls.c:518
+#, c-format
 msgid "Error when signing self-signed csr"
 msgstr "Error al firmar solicitud autofirmada"
 
 #: ../src/tls.c:578
+#, c-format
 msgid "Error when initializing crt structure"
 msgstr "Error al inicializar estructura de solicitud"
 
 #: ../src/tls.c:586
+#, c-format
 msgid "Error when copying data from CSR to certificate structure"
 msgstr "Error al copiar datos de solicitud a la estructura del certificado"
 
 #: ../src/tls.c:704
+#, c-format
 msgid "Error when signing certificate"
 msgstr "Error al firmar certificado"
 
