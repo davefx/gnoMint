@@ -153,11 +153,11 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
 	gint errorcode;
 
         gchar *friendly_name;
-        guint friendly_name_size = 0;
+        size_t friendly_name_size = 0;
         
         gint ret, bag_index;
         gchar *pkcs12_struct = NULL;
-        guint pkcs12_struct_size = 0;
+        size_t pkcs12_struct_size = 0;
 
 
         /* First of all, we need to generate a PKCS8 structure holding the private key */
@@ -1185,7 +1185,7 @@ gchar * tls_generate_crl (GList * revoked_certs,
         GList *cursor = NULL;
 
         gchar *result = NULL;
-        guint result_size = 0;
+        size_t result_size = 0;
         
         gnutls_x509_crl_init (&crl);
         
@@ -1214,48 +1214,64 @@ gchar * tls_generate_crl (GList * revoked_certs,
                 gnutls_x509_crt_deinit (rcrt);
         }
 
-        fprintf (stderr, "Number of certificates in CRL: %d", gnutls_x509_crl_get_crt_count (crl));
+        fprintf (stderr, "Number of certificates in CRL: %d\n", gnutls_x509_crl_get_crt_count (crl));
         
-        if (gnutls_x509_crl_set_version (crl, crl_version))
+        if (gnutls_x509_crl_set_version (crl, 2)) {
+		fprintf (stderr, "Error setting version\n");
                 return NULL;
+	}
 
-        if (gnutls_x509_crl_set_this_update (crl, current_timestamp))
+        if (gnutls_x509_crl_set_this_update (crl, current_timestamp)) {
+		fprintf (stderr, "Error setting this update\n");
                 return NULL;
+	}
 
-        if (next_crl_timestamp)
-                if (gnutls_x509_crl_set_next_update (crl, next_crl_timestamp))
-                        return NULL;
+	if (! next_crl_timestamp) {
+		next_crl_timestamp = current_timestamp + 60*24;
+	}
+
+	if (gnutls_x509_crl_set_next_update (crl, next_crl_timestamp)) {
+		fprintf (stderr, "Error setting next update\n");
+		return NULL;
+	}
 
         gnutls_x509_crt_init (&ca_crt);
 
         pem_datum.data = ca_pem;
         pem_datum.size = strlen((gchar *)ca_pem);
         
-        if (gnutls_x509_crt_import (ca_crt, &pem_datum, GNUTLS_X509_FMT_PEM))
+        if (gnutls_x509_crt_import (ca_crt, &pem_datum, GNUTLS_X509_FMT_PEM)) {
+		fprintf (stderr, "Error importing ca_pem\n");
                 return NULL;
-        
+        }
+
         gnutls_x509_privkey_init (&ca_pkey);
 
         pem_datum.data = ca_private_key;
         pem_datum.size = strlen((gchar *) ca_private_key);
 
-        if (gnutls_x509_privkey_import (ca_pkey, &pem_datum, GNUTLS_X509_FMT_PEM))
+        if (gnutls_x509_privkey_import (ca_pkey, &pem_datum, GNUTLS_X509_FMT_PEM)) {
+		fprintf (stderr, "Error importing ca privkey\n");
                 return NULL;
+	}
         
-        if (gnutls_x509_crl_sign (crl, ca_crt, ca_pkey))
+        if (gnutls_x509_crl_sign (crl, ca_crt, ca_pkey)) {
+		fprintf (stderr, "Error signing CRL: %d\n", gnutls_x509_crl_sign (crl, ca_crt, ca_pkey));
                 return NULL;
-        
+        }
+
         gnutls_x509_privkey_deinit (ca_pkey);
         gnutls_x509_crt_deinit (ca_crt);
 
         result = g_new0 (gchar, 0);
-        if (gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, result, &result_size))
-                return NULL;
+        gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, result, &result_size);
         g_free (result);
 
         result = g_new0 (gchar, result_size);
-        if (gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, result, &result_size))
+        if (gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, result, &result_size)) {
+		fprintf (stderr, "Error exporting CRL pem\n");
                 return NULL;
+	}
         
         return result;
 }
