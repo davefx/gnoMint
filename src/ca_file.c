@@ -328,7 +328,7 @@ gboolean ca_file_check_and_update_version ()
 
                 if (sqlite3_exec (ca_db,
                                   "CREATE TABLE ca_crl (id INTEGER PRIMARY KEY, ca_id INTEGER, crl_version INTEGER, "
-                                  "date TIMESTAMP, UNIQUE (ca_id, version));",
+                                  "date TIMESTAMP, UNIQUE (ca_id, crl_version));",
                                   NULL, NULL, &error)) {
                         return FALSE;
                 }
