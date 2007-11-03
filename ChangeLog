@@ -1,3 +1,24 @@
+2007-11-01 22:00  davefx
+
+	* [r96] ChangeLog, NEWS, configure.in:
+	  Updating to version 0.3.1, prior to official release
+
+2007-11-01 21:07  davefx
+
+	* [r95] gui/gnomint.glade, src/ca.c, src/ca_file.c, src/ca_file.h,
+	  src/ca_policy.c, src/new_cert_creation_process.c,
+	  src/new_cert_window.c:
+	  * Fixing problem with certificates serial number: all the certs
+	  were being created with serial 0.
+	  
+	  * Allowing the definition of time between two CRL updates.
+
+2007-11-01 17:32  davefx
+
+	* [r94] ChangeLog, src/tls.c:
+	  Fixing CRL generation problems. Currently, the CRL expiration
+	  time is 1 day
+
 2007-07-30 18:38  davefx
 
 	* [r93] gui/gnomint.glade, po/es.po, po/gnomint.pot, src/ca.c,
