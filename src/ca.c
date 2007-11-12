@@ -1638,25 +1638,44 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 
 gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 {
-	GtkWidget *menu;
+	GtkWidget *menu, *widget;
 	GtkTreeView * tree_view =  GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
 	GdkEventButton *event_button = (GdkEventButton *) data;
-	GtkTreeIter *selection_iter;
+	GtkTreeIter *iter;
+	gboolean pk_indb, is_revoked;
 	gint selection_type;
 
-	selection_type  = __ca_selection_type (tree_view, &selection_iter);
+	selection_type  = __ca_selection_type (tree_view, &iter);
 	switch (selection_type) {
 		
 	case 1:
 		menu = glade_xml_get_widget (cert_popup_menu_xml,
 					     "certificate_popup_menu");
 		
+		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+				   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
+		
+		widget = glade_xml_get_widget (cert_popup_menu_xml, "extract_pkey_menuitem");
+		gtk_widget_set_sensitive (widget, pk_indb);
+		
+		widget = glade_xml_get_widget (cert_popup_menu_xml, "revoke_menuitem");
+		gtk_widget_set_sensitive (widget, (! is_revoked));
+
 		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
 				event_button->button, event_button->time);
 		return FALSE;
 	case 2:
 		menu = glade_xml_get_widget (csr_popup_menu_xml,
 					     "csr_popup_menu");
+
+		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+				   -1);
+		
+		widget = glade_xml_get_widget (csr_popup_menu_xml, "extract_pkey_menuitem3");
+		gtk_widget_set_sensitive (widget, pk_indb);
+		
 		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
 				event_button->button, event_button->time);
 		return FALSE;
