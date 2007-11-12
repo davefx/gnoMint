@@ -21,6 +21,7 @@
 #include <glade/glade.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +39,8 @@
 #include "new_cert_window.h"
 
 extern GladeXML * main_window_xml;
+extern GladeXML * cert_popup_menu_xml;
+extern GladeXML * csr_popup_menu_xml;
 extern sqlite3 * ca_db;
 
 GtkTreeStore * ca_model = NULL;
@@ -480,10 +483,12 @@ void __ca_csr_activated (GtkTreeView *tree_view,
 	free (valuebool);
 }
 
-void ca_treeview_row_activated (GtkTreeView *tree_view,
-				GtkTreePath *path,
-				GtkTreeViewColumn *column,
-				gpointer user_data)
+
+
+gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
+				    GtkTreePath *path,
+				    GtkTreeViewColumn *column,
+				    gpointer user_data)
 {
 	if (tree_view == NULL) {
                 GtkTreeSelection *selection;
@@ -493,7 +498,7 @@ void ca_treeview_row_activated (GtkTreeView *tree_view,
                 selection = gtk_tree_view_get_selection (tree_view);
 		
                 if (gtk_tree_selection_count_selected_rows (selection) != 1)
-                        return;
+                        return FALSE;
 		
                 gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
                 path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
@@ -513,6 +518,8 @@ void ca_treeview_row_activated (GtkTreeView *tree_view,
 		}
 	}
 	gtk_tree_path_free (parent);
+	
+	return FALSE;
 	
 }
 
@@ -633,8 +640,8 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	return 0;
 }
 
-void ca_treeview_selection_change (GtkTreeView *tree_view,
-				   gpointer user_data)
+gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
+				       gpointer user_data)
 {
 	GtkTreeIter *selection_iter;
 	switch (__ca_selection_type (tree_view, &selection_iter)) {
@@ -649,6 +656,8 @@ void ca_treeview_selection_change (GtkTreeView *tree_view,
 		__ca_deactivate_actions();
 		break;
 	}
+
+	return FALSE;
 }
 
 void __ca_error_dialog (gchar *message) {
@@ -1626,3 +1635,60 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 	
 	
 }
+
+gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
+{
+	GtkWidget *menu;
+	GtkTreeView * tree_view =  GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
+	GdkEventButton *event_button = (GdkEventButton *) data;
+	GtkTreeIter *selection_iter;
+	gint selection_type;
+
+	selection_type  = __ca_selection_type (tree_view, &selection_iter);
+	switch (selection_type) {
+		
+	case 1:
+		menu = glade_xml_get_widget (cert_popup_menu_xml,
+					     "certificate_popup_menu");
+		
+		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
+				event_button->button, event_button->time);
+		return FALSE;
+	case 2:
+		menu = glade_xml_get_widget (csr_popup_menu_xml,
+					     "csr_popup_menu");
+		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
+				event_button->button, event_button->time);
+		return FALSE;
+	default:
+	case 0:
+		return FALSE;
+	}
+
+}
+
+void ca_treeview_popup_timeout_program (GdkEventButton *event)
+{
+	g_timeout_add (1, ca_treeview_popup_timeout_program_cb, event); 
+
+}
+					
+
+gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
+				    GdkEvent *event, gpointer user_data)
+{
+	GdkEventButton *event_button;
+	
+	g_return_val_if_fail (event != NULL, FALSE);
+	
+	if (event->type == GDK_BUTTON_PRESS) {
+
+		event_button = (GdkEventButton *) event;
+		if (event_button->button == 3) {
+			ca_treeview_popup_timeout_program (event_button);
+		}
+	}
+	
+	return FALSE;
+}
+

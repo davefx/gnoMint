@@ -37,6 +37,8 @@ gchar * PACKAGE_AUTHORS[] = {
 };
 
 GladeXML * main_window_xml = NULL;
+GladeXML * csr_popup_menu_xml = NULL;
+GladeXML * cert_popup_menu_xml = NULL;
 
 gchar * gnomint_current_opened_file = NULL;
 gchar * gnomint_temp_created_file = NULL;
@@ -103,10 +105,14 @@ int main (int   argc,
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 
 	main_window_xml = glade_xml_new (xml_file, "main_window1", NULL);
+	cert_popup_menu_xml = glade_xml_new (xml_file, "certificate_popup_menu", NULL);
+	csr_popup_menu_xml = glade_xml_new (xml_file, "csr_popup_menu", NULL);
 
 	g_free (xml_file);
 
 	glade_xml_signal_autoconnect (main_window_xml);	       	
+	glade_xml_signal_autoconnect (cert_popup_menu_xml);	       	
+	glade_xml_signal_autoconnect (csr_popup_menu_xml);	       	
 
 	__disable_widget ("new_certificate1");
 	__disable_widget ("save_as1");

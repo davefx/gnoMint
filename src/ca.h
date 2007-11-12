@@ -25,7 +25,7 @@ gboolean ca_refresh_model ();
 void ca_todo_callback();
 gint ca_get_selected_row_id ();
 gchar * ca_get_selected_row_pem ();
-void ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
+gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
 gboolean ca_import (gchar *filename);
 
 #endif
