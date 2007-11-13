@@ -1,0 +1,23 @@
+1. Open program.
+2. Create a new database.
+3. Create 5 CSRs.
+4. Sign CSR 1 => Cert serial 2.
+5. Sign CSR 2 => Cert serial 3.
+5. Sign CSR 3 => Cert serial 4.
+6. Close and open the database.
+7. Export public part of CSR 3. Check it with openssl.
+8. Export private part (with password) of CSR 3. Check it with openssl.
+9. Export private part (without password) of CSR 3. Check it with openssl.
+10. Delete CSR 3.
+11. Import CSR 3.
+12. See CSR 3 properties.
+13. Delete CSR 3.
+14. See Cert 1 properties
+15. See Cert 2 properties
+16. Export public part of Cert 2. Check it with openssl.
+17. Export private part (with password) of Cert 2. Check it with openssl.
+18. Export private part (without password) of Cert 2. Check it with openssl.
+19. Export both parts of Cert 2. Check it with openssl.
+20. Revoke cert 3.
+21. Revoke cert 4.
+22. Generate CRL. Check it with openssl.
