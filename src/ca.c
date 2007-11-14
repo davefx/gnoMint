@@ -1831,11 +1831,11 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
 	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
 
-	widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
-	gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
 	
 	do {
 
+		widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+		gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
 		response = gtk_dialog_run(GTK_DIALOG(widget)); 
 		
 		if (!response || response == GTK_RESPONSE_CANCEL) {
@@ -1852,9 +1852,12 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 
 		repeat = (ca_file_is_password_protected() && ! ca_file_check_password (currpwd));
 		
-		if (repeat)
-			ca_error_dialog (_("The password you have entered as <i>current password</i> "
-					   "doesn't match with the current database password."));
+		if (repeat) {
+			ca_error_dialog (_("The current password you have entered  "
+					   "doesn't match with the actual current database password."));
+			widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+			gtk_widget_grab_focus (widget);
+		} 
 
 	} while (repeat);
 	

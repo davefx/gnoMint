@@ -144,7 +144,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		g_free (hashed_pwd);				       
 	} else  {
 
-		sql = sqlite3_mprintf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_is_password_protected', 0);");
+		sql = sqlite3_mprintf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_is_password_protected', '0');");
 
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 			return error;
@@ -405,6 +405,9 @@ gboolean ca_file_check_and_update_version ()
 
 gboolean ca_file_open (gchar *file_name)
 {
+	if (! g_file_test(file_name, G_FILE_TEST_EXISTS))
+		return FALSE;
+
 	if (sqlite3_open(file_name, &ca_db)) {
 		g_printerr ("%s\n\n", sqlite3_errmsg(ca_db));
 		return FALSE;
@@ -787,8 +790,14 @@ void ca_file_rollback_new_crl_transaction ()
 
 gboolean ca_file_is_password_protected()
 {
-	gchar **result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_is_password_protected';");
-	gboolean res = ((result != NULL) && (strcmp(result[0], "0")));
+	gchar **result; 
+	gboolean res;
+
+	if (! ca_db)
+		return FALSE;
+	
+	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_is_password_protected';");
+	res = ((result != NULL) && (strcmp(result[0], "0")));
 	
 	if (result)
 		g_strfreev (result);
@@ -800,7 +809,7 @@ gboolean ca_file_check_password (const gchar *password)
 {
 	gchar **result;
 	gboolean res;
-	
+
 	if (! ca_file_is_password_protected())
 		return FALSE;
 
@@ -940,6 +949,23 @@ gboolean ca_file_password_protect(const gchar *new_password)
 	
 	pwd_change.new_password = new_password;
 
+	if (sqlite3_exec (ca_db, "UPDATE ca_properties SET value='1' WHERE name='ca_db_is_password_protected';", 
+			  NULL, NULL, &error)) {
+		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
+		return FALSE;
+	}	
+
+	hashed_pwd = pkey_cipher_encrypt_password (new_password);
+	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_db_hashed_password';",
+			       hashed_pwd);
+	g_free (hashed_pwd);
+
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+		sqlite3_free (sql);
+		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
+		return FALSE;
+	}
+
 	pwd_change.table = "certificates";
 	if (sqlite3_exec (ca_db, "SELECT id, private_key_in_db, private_key, dn FROM certificates",
 			  __ca_file_password_protect_cb, &pwd_change, &error)){
@@ -954,24 +980,7 @@ gboolean ca_file_password_protect(const gchar *new_password)
 		return FALSE;
 	}
 
-	if (sqlite3_exec (ca_db, "UPDATE ca_properties SET value='1' WHERE name='ca_db_is_password_protected';", 
-			  NULL, NULL, &error)) {
-		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
-		return FALSE;
-	}	
-
-	hashed_pwd = pkey_cipher_encrypt_password (new_password);
-	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_db_hashed_password';",
-			       hashed_pwd);
-	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
-		sqlite3_free (sql);
-		g_free (hashed_pwd);
-		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
-		return FALSE;
-	}
-
 	sqlite3_free (sql);
-	g_free (hashed_pwd);
 
 	sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error);	
 
