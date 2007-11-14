@@ -5,6 +5,8 @@
   <widget class="GtkWindow" id="main_window1">
     <property name="visible">True</property>
     <property name="title">gnoMint</property>
+    <property name="startup_id">gnoMint_main</property>
+    <property name="role">gnoMint_main</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
@@ -83,7 +85,7 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="menuitem4">
+                      <widget class="GtkMenuItem" id="generate_crl_menuitem">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="tooltip" translatable="yes">Generate the current Certificate Revocation List</property>
@@ -93,7 +95,21 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator2">
+                      <widget class="GtkSeparatorMenuItem" id="separator3">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="change_pwd_menuitem">
+                        <property name="visible">True</property>
+                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">Change Pass_word</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="ca_on_change_pwd_menuitem_activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator5">
                         <property name="visible">True</property>
                       </widget>
                     </child>
@@ -663,13 +679,13 @@ Common Name (CN):</property>
           </packing>
         </child>
         <child>
-          <widget class="GtkVBox" id="vbox3">
+          <widget class="GtkVBox" id="vbox20">
             <property name="visible">True</property>
             <child>
-              <widget class="GtkHBox" id="hbox2">
+              <widget class="GtkHBox" id="hbox21">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="label13">
+                  <widget class="GtkLabel" id="label37">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
@@ -683,7 +699,7 @@ Common Name (CN):</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label14">
+                  <widget class="GtkLabel" id="label103">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
@@ -708,48 +724,28 @@ Common Name (CN):</property>
                 <property name="n_columns">2</property>
                 <property name="homogeneous">True</property>
                 <child>
-                  <widget class="GtkSpinButton" id="months_before_expiration_spinbutton">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="adjustment">240 1 600 1 12 12</property>
-                    <property name="climb_rate">1</property>
-                    <property name="numeric">True</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                    <property name="y_options"></property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label27">
+                  <widget class="GtkLabel" id="label17">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Months before root certificate expiration:</property>
+                    <property name="label" translatable="yes">Private key type:</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkSpinButton" id="keylength_spinbutton">
+                  <widget class="GtkLabel" id="label21">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="adjustment">2048 1024 4096 1024 1024 1024</property>
-                    <property name="climb_rate">1024</property>
-                    <property name="numeric">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes">Private key bit length:</property>
                   </widget>
                   <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
                     <property name="top_attach">1</property>
                     <property name="bottom_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
                     <property name="y_options"></property>
                   </packing>
                 </child>
@@ -778,7 +774,6 @@ Common Name (CN):</property>
                         <property name="label" translatable="yes">DSA</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
-                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
                       </widget>
@@ -797,28 +792,48 @@ Common Name (CN):</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label21">
+                  <widget class="GtkSpinButton" id="keylength_spinbutton">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="adjustment">2048 1024 4096 1024 1024 1024</property>
+                    <property name="climb_rate">1024</property>
+                    <property name="numeric">True</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                    <property name="y_options"></property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label27">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Private key bit length:</property>
+                    <property name="label" translatable="yes">Months before root certificate expiration:</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label17">
+                  <widget class="GtkSpinButton" id="months_before_expiration_spinbutton">
                     <property name="visible">True</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Private key type:</property>
+                    <property name="can_focus">True</property>
+                    <property name="adjustment">240 1 600 1 12 12</property>
+                    <property name="climb_rate">1</property>
+                    <property name="numeric">True</property>
                   </widget>
                   <packing>
-                    <property name="x_options">GTK_FILL</property>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="y_options"></property>
                   </packing>
                 </child>
@@ -828,12 +843,12 @@ Common Name (CN):</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkHButtonBox" id="hbuttonbox4">
+              <widget class="GtkHButtonBox" id="hbuttonbox12">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
                 <property name="layout_style">GTK_BUTTONBOX_END</property>
                 <child>
-                  <widget class="GtkButton" id="button12">
+                  <widget class="GtkButton" id="button8">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
@@ -871,14 +886,14 @@ Common Name (CN):</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkButton" id="new_cert_ca_commit">
+                  <widget class="GtkButton" id="new_cert_ca_next2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-ok</property>
+                    <property name="label">gtk-media-next</property>
                     <property name="use_stock">True</property>
                     <property name="response_id">0</property>
-                    <signal name="clicked" handler="on_new_cert_ca_commit_clicked"/>
+                    <signal name="clicked" handler="on_new_cert_ca_next2_clicked"/>
                   </widget>
                   <packing>
                     <property name="position">3</property>
@@ -905,6 +920,251 @@ Common Name (CN):</property>
           <packing>
             <property name="type">tab</property>
             <property name="position">1</property>
+            <property name="tab_fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkVBox" id="vbox3">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkHBox" id="hbox2">
+                <property name="visible">True</property>
+                <child>
+                  <widget class="GtkLabel" id="label13">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes">&lt;big&gt;Password protection&lt;/big&gt;
+</property>
+                    <property name="use_markup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label14">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes"> </property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkTable" id="table17">
+                <property name="visible">True</property>
+                <property name="border_width">6</property>
+                <property name="n_rows">3</property>
+                <property name="n_columns">2</property>
+                <property name="homogeneous">True</property>
+                <child>
+                  <widget class="GtkLabel" id="label107">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes">Protect CA database private keys
+with password:</property>
+                  </widget>
+                  <packing>
+                    <property name="x_options">GTK_FILL</property>
+                    <property name="y_options"></property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="new_cert_ca_pwd_label_1">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes">Please, enter password:</property>
+                  </widget>
+                  <packing>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
+                    <property name="y_options"></property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkHBox" id="hbox23">
+                    <property name="visible">True</property>
+                    <property name="homogeneous">True</property>
+                    <child>
+                      <widget class="GtkRadioButton" id="new_cert_ca_pwd_protect_yes_radiobutton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">_Yes</property>
+                        <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
+                        <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_ca_pwd_protect_radiobutton_toggled"/>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioButton" id="new_cert_ca_pwd_protect_no_radiobutton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">_No</property>
+                        <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
+                        <property name="draw_indicator">True</property>
+                        <property name="group">new_cert_ca_pwd_protect_yes_radiobutton</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
+                    <property name="y_options"></property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="new_cert_ca_pwd_label_2">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes">Enter password again for confirmation:</property>
+                  </widget>
+                  <packing>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
+                    <property name="x_options">GTK_FILL</property>
+                    <property name="y_options"></property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkEntry" id="new_cert_ca_pwd_entry_1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="visibility">False</property>
+                    <signal name="changed" handler="on_new_cert_ca_pwd_entry_changed"/>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkEntry" id="new_cert_ca_pwd_entry_2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="visibility">False</property>
+                    <signal name="changed" handler="on_new_cert_ca_pwd_entry_changed"/>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkHButtonBox" id="hbuttonbox4">
+                <property name="visible">True</property>
+                <property name="spacing">12</property>
+                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <child>
+                  <widget class="GtkButton" id="button12">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="can_default">True</property>
+                    <property name="label">gtk-help</property>
+                    <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="new_cert_ca_cancel3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="can_default">True</property>
+                    <property name="label">gtk-cancel</property>
+                    <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
+                    <signal name="clicked" handler="on_new_cert_ca_cancel_clicked"/>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="new_cert_ca_previous3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="can_default">True</property>
+                    <property name="label">gtk-media-previous</property>
+                    <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
+                    <signal name="clicked" handler="on_new_cert_ca_previous3_clicked"/>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="new_cert_ca_commit">
+                    <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can_focus">True</property>
+                    <property name="can_default">True</property>
+                    <property name="label">gtk-ok</property>
+                    <property name="use_stock">True</property>
+                    <property name="response_id">0</property>
+                    <signal name="clicked" handler="on_new_cert_ca_commit_clicked"/>
+                  </widget>
+                  <packing>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkLabel" id="label18">
+            <property name="visible">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="label" translatable="yes">Password protect</property>
+          </widget>
+          <packing>
+            <property name="type">tab</property>
+            <property name="position">2</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>
@@ -4848,6 +5108,343 @@ each time the CSR will be used</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_delete2_activate"/>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkDialog" id="get_db_password_dialog">
+    <property name="modal">True</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="has_separator">False</property>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox4">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkVBox" id="vbox24">
+            <property name="visible">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="border_width">20</property>
+            <child>
+              <widget class="GtkLabel" id="info_message2">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="yalign">0</property>
+                <property name="label" translatable="yes">This action requires using one or more private keys saved in the CA database.
+
+Please insert the database password.</property>
+                <property name="use_markup">True</property>
+                <property name="justify">GTK_JUSTIFY_FILL</property>
+                <property name="wrap">True</property>
+              </widget>
+              <packing>
+                <property name="padding">25</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkHBox" id="hbox24">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <child>
+                  <widget class="GtkImage" id="image1">
+                    <property name="visible">True</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="icon_size">6</property>
+                    <property name="icon_name">dialog-password</property>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="password_message2">
+                    <property name="visible">True</property>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">Password:</property>
+                    <property name="use_markup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkEntry" id="cadb_password_entry">
+                    <property name="visible">True</property>
+                    <property name="has_focus">True</property>
+                    <property name="is_focus">True</property>
+                    <property name="can_default">True</property>
+                    <property name="visibility">False</property>
+                    <property name="activates_default">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">50</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkCheckButton" id="remember_password_checkbutton">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">Remember this password during this
+gnoMint session</property>
+                <property name="focus_on_click">False</property>
+                <property name="xalign">0</property>
+                <property name="response_id">0</property>
+                <property name="draw_indicator">True</property>
+              </widget>
+              <packing>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area4">
+            <property name="visible">True</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <child>
+              <widget class="GtkButton" id="button11">
+                <property name="visible">True</property>
+                <property name="label">gtk-cancel</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">0</property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkButton" id="cadb_password_dialog_ok_button">
+                <property name="visible">True</property>
+                <property name="has_focus">True</property>
+                <property name="label">gtk-ok</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">1</property>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">GTK_PACK_END</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkDialog" id="change_password_dialog">
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <property name="border_width">5</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="has_separator">False</property>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox5">
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="spacing">2</property>
+        <child>
+          <widget class="GtkTable" id="table20">
+            <property name="visible">True</property>
+            <property name="border_width">20</property>
+            <property name="n_rows">4</property>
+            <property name="n_columns">2</property>
+            <property name="column_spacing">10</property>
+            <property name="row_spacing">10</property>
+            <child>
+              <widget class="GtkEntry" id="ca_changepwd_current_pwd_entry">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="visibility">False</property>
+                <signal name="changed" handler="ca_changepwd_newpwd_entry_changed"/>
+              </widget>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="ca_changepwd_label1">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="yalign">0</property>
+                <property name="label" translatable="yes">Please, enter current
+password:</property>
+                <property name="wrap">True</property>
+              </widget>
+              <packing>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options"></property>
+                <property name="y_padding">15</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="ca_changepwd_label2">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">Please, enter new 
+password:</property>
+                <property name="wrap">True</property>
+              </widget>
+              <packing>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options"></property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkEntry" id="ca_changepwd_newpwd_entry1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="visibility">False</property>
+                <signal name="changed" handler="ca_changepwd_newpwd_entry_changed"/>
+              </widget>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkEntry" id="ca_changepwd_newpwd_entry2">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="visibility">False</property>
+                <signal name="changed" handler="ca_changepwd_newpwd_entry_changed"/>
+              </widget>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="ca_changepwd_label3">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">Enter new password again 
+for confirmation:</property>
+                <property name="wrap">True</property>
+                <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
+              </widget>
+              <packing>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options"></property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="label109">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="yalign">0</property>
+                <property name="label" translatable="yes">Protect CA database private 
+keys with password:</property>
+                <property name="wrap">True</property>
+              </widget>
+              <packing>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options"></property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkHBox" id="hbox26">
+                <property name="visible">True</property>
+                <property name="homogeneous">True</property>
+                <child>
+                  <widget class="GtkRadioButton" id="ca_changepwd_pwd_protect_yes_radiobutton">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="label" translatable="yes">_Yes</property>
+                    <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
+                    <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="ca_changepwd_pwd_protect_radiobutton_toggled"/>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkRadioButton" id="ca_changepwd_pwd_protect_no_radiobutton">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="label" translatable="yes">_No</property>
+                    <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">ca_changepwd_pwd_protect_yes_radiobutton</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options"></property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area5">
+            <property name="visible">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <child>
+              <widget class="GtkButton" id="ca_changepwd_cancel_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">0</property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkButton" id="ca_changepwd_commit_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">1</property>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">GTK_PACK_END</property>
+          </packing>
+        </child>
       </widget>
     </child>
   </widget>

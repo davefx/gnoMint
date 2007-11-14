@@ -1,0 +1,12 @@
+* ca_db_version        
+  Version of the DB.
+* ca_root_certificate_pem
+  Public certificate of the Root CA 
+  (will change when gnoMint supports several Root CAs).
+* ca_root_last_assigned_serial
+  Last assigned certificate serial of the Root CA 
+  (will change when gnoMint supports several Root CAs).
+* ca_db_is_password_protected
+  1 if the DB is password protected, else 0.
+* ca_db_hashed_password
+  AES ciphered salted password

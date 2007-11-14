@@ -45,7 +45,7 @@ gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 		return g_strdup_printf(_("Error initializing private key structure."));
 	}
 
-	/* Generate a 1024 bit RSA private key. */
+	/* Generate a RSA private key. */
 	if (gnutls_x509_privkey_generate ((** key), GNUTLS_PK_RSA, creation_data->key_bitlength, 0) < 0) {
 		return g_strdup_printf(_("Error creating private key."));
 	}
@@ -77,7 +77,7 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 		return g_strdup_printf(_("Error initializing private key structure."));
 	}
 
-	/* Generate a 1024 bit RSA private key. */
+	/* Generate DSA private key. */
 	if (gnutls_x509_privkey_generate ((** key), GNUTLS_PK_DSA, creation_data->key_bitlength, 0) < 0) {
 		return g_strdup_printf(_("Error creating private key."));
 	}
@@ -526,7 +526,7 @@ gchar * tls_generate_csr (CaCreationData * creation_data,
 	/* Save the private key to a PEM format */
 	(* csr) = g_new0 (gchar, csr_len);	
 	if (gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, (* csr), &csr_len) < 0) {
-		return g_strdup_printf(_("Error exporting private key to PEM structure."));
+		return g_strdup_printf(_("Error exporting CSR to PEM structure."));
 	}
 
 	gnutls_x509_crq_deinit (crq);

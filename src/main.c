@@ -123,6 +123,11 @@ int main (int   argc,
 	if (argc >= 2)
 		ca_open (g_strdup(argv[1]));
 
+/* 	printf("In: %s\nOut: %s\nInOutIn: %s\n", */
+/* 	       "lala",  */
+/* 	       pkey_cipher_aes_encrypt("lala","pedokakafeoauiuilosotatamicobbbb1234"),  */
+/* 	       pkey_cipher_aes_decrypt(pkey_cipher_aes_encrypt("lala","pedokakafeoauiuilosotatamicobbbb1234"), "pedokakafeoauiuilosotatamicobbbb1234")); */
+
 	gtk_main ();
 
 	return 0;

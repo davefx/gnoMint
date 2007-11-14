@@ -20,6 +20,7 @@
 #include "ca_creation.h"
 #include "ca_file.h"
 #include "tls.h"
+#include "pkey_cipher.h"
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
@@ -48,6 +49,7 @@ gpointer ca_creation_thread (gpointer data)
 	gnutls_x509_privkey_t * ca_key = NULL;
 	gchar * root_certificate = NULL;
 	gchar * error_message = NULL;
+	
 
 	switch (creation_data->key_type){
 	case 0: /* RSA */
@@ -66,6 +68,7 @@ gpointer ca_creation_thread (gpointer data)
 
 			g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
+			ca_creation_data_free (creation_data);
 			return NULL;
 			// return error_message;
 		}
@@ -91,6 +94,7 @@ gpointer ca_creation_thread (gpointer data)
 
 
  			//return error_message; 
+			ca_creation_data_free (creation_data);
 			return NULL;
  		} 
 
@@ -113,12 +117,15 @@ gpointer ca_creation_thread (gpointer data)
 
 		g_free (error_message);
  		//return error_message; 
+		ca_creation_data_free (creation_data);
 		return NULL;
  	} 
 
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Creating CA database");
 	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+
+	pkey_cipher_crypt_auto (creation_data, &private_key, root_certificate);
 
 	error_message = ca_creation_database_save (creation_data, private_key, root_certificate);
 	if (error_message) {
@@ -130,6 +137,7 @@ gpointer ca_creation_thread (gpointer data)
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 		
 		g_free (error_message);
+		ca_creation_data_free (creation_data);
 
 		return NULL;
 	}
@@ -146,9 +154,10 @@ gpointer ca_creation_thread (gpointer data)
 		g_free (ca_key);
 	}
 
+	ca_creation_data_free (creation_data);
+
 	return NULL;
 	
-
 }
 
 
@@ -183,10 +192,32 @@ gchar * ca_creation_get_thread_message()
 }
 
 gchar * ca_creation_database_save (CaCreationData * creation_data, 
-				gchar * private_key, 
-				gchar * root_certificate)
+				   gchar * private_key, 
+				   gchar * root_certificate)
 {
 	return ca_file_create (creation_data, 
 			       private_key,
 			       root_certificate);
 }
+
+void ca_creation_data_free (CaCreationData *cd)
+{
+	if (cd->country)
+		g_free (cd->country);
+	if (cd->state)
+		g_free (cd->state);
+	if (cd->city)
+		g_free (cd->city);
+	if (cd->org)
+		g_free (cd->org);
+	if (cd->ou)
+		g_free (cd->ou);
+	if (cd->cn)
+		g_free (cd->cn);
+	if (cd->emailAddress)
+		g_free (cd->emailAddress);
+	if (cd->password)
+		g_free (cd->password);
+	g_free (cd);
+}
+

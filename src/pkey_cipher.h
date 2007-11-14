@@ -17,9 +17,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CERTIFICATE_PROPERTIES_H_
-#define _CERTIFICATE_PROPERTIES_H_
+#ifndef _PKEY_CIPHER_H_
+#define _PKEY_CIPHER_H_
 
-void certificate_properties_display (const char *, gboolean, gboolean);
+void pkey_cipher_crypt_auto (CaCreationData *creation_data,
+			     gchar **pem_private_key,
+			     const gchar *pem_root_certificate);
+
+gchar * pkey_cipher_crypt   (const gchar *pem_private_key, const gchar *dn);
+gchar * pkey_cipher_uncrypt (const gchar *pem_private_key, const gchar *dn);
+gchar * pkey_cipher_ask_password ();
+gchar * pkey_cipher_crypt_w_pwd   (const gchar *pem_private_key, const gchar *dn, const gchar *pwd);
+gchar * pkey_cipher_uncrypt_w_pwd (const gchar *pem_private_key, const gchar *dn, const gchar *pwd);
+
+gchar * pkey_cipher_encrypt_password (const gchar *pwd);
+gboolean pkey_cipher_check_password (const gchar *checking_password, const gchar *hashed_password);
 
 #endif

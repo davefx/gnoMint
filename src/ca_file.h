@@ -24,8 +24,8 @@
 #include "ca_creation.h"
 
 gchar * ca_file_create (CaCreationData * creation_data, 
-				  gchar *pem_ca_private_key,
-				  gchar *pem_ca_certificate);
+			gchar *pem_ca_private_key,
+			gchar *pem_ca_certificate);
 
 gboolean ca_file_open (gchar *file_name);
 
@@ -61,5 +61,10 @@ gint ca_file_begin_new_crl_transaction (gint ca_id, time_t timestamp);
 void ca_file_commit_new_crl_transaction ();
 void ca_file_rollback_new_crl_transaction ();
 
+gboolean ca_file_is_password_protected();
+gboolean ca_file_check_password (const gchar *password);
+gboolean ca_file_password_unprotect(const gchar *old_password);
+gboolean ca_file_password_protect(const gchar *new_password);
+gboolean ca_file_password_change(const gchar *old_password, const gchar *new_password);
 
 #endif

@@ -37,6 +37,7 @@
 #include "csr_properties.h"
 #include "tls.h"
 #include "new_cert_window.h"
+#include "pkey_cipher.h"
 
 extern GladeXML * main_window_xml;
 extern GladeXML * cert_popup_menu_xml;
@@ -449,18 +450,22 @@ void __ca_certificate_activated (GtkTreeView *tree_view,
                                  gpointer user_data)
 {	
 	GValue * valuestr = g_new0 (GValue, 1);
-	GValue * valuebool = g_new0 (GValue, 1);
+	GValue * value_pkey_in_db = g_new0 (GValue, 1);
+	GValue * value_is_ca = g_new0 (GValue, 1);
 	GtkTreeIter iter;
 	GtkTreeModel * tree_model = gtk_tree_view_get_model (tree_view);
 	
 	gtk_tree_model_get_iter (tree_model, &iter, path);
 	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PEM, valuestr);	
-	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, valuebool);	
+	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, value_pkey_in_db);	
+	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_IS_CA, value_is_ca);	
 
-	certificate_properties_display (g_value_get_string(valuestr), g_value_get_boolean(valuebool));
+	certificate_properties_display (g_value_get_string(valuestr), g_value_get_boolean(value_pkey_in_db),
+					g_value_get_boolean (value_is_ca));
 
-	free (valuestr);
-	free (valuebool);
+	g_free (valuestr);
+	g_free (value_pkey_in_db);
+	g_free (value_is_ca);
 }
 
 void __ca_csr_activated (GtkTreeView *tree_view,
@@ -660,7 +665,7 @@ gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 	return FALSE;
 }
 
-void __ca_error_dialog (gchar *message) {
+void ca_error_dialog (gchar *message) {
         GtkWidget *dialog, *widget;
    
         widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -714,9 +719,9 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 		if (error) {
 			gtk_widget_destroy (GTK_WIDGET(dialog));
 			if (type == 1)
-				__ca_error_dialog (_("There was an error while exporting certificate."));
+				ca_error_dialog (_("There was an error while exporting certificate."));
 			else
-				__ca_error_dialog (_("There was an error while exporting CSR."));
+				ca_error_dialog (_("There was an error while exporting CSR."));
 			return;
 		} 
 
@@ -725,9 +730,9 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                 if (error) {
                         gtk_widget_destroy (GTK_WIDGET(dialog));
                         if (type == 1)
-                                __ca_error_dialog (_("There was an error while exporting certificate."));
+                                ca_error_dialog (_("There was an error while exporting certificate."));
                         else
-                                __ca_error_dialog (_("There was an error while exporting CSR."));
+                                ca_error_dialog (_("There was an error while exporting CSR."));
                         return;
                 } 
 
@@ -735,9 +740,9 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                 if (error) {
                         gtk_widget_destroy (GTK_WIDGET(dialog));
                         if (type == 1)
-                                __ca_error_dialog (_("There was an error while exporting certificate."));
+                                ca_error_dialog (_("There was an error while exporting certificate."));
                         else
-                                __ca_error_dialog (_("There was an error while exporting CSR."));
+                                ca_error_dialog (_("There was an error while exporting CSR."));
                         return;
                 } 
 
@@ -817,7 +822,7 @@ gchar * ca_dialog_get_password (gchar *info_message,
 		}
 		
 		if (strcmp (password, passwordagain)) {
-			__ca_error_dialog (distinct_error_message);
+			ca_error_dialog (distinct_error_message);
 		}
 
 	} while (strcmp (password, passwordagain));
@@ -852,7 +857,8 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 	gint id;
-	gchar ** privatekey = NULL;
+	gchar ** aux = NULL;
+	gchar * privatekey = NULL;
 	gchar * pem = NULL;
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -874,6 +880,33 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 	
+	
+	file = g_io_channel_new_file (filename, "w", &error);
+	g_free (filename);
+	if (error) {
+		ca_error_dialog (_("There was an error while exporting private key."));
+		g_free (password);
+		return;
+	} 
+	
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
+	if (type == 1)
+		aux = ca_file_get_single_row ("SELECT private_key,dn FROM certificates WHERE id=%d", id);
+	else
+		aux = ca_file_get_single_row ("SELECT private_key,dn FROM cert_requests WHERE id=%d", id);
+		
+	
+	if (!aux) {
+		ca_error_dialog (_("There was an error while getting private key."));
+		return;
+	}
+
+	privatekey = pkey_cipher_uncrypt (aux[0], aux[1]);
+	if (! privatekey) {
+		g_free (filename);
+		return;
+	}
+	
 	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
 					     "so nobody else but authorized people can use it. This passphrase will be asked "
 					     "by any application that will make use of the private key."),
@@ -881,42 +914,23 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 					   _("The introduced passphrases are distinct."), 8);
 	if (! password) {
 		g_free (filename);
+		g_free (privatekey);
 		return;
 	}
-	
-	file = g_io_channel_new_file (filename, "w", &error);
-	g_free (filename);
-	if (error) {
-		__ca_error_dialog (_("There was an error while exporting private key."));
-		g_free (password);
-		return;
-	} 
-	
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	if (type == 1)
-		privatekey = ca_file_get_single_row ("SELECT private_key FROM certificates WHERE id=%d", id);
-	else
-		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id=%d", id);
-		
-	
-	if (!privatekey) {
-		__ca_error_dialog (_("There was an error while getting private key."));
-		g_free (password);
-		return;
-	}
-	
-	pem = tls_generate_pkcs8_encrypted_private_key (privatekey[0], password); 
+
+	pem = tls_generate_pkcs8_encrypted_private_key (privatekey, password); 
 	g_free (password);
-	g_strfreev (privatekey);
+	g_free (privatekey);
+	g_strfreev (aux);
 	
 	if (!pem) {
-		__ca_error_dialog (_("There was an error while password-protecting private key."));
+		ca_error_dialog (_("There was an error while password-protecting private key."));
 		return;
 	}
 	
 	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting private key."));
+		ca_error_dialog (_("There was an error while exporting private key."));
 		return;
 	} 
 	g_free (pem);
@@ -924,7 +938,7 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting private key."));
+		ca_error_dialog (_("There was an error while exporting private key."));
 		g_io_channel_unref (file);
 		return;
 	} 
@@ -954,7 +968,7 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 	gint id;
-	gchar ** privatekey = NULL;
+	gchar ** aux = NULL;
 	gchar * pem = NULL;
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -979,33 +993,33 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	file = g_io_channel_new_file (filename, "w", &error);
 	g_free (filename);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting private key."));
+		ca_error_dialog (_("There was an error while exporting private key."));
 		return;
 	} 
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
 	if (type == 1)
-		privatekey = ca_file_get_single_row ("SELECT private_key FROM certificates WHERE id=%d", id);
+		aux = ca_file_get_single_row ("SELECT private_key,dn FROM certificates WHERE id=%d", id);
 	else
-		privatekey = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id=%d", id);
+		aux = ca_file_get_single_row ("SELECT private_key,dn FROM cert_requests WHERE id=%d", id);
 		
 	
-	if (!privatekey) {
-		__ca_error_dialog (_("There was an error while getting private key."));
+	if (!aux) {
+		ca_error_dialog (_("There was an error while getting private key."));
 		return;
 	}
 	
-	pem = g_strdup (privatekey[0]);
-	g_strfreev (privatekey);
+	pem =  pkey_cipher_uncrypt (aux[0], aux[1]);
+	g_strfreev (aux);
 	
 	if (!pem) {
-		__ca_error_dialog (_("There was an error while password-protecting private key."));
+		ca_error_dialog (_("There was an error while decrypting private key."));
 		return;
 	}
 	
 	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting private key."));
+		ca_error_dialog (_("There was an error while exporting private key."));
 		return;
 	} 
 	g_free (pem);
@@ -1013,7 +1027,7 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting private key."));
+		ca_error_dialog (_("There was an error while exporting private key."));
 		g_io_channel_unref (file);
 		return;
 	} 
@@ -1044,7 +1058,8 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 	gint id;
-	gchar ** privatekey = NULL;
+	gchar ** aux = NULL;
+	gchar * privatekey = NULL;
         gnutls_datum_t * pkcs12_datum = NULL;
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -1066,7 +1081,30 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 
 	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
 	gtk_widget_destroy (GTK_WIDGET(dialog));
+
+
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
+
+	if (type == 1)
+		aux = ca_file_get_single_row ("SELECT private_key, pem, dn FROM certificates WHERE id=%d", id);
+	else
+                aux = NULL;
+		
 	
+	if (! aux) {
+		ca_error_dialog (_("There was an error while getting the certificate and private key from the internal database."));
+		g_free (filename);
+		return;
+	}
+	
+	privatekey = pkey_cipher_uncrypt (aux[0], aux[2]);
+	if (! privatekey) {
+		ca_error_dialog (_("There was an error while getting the certificate and private key from the internal database."));
+		g_free (filename);
+		g_strfreev (aux);
+		return;
+	}
+
 	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported certificate, "
 					     "so nobody else but authorized people can use it. This passphrase will be asked "
 					     "by any application that will import the certificate."),
@@ -1074,44 +1112,34 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 					   _("The introduced passphrases are distinct."), 8);
 	if (! password) {
 		g_free (filename);
+		g_strfreev (aux);
+		g_free (privatekey);
+		return;
+	}
+			
+	pkcs12_datum = tls_generate_pkcs12 (aux[1], privatekey, password); 
+	g_free (password);
+	g_free (privatekey);
+	g_strfreev (aux);
+	
+	
+	if (!pkcs12_datum) {
+		ca_error_dialog (_("There was an error while generating the PKCS#12 package."));
 		return;
 	}
 	
 	file = g_io_channel_new_file (filename, "w", &error);
 	g_free (filename);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting certificate."));
-		g_free (password);
+		ca_error_dialog (_("There was an error while exporting certificate."));
 		return;
 	} 
-	
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	if (type == 1)
-		privatekey = ca_file_get_single_row ("SELECT private_key, pem FROM certificates WHERE id=%d", id);
-	else
-                privatekey = NULL;
-		
-	
-	if (!privatekey) {
-		__ca_error_dialog (_("There was an error while getting the certificate and private key from the internal database."));
-		g_free (password);
-		return;
-	}
-	
-	pkcs12_datum = tls_generate_pkcs12 (privatekey[1], privatekey[0], password); 
-	g_free (password);
-	g_strfreev (privatekey);
-	
-	if (!pkcs12_datum) {
-		__ca_error_dialog (_("There was an error while generating the PKCS#12 package."));
-		return;
-	}
-	
+
         g_io_channel_set_encoding (file, NULL, NULL);
 
 	g_io_channel_write_chars (file, (gchar *) pkcs12_datum->data, pkcs12_datum->size, NULL, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting the certificate."));
+		ca_error_dialog (_("There was an error while exporting the certificate."));
                 g_free (pkcs12_datum->data);
                 g_free (pkcs12_datum);
 		return;
@@ -1122,7 +1150,7 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 	
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting the certificate."));
+		ca_error_dialog (_("There was an error while exporting the certificate."));
 		g_io_channel_unref (file);
 		return;
 	} 
@@ -1239,12 +1267,12 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	
 	gtk_widget_destroy (widget);
 	g_object_unref (G_OBJECT(dialog_xml));
-	__ca_error_dialog (_("Unexpected error"));
+	ca_error_dialog (_("Unexpected error"));
 }
 
 void ca_todo_callback ()
 {
-	__ca_error_dialog (_("To do. Feature not implemented yet."));
+	ca_error_dialog (_("To do. Feature not implemented yet."));
 }
 
 
@@ -1279,7 +1307,7 @@ void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
         errmsg = ca_file_revoke_crt (id);
 	if (errmsg) {
-                __ca_error_dialog (_(errmsg));
+                ca_error_dialog (_(errmsg));
 
         }
 
@@ -1399,7 +1427,7 @@ gboolean ca_import (gchar *filename)
 	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
 	
 	if (error) {
-		__ca_error_dialog (_(error->message));
+		ca_error_dialog (_(error->message));
 		return FALSE;
 	}
 
@@ -1439,7 +1467,7 @@ gboolean ca_import (gchar *filename)
 			gchar *message = g_strdup_printf (_("Couldn't import the certificate request. \n"
 							    "The database returned this error: \n\n'%s'"),
 							  error_msg);
-			__ca_error_dialog (message);
+			ca_error_dialog (message);
 			g_free (message);
 		}
 		successful_import = TRUE;
@@ -1492,7 +1520,7 @@ gboolean ca_import (gchar *filename)
 	if (successful_import) {
 		ca_refresh_model();
 	} else {
-		__ca_error_dialog (_("Couldn't find any supported format in the given file"));
+		ca_error_dialog (_("Couldn't find any supported format in the given file"));
 	}
 
 	return TRUE;
@@ -1529,6 +1557,7 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 	gchar * pem = NULL;
         GList * revoked_certs = NULL;
         gchar ** ca_data = NULL;
+	gchar * private_key = NULL;
         gint crl_version = 0;
         time_t timestamp;
 
@@ -1554,18 +1583,18 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 	file = g_io_channel_new_file (filename, "w", &error);
 	g_free (filename);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting CRL."));
+		ca_error_dialog (_("There was an error while exporting CRL."));
 		return;
 	} 
 	
         revoked_certs = ca_file_get_revoked_certs ();
 	
 	if (!revoked_certs) {
-		__ca_error_dialog (_("There was an error while getting revoked certificates."));
+		ca_error_dialog (_("There was an error while getting revoked certificates."));
 		return;
 	}
 	
-	ca_data = ca_file_get_single_row ("SELECT pem, private_key, serial FROM certificates WHERE is_ca = 1;");        
+	ca_data = ca_file_get_single_row ("SELECT pem, private_key, serial, dn FROM certificates WHERE is_ca = 1;");        
 
         timestamp = time (NULL);
 
@@ -1573,9 +1602,19 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 
         if (ca_data) {
 
+		private_key = pkey_cipher_uncrypt (ca_data[1], ca_data[3]);		
+                if (!private_key) {
+			g_strfreev (ca_data);
+                        ca_error_dialog (_("There was an error while generating CRL."));
+                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
+                        g_list_free (revoked_certs);
+                        ca_file_rollback_new_crl_transaction ();
+                        return;
+                }
+
                 pem = tls_generate_crl (revoked_certs, 
                                         (guchar *) ca_data[0], 
-                                        (guchar *) ca_data[1],
+                                        (guchar *) private_key,
                                         crl_version,
                                         timestamp,
                                         timestamp + (3600 * ca_policy_get (atoll(ca_data[2]), "HOURS_BETWEEN_CRL_UPDATES")));           
@@ -1584,7 +1623,7 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 		g_strfreev (ca_data);
 
                 if (!pem) {
-                        __ca_error_dialog (_("There was an error while generating CRL."));
+                        ca_error_dialog (_("There was an error while generating CRL."));
                         g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
                         g_list_free (revoked_certs);
                         ca_file_rollback_new_crl_transaction ();
@@ -1593,7 +1632,7 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
                 g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 
                 if (error) {
-                        __ca_error_dialog (_("There was an error while writing CRL."));
+                        ca_error_dialog (_("There was an error while writing CRL."));
                         g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
                         g_list_free (revoked_certs);
                         ca_file_rollback_new_crl_transaction ();
@@ -1615,7 +1654,7 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 		
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
-		__ca_error_dialog (_("There was an error while exporting CRL."));
+		ca_error_dialog (_("There was an error while exporting CRL."));
 		g_io_channel_unref (file);
 		return;
 	} 
@@ -1635,6 +1674,9 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 	
 	
 }
+
+
+
 
 gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 {
@@ -1711,3 +1753,270 @@ gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 	return FALSE;
 }
 
+void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data) 
+{
+	GtkWidget * widget = NULL;
+	GtkDialog * dialog = NULL;
+	GladeXML * dialog_xml = NULL;
+	gchar     * xml_file = NULL;
+	const gchar *newpwd;
+	const gchar *currpwd;
+
+	gint response = 0;
+	gboolean repeat;
+
+	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+	dialog_xml = glade_xml_new (xml_file, "change_password_dialog", NULL);
+	g_free (xml_file);
+	glade_xml_signal_autoconnect (dialog_xml); 	
+
+	if (ca_file_is_password_protected()) {
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label1");
+		g_object_set (G_OBJECT(widget), "visible", TRUE, NULL);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+		g_object_set (G_OBJECT(widget), "visible", TRUE, NULL);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_commit_button");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+	} else {
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_no_radiobutton");
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label1");
+		g_object_set (G_OBJECT(widget), "visible", FALSE, NULL);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+		g_object_set (G_OBJECT(widget), "visible", FALSE, NULL);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+	}
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+
+	widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+	gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
+	
+	do {
+
+		response = gtk_dialog_run(GTK_DIALOG(widget)); 
+		
+		if (!response || response == GTK_RESPONSE_CANCEL) {
+			gtk_widget_destroy (widget);
+			g_object_unref (G_OBJECT(dialog_xml));
+			return;
+		} 
+		
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+		newpwd = gtk_entry_get_text (GTK_ENTRY(widget));
+		
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+		currpwd = gtk_entry_get_text (GTK_ENTRY(widget));
+
+		repeat = (ca_file_is_password_protected() && ! ca_file_check_password (currpwd));
+		
+		if (repeat)
+			ca_error_dialog (_("The password you have entered as <i>current password</i> "
+					   "doesn't match with the current database password."));
+
+	} while (repeat);
+	
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
+
+		if (ca_file_is_password_protected()) {
+			// It's a password change
+
+			if (! ca_file_password_change (currpwd, newpwd)) {
+				ca_error_dialog (_("Error while changing database password. "
+						   "The operation was cancelled."));
+			} else {
+				widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+									    GTK_DIALOG_DESTROY_WITH_PARENT,
+									    GTK_MESSAGE_INFO,
+									    GTK_BUTTONS_CLOSE,
+									    "%s",
+									    _("Password changed successfully")));
+				gtk_dialog_run (GTK_DIALOG(dialog));
+				
+				gtk_widget_destroy (GTK_WIDGET(dialog));
+			}
+
+		} else {
+			// It's a new password
+
+			if (! ca_file_password_protect (newpwd)) {
+				ca_error_dialog (_("Error while establishing database password. "
+						   "The operation was cancelled."));
+
+			} else {
+				widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+									    GTK_DIALOG_DESTROY_WITH_PARENT,
+									    GTK_MESSAGE_INFO,
+									    GTK_BUTTONS_CLOSE,
+									    "%s",
+									    _("Password established successfully")));
+				gtk_dialog_run (GTK_DIALOG(dialog));
+				
+				gtk_widget_destroy (GTK_WIDGET(dialog));
+			}
+		}
+	} else {
+		if (ca_file_is_password_protected()) {
+			// Remove password protection
+			if (! ca_file_password_unprotect (currpwd)) {
+				ca_error_dialog (_("Error while removing database password. "
+						   "The operation was cancelled."));
+			} else {
+				widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+									    GTK_DIALOG_DESTROY_WITH_PARENT,
+									    GTK_MESSAGE_INFO,
+									    GTK_BUTTONS_CLOSE,
+									    "%s",
+									    _("Password removed successfully")));
+				gtk_dialog_run (GTK_DIALOG(dialog));
+				
+				gtk_widget_destroy (GTK_WIDGET(dialog));
+
+			}
+
+		} else {
+			// Don't do anything
+			
+		}
+
+	}
+
+	widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+	gtk_widget_destroy (widget);
+
+}
+
+
+gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data)
+{
+	GladeXML * dialog_xml = g_object_get_data (G_OBJECT(entry), "dialog_xml");
+	GtkWidget *widget;
+
+	const gchar *pwd1;
+	const gchar *pwd2;
+	const gchar *currpwd;
+	gboolean pwd_protect;
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	pwd_protect = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+	pwd1 = gtk_entry_get_text (GTK_ENTRY(widget));
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+	pwd2 = gtk_entry_get_text (GTK_ENTRY(widget));
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+	currpwd = gtk_entry_get_text (GTK_ENTRY(widget));
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_commit_button");
+	if (pwd_protect) {
+		if (strlen(pwd1) && strlen(pwd2) && ! strcmp(pwd1, pwd2)) {
+			if (!ca_file_is_password_protected() || (ca_file_is_password_protected() && strlen(currpwd)))
+				gtk_widget_set_sensitive (widget, TRUE);
+			else
+				gtk_widget_set_sensitive (widget, FALSE);			
+		} else {
+			gtk_widget_set_sensitive (widget, FALSE);		
+		}
+	} else {
+		gtk_widget_set_sensitive (widget, TRUE);
+	}
+
+	return FALSE;
+}
+
+gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data)
+{
+	GladeXML * dialog_xml;
+
+	if (! G_IS_OBJECT(button))
+		return TRUE;
+
+	dialog_xml = g_object_get_data (G_OBJECT(button), "dialog_xml");
+	if (! dialog_xml)
+		return TRUE;
+
+	GtkWidget * widget = NULL;
+
+	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
+		/* We want to password-protect the database */
+		
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (widget, TRUE);
+
+		ca_changepwd_newpwd_entry_changed (button, NULL);
+	
+	} else {
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (widget, FALSE);
+
+		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (widget, FALSE);
+	}
+
+	return FALSE;
+}

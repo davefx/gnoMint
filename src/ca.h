@@ -27,5 +27,5 @@ gint ca_get_selected_row_id ();
 gchar * ca_get_selected_row_pem ();
 gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
 gboolean ca_import (gchar *filename);
-
+void ca_error_dialog(gchar *message);
 #endif
