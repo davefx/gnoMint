@@ -30,7 +30,7 @@
 #include "ca_file.h"
 #include "tls.h"
 #include "ca.h"
-#include "pkey_cipher.h"
+#include "pkey_manage.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -451,7 +451,7 @@ void on_new_req_commit_clicked (GtkButton *widg,
 	gtk_object_destroy(GTK_OBJECT(window));
 
 	if (ca_file_is_password_protected())
-		csr_creation_data->password = pkey_cipher_ask_password();
+		csr_creation_data->password = pkey_manage_ask_password();
 
 	new_csr_creation_process_window_display (csr_creation_data);	
 
@@ -517,15 +517,10 @@ void on_new_cert_next1_clicked (GtkButton *button,
 
 	// Meanwhile, we choose the unique CA, and determine its policy.
 
-	guint64 ca_id;
-	gchar ** row = NULL;
+	guint64 ca_id = atoll("0");
 
 	GtkWidget * widget;
 	guint value;
-
-	row = ca_file_get_single_row ("SELECT serial FROM certificates WHERE is_ca = 1;");
-
-	ca_id = atoll(row[0]);
 	
 	value = ca_policy_get (ca_id, "MONTHS_TO_EXPIRE");
 	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton");
@@ -649,8 +644,10 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	GtkWidget *widget = NULL;
 	GtkWindow *window = NULL;
 	gint active = -1;
-	gchar ** aux;
+	gchar *pem;
+	gchar *dn;
 	gchar *pkey_pem;
+	gchar *crypted_pkey_pem;
 	
 	time_t tmp;
 	struct tm * expiration_time;
@@ -703,33 +700,44 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	csr_pem = ca_get_selected_row_pem ();
 
-	aux = ca_file_get_single_row ("SELECT pem, private_key, dn FROM certificates WHERE is_ca = 1;");
+	// Here I am supossing that there's only one CA cert, and its serial is 1.
+	// We'll have to remake this when it is possible to hold more than one CA cert in DB.
+	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+	crypted_pkey_pem = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+					      
+	if (pem && crypted_pkey_pem && dn) {
+		
+		gchar *csr_pkey_pem = NULL;
 
-	if (aux) {
+		pkey_pem = pkey_manage_uncrypt (crypted_pkey_pem, dn);
 
-		pkey_pem = pkey_cipher_uncrypt (aux[1], aux[2]);
-
-		if (! pkey_pem)
+		if (! pkey_pem) {
+			g_free (pem);
+			g_free (crypted_pkey_pem);
+			g_free (dn);
 			return;
+		}
 
-		tls_generate_certificate (cert_creation_data, csr_pem, aux[0], pkey_pem, &certificate);
+		tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
 
 		g_free (pkey_pem);
 		
-		g_strfreev (aux);
+		csr_pkey_pem = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, ca_get_selected_row_id());
 		
-		aux = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id = %d;", ca_get_selected_row_id());
-		
-		if (aux) {			
-			ca_file_insert_cert (cert_creation_data, aux[0], certificate);
+		ca_file_insert_cert (cert_creation_data, csr_pkey_pem, certificate);
 
-			ca_file_remove_csr (ca_get_selected_row_id());
+		ca_file_remove_csr (ca_get_selected_row_id());
 
-			g_strfreev (aux);
-		}
+		if (csr_pkey_pem)
+			g_free (csr_pkey_pem);
 		
 	}
 		
+	if (pem) g_free (pem);
+	if (crypted_pkey_pem) g_free (crypted_pkey_pem);
+	if (dn) g_free (dn);
+
 	window = GTK_WINDOW(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
 	gtk_object_destroy(GTK_OBJECT(window));	
 	

@@ -20,11 +20,10 @@
 #include "ca_creation.h"
 #include "ca_file.h"
 #include "tls.h"
-#include "pkey_cipher.h"
+#include "pkey_manage.h"
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
-#include <sqlite3.h>
 
 #include <libintl.h>
 #define _(x) gettext(x)
@@ -125,7 +124,7 @@ gpointer ca_creation_thread (gpointer data)
 	ca_creation_message =  _("Creating CA database");
 	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-	pkey_cipher_crypt_auto (creation_data, &private_key, root_certificate);
+	pkey_manage_crypt_auto (creation_data, &private_key, root_certificate);
 
 	error_message = ca_creation_database_save (creation_data, private_key, root_certificate);
 	if (error_message) {

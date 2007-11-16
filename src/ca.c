@@ -25,7 +25,6 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h>
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -37,12 +36,11 @@
 #include "csr_properties.h"
 #include "tls.h"
 #include "new_cert_window.h"
-#include "pkey_cipher.h"
+#include "pkey_manage.h"
 
 extern GladeXML * main_window_xml;
 extern GladeXML * cert_popup_menu_xml;
 extern GladeXML * csr_popup_menu_xml;
-extern sqlite3 * ca_db;
 
 GtkTreeStore * ca_model = NULL;
 gboolean cert_title_inserted = FALSE;
@@ -304,16 +302,12 @@ void __ca_tree_view_private_key_in_db_datafunc (GtkTreeViewColumn *tree_column,
 
 gboolean ca_refresh_model () 
 {
-	gchar * error_str = NULL;
-//	GtkTreeIter iter;
 	GtkTreeStore * new_model = NULL;
 	GtkTreeView * treeview = NULL;
 	GtkCellRenderer * renderer = NULL;
         GtkTreeViewColumn * column = NULL;
                  
         guint columns_number;
-
-	g_assert (ca_db != NULL);
 
 	/* Models have these columns: 
            - Id
@@ -337,16 +331,10 @@ gboolean ca_refresh_model ()
 	csr_title_inserted=FALSE;
 	csr_parent_iter = NULL;
 
-        if (view_rcrt) 
-          sqlite3_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates ORDER BY id", __ca_refresh_model_add_certificate, new_model, &error_str);
-        else
-          sqlite3_exec (ca_db, "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates WHERE revocation IS NULL ORDER BY id", __ca_refresh_model_add_certificate, new_model, &error_str);
+	ca_file_foreach_crt (__ca_refresh_model_add_certificate, view_rcrt, new_model);
           
         if (view_csr)
-          sqlite3_exec 
-            (ca_db, 
-             "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
-             __ca_refresh_model_add_csr, new_model, &error_str);
+		ca_file_foreach_csr (__ca_refresh_model_add_csr, new_model);
 
 	treeview = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
 
@@ -857,7 +845,8 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 	gint id;
-	gchar ** aux = NULL;
+	gchar * dn = NULL;
+	gchar * crypted_pkey = NULL;
 	gchar * privatekey = NULL;
 	gchar * pem = NULL;
 
@@ -890,18 +879,25 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	} 
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	if (type == 1)
-		aux = ca_file_get_single_row ("SELECT private_key,dn FROM certificates WHERE id=%d", id);
-	else
-		aux = ca_file_get_single_row ("SELECT private_key,dn FROM cert_requests WHERE id=%d", id);
+	if (type == 1) {
+		crypted_pkey = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	} else {
+		crypted_pkey = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+	}
 		
 	
-	if (!aux) {
+	if (!crypted_pkey) {
 		ca_error_dialog (_("There was an error while getting private key."));
 		return;
 	}
 
-	privatekey = pkey_cipher_uncrypt (aux[0], aux[1]);
+	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
+	
+	g_free (crypted_pkey);
+	g_free (dn);
+
 	if (! privatekey) {
 		g_free (filename);
 		return;
@@ -921,7 +917,6 @@ void __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	pem = tls_generate_pkcs8_encrypted_private_key (privatekey, password); 
 	g_free (password);
 	g_free (privatekey);
-	g_strfreev (aux);
 	
 	if (!pem) {
 		ca_error_dialog (_("There was an error while password-protecting private key."));
@@ -968,8 +963,9 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 	gint id;
-	gchar ** aux = NULL;
 	gchar * pem = NULL;
+	gchar * crypted_pkey = NULL;
+	gchar * dn = NULL;
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
 	
@@ -998,19 +994,23 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	} 
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	if (type == 1)
-		aux = ca_file_get_single_row ("SELECT private_key,dn FROM certificates WHERE id=%d", id);
-	else
-		aux = ca_file_get_single_row ("SELECT private_key,dn FROM cert_requests WHERE id=%d", id);
-		
+	if (type == 1) {
+		crypted_pkey = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	} else {
+		crypted_pkey = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+	}
 	
-	if (!aux) {
+	if (!crypted_pkey) {
 		ca_error_dialog (_("There was an error while getting private key."));
 		return;
 	}
 	
-	pem =  pkey_cipher_uncrypt (aux[0], aux[1]);
-	g_strfreev (aux);
+	pem =  pkey_manage_uncrypt (crypted_pkey, dn);
+
+	g_free (crypted_pkey);
+	g_free (dn);
 	
 	if (!pem) {
 		ca_error_dialog (_("There was an error while decrypting private key."));
@@ -1058,7 +1058,9 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 	gint id;
-	gchar ** aux = NULL;
+	gchar * crt_pem = NULL;
+	gchar * crypted_pkey = NULL;
+	gchar * dn = NULL;
 	gchar * privatekey = NULL;
         gnutls_datum_t * pkcs12_datum = NULL;
 
@@ -1085,23 +1087,30 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
 
-	if (type == 1)
-		aux = ca_file_get_single_row ("SELECT private_key, pem, dn FROM certificates WHERE id=%d", id);
-	else
-                aux = NULL;
+	if (type == 1) {
+		crypted_pkey = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		crt_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	}
 		
 	
-	if (! aux) {
+	if (! crypted_pkey || ! dn || ! crt_pem) {
 		ca_error_dialog (_("There was an error while getting the certificate and private key from the internal database."));
 		g_free (filename);
+		g_free (crypted_pkey);
+		g_free (dn);
+		g_free (crt_pem);
 		return;
 	}
 	
-	privatekey = pkey_cipher_uncrypt (aux[0], aux[2]);
+	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
+
 	if (! privatekey) {
 		ca_error_dialog (_("There was an error while getting the certificate and private key from the internal database."));
 		g_free (filename);
-		g_strfreev (aux);
+		g_free (crypted_pkey);
+		g_free (dn);
+		g_free (crt_pem);
 		return;
 	}
 
@@ -1112,15 +1121,19 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 					   _("The introduced passphrases are distinct."), 8);
 	if (! password) {
 		g_free (filename);
-		g_strfreev (aux);
+		g_free (crypted_pkey);
+		g_free (dn);
+		g_free (crt_pem);
 		g_free (privatekey);
 		return;
 	}
 			
-	pkcs12_datum = tls_generate_pkcs12 (aux[1], privatekey, password); 
+	pkcs12_datum = tls_generate_pkcs12 (crt_pem, privatekey, password); 
 	g_free (password);
 	g_free (privatekey);
-	g_strfreev (aux);
+	g_free (crypted_pkey);
+	g_free (dn);
+	g_free (crt_pem);
 	
 	
 	if (!pkcs12_datum) {
@@ -1556,9 +1569,12 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 	GError * error = NULL;
 	gchar * pem = NULL;
         GList * revoked_certs = NULL;
-        gchar ** ca_data = NULL;
+	gchar * crypted_pkey = NULL;
+	gchar * dn = NULL;
+	gchar * ca_pem = NULL;
 	gchar * private_key = NULL;
         gint crl_version = 0;
+	guint64 ca_id = 0;
         time_t timestamp;
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -1593,18 +1609,22 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 		ca_error_dialog (_("There was an error while getting revoked certificates."));
 		return;
 	}
-	
-	ca_data = ca_file_get_single_row ("SELECT pem, private_key, serial, dn FROM certificates WHERE is_ca = 1;");        
 
+	ca_id = 1;
+	ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	crypted_pkey = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
         timestamp = time (NULL);
 
         crl_version = ca_file_begin_new_crl_transaction (1, timestamp);
 
-        if (ca_data) {
+        if (ca_id && ca_pem && crypted_pkey && dn) {
 
-		private_key = pkey_cipher_uncrypt (ca_data[1], ca_data[3]);		
+		private_key = pkey_manage_uncrypt (crypted_pkey, dn);		
                 if (!private_key) {
-			g_strfreev (ca_data);
+			g_free (ca_pem);
+			g_free (crypted_pkey);
+			g_free (dn);
                         ca_error_dialog (_("There was an error while generating CRL."));
                         g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
                         g_list_free (revoked_certs);
@@ -1613,14 +1633,16 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
                 }
 
                 pem = tls_generate_crl (revoked_certs, 
-                                        (guchar *) ca_data[0], 
+                                        (guchar *) ca_pem, 
                                         (guchar *) private_key,
                                         crl_version,
                                         timestamp,
-                                        timestamp + (3600 * ca_policy_get (atoll(ca_data[2]), "HOURS_BETWEEN_CRL_UPDATES")));           
+                                        timestamp + (3600 * ca_policy_get (ca_id, "HOURS_BETWEEN_CRL_UPDATES")));           
                 
 
-		g_strfreev (ca_data);
+		g_free (ca_pem);
+		g_free (crypted_pkey);
+		g_free (dn);
 
                 if (!pem) {
                         ca_error_dialog (_("There was an error while generating CRL."));

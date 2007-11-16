@@ -27,7 +27,7 @@
 
 #include "tls.h"
 #include "ca_file.h"
-#include "pkey_cipher.h"
+#include "pkey_manage.h"
 
 #include <libintl.h>
 #define _(x) gettext(x)
@@ -42,6 +42,46 @@ sqlite3 * ca_db = NULL;
 #define CURRENT_GNOMINT_DB_VERSION 5
 
 
+int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames)
+{
+	gchar ***result = (gchar ***) pArg;
+	int i;
+
+	if (! result)
+		return 1;
+
+	(*result) = g_new0 (gchar *, argc+1);
+	for (i = 0; i<argc; i++) {
+		(*result)[i] = g_strdup (argv[i]);
+	}
+
+	return 0;
+}
+
+gchar ** ca_file_get_single_row (const gchar *query, ...)
+{
+	gchar **result = NULL;
+	gchar *sql = NULL;
+	gchar * error;
+	va_list list;	
+
+	va_start (list, query);
+	sql = sqlite3_vmprintf (query, list);
+	va_end (list);
+
+	g_assert (ca_db);
+
+	sqlite3_exec (ca_db, sql, __ca_file_get_single_row_cb, &result, &error);
+	
+	sqlite3_free (sql);
+
+        if (error)
+                fprintf (stderr, "%s\n", error);
+
+	return result;
+}
+
+
 gchar * ca_file_create (CaCreationData *creation_data, 
                         gchar *pem_ca_private_key,
                         gchar *pem_ca_certificate)
@@ -50,6 +90,10 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	gchar *error = NULL;
 
 	gchar *filename = NULL;
+
+	gchar **row;
+	gint64 rootca_rowid;
+	guint64 rootca_id;
 
 	TlsCert *tls_cert = tls_parse_cert_pem (pem_ca_certificate);
 
@@ -119,6 +163,11 @@ gchar * ca_file_create (CaCreationData *creation_data,
 		return error;
 	sqlite3_free (sql);
 
+	rootca_rowid = sqlite3_last_insert_rowid (ca_db);
+	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%llu ;",
+				      rootca_rowid);
+	rootca_id = atoll (row[0]);
+	g_strfreev (row);
 
 	sql = sqlite3_mprintf ("INSERT INTO ca_properties VALUES (NULL, 'ca_root_last_assigned_serial', 1);");
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
@@ -126,7 +175,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	sqlite3_free (sql);
 
 	if (creation_data->is_pwd_protected) {
-		gchar *hashed_pwd = pkey_cipher_encrypt_password (creation_data->password);
+		gchar *hashed_pwd = pkey_manage_encrypt_password (creation_data->password);
 
 		sql = sqlite3_mprintf ("INSERT INTO ca_properties VALUES (NULL, 'ca_db_is_password_protected', 1);");
 
@@ -156,6 +205,16 @@ gchar * ca_file_create (CaCreationData *creation_data,
 			return error;
 		sqlite3_free (sql);
 	}
+
+	ca_file_policy_set (rootca_id, "MONTHS_TO_EXPIRE", 60);
+	ca_file_policy_set (rootca_id, "HOURS_BETWEEN_CRL_UPDATES", 24);
+	ca_file_policy_set (rootca_id, "DIGITAL_SIGNATURE", 1);
+	ca_file_policy_set (rootca_id, "KEY_ENCIPHERMENT", 1);
+	ca_file_policy_set (rootca_id, "KEY_AGREEMENT", 1);
+	ca_file_policy_set (rootca_id, "DATA_ENCIPHERMENT", 1);
+	ca_file_policy_set (rootca_id, "TLS_WEB_SERVER", 1);
+	ca_file_policy_set (rootca_id, "TLS_WEB_CLIENT", 1);
+	ca_file_policy_set (rootca_id, "EMAIL_PROTECTION", 1);
 
 	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
@@ -496,45 +555,6 @@ gboolean ca_file_delete_tmp_file ()
 	return (! result);
 }
 
-int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames)
-{
-	gchar ***result = (gchar ***) pArg;
-	int i;
-
-	if (! result)
-		return 1;
-
-	(*result) = g_new0 (gchar *, argc+1);
-	for (i = 0; i<argc; i++) {
-		(*result)[i] = g_strdup (argv[i]);
-	}
-
-	return 0;
-}
-
-gchar ** ca_file_get_single_row (const gchar *query, ...)
-{
-	gchar **result = NULL;
-	gchar *sql = NULL;
-	gchar * error;
-	va_list list;	
-
-	va_start (list, query);
-	sql = sqlite3_vmprintf (query, list);
-	va_end (list);
-
-	g_assert (ca_db);
-
-	sqlite3_exec (ca_db, sql, __ca_file_get_single_row_cb, &result, &error);
-	
-	sqlite3_free (sql);
-
-        if (error)
-                fprintf (stderr, "%s\n", error);
-
-	return result;
-}
-
 guint64 ca_file_get_last_serial ()
 {
 	gchar **serialstr = NULL;
@@ -817,7 +837,7 @@ gboolean ca_file_check_password (const gchar *password)
 	if (! result)
 		return FALSE;	
 
-	res = pkey_cipher_check_password (password, result[0]);
+	res = pkey_manage_check_password (password, result[0]);
 
 	g_strfreev (result);
 
@@ -842,7 +862,7 @@ int  __ca_file_password_unprotect_cb (void *pArg, int argc, char **argv, char **
 	if (atoi(argv[1]) == 0)
 		return 0;
 
-	new_pkey = pkey_cipher_uncrypt_w_pwd (argv[2], argv[3], pwd);
+	new_pkey = pkey_manage_uncrypt_w_pwd (argv[2], argv[3], pwd);
 
         sql = sqlite3_mprintf ("UPDATE %q SET private_key='%q' WHERE id='%q';",
                                table, new_pkey, argv[0]);
@@ -915,7 +935,7 @@ int  __ca_file_password_protect_cb (void *pArg, int argc, char **argv, char **co
 	if (atoi(argv[1]) == 0)
 		return 0;
 
-	new_pkey = pkey_cipher_crypt_w_pwd (argv[2], argv[3], pwd);
+	new_pkey = pkey_manage_crypt_w_pwd (argv[2], argv[3], pwd);
 
         sql = sqlite3_mprintf ("UPDATE %q SET private_key='%q' WHERE id='%q';",
                                table, new_pkey, argv[0]);
@@ -955,7 +975,7 @@ gboolean ca_file_password_protect(const gchar *new_password)
 		return FALSE;
 	}	
 
-	hashed_pwd = pkey_cipher_encrypt_password (new_password);
+	hashed_pwd = pkey_manage_encrypt_password (new_password);
 	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_db_hashed_password';",
 			       hashed_pwd);
 	g_free (hashed_pwd);
@@ -1002,9 +1022,9 @@ int  __ca_file_password_change_cb (void *pArg, int argc, char **argv, char **col
 	if (atoi(argv[1]) == 0)
 		return 0;
 
-	clear_pkey = pkey_cipher_uncrypt_w_pwd (argv[2], argv[3], old_pwd);
+	clear_pkey = pkey_manage_uncrypt_w_pwd (argv[2], argv[3], old_pwd);
 
-	new_pkey = pkey_cipher_crypt_w_pwd (clear_pkey, argv[3], new_pwd);
+	new_pkey = pkey_manage_crypt_w_pwd (clear_pkey, argv[3], new_pwd);
 
 	g_free (clear_pkey);
 
@@ -1058,7 +1078,7 @@ gboolean ca_file_password_change(const gchar *old_password, const gchar *new_pas
 		return FALSE;
 	}
 
-	hashed_pwd = pkey_cipher_encrypt_password (new_password);
+	hashed_pwd = pkey_manage_encrypt_password (new_password);
 	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_db_hashed_password';",
 			       hashed_pwd);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
@@ -1076,3 +1096,155 @@ gboolean ca_file_password_change(const gchar *old_password, const gchar *new_pas
 
 	return TRUE;
 }
+
+
+gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gpointer userdata)
+{
+	gchar *error_str;
+
+	if (view_revoked) {
+		sqlite3_exec (ca_db, 
+			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates ORDER BY id", 
+			      func, userdata, &error_str);
+	} else {
+		sqlite3_exec (ca_db, 
+			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
+			      "pem FROM certificates WHERE revocation IS NULL ORDER BY id", 
+			      func, userdata, &error_str);
+	}
+
+	return  (! error_str);
+}
+
+gboolean ca_file_foreach_csr (CaFileCallbackFunc func, gpointer userdata)
+{
+	gchar *error_str;
+
+	sqlite3_exec 
+		(ca_db, 
+		 "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
+		 func, userdata, &error_str);
+
+	return  (! error_str);
+	
+}
+
+gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointer userdata)
+{
+	gchar *error_str;
+	gchar * query = g_strdup_printf ("SELECT ca_id, name, value FROM ca_policies WHERE ca_id=%"
+					 G_GUINT64_FORMAT ";", ca_id);
+
+	sqlite3_exec (ca_db, query, func, userdata, &error_str);
+
+	sqlite3_free (query);
+
+	return  (! error_str);
+	
+}
+
+guint64 ca_file_get_cert_serial_from_id (guint64 db_id)
+{
+	gchar ** aux;
+	guint64 res;
+
+	aux = ca_file_get_single_row ("SELECT dn FROM certificates WHERE id=%" G_GUINT64_FORMAT ";", db_id);
+
+	res = atoll (aux[0]);
+
+	g_strfreev (aux);
+
+	return res;
+}
+
+gchar * ca_file_get_field_from_id (CaFileElementType type, guint64 db_id, const gchar *field)
+{
+	gchar ** aux;
+	gchar * res;
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
+		aux = ca_file_get_single_row ("SELECT %s FROM certificates WHERE id=%" G_GUINT64_FORMAT ";", field, db_id);
+	} else {
+		aux = ca_file_get_single_row ("SELECT %s FROM cert_requests WHERE id=%" G_GUINT64_FORMAT ";", field, db_id);
+	}
+	
+	if (! aux)
+		return NULL;
+
+	if (! aux[0]) {
+		g_strfreev (aux);
+		return NULL;
+	}
+
+	res = g_strdup (aux[0]);
+
+	g_strfreev (aux);
+	
+	return res;
+
+}
+
+gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id)
+{
+	return ca_file_get_field_from_id (type, db_id, "dn");
+}
+
+gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id)
+{
+	return ca_file_get_field_from_id (type, db_id, "pem");
+}
+
+gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id)
+{
+	gboolean res;
+	gchar *aux;
+
+	aux = ca_file_get_field_from_id (type, db_id, "private_key_in_db");
+	res = atoi(aux);
+	g_free (aux);
+	return res;
+}
+
+gchar * ca_file_get_pkey_pem_from_id (CaFileElementType type, guint64 db_id)
+{
+	return ca_file_get_field_from_id (type, db_id, "private_key");
+}
+
+guint ca_file_policy_get (guint64 ca_id, gchar *property_name)
+{
+	gchar **row = ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%llu ;", 
+					      property_name, ca_id);
+
+	guint res;
+
+	if (!row)
+		return 0;
+
+	res = atoi(row[0]);
+
+	g_strfreev (row);
+
+	return res;
+}
+
+
+void ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
+{
+	gchar **aux;
+
+	aux = ca_file_get_single_row ("SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%llu ;", 
+				      property_name, ca_id);
+
+	if (! aux) {
+		aux = ca_file_get_single_row ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%llu, '%s', %d);",
+					      ca_id, property_name, value);
+		g_strfreev (aux);
+	} else {
+		g_strfreev (aux);
+		aux = ca_file_get_single_row ("UPDATE ca_policies SET value=%d WHERE ca_id=%llu AND name='%s';",
+					      value, ca_id, property_name);
+		g_strfreev (aux);
+	}
+		
+}
+

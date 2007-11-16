@@ -20,11 +20,10 @@
 #include "csr_creation.h"
 #include "ca_file.h"
 #include "tls.h"
-#include "pkey_cipher.h"
+#include "pkey_manage.h"
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
-#include <sqlite3.h>
 
 #include <libintl.h>
 #define _(x) gettext(x)
@@ -127,7 +126,7 @@ gpointer csr_creation_thread (gpointer data)
 	
 	tlscsr = tls_parse_csr_pem (certificate_sign_request);
 
-	pkey = pkey_cipher_crypt_w_pwd (private_key, tlscsr->dn, creation_data->password);
+	pkey = pkey_manage_crypt_w_pwd (private_key, tlscsr->dn, creation_data->password);
 
 	tls_csr_free (tlscsr);
 

@@ -24,7 +24,7 @@ gnomint_SOURCES = \
 	ca_policy.c \
 	csr_creation.c \
 	csr_properties.c \
-	pkey_cipher.c
+	pkey_manage.c
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)
@@ -44,5 +44,5 @@ EXTRA_DIST = \
 	new_cert_creation_process.h \
 	new_cert_window.h \
 	tls.h\
-	pkey_cipher.h
+	pkey_manage.h
 
