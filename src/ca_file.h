@@ -70,8 +70,11 @@ gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointe
 guint64 ca_file_get_cert_serial_from_id (guint64 db_id);
 gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id);
-gchar * ca_file_get_pkey_pem_from_id (CaFileElementType type, guint64 db_id);
+gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id);
 gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id);
+
+gboolean ca_file_set_pkey_field_for_id (CaFileElementType type, const gchar *new_value, guint64 db_id);
+gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gchar *filename, guint64 db_id);
 
 gint ca_file_begin_new_crl_transaction (gint ca_id, time_t timestamp);
 void ca_file_commit_new_crl_transaction ();

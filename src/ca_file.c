@@ -855,6 +855,13 @@ int  __ca_file_password_unprotect_cb (void *pArg, int argc, char **argv, char **
 	CaFilePwdChange * pwd_change = (CaFilePwdChange *) pArg;
 	const gchar *table = pwd_change->table;
 	const gchar *pwd = pwd_change->old_password;
+	PkeyManageData pkey;
+	
+	pkey.pkey_data = argv[2];
+	pkey.is_in_db = TRUE;
+	pkey.is_ciphered_with_db_pwd = TRUE;
+	pkey.external_file = NULL;
+
 	gchar *error;
 	gchar *sql;
 	gchar *new_pkey;
@@ -862,7 +869,7 @@ int  __ca_file_password_unprotect_cb (void *pArg, int argc, char **argv, char **
 	if (atoi(argv[1]) == 0)
 		return 0;
 
-	new_pkey = pkey_manage_uncrypt_w_pwd (argv[2], argv[3], pwd);
+	new_pkey = pkey_manage_uncrypt_w_pwd (&pkey, argv[3], pwd);
 
         sql = sqlite3_mprintf ("UPDATE %q SET private_key='%q' WHERE id='%q';",
                                table, new_pkey, argv[0]);
@@ -1018,11 +1025,19 @@ int  __ca_file_password_change_cb (void *pArg, int argc, char **argv, char **col
 	gchar *sql;
 	gchar *clear_pkey;
 	gchar *new_pkey;
+
+	PkeyManageData pkey;
+	
+	pkey.pkey_data = argv[2];
+	pkey.is_in_db = TRUE;
+	pkey.is_ciphered_with_db_pwd = TRUE;
+	pkey.external_file = NULL;
+
 	
 	if (atoi(argv[1]) == 0)
 		return 0;
 
-	clear_pkey = pkey_manage_uncrypt_w_pwd (argv[2], argv[3], old_pwd);
+	clear_pkey = pkey_manage_uncrypt_w_pwd (&pkey, argv[3], old_pwd);
 
 	new_pkey = pkey_manage_crypt_w_pwd (clear_pkey, argv[3], new_pwd);
 
@@ -1205,9 +1220,52 @@ gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id)
 	return res;
 }
 
-gchar * ca_file_get_pkey_pem_from_id (CaFileElementType type, guint64 db_id)
+gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id)
 {
 	return ca_file_get_field_from_id (type, db_id, "private_key");
+}
+
+gboolean ca_file_set_pkey_field_for_id (CaFileElementType type, const gchar *new_value, guint64 db_id)
+{
+	gchar *sql;
+	gchar *error;
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT)  {
+		sql = sqlite3_mprintf ("UPDATE certificates SET private_key='%q' WHERE id=%" G_GUINT64_FORMAT,
+				       new_value, db_id);
+	} else {
+		sql = sqlite3_mprintf ("UPDATE cert_requests SET private_key='%q' WHERE id=%" G_GUINT64_FORMAT,
+				       new_value, db_id);
+	}
+       
+
+	sqlite3_exec (ca_db, sql, NULL, NULL, &error);	
+	g_free (sql);
+
+	return (! error);
+}
+
+
+gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gchar *filename, guint64 db_id)
+{
+	gchar *sql;
+	gchar *error;
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT)  {
+		sql = sqlite3_mprintf ("UPDATE certificates SET private_key='%q', private_key_in_db=0 WHERE id=%" G_GUINT64_FORMAT,
+				       filename, db_id);
+	} else {
+		sql = sqlite3_mprintf ("UPDATE cert_requests SET private_key='%q', private_key_in_db=0 WHERE id=%" G_GUINT64_FORMAT,
+				       filename, db_id);
+	}
+       
+	sqlite3_exec (ca_db, sql, NULL, NULL, &error);	
+	g_free (sql);
+
+	if (error)
+		fprintf (stderr, "%s", error);
+
+	return (! error);
 }
 
 guint ca_file_policy_get (guint64 ca_id, gchar *property_name)

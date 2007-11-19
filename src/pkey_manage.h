@@ -24,16 +24,13 @@
 
 typedef struct {
 	gchar *pkey_data;
-	gboolean is_ciphered_with_db_pwd;
+	gboolean is_in_db;
+	gboolean is_ciphered_with_db_pwd;	
+	gchar *external_file;
 } PkeyManageData;
 
 PkeyManageData * pkey_manage_get_certificate_pkey (guint64 id);
 PkeyManageData * pkey_manage_get_csr_pkey (guint64 id);
-
-gpointer pkey_manage_get_data_for_certificate_pkey (guint64 id);
-gpointer pkey_manage_get_data_for_csr_pkey (guint64 id);
-PkeyManageData * pkey_manage_get_certificate_pkey_w_data (guint64 id, gpointer data);
-PkeyManageData * pkey_manage_get_csr_pkey_w_data (guint64 id, gpointer data);
 
 void pkey_manage_data_free (PkeyManageData *pkeydata);
 
@@ -48,9 +45,9 @@ gchar * pkey_manage_ask_password ();
 gboolean pkey_manage_check_password (const gchar *checking_password, const gchar *hashed_password);
 
 gchar * pkey_manage_crypt   (const gchar *pem_private_key, const gchar *dn);
-gchar * pkey_manage_uncrypt (const gchar *pem_private_key, const gchar *dn);
+gchar * pkey_manage_uncrypt (PkeyManageData *pkey, const gchar *dn);
 gchar * pkey_manage_crypt_w_pwd   (const gchar *pem_private_key, const gchar *dn, const gchar *pwd);
-gchar * pkey_manage_uncrypt_w_pwd (const gchar *pem_private_key, const gchar *dn, const gchar *pwd);
+gchar * pkey_manage_uncrypt_w_pwd (PkeyManageData *pkey, const gchar *dn, const gchar *pwd);
 
 gchar * pkey_manage_encrypt_password (const gchar *pwd);
 

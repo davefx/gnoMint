@@ -36,6 +36,266 @@
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
+
+#define PKEY_MANAGE_ENCRYPTED_PKCS8_HEADER "-----BEGIN ENCRYPTED PRIVATE KEY-----"
+#define PKEY_MANAGE_UNCRYPTED_PKCS8_HEADER "-----BEGIN PRIVATE KEY-----"
+
+
+gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
+{
+	gchar *password;
+	GtkWidget * widget = NULL, * password_widget = NULL, *remember_password_widget = NULL;
+	GladeXML * dialog_xml = NULL;
+	gchar     * xml_file = NULL;
+	gint response = 0;
+	gchar *message = NULL;
+
+	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+	dialog_xml = glade_xml_new (xml_file, "get_db_password_dialog", NULL);
+	g_free (xml_file);
+	glade_xml_signal_autoconnect (dialog_xml); 	
+
+	password_widget = glade_xml_get_widget (dialog_xml, "cadb_password_entry");
+
+	remember_password_widget = glade_xml_get_widget (dialog_xml, "remember_password_checkbutton");
+	g_object_set (G_OBJECT(remember_password_widget), "visible", FALSE, NULL);
+
+	widget = glade_xml_get_widget (dialog_xml, "get_passwd_msg_label");
+
+	message = g_strdup_printf (_("The file that holds private key for certificate '%s' is password-protected.\n\n"
+				     "Please, insert the password corresponding to this file."), cert_dn);
+	gtk_label_set_text (GTK_LABEL(widget), message);
+
+	gtk_widget_grab_focus (password_widget);
+	
+	widget = glade_xml_get_widget (dialog_xml, "get_db_password_dialog");
+	response = gtk_dialog_run(GTK_DIALOG(widget)); 
+	
+	if (!response) {
+		gtk_widget_destroy (widget);
+		g_object_unref (G_OBJECT(dialog_xml));
+		g_free (message);
+		return NULL;
+	} else {
+		password = g_strdup ((gchar *) gtk_entry_get_text (GTK_ENTRY(password_widget)));
+	}
+	
+	widget = glade_xml_get_widget (dialog_xml, "get_db_password_dialog");
+	gtk_widget_destroy (widget);
+	g_object_unref (G_OBJECT(dialog_xml));
+
+	g_free (message);
+
+	return password;
+}
+
+
+gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data)
+{
+	GtkWidget *remember_filepath_widget = NULL;
+
+	remember_filepath_widget = g_object_get_data (G_OBJECT(widget), "save_filename_checkbutton");
+	g_object_set (G_OBJECT(remember_filepath_widget), "visible", TRUE, NULL);
+
+	return FALSE;
+}
+
+gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
+{
+	gsize file_length = 0;
+	GError *error = NULL;
+	gboolean cancel = FALSE;
+
+	gboolean save_new_filename = FALSE;
+	gchar *file_name = g_strdup(* fn);
+
+	gchar *file_contents = NULL;
+
+	gchar *pem_pkey = NULL;
+
+	gint tls_error = 0;
+	gchar *password = NULL;
+
+	TlsCert *cert = tls_parse_cert_pem (cert_pem);		
+
+	do {
+		if (g_file_test(file_name, G_FILE_TEST_EXISTS)) {
+			GIOChannel *gc = g_io_channel_new_file (file_name, "r", &error);
+			if (gc) {
+				g_io_channel_read_to_end (gc, &file_contents, &file_length, &error);
+				g_io_channel_close (gc);
+				
+				do {
+					pem_pkey = tls_load_pkcs8_private_key (file_contents, password, cert->key_id, &tls_error);
+					
+					if (tls_error == TLS_INVALID_PASSWORD) {
+						// We ask for a password
+						password = __pkey_manage_ask_external_file_password (cert->dn);
+						
+						if (! password)
+							cancel = TRUE;
+					} 
+					
+				} while (tls_error == TLS_INVALID_PASSWORD && ! cancel);
+				
+				g_free (password);
+				
+				if (! pem_pkey) {
+					if (tls_error == TLS_NON_MATCHING_PRIVATE_KEY) {
+						// The file could be opened, but it didn't contain any recognized private key
+						ca_error_dialog (_("The designated file contains a private key, but it "
+								   "is not the private key corresponding to the certificate."));
+					} else {
+						// The file could be opened, but it didn't contain any recognized private key
+						ca_error_dialog (_("The designated file didn't contain any recognized private key."));
+					}
+				}
+			} else {
+				// The file cannot be opened
+				ca_error_dialog (_("The designated file couldn't be opened."));
+				
+			}
+		} else {
+			// The file doesn't exist
+			ca_error_dialog (_("File designated in database doesn't exist."));
+			
+		}
+		
+		if (! pem_pkey && ! cancel) {
+			// Show file open dialog
+			
+			GtkWidget * widget = NULL, * filepath_widget = NULL, *remember_filepath_widget = NULL;
+			GladeXML * dialog_xml = NULL;
+			gchar     * xml_file = NULL;
+			gint response = 0;
+			
+			xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+			dialog_xml = glade_xml_new (xml_file, "get_pkey_dialog", NULL);
+			g_free (xml_file);
+			glade_xml_signal_autoconnect (dialog_xml); 	
+			
+			filepath_widget = glade_xml_get_widget (dialog_xml, "pkey_filechooser");
+			
+			remember_filepath_widget = glade_xml_get_widget (dialog_xml, "save_filename_checkbutton");
+			g_object_set (G_OBJECT(remember_filepath_widget), "visible", FALSE, NULL);
+			
+			gtk_widget_grab_focus (filepath_widget);
+			gtk_file_chooser_set_filename (GTK_FILE_CHOOSER(filepath_widget), file_name); 
+			g_object_set_data (G_OBJECT(filepath_widget), "save_filename_checkbutton", remember_filepath_widget);
+
+			widget = glade_xml_get_widget (dialog_xml, "cert_dn_label");
+			gtk_label_set_text (GTK_LABEL(widget), cert->dn);
+			
+			widget = glade_xml_get_widget (dialog_xml, "get_pkey_dialog");
+			response = gtk_dialog_run(GTK_DIALOG(widget)); 
+			
+			if (! response) {
+				cancel = TRUE;
+			} else {
+				g_free (file_name);
+				file_name = g_strdup ((gchar *) gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(filepath_widget)));
+				save_new_filename = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(remember_filepath_widget));
+			}
+			
+			widget = glade_xml_get_widget (dialog_xml, "get_pkey_dialog");
+			gtk_widget_destroy (widget);
+			g_object_unref (G_OBJECT(dialog_xml));
+		}
+	} while (! pem_pkey && ! cancel);
+
+	tls_cert_free (cert);
+	g_free (file_contents);					
+	g_error_free (error);
+
+	if (cancel) {
+		g_free (file_name);
+		return NULL;
+	}
+
+	if (save_new_filename) {
+		g_free (*fn);
+		(* fn) = file_name;
+	}
+	
+	return pem_pkey;						
+}
+
+
+PkeyManageData * pkey_manage_get_certificate_pkey (guint64 id)
+{
+	PkeyManageData *res = NULL;
+	
+	res = g_new0 (PkeyManageData, 1);
+	
+	if (ca_file_get_pkey_in_db_from_id (CA_FILE_ELEMENT_TYPE_CERT, id)) {
+		res->pkey_data = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		res->is_in_db = TRUE;
+		res->is_ciphered_with_db_pwd = ca_file_is_password_protected();
+	} else {
+		gchar *cert_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		gchar *file_name = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		gchar *old_filename = g_strdup (file_name);
+
+		gchar *file_contents = __pkey_retrieve_from_file (&file_name, cert_pem);
+
+		if (strcmp (file_name, old_filename)) {
+			/* The private key location has changed, and the user wants us to remember it */
+			ca_file_set_pkey_field_for_id (CA_FILE_ELEMENT_TYPE_CERT, file_name, id);
+		}
+
+		if (file_contents) {
+			res->pkey_data = file_contents;
+			res->is_in_db = FALSE;
+			res->external_file = file_name;
+		} else {
+			g_free (file_name);
+			g_free (res);
+			res = NULL;
+		}
+
+		g_free (old_filename);
+		g_free (cert_pem);
+	}
+
+	return res;
+}
+
+PkeyManageData * pkey_manage_get_csr_pkey (guint64 id)
+{
+	PkeyManageData *res = NULL;
+
+	res = g_new0 (PkeyManageData, 1);
+	
+	if (ca_file_get_pkey_in_db_from_id (CA_FILE_ELEMENT_TYPE_CSR, id)) {
+		res->pkey_data = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+		res->is_in_db = TRUE;
+		res->is_ciphered_with_db_pwd = ca_file_is_password_protected();
+	} else {
+		// Retrieving external private keys for CSRs is not allowed, as it is impossible to check if 
+		// a private key corresponds to a public key/CSR.
+		g_free (res);
+		res = NULL;
+	}
+
+	return res;
+}
+
+void pkey_manage_data_free (PkeyManageData *pkeydata)
+{
+	if (! pkeydata)
+		return;
+
+	g_free (pkeydata->pkey_data);
+	g_free (pkeydata->external_file);
+}
+
+
+
+
+
+
+
+
 unsigned char iv[16] =
     { 'a', 'g', 'z', 'e', 'Q', '5', 'E', '7', 'c', '+', '*', 'G', '1', 'D',
 	'u', '='
@@ -370,12 +630,14 @@ gchar * pkey_manage_crypt_w_pwd (const gchar *pem_private_key, const gchar *dn, 
 	return res;
 }
 
-gchar * pkey_manage_uncrypt (const gchar *pem_private_key, const gchar *dn)
+gchar * pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn)
 {
- 	gchar *res; 	
-	gchar *password;
-
-	password = pkey_manage_ask_password();
+ 	gchar *res = NULL; 	
+	gchar *password = NULL;
+	
+	if (pem_private_key->is_in_db && 
+	    pem_private_key->is_ciphered_with_db_pwd)
+		password = pkey_manage_ask_password();
 
 	res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);
 
@@ -384,17 +646,17 @@ gchar * pkey_manage_uncrypt (const gchar *pem_private_key, const gchar *dn)
 	return res;
 }
 
-gchar * pkey_manage_uncrypt_w_pwd (const gchar *pem_private_key, const gchar *dn, const gchar *pwd)
+gchar * pkey_manage_uncrypt_w_pwd (PkeyManageData *pem_private_key, const gchar *dn, const gchar *pwd)
 {
  	gchar *res; 
 	gchar *password;
 
-	if (! ca_file_is_password_protected())
-		return g_strdup(pem_private_key);
+	if (! pem_private_key->is_in_db || ! pem_private_key->is_ciphered_with_db_pwd)
+		return g_strdup(pem_private_key->pkey_data);
 		
 	password = g_strdup_printf ("gnoMintPrivateKey%s%s", pwd, dn);
 
-	res = pkey_manage_aes_decrypt (pem_private_key, password);
+	res = pkey_manage_aes_decrypt (pem_private_key->pkey_data, password);
 
 	g_free (password);
 

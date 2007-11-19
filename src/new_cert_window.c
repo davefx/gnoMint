@@ -517,7 +517,7 @@ void on_new_cert_next1_clicked (GtkButton *button,
 
 	// Meanwhile, we choose the unique CA, and determine its policy.
 
-	guint64 ca_id = atoll("0");
+	guint64 ca_id = atoll("1");
 
 	GtkWidget * widget;
 	guint value;
@@ -647,7 +647,8 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	gchar *pem;
 	gchar *dn;
 	gchar *pkey_pem;
-	gchar *crypted_pkey_pem;
+	guint64 ca_id;
+	PkeyManageData *crypted_pkey;
 	
 	time_t tmp;
 	struct tm * expiration_time;
@@ -702,19 +703,20 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	// Here I am supossing that there's only one CA cert, and its serial is 1.
 	// We'll have to remake this when it is possible to hold more than one CA cert in DB.
-	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
-	crypted_pkey_pem = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+	ca_id = 1;
+	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
 	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
 					      
-	if (pem && crypted_pkey_pem && dn) {
+	if (pem && crypted_pkey && dn) {
 		
-		gchar *csr_pkey_pem = NULL;
+		PkeyManageData *csr_pkey = NULL;
 
-		pkey_pem = pkey_manage_uncrypt (crypted_pkey_pem, dn);
+		pkey_pem = pkey_manage_uncrypt (crypted_pkey, dn);
 
 		if (! pkey_pem) {
 			g_free (pem);
-			g_free (crypted_pkey_pem);
+			pkey_manage_data_free (crypted_pkey);
 			g_free (dn);
 			return;
 		}
@@ -723,20 +725,25 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 		g_free (pkey_pem);
 		
-		csr_pkey_pem = ca_file_get_pkey_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, ca_get_selected_row_id());
+		csr_pkey = pkey_manage_get_csr_pkey (ca_get_selected_row_id());
 		
-		ca_file_insert_cert (cert_creation_data, csr_pkey_pem, certificate);
+		if (csr_pkey)
+			if (csr_pkey->is_in_db)
+				ca_file_insert_cert (cert_creation_data, csr_pkey->pkey_data, certificate);
+			else
+				ca_file_insert_cert (cert_creation_data, csr_pkey->external_file, certificate);			
+		else
+			ca_file_insert_cert (cert_creation_data, NULL, certificate);
 
 		ca_file_remove_csr (ca_get_selected_row_id());
 
-		if (csr_pkey_pem)
-			g_free (csr_pkey_pem);
+		pkey_manage_data_free (csr_pkey);
 		
 	}
 		
-	if (pem) g_free (pem);
-	if (crypted_pkey_pem) g_free (crypted_pkey_pem);
-	if (dn) g_free (dn);
+	g_free (pem);
+	pkey_manage_data_free (crypted_pkey);
+	g_free (dn);
 
 	window = GTK_WINDOW(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
 	gtk_object_destroy(GTK_OBJECT(window));	

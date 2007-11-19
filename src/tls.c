@@ -136,6 +136,79 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 	return pkcs8_private_key;
 }
 
+gchar * tls_load_pkcs8_private_key (gchar *pkcs8_pem, gchar *passphrase, const gchar *cert_key_id, gint *error)
+{
+	gnutls_datum_t pkcs8_datum;
+	gchar * pem_private_key = NULL;
+	size_t pem_private_key_len = 0;
+	gnutls_x509_privkey_t key;
+	gchar * pkey_key_id = NULL;
+	size_t pkey_key_id_len = 0;
+	guchar * uaux;
+	guint i;
+
+	pkcs8_datum.data = (unsigned char *) pkcs8_pem;
+	pkcs8_datum.size = strlen (pkcs8_pem);
+
+	if (gnutls_x509_privkey_init (&key) < 0) {
+		return NULL;
+	}
+
+	*error = gnutls_x509_privkey_import_pkcs8 (key, &pkcs8_datum, GNUTLS_X509_FMT_PEM, passphrase, 0);
+	if (*error) {
+		gnutls_x509_privkey_deinit (key);
+		return NULL;
+	}
+		
+	/* Calculate private key length */
+	pem_private_key = g_new0 (gchar, 1);	
+	gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, pem_private_key, &pem_private_key_len);
+	g_free (pem_private_key);
+
+	/* Save the private key to a PEM format */
+	pem_private_key = g_new0 (gchar, pem_private_key_len);	
+	if (gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, pem_private_key, &pem_private_key_len) < 0) {
+		g_free (pem_private_key);
+		gnutls_x509_privkey_deinit (key);
+		return NULL;
+	}
+
+	uaux = NULL;
+	pkey_key_id_len = 0;
+	gnutls_x509_privkey_get_key_id (key, 0, uaux, &pkey_key_id_len);
+	uaux = g_new0(guchar, pkey_key_id_len);
+	if (gnutls_x509_privkey_get_key_id (key, 0, uaux, &pkey_key_id_len)) {
+		g_free (uaux);
+		g_free (pem_private_key);
+		gnutls_x509_privkey_deinit (key);
+		return NULL;
+	}
+	pkey_key_id = g_new0(gchar, pkey_key_id_len*3);
+	for (i=0; i<pkey_key_id_len; i++) {
+		snprintf (&pkey_key_id[i*3], 3, "%02X", uaux[i]);
+		if (i != pkey_key_id_len - 1)
+			pkey_key_id[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+
+	if (strcmp (pkey_key_id, cert_key_id)) {
+		// The private key's key_id doesn't match with the certificate's key_id
+		g_free (pkey_key_id);
+		g_free (pem_private_key);
+		gnutls_x509_privkey_deinit (key);
+		*error = TLS_NON_MATCHING_PRIVATE_KEY;
+		return NULL;
+	}
+
+	g_free (pkey_key_id);
+	gnutls_x509_privkey_deinit (key);
+	*error = 0;
+
+	return pem_private_key;
+
+}
+
+
 gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, gchar *passphrase)
 {
         gnutls_datum_t pem_datum, cert_datum, pkcs8_pkey_datum, key_id_datum;
@@ -950,6 +1023,19 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 
 	}		
 
+	size = 0;
+	gnutls_x509_crt_get_key_id (*cert, 0, uaux, &size);
+	uaux = g_new0(guchar, size);
+	gnutls_x509_crt_get_key_id (*cert, 0, uaux, &size);
+	res->key_id = g_new0(gchar, size*3);
+	for (i=0; i<size; i++) {
+		snprintf (&res->key_id[i*3], 3, "%02X", uaux[i]);
+		if (i != size - 1)
+			res->key_id[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+	uaux = NULL;
+
 	gnutls_x509_crt_deinit (*cert);
 	g_free (cert);
 
@@ -987,56 +1073,23 @@ gboolean tls_is_ca_pem (const char * pem_certificate)
 
 void tls_cert_free (TlsCert *tlscert)
 {
-	if (tlscert->cn) {
-		g_free (tlscert->cn);
-	}	
-	if (tlscert->o) {
-		g_free (tlscert->o);
-	}	
-	if (tlscert->ou) {
-		g_free (tlscert->ou);
-	}	
-	if (tlscert->c) {
-		g_free (tlscert->c);
-	}	
-	if (tlscert->st) {
-		g_free (tlscert->st);
-	}	
-	if (tlscert->l) {
-		g_free (tlscert->l);
-	}	
-	if (tlscert->dn) {
-		g_free (tlscert->dn);
-	}	
-
-	if (tlscert->i_cn) {
-		g_free (tlscert->i_cn);
-	}	
-	if (tlscert->i_o) {
-		g_free (tlscert->i_o);
-	}	
-	if (tlscert->i_ou) {
-		g_free (tlscert->i_ou);
-	}	
-	if (tlscert->i_c) {
-		g_free (tlscert->i_c);
-	}	
-	if (tlscert->i_st) {
-		g_free (tlscert->i_st);
-	}	
-	if (tlscert->i_l) {
-		g_free (tlscert->i_l);
-	}	
-	if (tlscert->i_dn) {
-		g_free (tlscert->i_dn);
-	}	
-
-	if (tlscert->sha1) {
-		g_free (tlscert->sha1);
-	}	
-	if (tlscert->md5) {
-		g_free (tlscert->md5);
-	}	
+	g_free (tlscert->cn);
+	g_free (tlscert->o);
+	g_free (tlscert->ou);
+	g_free (tlscert->c);
+	g_free (tlscert->st);
+	g_free (tlscert->l);
+	g_free (tlscert->dn);
+	g_free (tlscert->i_cn);
+	g_free (tlscert->i_o);
+	g_free (tlscert->i_ou);
+	g_free (tlscert->i_c);
+	g_free (tlscert->i_st);
+	g_free (tlscert->i_l);
+	g_free (tlscert->i_dn);
+	g_free (tlscert->sha1);
+	g_free (tlscert->md5);
+	g_free (tlscert->key_id);
 
 	g_free (tlscert);
 }
