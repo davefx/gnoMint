@@ -21,13 +21,13 @@
 20. Export both parts of Cert 2. Check it with openssl: "openssl pkcs12 -text -in filename"
 21. Revoke cert 3.
 22. Revoke cert 4.
-22. Generate CRL. Check it with openssl.
+22. Generate CRL. Check it with openssl. "openssl crl -text -in filename"
 23. Password protect database with password "12345678".
 24. Create 1 CSR, with CN="5".
 25. Extract private key of CSR 5
 26. Sign CSR 5. => Cert with CN 5.
 26. Revoke cert 2.
-27. Generate CRL. Check it with openssl.
+27. Generate CRL. Check it with openssl. "openssl crl -text -in filename"
 28. Close program. Open it again and open the database.
 29. Create 2 CSRs, with CN="6" and "7"
 30. Sign CSR 6 => Cert with CN 6
