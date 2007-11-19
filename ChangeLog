@@ -1,3 +1,18 @@
+2007-11-03 08:19  davefx
+
+	* [r99] ChangeLog, NEWS, configure.in, po/gnomint.pot:
+	  Preparing for version 0.3.2
+
+2007-11-03 08:02  davefx
+
+	* [r98] src/ca_file.c:
+	  Fixing DB upgrading from version 3 to 4
+
+2007-11-01 22:07  davefx
+
+	* [r97] po/es.po:
+	  Updating Spanish translation
+
 2007-11-01 22:00  davefx
 
 	* [r96] ChangeLog, NEWS, configure.in:
@@ -55,7 +70,8 @@
 
 	* [r89] src/tls.c:
 	  Using size_t where it is needed (in Fedora amd64 arch, it seems
-	  to be a problem)
+	  to be
+	  a problem)
 
 2007-05-17 18:55  davefx
 
@@ -192,8 +208,8 @@
 2006-11-11 10:45  davefx
 
 	* [r60] src/ca_file.c, src/ca_file.h:
-	  Updating DB version to 2, with support for CA policies. Adding
-	  support for upgrading from earlier DB versions.
+	  Updating DB version to 2, with support for CA policies.
+	  Adding support for upgrading from earlier DB versions.
 
 2006-11-10 13:26  davefx
 
@@ -203,10 +219,11 @@
 2006-11-10 13:19  davefx
 
 	* [r57] gui/gnomint.glade, po/es.po, po/gnomint.pot, src/ca.c:
-	  * Allowing uncrypted private key export. * Requiring minimum
-	  length for private-key export passphrase * Checking confirmation
-	  for private-key export passphrase * Fixing focus grab when asking
-	  for passphrase * Updated Spanish translation
+	  * Allowing uncrypted private key export.
+	  * Requiring minimum length for private-key export passphrase
+	  * Checking confirmation for private-key export passphrase
+	  * Fixing focus grab when asking for passphrase
+	  * Updated Spanish translation
 
 2006-11-10 10:40  davefx
 
