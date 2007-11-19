@@ -27,6 +27,9 @@
 #include <gnutls/pkcs12.h>
 #include <stdio.h>
 
+#define TLS_INVALID_PASSWORD GNUTLS_E_DECRYPTION_FAILED
+#define TLS_NON_MATCHING_PRIVATE_KEY -2000
+
 typedef struct __TlsCert {	
 	guint64 serial_number;
 
@@ -48,6 +51,8 @@ typedef struct __TlsCert {
 
 	gchar * sha1;
 	gchar * md5;
+
+	gchar * key_id;
 
 	GList * uses;
 
@@ -76,6 +81,7 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 			       gnutls_x509_privkey_t **key);
 
 gchar * tls_generate_pkcs8_encrypted_private_key (gchar *private_key, gchar *passphrase);
+gchar * tls_load_pkcs8_private_key (gchar *pem, gchar *passphrase, const gchar * key_id, gint *tls_error);
 
 gnutls_datum_t * tls_generate_pkcs12 (gchar *certificate, gchar *private_key, gchar *passphrase);
 

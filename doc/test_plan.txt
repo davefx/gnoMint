@@ -1,0 +1,37 @@
+1.  Open program.
+2.  Create a new database without password, naming the CA certificate with CN "CA"
+3.  Create 4 CSRs, with CNs "1", "2", "3", "4".
+4.  Sign CSR 1 => Cert with CN "1".
+5.  Sign CSR 2 => Cert with CN "2".
+5.  Sign CSR 3 => Cert with CN "3".
+6.  Close program. Open it again and open the database.
+7.  Export public part of CSR 4. Check it with openssl: "openssl req -text -in filename"
+8.  Export private part (with password) of CSR 4. Check it with openssl: "openssl pkcs8 -in filename"
+9.  Export private part (without password) of CSR 4. Check it with openssl: "openssl rsa -text -in filename"
+10. Delete CSR 4.
+11. Import CSR 4.
+12. See CSR 4 properties.
+13. Sign CSR 4 => Cert with CN "4"
+14. See Cert CA properties
+15. See Cert 1 properties
+16. See Cert 2 properties
+17. Export public part of Cert 2. Check it with openssl: "openssl x509 -text -in filename"
+18. Export private part (with password) of Cert 2. Check it with openssl: "openssl pkcs8 -in filename"
+19. Export private part (without password) of Cert 2. Check it with openssl: "openssl rsa -text -in filename"
+20. Export both parts of Cert 2. Check it with openssl: "openssl pkcs12 -text -in filename"
+21. Revoke cert 3.
+22. Revoke cert 4.
+22. Generate CRL. Check it with openssl. "openssl crl -text -in filename"
+23. Password protect database with password "12345678".
+24. Create 1 CSR, with CN="5".
+25. Extract private key of CSR 5
+26. Sign CSR 5. => Cert with CN 5.
+26. Revoke cert 2.
+27. Generate CRL. Check it with openssl. "openssl crl -text -in filename"
+28. Close program. Open it again and open the database.
+29. Create 2 CSRs, with CN="6" and "7"
+30. Sign CSR 6 => Cert with CN 6
+31. Extract private key of certificate CA. Save it with password "wawawawa"
+32. Sign CSR 7 => Cert with CN 7
+33. Revoke cert "5"
+34. Generate CRL. Check it with openssl

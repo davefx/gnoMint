@@ -34,7 +34,8 @@ GladeXML * certificate_properties_window_xml = NULL;
 
 guint64 __certificate_properties_populate (const char *certificate_pem);
 
-void certificate_properties_display(const char *certificate_pem, gboolean privkey_in_db)
+void certificate_properties_display(const char *certificate_pem, gboolean privkey_in_db,
+				    gboolean is_ca)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
@@ -54,7 +55,7 @@ void certificate_properties_display(const char *certificate_pem, gboolean privke
 	
 	serial_number = __certificate_properties_populate (certificate_pem);
        
-	if (! tls_is_ca_pem (certificate_pem)) {
+	if (! is_ca) {
 		widget = glade_xml_get_widget (certificate_properties_window_xml, "notebook2");
 		gtk_notebook_remove_page (GTK_NOTEBOOK(widget), 2);
 	} else {
