@@ -38,6 +38,9 @@ typedef struct {
 	gint key_months_before_expiration;
 	time_t activation;
 	time_t expiration;
+
+	gboolean is_pwd_protected;
+	gchar * password;
 	
 } CaCreationData;
 
@@ -61,6 +64,9 @@ typedef struct {
 	gboolean time_stamping;
 	gboolean ocsp_signing;
 	gboolean any_purpose;
+
+	gchar * cadb_password;
+
 } CertCreationData;
 
 GThread * ca_creation_launch_thread (CaCreationData *creation_data);
@@ -72,5 +78,7 @@ void ca_creation_unlock_status_mutex ();
 gint ca_creation_get_thread_status ();
 
 gchar * ca_creation_get_thread_message();
+
+void ca_creation_data_free ();
 
 #endif

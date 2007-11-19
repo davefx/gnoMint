@@ -1,3 +1,8 @@
+* Version 0.3.2 (2007.11.03)
+
+- FIX: Fixing database upgrading from version 3 (gnoMint 0.1.5 or
+  lower).
+
 * Version 0.3.1 (2007.11.01)
 
 - FEATURE: now, PKCS#12 structures can be exported, so certificates
