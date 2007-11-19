@@ -23,7 +23,6 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h>
 #include <ca_file.h> 
 
 #include "tls.h"
@@ -32,7 +31,6 @@
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
-extern sqlite3 * ca_db;
 extern GladeXML * certificate_properties_window_xml;
 
 gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **columnNames)
@@ -46,16 +44,11 @@ gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **column
 
 void ca_policy_populate (guint64 ca_id) 
 {
-	gchar * error_str;
 	GtkWidget * widget;
 	gint value;
 	GHashTable *policy_table = g_hash_table_new (g_str_hash, g_str_equal);	
 
-	gchar * query = g_strdup_printf ("SELECT ca_id, name, value FROM ca_policies WHERE ca_id=%"
-					 G_GUINT64_FORMAT ";", ca_id);
-
-	sqlite3_exec (ca_db, query,
-		      __ca_policy_populate_step, policy_table, &error_str);
+	ca_file_foreach_policy (__ca_policy_populate_step, ca_id, policy_table);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "hours_between_crl_updates_spinbutton");
@@ -129,29 +122,17 @@ void ca_policy_populate (guint64 ca_id)
 }
 
 
+
 guint ca_policy_get (guint64 ca_id, gchar *property_name)
 {
-	gchar **row = ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%llu ;", 
-					      property_name, ca_id);
-
-	if (!row)
-		return 0;
-
-	return atoi(row[0]);
+	return ca_file_policy_get (ca_id, property_name);
 }
 
 
 void ca_policy_set (guint64 ca_id, gchar *property_name, guint value)
 {
+	ca_file_policy_set (ca_id, property_name, value);
 
-	if (! ca_file_get_single_row ("SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%llu ;", 
-				      property_name, ca_id))
-		ca_file_get_single_row ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%llu, '%s', %d);",
-					ca_id, property_name, value);
-	else
-		ca_file_get_single_row ("UPDATE ca_policies SET value=%d WHERE ca_id=%llu AND name='%s';",
-					value, ca_id, property_name);
-		
 }
 
 

@@ -20,10 +20,10 @@
 #include "csr_creation.h"
 #include "ca_file.h"
 #include "tls.h"
+#include "pkey_manage.h"
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
-#include <sqlite3.h>
 
 #include <libintl.h>
 #define _(x) gettext(x)
@@ -45,9 +45,12 @@ gpointer csr_creation_thread (gpointer data)
 	CaCreationData *creation_data = (CaCreationData *) data;
 	
 	gchar * private_key = NULL;
+	gchar * pkey = NULL;
 	gnutls_x509_privkey_t * csr_key = NULL;
 	gchar * certificate_sign_request = NULL;
 	gchar * error_message = NULL;
+	TlsCsr *tlscsr;
+
 
 	switch (creation_data->key_type){
 	case 0: /* RSA */
@@ -120,8 +123,19 @@ gpointer csr_creation_thread (gpointer data)
 	g_static_mutex_lock (&csr_creation_thread_status_mutex);
 	csr_creation_message =  _("Saving CSR in database");
 	g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+	
+	tlscsr = tls_parse_csr_pem (certificate_sign_request);
 
-	error_message = csr_creation_database_save (creation_data, private_key, certificate_sign_request);
+	pkey = pkey_manage_crypt_w_pwd (private_key, tlscsr->dn, creation_data->password);
+
+	tls_csr_free (tlscsr);
+
+	if (! pkey)
+		return NULL;
+
+	g_free (private_key);
+
+	error_message = csr_creation_database_save (creation_data, pkey, certificate_sign_request);
 	if (error_message) {
 		g_static_mutex_lock (&csr_creation_thread_status_mutex);
 		
@@ -134,8 +148,6 @@ gpointer csr_creation_thread (gpointer data)
 
 		return NULL;
 	}
-
-	printf ("\n\n%s\n\n", certificate_sign_request);
 
 	g_static_mutex_lock (&csr_creation_thread_status_mutex);
 	csr_creation_message =  _("CSR generated successfully");

@@ -30,6 +30,7 @@
 #include "ca_file.h"
 #include "tls.h"
 #include "ca.h"
+#include "pkey_manage.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -135,6 +136,57 @@ void on_new_cert_ca_cancel_clicked (GtkButton *widget,
 	
 }
 
+
+void on_new_cert_ca_pwd_entry_changed (GtkEntry *entry,
+				       gpointer user_data)
+{
+	const gchar *text1;
+	const gchar *text2;
+	
+	GtkEntry *pwd_entry_1 = GTK_ENTRY(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_entry_1"));
+	GtkEntry *pwd_entry_2 = GTK_ENTRY(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_entry_2"));
+	GtkButton *commit_button = GTK_BUTTON(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_commit"));
+
+	text1 = gtk_entry_get_text (pwd_entry_1);
+	text2 = gtk_entry_get_text (pwd_entry_2);
+
+	if (strlen(text1) && strlen(text2) && ! strcmp(text1, text2)) {
+		gtk_widget_set_sensitive (GTK_WIDGET(commit_button), TRUE);		
+	} else {
+		gtk_widget_set_sensitive (GTK_WIDGET(commit_button), FALSE);		
+	}
+
+}
+
+
+void on_new_cert_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton, 
+						     gpointer user_data)
+{
+	GtkRadioButton *yes = GTK_RADIO_BUTTON(glade_xml_get_widget (new_cert_ca_window_xml, 
+								     "new_cert_ca_pwd_protect_yes_radiobutton"));
+	GtkLabel *pwd_label_1 = GTK_LABEL(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_label_1"));
+	GtkLabel *pwd_label_2 = GTK_LABEL(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_label_2"));
+	GtkEntry *pwd_entry_1 = GTK_ENTRY(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_entry_1"));
+	GtkEntry *pwd_entry_2 = GTK_ENTRY(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_entry_2"));
+	GtkButton *commit_button = GTK_BUTTON(glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_commit"));
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(yes))) {
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_label_1), TRUE);
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_label_2), TRUE);
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_entry_1), TRUE);
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_entry_2), TRUE);
+		on_new_cert_ca_pwd_entry_changed (pwd_entry_1, NULL);
+	} else {
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_label_1), FALSE);
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_label_2), FALSE);
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_entry_1), FALSE);
+		gtk_widget_set_sensitive (GTK_WIDGET(pwd_entry_2), FALSE);
+		gtk_widget_set_sensitive (GTK_WIDGET(commit_button), TRUE);		
+	}
+
+}
+
+
 void on_new_cert_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data) 
 {
@@ -222,6 +274,21 @@ void on_new_cert_ca_commit_clicked (GtkButton *widg,
 	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
 	ca_creation_data->expiration = mktime(expiration_time);
 	g_free (expiration_time);
+
+
+	widget = glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_protect_yes_radiobutton");
+	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	ca_creation_data->is_pwd_protected = active;
+
+	if (active) {
+		widget = glade_xml_get_widget (new_cert_ca_window_xml, "new_cert_ca_pwd_entry_1");
+		text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+		if (strlen (text))
+			ca_creation_data->password = g_strdup (text);
+		else
+			ca_creation_data->password = NULL;
+	}
+
 
 	window = GTK_WINDOW(glade_xml_get_widget (new_cert_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
@@ -383,6 +450,9 @@ void on_new_req_commit_clicked (GtkButton *widg,
 	window = GTK_WINDOW(glade_xml_get_widget (new_cert_req_window_xml, "new_req_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
 
+	if (ca_file_is_password_protected())
+		csr_creation_data->password = pkey_manage_ask_password();
+
 	new_csr_creation_process_window_display (csr_creation_data);	
 
 }
@@ -447,15 +517,10 @@ void on_new_cert_next1_clicked (GtkButton *button,
 
 	// Meanwhile, we choose the unique CA, and determine its policy.
 
-	guint64 ca_id;
-	gchar ** row = NULL;
+	guint64 ca_id = atoll("1");
 
 	GtkWidget * widget;
 	guint value;
-
-	row = ca_file_get_single_row ("SELECT serial FROM certificates WHERE is_ca = 1;");
-
-	ca_id = atoll(row[0]);
 	
 	value = ca_policy_get (ca_id, "MONTHS_TO_EXPIRE");
 	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton");
@@ -579,7 +644,11 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	GtkWidget *widget = NULL;
 	GtkWindow *window = NULL;
 	gint active = -1;
-	gchar ** aux;
+	gchar *pem;
+	gchar *dn;
+	gchar *pkey_pem;
+	guint64 ca_id;
+	PkeyManageData *crypted_pkey;
 	
 	time_t tmp;
 	struct tm * expiration_time;
@@ -632,22 +701,50 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	csr_pem = ca_get_selected_row_pem ();
 
-	aux = ca_file_get_single_row ("SELECT pem, private_key FROM certificates WHERE is_ca = 1;");
+	// Here I am supossing that there's only one CA cert, and its serial is 1.
+	// We'll have to remake this when it is possible to hold more than one CA cert in DB.
+	ca_id = 1;
+	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
+	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+					      
+	if (pem && crypted_pkey && dn) {
+		
+		PkeyManageData *csr_pkey = NULL;
 
-	if (aux) {
-		tls_generate_certificate (cert_creation_data, csr_pem, aux[0], aux[1], &certificate);
-		
-		g_strfreev (aux);
-		
-		aux = ca_file_get_single_row ("SELECT private_key FROM cert_requests WHERE id = %d;", ca_get_selected_row_id());
-		
-		if (aux) {
-			ca_file_insert_cert (cert_creation_data, aux[0], certificate);
-			ca_file_remove_csr (ca_get_selected_row_id());
+		pkey_pem = pkey_manage_uncrypt (crypted_pkey, dn);
+
+		if (! pkey_pem) {
+			g_free (pem);
+			pkey_manage_data_free (crypted_pkey);
+			g_free (dn);
+			return;
 		}
+
+		tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
+
+		g_free (pkey_pem);
+		
+		csr_pkey = pkey_manage_get_csr_pkey (ca_get_selected_row_id());
+		
+		if (csr_pkey)
+			if (csr_pkey->is_in_db)
+				ca_file_insert_cert (cert_creation_data, csr_pkey->pkey_data, certificate);
+			else
+				ca_file_insert_cert (cert_creation_data, csr_pkey->external_file, certificate);			
+		else
+			ca_file_insert_cert (cert_creation_data, NULL, certificate);
+
+		ca_file_remove_csr (ca_get_selected_row_id());
+
+		pkey_manage_data_free (csr_pkey);
 		
 	}
 		
+	g_free (pem);
+	pkey_manage_data_free (crypted_pkey);
+	g_free (dn);
+
 	window = GTK_WINDOW(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
 	gtk_object_destroy(GTK_OBJECT(window));	
 	
