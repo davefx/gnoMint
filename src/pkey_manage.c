@@ -536,7 +536,7 @@ gchar * pkey_manage_ask_password ()
 {
 	gchar *password;
 	gboolean is_key_ok;
-	gboolean remember;
+	gboolean remember = 0;
 	GtkWidget * widget = NULL, * password_widget = NULL, *remember_password_widget = NULL;
 	GladeXML * dialog_xml = NULL;
 	gchar     * xml_file = NULL;

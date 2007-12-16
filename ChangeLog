@@ -1,3 +1,73 @@
+2007-11-19 18:22  davefx
+
+	* [r110] doc/test_plan.txt:
+	  Actualizado plan de pruebas
+
+2007-11-19 17:53  davefx
+
+	* [r109] ChangeLog:
+	  Updating changelog for version 0.4
+
+2007-11-19 17:50  davefx
+
+	* [r108] configure.in, doc/test_plan.txt, po/es.po, po/gnomint.pot:
+	  Preparing for gnoMint version 0.4.0
+
+2007-11-19 17:10  davefx
+
+	* [r107] doc/test_plan.txt, gui/gnomint.glade, src/ca.c,
+	  src/ca_file.c, src/ca_file.h, src/new_cert_window.c,
+	  src/pkey_manage.c, src/pkey_manage.h, src/tls.c, src/tls.h:
+	  Allowing to extract private keys from database. Retrieving
+	  external private keys when needed
+
+2007-11-16 16:35  davefx
+
+	* [r106] src/Makefile.am, src/ca.c, src/ca_creation.c,
+	  src/ca_file.c, src/ca_file.h, src/ca_policy.c,
+	  src/csr_creation.c, src/new_cert_creation_process.c,
+	  src/new_cert_window.c, src/pkey_cipher.c, src/pkey_cipher.h,
+	  src/pkey_manage.c, src/pkey_manage.h:
+	  Tidying up a bit.
+
+2007-11-14 17:20  davefx
+
+	* [r105] po/es.po, po/gnomint.pot, src/ca.c, src/ca_file.c:
+	  Actualizando traducción. Solucionados algunos fallos
+
+2007-11-14 13:55  davefx
+
+	* [r104] TEST, doc, doc/ca-db-password-protection.txt,
+	  doc/ca-properties.txt, doc/gnomint-db.dia, doc/test_plan.txt,
+	  gui/gnomint.glade, src/Makefile.am, src/ca.c, src/ca.h,
+	  src/ca_creation.c, src/ca_creation.h, src/ca_file.c,
+	  src/ca_file.h, src/certificate_properties.c,
+	  src/certificate_properties.h, src/csr_creation.c, src/main.c,
+	  src/new_cert_window.c, src/pkey_cipher.c, src/pkey_cipher.h,
+	  src/tls.c:
+	  Allowing whole database password protection that affects to
+	  private keys
+
+2007-11-13 09:27  davefx
+
+	* [r103] TEST:
+	  Adding new tests for new features
+
+2007-11-13 09:16  davefx
+
+	* [r102] TEST:
+	  Committing test plan
+
+2007-11-12 15:47  davefx
+
+	* [r101] src/ca.c:
+	  Disabling non-available pop-up options
+
+2007-11-12 15:33  davefx
+
+	* [r100] gui/gnomint.glade, src/ca.c, src/ca.h, src/main.c:
+	  Adding pop-up menu support for managing CSRs and Certs
+
 2007-11-03 08:19  davefx
 
 	* [r99] ChangeLog, NEWS, configure.in, po/gnomint.pot:
@@ -70,8 +140,7 @@
 
 	* [r89] src/tls.c:
 	  Using size_t where it is needed (in Fedora amd64 arch, it seems
-	  to be
-	  a problem)
+	  to be a problem)
 
 2007-05-17 18:55  davefx
 
@@ -208,8 +277,8 @@
 2006-11-11 10:45  davefx
 
 	* [r60] src/ca_file.c, src/ca_file.h:
-	  Updating DB version to 2, with support for CA policies.
-	  Adding support for upgrading from earlier DB versions.
+	  Updating DB version to 2, with support for CA policies. Adding
+	  support for upgrading from earlier DB versions.
 
 2006-11-10 13:26  davefx
 
@@ -219,11 +288,10 @@
 2006-11-10 13:19  davefx
 
 	* [r57] gui/gnomint.glade, po/es.po, po/gnomint.pot, src/ca.c:
-	  * Allowing uncrypted private key export.
-	  * Requiring minimum length for private-key export passphrase
-	  * Checking confirmation for private-key export passphrase
-	  * Fixing focus grab when asking for passphrase
-	  * Updated Spanish translation
+	  * Allowing uncrypted private key export. * Requiring minimum
+	  length for private-key export passphrase * Checking confirmation
+	  for private-key export passphrase * Fixing focus grab when asking
+	  for passphrase * Updated Spanish translation
 
 2006-11-10 10:40  davefx
 
