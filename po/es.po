@@ -419,10 +419,6 @@ msgstr "Sólo la clave privada (sin cifrar)."
 msgid "Only the pu_blic part."
 msgstr "Sólo la parte pú_blica."
 
-#: ../gui/gnomint.glade.h:106
-msgid "Organitational Unit (OU)"
-msgstr "Unidad organizativa (OU)"
-
 #: ../gui/gnomint.glade.h:107
 msgid "Organization (O)"
 msgstr "Organización (O)"
