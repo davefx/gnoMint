@@ -11,5 +11,6 @@ src/csr_properties.c
 src/main.c
 src/new_cert_creation_process.c
 src/new_cert_window.c
+src/pkey_manage.c
 src/tls.c
 
