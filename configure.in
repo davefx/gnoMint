@@ -79,10 +79,8 @@ dnl
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 
 if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall -Werror -O2 $CFLAGS" 
+	CFLAGS="-Wall -Werror -O2 -g $CFLAGS" 
 fi
-
-CFLAGS="-Wall -Werror -O0 -g" 
 
 dnl
 dnl Scrollkeeper
