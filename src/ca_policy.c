@@ -50,6 +50,56 @@ void ca_policy_populate (guint64 ca_id)
 
 	ca_file_foreach_policy (__ca_policy_populate_step, ca_id, policy_table);
 
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_INHERIT"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "country_inherited_check");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton"), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_differ_radiobutton"), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_INHERIT"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "state_inherited_check");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton"), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_differ_radiobutton"), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_INHERIT"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "city_inherited_check");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton"), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_differ_radiobutton"), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_INHERIT"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "organization_inherited_check");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton"), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_differ_radiobutton"), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_INHERIT"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "ou_inherited_check");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton"), value);
+        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_differ_radiobutton"), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_FORCE_SAME"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_FORCE_SAME"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_FORCE_SAME"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_FORCE_SAME"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+
+        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_FORCE_SAME"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton");
+	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "hours_between_crl_updates_spinbutton");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
@@ -60,14 +110,6 @@ void ca_policy_populate (guint64 ca_id)
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CA"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "ca_check2");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CERT_SIGN"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "cert_signing_check2");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CRL_SIGN"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "crl_signing_check5");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "NON_REPUDIATION"));
@@ -118,7 +160,6 @@ void ca_policy_populate (guint64 ca_id)
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "any_purpose_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 	
-
 }
 
 
@@ -184,6 +225,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	gchar * cert_serial_number = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_serial_number");
 
 	gchar *property_name = NULL;
+        gboolean is_active;
 	
 	if (! cert_serial_number)
 		return;
@@ -192,15 +234,58 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		return;
 	
 	serial_number = atoll (cert_serial_number);
+
+        is_active = gtk_toggle_button_get_active(button);
+
+	if (! strcmp(glade_get_widget_name (button), "country_inherited_check")) {
+		property_name = "C_INHERIT";
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton"), is_active);
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_differ_radiobutton"), is_active);
+        }
+        
+	if (! strcmp(glade_get_widget_name (button), "state_inherited_check")) {
+		property_name = "ST_INHERIT";        
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton"), is_active);
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_differ_radiobutton"), is_active);
+        } 
+
+	if (! strcmp(glade_get_widget_name (button), "city_inherited_check")) {
+		property_name = "L_INHERIT";        
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton"), is_active);
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_differ_radiobutton"), is_active);
+        }
+
+	if (! strcmp(glade_get_widget_name (button), "organization_inherited_check")) {
+		property_name = "O_INHERIT";   
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton"), is_active);
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_differ_radiobutton"), is_active);
+        }
+
+	if (! strcmp(glade_get_widget_name (button), "ou_inherited_check")) {
+		property_name = "OU_INHERIT";        
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton"), is_active);
+                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_differ_radiobutton"), is_active);
+        }
+
+	if (! strcmp(glade_get_widget_name (button), "country_same_radiobutton"))
+		property_name = "C_FORCE_SAME";        
+        
+
+	if (! strcmp(glade_get_widget_name (button), "state_same_radiobutton"))
+		property_name = "ST_FORCE_SAME";        
+
+	if (! strcmp(glade_get_widget_name (button), "city_same_radiobutton"))
+		property_name = "L_FORCE_SAME";        
+
+	if (! strcmp(glade_get_widget_name (button), "organization_same_radiobutton"))
+		property_name = "O_FORCE_SAME";        
+
+	if (! strcmp(glade_get_widget_name (button), "ou_same_radiobutton"))
+		property_name = "OU_FORCE_SAME";        
+
 	
 	if (! strcmp(glade_get_widget_name (button), "ca_check2"))
 		property_name = "CA";
-		
-	if (! strcmp(glade_get_widget_name (button), "cert_signing_check2"))
-		property_name = "CERT_SIGN";
-		
-	if (! strcmp(glade_get_widget_name (button), "crl_signing_check5"))
-		property_name = "CRL_SIGN";
 		
 	if (! strcmp(glade_get_widget_name (button), "non_repudiation_check2"))
 		property_name = "NON_REPUDIATION";
@@ -239,7 +324,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "ANY_PURPOSE";
 
 	if (property_name)
-		ca_policy_set (serial_number, property_name, gtk_toggle_button_get_active(button));
+		ca_policy_set (serial_number, property_name, is_active);
 
 }
 

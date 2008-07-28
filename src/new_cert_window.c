@@ -69,7 +69,7 @@ void new_cert_ca_window_display()
 	
 	glade_xml_signal_autoconnect (new_cert_ca_window_xml); 	
 	
-	_new_cert_ca_populate_country_combobox(new_cert_ca_window_xml);
+	_new_cert_ca_populate_country_combobox(glade_xml_get_widget(new_cert_ca_window_xml, "country_combobox"));
 
 }
 
@@ -319,7 +319,7 @@ void new_cert_req_window_display()
 	
 	glade_xml_signal_autoconnect (new_cert_req_window_xml); 	
 	
-	_new_cert_ca_populate_country_combobox(new_cert_req_window_xml);
+	_new_cert_ca_populate_country_combobox(glade_xml_get_widget(new_cert_req_window_xml, "country_combobox1"));
 
 }
 
@@ -334,7 +334,7 @@ void new_req_tab_activate (int tab_number)
 void on_new_req_cn_entry_changed (GtkEditable *editable,
 			 gpointer user_data) 
 {
-	GtkButton *button = GTK_BUTTON(glade_xml_get_widget (new_cert_req_window_xml, "new_req_next1"));
+	GtkButton *button = GTK_BUTTON(glade_xml_get_widget (new_cert_req_window_xml, "new_req_next2"));
 
 	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
 		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
@@ -390,7 +390,7 @@ void on_new_req_commit_clicked (GtkButton *widg,
 	GtkTreeIter tree_iter;
 	
 	csr_creation_data = g_new0 (CaCreationData, 1);
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "country_combobox");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "country_combobox1");
 	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
 
 	if (active < 0) {
@@ -404,46 +404,46 @@ void on_new_req_commit_clicked (GtkButton *widg,
 		
 	}
 		
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "st_entry");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "st_entry1");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->state = g_strdup (text);
 	else
 		csr_creation_data->state = NULL;
 
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "city_entry");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "city_entry1");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->city = g_strdup (text);
 	else
 		csr_creation_data->city = NULL;
 
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "o_entry");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "o_entry1");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->org = g_strdup (text);
 	else
 		csr_creation_data->org = NULL;
 
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "ou_entry");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "ou_entry1");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->ou = g_strdup (text);
 	else
 		csr_creation_data->ou = NULL;
 
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "cn_entry");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "cn_entry1");
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->cn = g_strdup (text);
 	else
 		csr_creation_data->cn = NULL;
 
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "dsa_radiobutton");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "dsa_radiobutton1");
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	csr_creation_data->key_type = active;
 
-	widget = glade_xml_get_widget (new_cert_req_window_xml, "keylength_spinbutton");
+	widget = glade_xml_get_widget (new_cert_req_window_xml, "keylength_spinbutton1");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	csr_creation_data->key_bitlength = active;
 
@@ -1247,10 +1247,9 @@ void populate_country_table()
 	qsort (country_table, NUMBER_OF_COUNTRIES, sizeof(CountryItem), comp_countries);
 }
 
-void _new_cert_ca_populate_country_combobox(GladeXML *xml_object)
+void _new_cert_ca_populate_country_combobox(GtkComboBox *country_combobox)
 {
 	int i = 0;
-	GtkComboBox *country_combobox = NULL;
 	GtkTreeStore * new_store = NULL;
 	GtkTreeIter iter;
 	GtkCellRenderer *renderer = NULL;
@@ -1258,7 +1257,6 @@ void _new_cert_ca_populate_country_combobox(GladeXML *xml_object)
 	populate_country_table();
 	new_store = gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 
-	country_combobox = GTK_COMBO_BOX(glade_xml_get_widget (xml_object, "country_combobox"));
 	for (i=0; i<NUMBER_OF_COUNTRIES; i++) {
 		gtk_tree_store_append (new_store, &iter, NULL);
 		gtk_tree_store_set (new_store, &iter, 0, country_table[i].name, 1, country_table[i].code, -1);

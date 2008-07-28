@@ -511,7 +511,7 @@ msgid ""
 "Protect CA database private keys\n"
 "with password:"
 msgstr ""
-"Proteger con contraseña las claves privadasde la base de datos de la AC:"
+"Proteger con contraseña las claves privadas de la base de datos de la AC:"
 
 #: ../gui/gnomint.glade.h:131
 msgid "RSA"
