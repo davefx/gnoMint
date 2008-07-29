@@ -20,6 +20,10 @@
 #ifndef _CA_H_
 #define _CA_H_
 
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <gtk/gtk.h>
+
 gboolean ca_open (gchar *filename);
 gboolean ca_refresh_model ();
 void ca_todo_callback();

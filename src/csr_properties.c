@@ -67,13 +67,13 @@ void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 
 	csr = tls_parse_csr_pem (csr_pem);
 
-	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectCNLabel");	
+	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectCNLabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->cn);
 
-	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectOLabel");	
+	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectOLabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->o);
 
-	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectOULabel");	
+	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectOULabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->ou);
 
 	if (! privkey_in_db) {

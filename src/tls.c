@@ -718,7 +718,7 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 						      0, ca_cert_data->cn, strlen(ca_cert_data->cn));	
 
 	
-	if (gnutls_x509_crt_set_ca_status (crt, 0) != 0) {
+	if (gnutls_x509_crt_set_ca_status (crt, creation_data->ca) != 0) {
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (crt);
 		gnutls_x509_crt_deinit (ca_crt);
@@ -727,6 +727,10 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 	}
 	
 	key_usage = 0;
+	if (creation_data->ca)
+		key_usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+	if (creation_data->crl_signing)
+		key_usage |= GNUTLS_KEY_CRL_SIGN;
 	if (creation_data->digital_signature)
 		key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 	if (creation_data->data_encipherment)

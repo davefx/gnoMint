@@ -50,7 +50,9 @@ typedef struct {
 	time_t expiration;
 	
 	guint64 serial;
-	
+
+        gboolean ca;
+        gboolean crl_signing;
 	gboolean digital_signature;
 	gboolean data_encipherment;
 	gboolean key_encipherment;

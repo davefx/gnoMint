@@ -25,6 +25,7 @@
 #include <time.h>
 #include <stdlib.h>
 
+#include "ca.h"
 #include "tls.h"
 #include "ca_file.h"
 #include "pkey_manage.h"
@@ -39,7 +40,7 @@ extern gchar * gnomint_temp_created_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 5
+#define CURRENT_GNOMINT_DB_VERSION 6
 
 
 int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames)
@@ -252,6 +253,11 @@ gboolean ca_file_check_and_update_version ()
 		g_strfreev (result);
 	}
 
+        if (db_version_in_file > CURRENT_GNOMINT_DB_VERSION) {
+                ca_error_dialog (_("The selected database has been created with a newer version of gnoMint than the currently installed."));
+                return FALSE;
+        }
+
 	switch (db_version_in_file) {
 		/* Careful! This switch has not breaks, as all actions must be done for the earliest versions */
 	case 1:
@@ -455,6 +461,42 @@ gboolean ca_file_check_and_update_version ()
 			return FALSE;
 
         case 5:
+ 		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+ 		if (sqlite3_exec (ca_db, "ALTER TABLE `ca_properties` ADD COLUMN `ca_id` INTEGER;", NULL, NULL, &error)) {
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+
+ 		if (sqlite3_exec (ca_db, "UPDATE `ca_properties` SET ca_id=1 WHERE name LIKE 'ca_root_%';", NULL, NULL, &error)) {
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+
+ 		if (sqlite3_exec (ca_db, "UPDATE `ca_properties` SET ca_id=0 WHERE name LIKE 'ca_db_%';", NULL, NULL, &error)) {
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+
+                if (sqlite3_exec (ca_db, "CREATE UNIQUE INDEX `name_ca_id` ON `ca_properties` (`name` ASC, `ca_id` ASC);", NULL, NULL, &error)) {
+                        fprintf (stderr, "%s\n", error);                        
+                        return FALSE;
+                }
+
+                
+		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version';", 6);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+		sqlite3_free (sql);
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return FALSE;
+
+        case 6:
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -472,8 +514,13 @@ gboolean ca_file_open (gchar *file_name)
 		return FALSE;
 	} else {
 		gnomint_current_opened_file = file_name;
-		return ca_file_check_and_update_version ();
+		if (! ca_file_check_and_update_version ()) {
+                        sqlite3_close (ca_db);
+                        ca_db = NULL;
+                        return FALSE;
+                }
 	}
+        return TRUE;
 }
 
 void ca_file_close ()
@@ -568,7 +615,8 @@ guint64 ca_file_get_last_serial ()
 }
 
 gchar * ca_file_insert_cert (CertCreationData *creation_data, 
-			     gchar *pem_private_key,
+                             gboolean is_ca,
+			     gchar *pem_private_key,                             
 			     gchar *pem_certificate)
 {
 	gchar *sql = NULL;
@@ -586,7 +634,10 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	g_strfreev (serialstr);
 
 	if (pem_private_key)
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%q', '%ld', '%ld', NULL, '%q', 1, '%q', '%q', '%q');", 
+		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"
+                                       G_GUINT64_FORMAT
+                                       ", '%q', '%ld', '%ld', NULL, '%q', 1, '%q', '%q', '%q');", 
+                                       is_ca,
 				       serial,
 				       tlscert->cn,
 				       creation_data->activation,
@@ -596,7 +647,10 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       tlscert->dn,
 				       tlscert->i_dn);
 	else
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 0, %lld, '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q');", 
+		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"
+                                       G_GUINT64_FORMAT
+                                       ", '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q');", 
+                                       is_ca,
 				       serial,
 				       tlscert->cn,
 				       creation_data->activation,

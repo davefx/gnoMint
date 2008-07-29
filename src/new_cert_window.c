@@ -509,7 +509,7 @@ void new_cert_tab_activate (int tab_number)
 
 }
 
-void on_new_cert_next1_clicked (GtkButton *button,
+void on_new_cert_next2_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
 	// Whenever gnoMint support more than one CA, here we will
@@ -523,22 +523,21 @@ void on_new_cert_next1_clicked (GtkButton *button,
 	guint value;
 	
 	value = ca_policy_get (ca_id, "MONTHS_TO_EXPIRE");
-	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton");
+	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton1");
 	gtk_spin_button_set_range (GTK_SPIN_BUTTON(widget), 1, value);
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
 
-
-/* 	value = ca_policy_get (ca_id, "CA")); */
-/* 	widget = glade_xml_get_widget (new_cert_window_xml, "ca_check2"); */
-/* 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value); */
+	value = ca_policy_get (ca_id, "CA");
+	widget = glade_xml_get_widget (new_cert_window_xml, "ca_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 /* 	value = ca_policy_get (ca_id, "CERT_SIGN")); */
 /* 	widget = glade_xml_get_widget (new_cert_window_xml, "cert_signing_check2"); */
 /* 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value); */
 
-/* 	value = ca_policy_get (ca_id, "CRL_SIGN")); */
-/* 	widget = glade_xml_get_widget (new_cert_window_xml, "crl_signing_check5"); */
-/* 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value); */
+	value = ca_policy_get (ca_id, "CRL_SIGN");
+	widget = glade_xml_get_widget (new_cert_window_xml, "crl_signing_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = ca_policy_get (ca_id, "NON_REPUDIATION");
 	widget = glade_xml_get_widget (new_cert_window_xml, "non_repudiation_check");
@@ -601,7 +600,7 @@ void on_new_cert_next1_clicked (GtkButton *button,
 	gtk_widget_set_sensitive (widget, value);
 
 	
-	new_cert_tab_activate (1);
+	new_cert_tab_activate (2);
 }
 
 void on_new_cert_previous2_clicked (GtkButton *widget,
@@ -610,11 +609,11 @@ void on_new_cert_previous2_clicked (GtkButton *widget,
 	new_cert_tab_activate (0);
 }
 
-void on_new_cert_next2_clicked (GtkButton *button,
+void on_new_cert_next1_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
 
-	new_cert_tab_activate (2);
+	new_cert_tab_activate (1);
 }
 
 void on_new_cert_previous3_clicked (GtkButton *widget,
@@ -640,6 +639,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	gchar *csr_pem = NULL;
 	
 	gchar *certificate;
+        gchar *error = NULL;
 
 	GtkWidget *widget = NULL;
 	GtkWindow *window = NULL;
@@ -655,7 +655,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	cert_creation_data = g_new0 (CertCreationData, 1);
 		
-	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton");
+	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton1");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	cert_creation_data->key_months_before_expiration = active;
 
@@ -670,11 +670,15 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->expiration = mktime(expiration_time);
 	g_free (expiration_time);
 
+	widget = glade_xml_get_widget (new_cert_window_xml, "ca_check");
+	cert_creation_data->ca = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+	widget = glade_xml_get_widget (new_cert_window_xml, "crl_signing_check");
+	cert_creation_data->crl_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	widget = glade_xml_get_widget (new_cert_window_xml, "digital_signature_check");
 	cert_creation_data->digital_signature = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	widget = glade_xml_get_widget (new_cert_window_xml, "data_encipherment_check");
 	cert_creation_data->data_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "key_encipherment");
+	widget = glade_xml_get_widget (new_cert_window_xml, "key_encipherment_check");
 	cert_creation_data->key_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	widget = glade_xml_get_widget (new_cert_window_xml, "non_repudiation_check");
 	cert_creation_data->non_repudiation = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
@@ -721,24 +725,28 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 			return;
 		}
 
-		tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
+		error = tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
 
 		g_free (pkey_pem);
+                if (! error) {
 		
-		csr_pkey = pkey_manage_get_csr_pkey (ca_get_selected_row_id());
-		
-		if (csr_pkey)
-			if (csr_pkey->is_in_db)
-				ca_file_insert_cert (cert_creation_data, csr_pkey->pkey_data, certificate);
-			else
-				ca_file_insert_cert (cert_creation_data, csr_pkey->external_file, certificate);			
-		else
-			ca_file_insert_cert (cert_creation_data, NULL, certificate);
-
-		ca_file_remove_csr (ca_get_selected_row_id());
-
-		pkey_manage_data_free (csr_pkey);
-		
+                        csr_pkey = pkey_manage_get_csr_pkey (ca_get_selected_row_id());
+                        
+                        if (csr_pkey)
+                                if (csr_pkey->is_in_db)
+                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, csr_pkey->pkey_data, certificate);
+                                else
+                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, csr_pkey->external_file, certificate);			
+                        else
+                                error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, NULL, certificate);
+                        
+                        if (!error)
+                                ca_file_remove_csr (ca_get_selected_row_id());
+                        else 
+                                ca_error_dialog (error);
+                        
+                        pkey_manage_data_free (csr_pkey);
+		}
 	}
 		
 	g_free (pem);

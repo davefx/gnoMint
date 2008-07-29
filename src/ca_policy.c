@@ -112,6 +112,10 @@ void ca_policy_populate (guint64 ca_id)
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "ca_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
+	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CRL_SIGN"));
+	widget = glade_xml_get_widget (certificate_properties_window_xml, "crl_signing_check1");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
+
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "NON_REPUDIATION"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "non_repudiation_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
@@ -286,6 +290,9 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	
 	if (! strcmp(glade_get_widget_name (button), "ca_check2"))
 		property_name = "CA";
+
+	if (! strcmp(glade_get_widget_name (button), "crl_signing_check1"))
+		property_name = "CRL_SIGN";
 		
 	if (! strcmp(glade_get_widget_name (button), "non_repudiation_check2"))
 		property_name = "NON_REPUDIATION";
