@@ -30,7 +30,6 @@
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
-
 typedef struct
 {
 	const gchar *oid;
@@ -231,15 +230,15 @@ void certificate_properties_close_clicked (const char *certificate_pem)
 
 char * __certificate_properties_dump_raw_data(const unsigned char *buffer, size_t buffer_size)
 {
-	const int BYTES_PER_LINE = 16;
-	char *result = malloc(4 * buffer_size);
+	const gint BYTES_PER_LINE = 16;
+	gchar *result = g_new0 (gchar, 4 * buffer_size);
 	if (!result)
 	{
 		fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, "Not enough memory\n");
 		return result;
 	}
 	size_t i;
-	char *result_iterator = result;
+	gchar *result_iterator = result;
 	for (i = 0; i < buffer_size; i++)
 	{
 		result_iterator += sprintf(result_iterator, "%02x:", buffer[i]);
@@ -262,7 +261,7 @@ const gchar * __certificate_properties_lookup_oid_label(const certificate_proper
 	for (i = certificate_properties_oid_label_table; i->oid; i++)
 		if (strcmp(i->oid, oid) == 0)
 			break;
-	return i->label;
+	return _(i->label);
 }
 
 
@@ -322,23 +321,23 @@ gchar * __certificate_properties_dump_key_usage(guint key_usage)
 	gchar *result = g_new0 (gchar, BUFFER_SIZE_MAX + 1);
 	gchar *buffer_iterator = result;
 	if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Digital signature");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Digital signature"));
 	if (key_usage & GNUTLS_KEY_NON_REPUDIATION)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Non repudiation");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Non repudiation"));
 	if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Key encipherment");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key encipherment"));
 	if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Data encipherment");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Data encipherment"));
 	if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Key agreement");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key agreement"));
 	if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Certificate signing");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Certificate signing"));
 	if (key_usage & GNUTLS_KEY_CRL_SIGN)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "CRL signing");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("CRL signing"));
 	if (key_usage & GNUTLS_KEY_ENCIPHER_ONLY)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Key encipherment only");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key encipherment only"));
 	if (key_usage & GNUTLS_KEY_DECIPHER_ONLY)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", "Key decipherment only");
+		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key decipherment only"));
 	*(buffer_iterator - 1) = 0;
 	return result;
 }
@@ -351,7 +350,7 @@ void __certificate_properties_fill_tbsCertificate_version(GtkTreeStore *store, G
 	sprintf(value, "v%d", result);
 	GtkTreeIter j;
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Version", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Version"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 }
 
 void __certificate_properties_fill_tbsCertificate_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
@@ -386,7 +385,7 @@ void __certificate_properties_fill_tbsCertificate_serialNumber(GtkTreeStore *sto
 	g_free(buffer);
 
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Serial Number", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Serial Number"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 
 	g_free(value);
 }
@@ -401,13 +400,13 @@ void __certificate_properties_fill_tbsCertificate_signature(GtkTreeStore *store,
 	const gchar *name = gnutls_sign_algorithm_get_name(result);
 
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Signature", -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Signature"), -1);
 
 	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "Algorithm", CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
+	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
 
 	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "Parameters", CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 }
 
 void __certificate_properties_fill_tbsCertificate_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
@@ -439,7 +438,7 @@ void __certificate_properties_fill_tbsCertificate_issuer(GtkTreeStore *store, Gt
 	g_free(buffer);
 
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Issuer", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Issuer"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 
 	g_free(value);
 }
@@ -467,13 +466,13 @@ void __certificate_properties_fill_tbsCertificate_validity (GtkTreeStore *store,
 	not_after_asctime[strlen(not_after_asctime) - 1] = 0;
 
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Validity", -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Validity"), -1);
 
 	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "Not Before", CERTIFICATE_PROPERTIES_COL_VALUE, not_before_asctime, -1);
+	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Not Before"), CERTIFICATE_PROPERTIES_COL_VALUE, not_before_asctime, -1);
 
 	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "Not After", CERTIFICATE_PROPERTIES_COL_VALUE, not_after_asctime, -1);
+	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Not After"), CERTIFICATE_PROPERTIES_COL_VALUE, not_after_asctime, -1);
 }
 
 void __certificate_properties_fill_tbsCertificate_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
@@ -505,7 +504,7 @@ void __certificate_properties_fill_tbsCertificate_subject (GtkTreeStore *store, 
 	g_free(buffer);
 
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Subject", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 
 	g_free(value);
 }
@@ -529,20 +528,20 @@ void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeS
 	name = gnutls_pk_algorithm_get_name(result);
 
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Subject Public Key Info", -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Public Key Info"), -1);
 
 	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "Algorithm", -1);
+	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), -1);
 
 	gtk_tree_store_append(store, &l, &k);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Algorithm", CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
 
 	switch (result) {
 	case GNUTLS_PK_RSA:
 		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Parameters", CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "RSA PublicKey", -1);
+		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("RSA PublicKey"), -1);
 		result = gnutls_x509_crt_get_pk_rsa_raw(*certificate, &modulus, &publicExponent);
 		if (result < 0) {
 			fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
@@ -552,13 +551,13 @@ void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeS
 		gnutls_free(modulus.data);
 
 		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Modulus", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Modulus"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 		g_free(value);
 
 		value = __certificate_properties_dump_raw_data(publicExponent.data, publicExponent.size);
 		gnutls_free(publicExponent.data);
 		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Public Exponent", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Public Exponent"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 		g_free(value);
 		break;
 	case GNUTLS_PK_DSA:
@@ -568,7 +567,7 @@ void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeS
 			break;
 		}
 		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Parameters", -1);
+		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), -1);
 
 		value = __certificate_properties_dump_raw_data(p.data, p.size);
 		gnutls_free(p.data);
@@ -591,14 +590,14 @@ void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeS
 		value = __certificate_properties_dump_raw_data(y.data, y.size);
 		gnutls_free(y.data);
 		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "DSA PublicKey", value, -1);
+		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("DSA PublicKey"), value, -1);
 		g_free(value);
 		break;
 	default:
 		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Parameters", CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, "Subject Public Key", CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Public Key"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 		break;
 	}
 }
@@ -609,7 +608,7 @@ void __certificate_properties_fill_tbsCertificate_issuerUniqueID (GtkTreeStore *
 {
 	GtkTreeIter j;
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Issuer Unique ID", CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Issuer Unique ID"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 } 
 
 void __certificate_properties_fill_tbsCertificate_subjectUniqueID (GtkTreeStore *store, 
@@ -618,7 +617,7 @@ void __certificate_properties_fill_tbsCertificate_subjectUniqueID (GtkTreeStore 
 {
 	GtkTreeIter j;
 	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Subject Unique ID", CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Unique ID"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 }
 
 void __certificate_properties_fill_tbsCertificate_extensions_SubjectKeyIdentifier (GtkTreeStore *store, 
@@ -640,7 +639,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_SubjectKeyIdentifie
 	}
 	hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 	g_free(hex_buffer);
 }
 
@@ -662,7 +661,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_KeyUsage (GtkTreeSt
 	GtkTreeIter l;
 
 	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 	g_free(buffer);
 }
 
@@ -696,37 +695,37 @@ void __certificate_properties_fill_tbsCertificate_extensions_SubjectAltName (Gtk
 		switch (result) {
 		case GNUTLS_SAN_DNSNAME:
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "DNS Name", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("DNS Name"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_RFC822NAME:
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "RFC822 Name", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("RFC822 Name"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_URI:
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "URI", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("URI"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_IPADDRESS:
 			hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "IP", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 			break;
 		case GNUTLS_SAN_DN:
 			hex_buffer = __certificate_properties_dump_RDNSequence (buffer, buffer_size);
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Directory Name", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Directory Name"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 			break;
 		default:
 			hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 			gtk_tree_store_append (store, &l, parent);
-			gtk_tree_store_set (store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", 
+			gtk_tree_store_set (store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
 					    CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 			break;
@@ -750,18 +749,18 @@ void __certificate_properties_fill_tbsCertificate_extensions_BasicConstraints (G
 		return;
 	}
 
-	gchar *ca_as_string = ca ? "TRUE" : "FALSE";
+	gchar *ca_as_string = ca ? _("TRUE") : _("FALSE");
 	gchar *pathlen_as_string = NULL;
 	GtkTreeIter l;
 	
 	g_strdup_printf (pathlen_as_string, "%d", path_len_constraint);
 
 	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "CA", 
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("CA"), 
 			   CERTIFICATE_PROPERTIES_COL_VALUE, ca_as_string, -1);
 
 	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Path Length Constraint", 
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Path Length Constraint"), 
 			   CERTIFICATE_PROPERTIES_COL_VALUE, pathlen_as_string, -1);
 
 	g_free (pathlen_as_string);
@@ -799,37 +798,37 @@ void __certificate_properties_fill_tbsCertificate_extensions_CRLDistributionPoin
 		switch (result)	{
 		case GNUTLS_SAN_DNSNAME:
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "DNS Name", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("DNS Name"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_RFC822NAME:
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "RFC822 Name", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("RFC822 Name"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_URI:
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "URI", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("URI"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_IPADDRESS:
 			hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "IP Address", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 			break;
 		case GNUTLS_SAN_DN:
 			hex_buffer = __certificate_properties_dump_RDNSequence (buffer, buffer_size);
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Directory Name", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Directory Name"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 			break;
 		default:
 			hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 			break;
@@ -857,7 +856,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_AuthorityKeyIdentif
 	hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 
 	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", 
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
 			   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 
 	g_free(hex_buffer);
@@ -894,7 +893,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_ExtKeyUsage (GtkTre
 	*(usage_buffer_iterator - 1) = 0;
 	GtkTreeIter l;
 	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", 
+	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
 			   CERTIFICATE_PROPERTIES_COL_VALUE, usage_buffer, -1);
 }
 
@@ -923,16 +922,16 @@ void __certificate_properties_fill_tbsCertificate_extensions (GtkTreeStore *stor
 		}
 		if (i == 0) {
 			gtk_tree_store_append(store, &j, parent);
-			gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Extensions", -1);
+			gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Extensions"), -1);
 		}
 		const gchar *label = __certificate_properties_lookup_oid_label(certificate_properties_oid_label_table, oid);
 		gtk_tree_store_append(store, &k, &j);
 		if (!label)
 			label = oid;
 		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, label, -1);
-		const gchar *critical_as_string = critical ? "TRUE" : "FALSE";
+		const gchar *critical_as_string = critical ? _("TRUE") : _("FALSE");
 		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Critical", 
+		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Critical"), 
 				   CERTIFICATE_PROPERTIES_COL_VALUE, critical_as_string, -1);
 		certificate_properties_fill_t function;
 		function = __certificate_properties_lookup_oid_function(certificate_properties_oid_function_table, oid);
@@ -946,7 +945,7 @@ void __certificate_properties_fill_tbsCertificate_extensions (GtkTreeStore *stor
 			result = gnutls_x509_crt_get_extension_data(*certificate, i, buffer, &buffer_size);
 			gchar *hex_buffer = __certificate_properties_dump_raw_data((unsigned char *) buffer, buffer_size);
 			gtk_tree_store_append(store, &l, &k);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, "Value", 
+			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
 					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 			g_free(hex_buffer);
 		}
@@ -959,7 +958,7 @@ void __certificate_properties_fill_tbsCertificate (GtkTreeStore *store,
 {
 	GtkTreeIter i;
 	gtk_tree_store_append(store, &i, parent);
-	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, "Certificate", -1);
+	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Certificate"), -1);
 	__certificate_properties_fill_tbsCertificate_version(store, &i, certificate);
 	__certificate_properties_fill_tbsCertificate_serialNumber(store, &i, certificate);
 	__certificate_properties_fill_tbsCertificate_signature(store, &i, certificate);
@@ -981,14 +980,14 @@ void __certificate_properties_fill_signatureAlgorithm (GtkTreeStore *store,
 	gint result;
 	result = gnutls_x509_crt_get_signature_algorithm(*certificate);
 	const gchar *name = gnutls_sign_algorithm_get_name(result);
-	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, "Signature Algorithm", -1);
+	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Signature Algorithm"), -1);
 	GtkTreeIter j;
 	gtk_tree_store_append(store, &j, &i);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Algorithm", 
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), 
 			   CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
 	gtk_tree_store_append(store, &j, &i);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, "Parameters", 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, "(unknown)", -1);
+	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), 
+			   CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 }
 
 void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
@@ -1017,7 +1016,7 @@ void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeI
 	
 	hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 
-	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, "Signature", 
+	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Signature"), 
 			   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
 
 	g_free(hex_buffer);
@@ -1065,12 +1064,45 @@ __certificate_details_populate(const char *certificate_pem)
 	renderer = gtk_cell_renderer_text_new();
 
 	g_object_set(renderer, "yalign", 0.0, NULL);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, "Name", renderer, "text", CERTIFICATE_PROPERTIES_COL_NAME, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, _("Name"), renderer, "text", CERTIFICATE_PROPERTIES_COL_NAME, NULL);
 	renderer = gtk_cell_renderer_text_new();
 
 	g_object_set(renderer, "family", "Monospace", "family-set", 1, NULL);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, "Value", renderer, "text", CERTIFICATE_PROPERTIES_COL_VALUE, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, _("Value"), renderer, "text", CERTIFICATE_PROPERTIES_COL_VALUE, NULL);
 	gtk_tree_view_set_model(GTK_TREE_VIEW(view), GTK_TREE_MODEL(store));
 
 	g_object_unref(store);
 }
+
+#if 0
+
+//Function included for generating extra gettext strings. Do not remove.
+
+void useless_function ()
+{
+	printf ("%s",_("TLS WWW Server"));
+	printf ("%s",_("TLS WWW Client"));
+	printf ("%s",_("Code signing"));
+	printf ("%s",_("Email protection"));
+	printf ("%s",_("Time stamping"));
+	printf ("%s",_("OCSP signing"));
+	printf ("%s",_("Any purpose"));
+	printf ("%s",_("Subject Directory Attributes"));
+	printf ("%s",_("Subject Key Identifier"));
+	printf ("%s",_("Key Usage"));
+	printf ("%s",_("Private Key Usage Period"));
+	printf ("%s",_("Subject Alternative Name"));
+	printf ("%s",_("Basic Constraints"));
+	printf ("%s",_("Name Constraints"));
+	printf ("%s",_("CRL Distribution Points"));
+	printf ("%s",_("Certificate Policies"));
+	printf ("%s",_("Policy Mappings"));
+	printf ("%s",_("Authority Key Identifier"));
+	printf ("%s",_("Policy Constraints"));
+	printf ("%s",_("Extended Key Usage"));
+	printf ("%s",_("Delta CRL Distribution Point"));
+	printf ("%s",_("Inhibit Any-Policy"));
+
+}
+
+#endif
