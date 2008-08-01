@@ -35,6 +35,8 @@
 #include "certificate_properties.h"
 #include "csr_properties.h"
 #include "tls.h"
+#include "new_ca_window.h"
+#include "new_req_window.h"
 #include "new_cert_window.h"
 #include "pkey_manage.h"
 
@@ -322,7 +324,7 @@ gboolean ca_refresh_model ()
            - Item type
 	*/
 
-	new_model = gtk_tree_store_new (10, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_UINT64, G_TYPE_STRING, 
+	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_UINT64, G_TYPE_STRING, 
 					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_INT);
 
 	cert_title_inserted = FALSE;

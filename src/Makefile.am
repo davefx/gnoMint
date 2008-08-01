@@ -14,6 +14,8 @@ INCLUDES = \
 
 gnomint_SOURCES = \
 	main.c \
+        new_ca_window.c \
+        new_req_window.c \
 	new_cert_window.c \
 	new_cert_creation_process.c \
 	ca.c \
@@ -42,6 +44,8 @@ EXTRA_DIST = \
 	csr_creation.h \
 	csr_properties.h \
 	new_cert_creation_process.h \
+	new_ca_window.h \
+	new_req_window.h \
 	new_cert_window.h \
 	tls.h\
 	pkey_manage.h

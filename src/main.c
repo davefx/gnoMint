@@ -23,6 +23,8 @@
 #include <glade/glade.h>
 #include <stdlib.h>
 
+#include "new_ca_window.h"
+#include "new_req_window.h"
 #include "new_cert_window.h"
 #include "tls.h"
 #include "ca.h"
@@ -152,13 +154,13 @@ gboolean on_main_window1_delete (GtkWidget *widget,
 
 void on_new1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	new_cert_ca_window_display();
+	new_ca_window_display();
 	
 }
 
 void on_new_certificate1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-	new_cert_req_window_display();
+	new_req_window_display();
 	
 }
 
