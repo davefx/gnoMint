@@ -63,35 +63,35 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
         NewReqCaListModelColumns;
 
 
-int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
-{
-	GtkTreeIter iter;
-	GtkTreeIter iter_previous;
+/* int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames) */
+/* { */
+/* 	GtkTreeIter iter; */
+/* 	GtkTreeIter iter_previous; */
 
-	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
+/* 	GtkTreeStore * new_model = GTK_TREE_STORE (pArg); */
 
-	// First we must check if the current CA is at the same level than the last one
-	if (new_req_last_ca_iter) {
-		gtk_tree_
+/* 	// First we must check if the current CA is at the same level than the last one */
+/* 	if (new_req_last_ca_iter) { */
+/* 		gtk_tree_ */
 
-	}
+/* 	} */
 	
-	gtk_tree_store_append (new_model, &iter, new_req_last_ca_iter);
+/* 	gtk_tree_store_append (new_model, &iter, new_req_last_ca_iter); */
 	
-	gtk_tree_store_set (new_model, &iter,
-			    0, atoi(argv[CA_MODEL_COLUMN_ID]),
-			    1, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
-			    2, argv[CA_MODEL_COLUMN_SUBJECT],
-			    3, argv[CA_MODEL_COLUMN_DN],
-			    -1);
+/* 	gtk_tree_store_set (new_model, &iter, */
+/* 			    0, atoi(argv[CA_MODEL_COLUMN_ID]), */
+/* 			    1, atoll(argv[CA_MODEL_COLUMN_SERIAL]), */
+/* 			    2, argv[CA_MODEL_COLUMN_SUBJECT], */
+/* 			    3, argv[CA_MODEL_COLUMN_DN], */
+/* 			    -1); */
 	
-	// For now, we only support one only CA
-	if (atoi(argv[CA_MODEL_COLUMN_IS_CA]) != 0) {
-		new_req_last_ca_iter = gtk_tree_iter_copy (&iter);
-	}
+/* 	// For now, we only support one only CA */
+/* 	if (atoi(argv[CA_MODEL_COLUMN_IS_CA]) != 0) { */
+/* 		new_req_last_ca_iter = gtk_tree_iter_copy (&iter); */
+/* 	} */
 	
-	return 0;
-}
+/* 	return 0; */
+/* } */
 
 
 
@@ -100,8 +100,8 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 
 void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 {
-	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING,
-						    G_TYPE_STRING, G_TYPE_STRING);
+	/* new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING, */
+	/* 					    G_TYPE_STRING, G_TYPE_STRING); */
 }
 
 void new_req_window_display()
