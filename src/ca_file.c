@@ -43,6 +43,30 @@ sqlite3 * ca_db = NULL;
 #define CURRENT_GNOMINT_DB_VERSION 6
 
 
+void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+        gchar *result = NULL;
+        const guchar *aux1;
+        gchar *aux2 = NULL;
+        guint i;
+        
+        for (i=0; i < argc; i++) {
+                aux1 = sqlite3_value_text(argv[i]);
+                if (! result) {
+                        result = g_strdup ((const gchar *) aux1);
+                } else {
+                        aux2 = g_strdup_printf ("%s%s", result, aux1);
+                        g_free (result);
+                        result = aux2;
+                }
+        }
+
+
+        sqlite3_result_text (context, result, -1, g_free);
+}
+
+
+
 int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames)
 {
 	gchar ***result = (gchar ***) pArg;
@@ -244,7 +268,7 @@ gboolean ca_file_check_and_update_version ()
 	gchar * sql = NULL;
 	gchar * error;
 
-	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name = 'ca_db_version' AND ca_id=0;");
+	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name = 'ca_db_version';");
 
 	if (result && result[0] && atoi(result[0]) == CURRENT_GNOMINT_DB_VERSION) {
 		g_strfreev (result);
@@ -505,19 +529,36 @@ gboolean ca_file_check_and_update_version ()
 			return FALSE;
 		}
 
-		if (sqlite3_exec (ca_db, 
-				  "ALTER TABLE certificates ADD COLUMN parent_id INTEGER DEFAULT 0;",
+                if (sqlite3_exec (ca_db,
+                                  "CREATE TABLE certificates_tmp (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, "
+                                  "activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, "
+                                  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT UNIQUE);",
+                                  NULL, NULL, &error)) {
+                        fprintf (stderr, "%s\n", error);
+                        return FALSE;
+                }
+                
+ 		if (sqlite3_exec (ca_db,
+				  "INSERT OR REPLACE INTO certificates_tmp SELECT *, 0, NULL FROM certificates;",
 				  NULL, NULL, &error)) {
                         fprintf (stderr, "%s\n", error);
 			return FALSE;
 		}
 
-		if (sqlite3_exec (ca_db, 
-				  "ALTER TABLE certificates ADD COLUMN parent_route UNIQUE TEXT;",
+ 		if (sqlite3_exec (ca_db,
+				  "DROP TABLE certificates;",
 				  NULL, NULL, &error)) {
                         fprintf (stderr, "%s\n", error);
 			return FALSE;
 		}
+               
+ 		if (sqlite3_exec (ca_db,
+				  "ALTER TABLE certificates_tmp RENAME TO certificates;",
+				  NULL, NULL, &error)) {
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+               
                 
 		{
 			gchar **cert_table;
@@ -546,6 +587,19 @@ gboolean ca_file_check_and_update_version ()
 		}
 
 
+		sql = sqlite3_mprintf ("UPDATE certificates SET parent_route=':' WHERE dn=parent_dn;");
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+		sqlite3_free (sql);
+
+		sql = sqlite3_mprintf ("UPDATE certificates SET parent_route=':1:' WHERE dn<>parent_dn;");
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+		sqlite3_free (sql);
 
 		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version' AND ca_id=0;", 6);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
@@ -581,6 +635,9 @@ gboolean ca_file_open (gchar *file_name)
                         return FALSE;
                 }
 	}
+
+        sqlite3_create_function (ca_db, "concat", -1, SQLITE_ANY, NULL, __ca_file_concat_string, NULL, NULL);
+
         return TRUE;
 }
 
@@ -690,17 +747,19 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	gchar **parent_idstr = NULL;
 	guint64 parent_id;
+        gchar *parent_parent_route = NULL;
 
 	TlsCert *tlscert = tls_parse_cert_pem (pem_certificate);
 
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	parent_idstr = ca_file_get_single_row ("SELECT id FROM certificates WHERE dn='%q';", tlscert->i_dn);
+	parent_idstr = ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn);
 	if (parent_idstr == NULL)
 		parent_id = 0;
 	else {
 		parent_id = atoll (parent_idstr[0]);
+                parent_parent_route = g_strdup(parent_idstr[1]);
 		g_strfreev (parent_idstr);
 	}
 
@@ -713,7 +772,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"
                                        G_GUINT64_FORMAT
                                        ", '%q', '%ld', '%ld', NULL, '%q', 1, '%q', '%q', '%q', "
-				       G_GUINT64_FORMAT ");", 
+				       G_GUINT64_FORMAT", '%q%"G_GUINT64_FORMAT":');", 
                                        is_ca,
 				       serial,
 				       tlscert->cn,
@@ -723,12 +782,14 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       pem_private_key,
 				       tlscert->dn,
 				       tlscert->i_dn,
-				       parent_id);
+				       parent_id,
+                                       parent_parent_route,
+                                       parent_id);
 	else
 		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"
                                        G_GUINT64_FORMAT
                                        ", '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
-				       G_GUINT64_FORMAT");", 
+				       G_GUINT64_FORMAT", '%q%"G_GUINT64_FORMAT":');", 
                                        is_ca,
 				       serial,
 				       tlscert->cn,
@@ -737,7 +798,9 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       pem_certificate,
 				       tlscert->dn,
 				       tlscert->i_dn,
-				       parent_id);
+				       parent_id,
+                                       parent_parent_route,
+                                       parent_id);
 
 	tls_cert_free (tlscert);
 	tlscert = NULL;
@@ -1276,17 +1339,10 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gboolean view_revoked, gpo
 {
 	gchar *error_str;
 
-	if (view_revoked) {
-		sqlite3_exec (ca_db, 
-			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem "
-			      "FROM certificates ORDER BY parent_route, id", 
-			      func, userdata, &error_str);
-	} else {
-		sqlite3_exec (ca_db, 
-			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
-			      "pem FROM certificates WHERE revocation IS NULL ORDER BY parent_route, id", 
-			      func, userdata, &error_str);
-	}
+        sqlite3_exec (ca_db, 
+                      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem "
+                      "FROM certificates WHERE is_ca=1 AND revocation IS NULL ORDER BY concat(parent_route, id)", 
+                      func, userdata, &error_str);
 
 	return  (! error_str);
 }
@@ -1298,12 +1354,12 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
 
 	if (view_revoked) {
 		sqlite3_exec (ca_db, 
-			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates ORDER BY id", 
+			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates ORDER BY concat(parent_route,id) ", 
 			      func, userdata, &error_str);
 	} else {
 		sqlite3_exec (ca_db, 
 			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
-			      "pem FROM certificates WHERE revocation IS NULL ORDER BY id", 
+			      "pem FROM certificates WHERE revocation IS NULL ORDER BY concat(parent_route,id)", 
 			      func, userdata, &error_str);
 	}
 
