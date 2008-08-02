@@ -174,7 +174,7 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 				   GtkTreeIter *iter,
 				   gpointer data)
 {
-	time_t model_time;
+	time_t model_time = 0;
 	struct tm model_time_tm;
 	gchar model_time_str[100];
 	gchar *result = NULL;

@@ -747,7 +747,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	gchar **parent_idstr = NULL;
 	guint64 parent_id;
-        gchar *parent_parent_route = NULL;
+        gchar *parent_route = NULL;
 
 	TlsCert *tlscert = tls_parse_cert_pem (pem_certificate);
 
@@ -755,11 +755,12 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 		return error;
 
 	parent_idstr = ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn);
-	if (parent_idstr == NULL)
+	if (parent_idstr == NULL) {
 		parent_id = 0;
-	else {
+		parent_route = g_strdup(":");
+	} else {
 		parent_id = atoll (parent_idstr[0]);
-                parent_parent_route = g_strdup(parent_idstr[1]);
+                parent_route = g_strdup_printf("%s%s:",parent_idstr[1], parent_idstr[0]);
 		g_strfreev (parent_idstr);
 	}
 
@@ -769,10 +770,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	g_strfreev (serialstr);
 
 	if (pem_private_key)
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"
-                                       G_GUINT64_FORMAT
-                                       ", '%q', '%ld', '%ld', NULL, '%q', 1, '%q', '%q', '%q', "
-				       G_GUINT64_FORMAT", '%q%"G_GUINT64_FORMAT":');", 
+		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"G_GUINT64_FORMAT", '%q', '%ld', '%ld', "
+				       "NULL, '%q', 1, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", 
                                        is_ca,
 				       serial,
 				       tlscert->cn,
@@ -783,13 +782,12 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       tlscert->dn,
 				       tlscert->i_dn,
 				       parent_id,
-                                       parent_parent_route,
-                                       parent_id);
+                                       parent_route);
 	else
 		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, %"
                                        G_GUINT64_FORMAT
                                        ", '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
-				       G_GUINT64_FORMAT", '%q%"G_GUINT64_FORMAT":');", 
+				       "%"G_GUINT64_FORMAT", '%q');", 
                                        is_ca,
 				       serial,
 				       tlscert->cn,
@@ -799,11 +797,12 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       tlscert->dn,
 				       tlscert->i_dn,
 				       parent_id,
-                                       parent_parent_route,
-                                       parent_id);
+                                       parent_route);
 
 	tls_cert_free (tlscert);
 	tlscert = NULL;
+
+	g_free (parent_route);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -1335,7 +1334,7 @@ gboolean ca_file_password_change(const gchar *old_password, const gchar *new_pas
 }
 
 
-gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gboolean view_revoked, gpointer userdata)
+gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 {
 	gchar *error_str;
 

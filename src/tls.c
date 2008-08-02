@@ -831,7 +831,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	size = 0;
 	gnutls_x509_crt_get_serial (*cert, NULL, &size);
 	if (size) {
-		aux = g_new0 (gchar, size);
+		aux = g_new0 (gchar, size+1);
 		gnutls_x509_crt_get_serial (*cert, aux, &size);
 		res->serial_number = strtoull (aux, NULL, 16);
 		g_free(aux);

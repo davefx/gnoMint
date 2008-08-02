@@ -64,7 +64,7 @@ gchar * ca_file_revoke_crt (gint id);
 GList * ca_file_get_revoked_certs (void);
 
 
-gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gboolean view_revoked, gpointer userdata);
+gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata);
 gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gpointer userdata);
 gboolean ca_file_foreach_csr (CaFileCallbackFunc func, gpointer userdata);
 gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointer userdata);

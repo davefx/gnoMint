@@ -49,10 +49,6 @@ CountryItem country_table[NUMBER_OF_COUNTRIES];
 GladeXML * new_req_window_xml = NULL;
 GtkTreeStore * new_req_ca_list_model = NULL;
 
-GtkTreeIter * new_req_cert_parent_iter = NULL;
-GtkTreeIter * new_req_last_ca_iter = NULL;
-
-
 
 enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
       NEW_REQ_CA_MODEL_COLUMN_SERIAL=1,
@@ -63,35 +59,73 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
         NewReqCaListModelColumns;
 
 
-/* int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames) */
-/* { */
-/* 	GtkTreeIter iter; */
-/* 	GtkTreeIter iter_previous; */
+int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
+{
 
-/* 	GtkTreeStore * new_model = GTK_TREE_STORE (pArg); */
+	GValue *last_dn_value=NULL;
+	GValue *last_parent_dn_value=NULL;
+	GtkTreeIter iter;
+	GtkTreeIter *last_parent_iter = g_dataset_get_data (pArg, "parent_iter");
+	GtkTreeIter *last_ca_iter = g_dataset_get_data (pArg, "ca_iter");
 
-/* 	// First we must check if the current CA is at the same level than the last one */
-/* 	if (new_req_last_ca_iter) { */
-/* 		gtk_tree_ */
+	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
 
-/* 	} */
+	// First we check if this is the first CA, or is a self-signed certificate
+	if (! last_ca_iter || 
+	    (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_DN],argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN])) ) {
+
+		if (last_parent_iter)
+			gtk_tree_iter_free (last_parent_iter);
+
+		last_parent_iter = NULL;
+		
+	} else {
+		// If not, then we must find the parent of the current nod
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_DN, last_dn_value);
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_PARENT_DN, last_parent_dn_value);
+		
+		if (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_dn_value))) {
+			// Last node is parent of the current node
+			if (last_parent_iter)
+				gtk_tree_iter_free (last_parent_iter);
+			last_parent_iter = gtk_tree_iter_copy (last_ca_iter);
+		} else {
+			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
+			// current certificate.
+			
+			while (last_parent_iter && 
+			       strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
+
+				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
+					// Last ca iter is a top_level
+					if (last_parent_iter)
+						gtk_tree_iter_free (last_parent_iter);
+					last_parent_iter = NULL;
+				} else {
+					if (last_parent_iter)
+						gtk_tree_iter_free (last_parent_iter);
+					last_parent_iter = gtk_tree_iter_copy (&iter);
+				}
+			}
+		}
+
+		
+	}
+
+	gtk_tree_store_append (new_model, &iter, last_parent_iter);
 	
-/* 	gtk_tree_store_append (new_model, &iter, new_req_last_ca_iter); */
-	
-/* 	gtk_tree_store_set (new_model, &iter, */
-/* 			    0, atoi(argv[CA_MODEL_COLUMN_ID]), */
-/* 			    1, atoll(argv[CA_MODEL_COLUMN_SERIAL]), */
-/* 			    2, argv[CA_MODEL_COLUMN_SUBJECT], */
-/* 			    3, argv[CA_MODEL_COLUMN_DN], */
-/* 			    -1); */
-	
-/* 	// For now, we only support one only CA */
-/* 	if (atoi(argv[CA_MODEL_COLUMN_IS_CA]) != 0) { */
-/* 		new_req_last_ca_iter = gtk_tree_iter_copy (&iter); */
-/* 	} */
-	
-/* 	return 0; */
-/* } */
+	gtk_tree_store_set (new_model, &iter,
+			    0, atoi(argv[NEW_REQ_CA_MODEL_COLUMN_ID]),
+			    1, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL]),
+			    2, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT],
+			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
+			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
+			    -1);
+
+	last_ca_iter = gtk_tree_iter_copy (&iter);
+
+	return 0;
+}
 
 
 
@@ -100,8 +134,18 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
 
 void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 {
-	/* new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING, */
-	/* 					    G_TYPE_STRING, G_TYPE_STRING); */
+	GtkTreeIter *last_parent_iter = NULL;
+	GtkTreeIter *last_ca_iter = NULL;
+
+	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING,
+						    G_TYPE_STRING, G_TYPE_STRING);
+
+	g_dataset_set_data (new_req_ca_list_model, "parent_iter", last_parent_iter);
+	g_dataset_set_data (new_req_ca_list_model, "ca_iter", last_ca_iter);
+
+	ca_file_foreach_ca (__new_req_window_refresh_model_add_ca, new_req_ca_list_model);
+
+	g_dataset_destroy (new_req_ca_list_model);
 }
 
 void new_req_window_display()
