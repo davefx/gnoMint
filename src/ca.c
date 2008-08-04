@@ -47,7 +47,8 @@ extern GladeXML * csr_popup_menu_xml;
 GtkTreeStore * ca_model = NULL;
 gboolean cert_title_inserted = FALSE;
 GtkTreeIter * cert_parent_iter = NULL;
-GtkTreeIter * last_ca_iter = NULL;
+GtkTreeIter * last_parent_iter = NULL;
+GtkTreeIter * last_cert_iter = NULL;
 gboolean csr_title_inserted=FALSE;
 GtkTreeIter * csr_parent_iter = NULL;
 
@@ -63,8 +64,10 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_REVOCATION=6,
       CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB=7,
       CA_MODEL_COLUMN_PEM=8,
-      CA_MODEL_COLUMN_ITEM_TYPE=9,
-      CA_MODEL_COLUMN_NUMBER=10}
+      CA_MODEL_COLUMN_DN=9,
+      CA_MODEL_COLUMN_PARENT_DN=10,
+      CA_MODEL_COLUMN_ITEM_TYPE=11,
+      CA_MODEL_COLUMN_NUMBER=12}
         CaModelColumns;
 
 enum {CSR_MODEL_COLUMN_ID=0,
@@ -82,18 +85,69 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 {
 	GtkTreeIter iter;
 	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
+	GValue *last_dn_value = g_new0 (GValue, 1);
+	GValue *last_parent_dn_value = g_new0 (GValue, 1);
+        const gchar * string_value;
 	
 	if (cert_title_inserted == FALSE) {
-		gtk_tree_store_insert (new_model, &iter, NULL, 0);
+		gtk_tree_store_append (new_model, &iter, NULL);
 		gtk_tree_store_set (new_model, &iter,
 				    3, _("<b>Certificates</b>"),
 				    -1);
-		last_ca_iter = gtk_tree_iter_copy (&iter);
 		cert_parent_iter = gtk_tree_iter_copy (&iter);
 		cert_title_inserted = TRUE;
 	}
 
-	gtk_tree_store_append (new_model, &iter, last_ca_iter);
+	if (! last_cert_iter || (! strcmp (argv[CA_MODEL_COLUMN_DN], argv[CA_MODEL_COLUMN_PARENT_DN]))) {
+		if (last_parent_iter)
+			gtk_tree_iter_free (last_parent_iter);
+		last_parent_iter = NULL;
+	} else {
+		// If not, then we must find the parent of the current nod
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_DN, last_dn_value);
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_PARENT_DN, 
+					  last_parent_dn_value);
+		
+                fprintf (stderr, G_VALUE_TYPE_NAME(last_dn_value));
+		string_value = g_value_get_string (last_dn_value);
+                g_assert (string_value);
+		
+
+		fprintf (stderr, "Parent DN: %s, last_cert_dn: %s\n", argv[CA_MODEL_COLUMN_PARENT_DN], string_value);
+		if (! strcmp (argv[CA_MODEL_COLUMN_PARENT_DN], string_value)) {
+			// Last node is parent of the current node
+			if (last_parent_iter)
+				gtk_tree_iter_free (last_parent_iter);
+			last_parent_iter = gtk_tree_iter_copy (last_cert_iter);
+		} else {
+			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
+			// current certificate.
+			
+			while (last_parent_iter && 
+			       strcmp (argv[CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
+				
+				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
+					// Last ca iter is a top_level
+					if (last_parent_iter)
+						gtk_tree_iter_free (last_parent_iter);
+					last_parent_iter = NULL;
+				} else {
+					if (last_parent_iter)
+						gtk_tree_iter_free (last_parent_iter);
+					last_parent_iter = gtk_tree_iter_copy (&iter);
+				}
+
+				g_value_unset (last_parent_dn_value);
+				gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_parent_iter,
+							  CA_MODEL_COLUMN_DN, 
+							  last_parent_dn_value);
+				
+			}
+		}
+	
+	}
+	
+	gtk_tree_store_append (new_model, &iter, (last_parent_iter ? last_parent_iter: cert_parent_iter));
 
         if (! argv[CA_MODEL_COLUMN_REVOCATION])        
                 gtk_tree_store_set (new_model, &iter,
@@ -106,7 +160,9 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
                                     6, 0,
                                     7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
                                     8, argv[CA_MODEL_COLUMN_PEM],
-                                    9, 0,
+				    9, argv[CA_MODEL_COLUMN_DN],
+				    10, argv[CA_MODEL_COLUMN_PARENT_DN],
+                                    11, 0,
                                     -1);
         else {
                 gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>", 
@@ -122,18 +178,21 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
                                     6, atoi(argv[CA_MODEL_COLUMN_REVOCATION]),
                                     7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
                                     8, argv[CA_MODEL_COLUMN_PEM],
-                                    9, 0,
+				    9, argv[CA_MODEL_COLUMN_DN],
+				    10, argv[CA_MODEL_COLUMN_PARENT_DN],
+                                    11, 0,
                                     -1);
 
                 g_free (revoked_subject);
         }
 
-	// For now, we only support one only CA
-	if (atoi(argv[CA_MODEL_COLUMN_IS_CA]) != 0) {
-		last_ca_iter = gtk_tree_iter_copy (&iter);
-	}
-	
-	
+
+	if (last_cert_iter)
+		gtk_tree_iter_free (last_cert_iter);
+	last_cert_iter = gtk_tree_iter_copy (&iter);
+ 
+	g_free (last_dn_value);
+	g_free (last_parent_dn_value);      	
 
 	return 0;
 }
@@ -146,7 +205,7 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 	GtkTreeStore * new_model = GTK_TREE_STORE(pArg);
 
 	if (csr_title_inserted == 0) {
-		gtk_tree_store_insert (new_model, &iter, NULL, 1);
+		gtk_tree_store_append (new_model, &iter, NULL);
 		gtk_tree_store_set (new_model, &iter,
 				    3, _("<b>Certificate Signing Requests</b>"),
 				    -1);		
@@ -159,15 +218,10 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 
 	gtk_tree_store_set (new_model, &iter,
 			    0, atoi(argv[CSR_MODEL_COLUMN_ID]),
-                            1, 0,
-                            2, 0,
 			    3, argv[CSR_MODEL_COLUMN_SUBJECT],
-                            4, 0,
-                            5, 0,
-                            6, 0,
 			    7, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
 			    8, argv[CSR_MODEL_COLUMN_PEM],
-			    9, 1,
+			    11, 1,
 			    -1);
 
 	return 0;
@@ -330,11 +384,13 @@ gboolean ca_refresh_model ()
 	*/
 
 	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_UINT64, G_TYPE_STRING, 
-					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_INT);
+					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, 
+					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 
 	cert_title_inserted = FALSE;
 	cert_parent_iter = NULL;
-	last_ca_iter = NULL;
+	last_parent_iter = NULL;
+	last_cert_iter = NULL;
 	csr_title_inserted=FALSE;
 	csr_parent_iter = NULL;
 

@@ -142,7 +142,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	if (sqlite3_exec (ca_db,
                           "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, "
 			  "activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, "
-			  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT UNIQUE);",
+			  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT);",
                           NULL, NULL, &error)) {
 		return error;
 	}
@@ -532,7 +532,7 @@ gboolean ca_file_check_and_update_version ()
                 if (sqlite3_exec (ca_db,
                                   "CREATE TABLE certificates_tmp (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial INT, subject TEXT, "
                                   "activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, "
-                                  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT UNIQUE);",
+                                  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT);",
                                   NULL, NULL, &error)) {
                         fprintf (stderr, "%s\n", error);
                         return FALSE;
@@ -1353,12 +1353,13 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
 
 	if (view_revoked) {
 		sqlite3_exec (ca_db, 
-			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem FROM certificates ORDER BY concat(parent_route,id) ", 
+			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem,"
+			      " dn, parent_dn FROM certificates ORDER BY concat(parent_route,id) ", 
 			      func, userdata, &error_str);
 	} else {
 		sqlite3_exec (ca_db, 
 			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
-			      "pem FROM certificates WHERE revocation IS NULL ORDER BY concat(parent_route,id)", 
+			      "pem, dn, parent_dn FROM certificates WHERE revocation IS NULL ORDER BY concat(parent_route,id)", 
 			      func, userdata, &error_str);
 	}
 

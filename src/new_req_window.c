@@ -115,6 +115,13 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 						gtk_tree_iter_free (pdata->last_parent_iter);
 					pdata->last_parent_iter = gtk_tree_iter_copy (&iter);
 				}
+
+				g_value_unset (last_parent_dn_value);
+
+				gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_parent_iter,
+							  NEW_REQ_CA_MODEL_COLUMN_DN, 
+							  last_parent_dn_value);
+
 			}
 		}
 
@@ -151,7 +158,7 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 	guint column_number;
 
-	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_INT, G_TYPE_UINT64, G_TYPE_STRING,
+	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT, G_TYPE_UINT64, G_TYPE_STRING,
 						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
         pdata.new_model = new_req_ca_list_model;
@@ -259,14 +266,16 @@ gboolean __new_req_window_lookup_country (GtkTreeModel *model,
                                           gpointer data)
 {
         gchar *country = (gchar *) data;
-        GValue value;
+        GValue *value = g_new0(GValue, 1);
         
-        gtk_tree_model_get_value (model, iter, 1, &value);
-        if (! strcmp (country, g_value_get_string(&value))) {
+        gtk_tree_model_get_value (model, iter, 1, value);
+        if (! strcmp (country, g_value_get_string(value))) {
                 gtk_combo_box_set_active_iter (GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml,"country_combobox1")), iter);
+		g_free (value);
                 return TRUE;
         }
         
+	g_free(value);
         return FALSE;
 
 }
@@ -281,59 +290,67 @@ void on_new_req_next1_clicked (GtkButton *button,
 	GtkTreeIter iter;
         TlsCert * tlscert;
         GtkWidget * widget; 
-        gint ca_id;
-
+	const gchar *pem;
+        guint ca_id;
 
         if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
 
                 gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_PEM, value);
-                tlscert = tls_parse_cert_pem (g_value_get_string(value));
-                
-                g_value_reset (value);
+
+		pem = g_value_get_string (value);
+		g_assert (pem);
+                tlscert = tls_parse_cert_pem (pem);
+
+                g_value_unset (value);
 
                 gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_ID, value);
-                ca_id = g_value_get_int(value);
+                ca_id = g_value_get_uint(value);
 
+		widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
                 if (ca_file_policy_get (ca_id, "C_INHERIT")) {
-                        widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "C_FORCE_SAME"));
                         model = GTK_TREE_MODEL(gtk_combo_box_get_model (GTK_COMBO_BOX(widget)));
-                        gtk_tree_model_foreach (model, __new_req_window_lookup_country, tlscert->cn);
+                        gtk_tree_model_foreach (model, __new_req_window_lookup_country, tlscert->c);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
+			gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
                 }
                 
+		widget = glade_xml_get_widget(new_req_window_xml,"st_entry1");
                 if (ca_file_policy_get (ca_id, "ST_INHERIT")) {
-                        widget = glade_xml_get_widget(new_req_window_xml,"st_entry1");
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "ST_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->st);
-                } else
+                } else {
                         gtk_widget_set_sensitive (widget, TRUE);
+                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                }
                 
-                
+		widget = glade_xml_get_widget(new_req_window_xml,"city_entry1");
                 if (ca_file_policy_get (ca_id, "L_INHERIT")) {
-                        widget = glade_xml_get_widget(new_req_window_xml,"city_entry1");
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "L_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->l);
-                } else
+                } else {
                         gtk_widget_set_sensitive (widget, TRUE);
+                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                }
                 
-                
+		widget = glade_xml_get_widget(new_req_window_xml,"o_entry1");
                 if (ca_file_policy_get (ca_id, "O_INHERIT")) {
-                        widget = glade_xml_get_widget(new_req_window_xml,"o_entry1");
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "O_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->o);
-                } else
+                } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                
+                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                }
                 
                 widget = glade_xml_get_widget(new_req_window_xml,"ou_entry1");
                 if (ca_file_policy_get (ca_id, "OU_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "OU_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->ou);
-                } else 
+                } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-
+			gtk_entry_set_text(GTK_ENTRY(widget), "");
+		}
                 
                 tls_cert_free (tlscert);
         }
