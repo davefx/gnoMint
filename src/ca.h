@@ -32,4 +32,10 @@ gchar * ca_get_selected_row_pem ();
 gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
 gboolean ca_import (gchar *filename);
 void ca_error_dialog(gchar *message);
+
+void ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
+				   GtkCellRenderer *cell,
+				   GtkTreeModel *tree_model,
+				   GtkTreeIter *iter,
+				   gpointer data);
 #endif

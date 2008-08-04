@@ -198,7 +198,7 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 }
 
 
-void __ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
+void ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
 				     GtkCellRenderer *cell,
 				     GtkTreeModel *tree_model,
 				     GtkTreeIter *iter,
@@ -365,7 +365,7 @@ gboolean ca_refresh_model ()
 		
 /*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
 /*                                       _("Subject of the certificate or request"),  */
-/*                                       _("This is the distingished name (DN) of the certificate or request")); */
+/*                                       _("This is the distinguished name (DN) of the certificate or request")); */
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
 		
@@ -395,7 +395,7 @@ gboolean ca_refresh_model ()
 
 		gtk_tree_view_insert_column_with_data_func (treeview,
 							    -1, _("Serial"), renderer,
-							    __ca_tree_view_serial_datafunc, NULL, g_free);
+							    ca_tree_view_serial_datafunc, NULL, g_free);
 		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 

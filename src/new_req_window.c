@@ -62,8 +62,8 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
 int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
 {
 
-	GValue *last_dn_value=NULL;
-	GValue *last_parent_dn_value=NULL;
+	GValue *last_dn_value = g_new0 (GValue, 1);
+	GValue *last_parent_dn_value = g_new0 (GValue, 1);
 	GtkTreeIter iter;
 	GtkTreeIter *last_parent_iter = g_dataset_get_data (pArg, "parent_iter");
 	GtkTreeIter *last_ca_iter = g_dataset_get_data (pArg, "ca_iter");
@@ -82,7 +82,8 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	} else {
 		// If not, then we must find the parent of the current nod
 		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_DN, last_dn_value);
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_PARENT_DN, last_parent_dn_value);
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_PARENT_DN, 
+					  last_parent_dn_value);
 		
 		if (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_dn_value))) {
 			// Last node is parent of the current node
@@ -121,8 +122,15 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
 			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
 			    -1);
-
+	if (last_ca_iter)
+		gtk_tree_iter_free (last_ca_iter);
 	last_ca_iter = gtk_tree_iter_copy (&iter);
+
+	g_dataset_set_data (pArg, "parent_iter", last_parent_iter);
+	g_dataset_set_data (pArg, "ca_iter", last_ca_iter);
+
+	g_free (last_dn_value);
+	g_free (last_parent_dn_value);
 
 	return 0;
 }
@@ -130,12 +138,13 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 
 
 
-// NEW CSR WINDOW CALLBACKS
-
 void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 {
 	GtkTreeIter *last_parent_iter = NULL;
 	GtkTreeIter *last_ca_iter = NULL;
+	GtkCellRenderer * renderer = NULL;
+
+	guint column_number;
 
 	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING,
 						    G_TYPE_STRING, G_TYPE_STRING);
@@ -145,8 +154,54 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 	ca_file_foreach_ca (__new_req_window_refresh_model_add_ca, new_req_ca_list_model);
 
+	last_parent_iter = g_dataset_get_data (new_req_ca_list_model, "parent_iter");
+	last_ca_iter = g_dataset_get_data (new_req_ca_list_model, "ca_iter");
+
+	gtk_tree_iter_free (last_parent_iter);
+	gtk_tree_iter_free (last_ca_iter);
+
 	g_dataset_destroy (new_req_ca_list_model);
+
+	renderer = GTK_CELL_RENDERER (gtk_cell_renderer_text_new());
+
+	column_number = gtk_tree_view_insert_column_with_attributes (treeview,
+								     -1, _("Subject"), renderer,
+								     "markup", NEW_REQ_CA_MODEL_COLUMN_SUBJECT,
+								     NULL);
+
+	
+	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(new_req_ca_list_model));
+
+	gtk_tree_view_expand_all (treeview);
+
+	return;
+
 }
+
+void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data)
+{
+	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview"));
+	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
+	GtkTreeIter iter;
+
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_req_window_xml, "inherit_radiobutton")))) {
+		/* Inherit */
+		gtk_widget_set_sensitive (GTK_WIDGET(treeview), TRUE);
+		gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+
+		gtk_tree_model_get_iter_first (GTK_TREE_MODEL(new_req_ca_list_model), &iter);
+
+		gtk_tree_selection_select_iter (selection, &iter);
+
+	} else {
+		/* Don't inherit */
+		gtk_widget_set_sensitive (GTK_WIDGET(treeview), FALSE);
+		gtk_tree_selection_set_mode (selection, GTK_SELECTION_NONE);
+	}
+}
+
+
 
 void new_req_window_display()
 {
@@ -165,7 +220,9 @@ void new_req_window_display()
 	
 	new_ca_populate_country_combobox(GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml, "country_combobox1")));
 
-	__new_req_populate_ca_treeview (GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "")));
+	__new_req_populate_ca_treeview (GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview")));
+
+	new_req_inherit_fields_toggled (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_req_window_xml, "inherit_radiobutton")), NULL);
 
 }
 

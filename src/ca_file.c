@@ -1339,7 +1339,7 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 	gchar *error_str;
 
         sqlite3_exec (ca_db, 
-                      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem "
+                      "SELECT id, serial, subject, dn, parent_dn "
                       "FROM certificates WHERE is_ca=1 AND revocation IS NULL ORDER BY concat(parent_route, id)", 
                       func, userdata, &error_str);
 
