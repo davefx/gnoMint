@@ -720,12 +720,12 @@ gboolean ca_file_delete_tmp_file ()
 	return (! result);
 }
 
-guint64 ca_file_get_last_serial ()
+guint64 ca_file_get_last_serial (gint ca_id)
 {
 	gchar **serialstr = NULL;
 	guint64 serial;
 
-	serialstr = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial';");
+	serialstr = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%d;", ca_id);
 	serial = atoll (serialstr[0]);
 	g_strfreev (serialstr);
 
@@ -1339,7 +1339,7 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 	gchar *error_str;
 
         sqlite3_exec (ca_db, 
-                      "SELECT id, serial, subject, dn, parent_dn "
+                      "SELECT id, serial, subject, dn, parent_dn, pem "
                       "FROM certificates WHERE is_ca=1 AND revocation IS NULL ORDER BY concat(parent_route, id)", 
                       func, userdata, &error_str);
 

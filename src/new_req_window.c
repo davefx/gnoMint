@@ -55,57 +55,65 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
       NEW_REQ_CA_MODEL_COLUMN_SUBJECT=2,
       NEW_REQ_CA_MODEL_COLUMN_DN=3,
       NEW_REQ_CA_MODEL_COLUMN_PARENT_DN=4,
-      NEW_REQ_CA_MODEL_COLUMN_NUMBER=5}
+      NEW_REQ_CA_MODEL_COLUMN_PEM=5,
+      NEW_REQ_CA_MODEL_COLUMN_NUMBER=6}
         NewReqCaListModelColumns;
+
+typedef struct {
+        GtkTreeStore * new_model;
+        GtkTreeIter * last_parent_iter;
+        GtkTreeIter * last_ca_iter;
+} __NewReqWindowRefreshModelAddCaUserData;
 
 
 int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
 {
-
 	GValue *last_dn_value = g_new0 (GValue, 1);
 	GValue *last_parent_dn_value = g_new0 (GValue, 1);
 	GtkTreeIter iter;
-	GtkTreeIter *last_parent_iter = g_dataset_get_data (pArg, "parent_iter");
-	GtkTreeIter *last_ca_iter = g_dataset_get_data (pArg, "ca_iter");
+        __NewReqWindowRefreshModelAddCaUserData *pdata = (__NewReqWindowRefreshModelAddCaUserData *) pArg;
+	GtkTreeStore * new_model = pdata->new_model;
 
-	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
+        const gchar * string_value;
 
 	// First we check if this is the first CA, or is a self-signed certificate
-	if (! last_ca_iter || 
-	    (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_DN],argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN])) ) {
+	if (! pdata->last_ca_iter || (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_DN],argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN])) ) {
 
-		if (last_parent_iter)
-			gtk_tree_iter_free (last_parent_iter);
+		if (pdata->last_parent_iter)
+			gtk_tree_iter_free (pdata->last_parent_iter);
 
-		last_parent_iter = NULL;
+		pdata->last_parent_iter = NULL;
 		
 	} else {
 		// If not, then we must find the parent of the current nod
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_DN, last_dn_value);
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_PARENT_DN, 
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_DN, last_dn_value);
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_PARENT_DN, 
 					  last_parent_dn_value);
 		
-		if (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_dn_value))) {
+                string_value = g_value_get_string (last_dn_value);
+                g_assert (string_value);
+
+		if (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], string_value)) {
 			// Last node is parent of the current node
-			if (last_parent_iter)
-				gtk_tree_iter_free (last_parent_iter);
-			last_parent_iter = gtk_tree_iter_copy (last_ca_iter);
+			if (pdata->last_parent_iter)
+				gtk_tree_iter_free (pdata->last_parent_iter);
+			pdata->last_parent_iter = gtk_tree_iter_copy (pdata->last_ca_iter);
 		} else {
 			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
 			// current certificate.
 			
-			while (last_parent_iter && 
+			while (pdata->last_parent_iter && 
 			       strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
 
-				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
+				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, pdata->last_parent_iter)) {
 					// Last ca iter is a top_level
-					if (last_parent_iter)
-						gtk_tree_iter_free (last_parent_iter);
-					last_parent_iter = NULL;
+					if (pdata->last_parent_iter)
+						gtk_tree_iter_free (pdata->last_parent_iter);
+					pdata->last_parent_iter = NULL;
 				} else {
-					if (last_parent_iter)
-						gtk_tree_iter_free (last_parent_iter);
-					last_parent_iter = gtk_tree_iter_copy (&iter);
+					if (pdata->last_parent_iter)
+						gtk_tree_iter_free (pdata->last_parent_iter);
+					pdata->last_parent_iter = gtk_tree_iter_copy (&iter);
 				}
 			}
 		}
@@ -113,21 +121,19 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 		
 	}
 
-	gtk_tree_store_append (new_model, &iter, last_parent_iter);
+	gtk_tree_store_append (new_model, &iter, pdata->last_parent_iter);
 	
 	gtk_tree_store_set (new_model, &iter,
-			    0, atoi(argv[NEW_REQ_CA_MODEL_COLUMN_ID]),
+			    0, atoi(argv[NEW_REQ_CA_MODEL_COLUMN_ID]), 
 			    1, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL]),
 			    2, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT],
 			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
 			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
+                            5, argv[NEW_REQ_CA_MODEL_COLUMN_PEM],
 			    -1);
-	if (last_ca_iter)
-		gtk_tree_iter_free (last_ca_iter);
-	last_ca_iter = gtk_tree_iter_copy (&iter);
-
-	g_dataset_set_data (pArg, "parent_iter", last_parent_iter);
-	g_dataset_set_data (pArg, "ca_iter", last_ca_iter);
+	if (pdata->last_ca_iter)
+		gtk_tree_iter_free (pdata->last_ca_iter);
+	pdata->last_ca_iter = gtk_tree_iter_copy (&iter);
 
 	g_free (last_dn_value);
 	g_free (last_parent_dn_value);
@@ -140,25 +146,25 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 
 void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 {
-	GtkTreeIter *last_parent_iter = NULL;
-	GtkTreeIter *last_ca_iter = NULL;
 	GtkCellRenderer * renderer = NULL;
+        __NewReqWindowRefreshModelAddCaUserData pdata;
 
 	guint column_number;
 
-	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING,
-						    G_TYPE_STRING, G_TYPE_STRING);
+	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_INT, G_TYPE_UINT64, G_TYPE_STRING,
+						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
-	g_dataset_set_data (new_req_ca_list_model, "parent_iter", last_parent_iter);
-	g_dataset_set_data (new_req_ca_list_model, "ca_iter", last_ca_iter);
+        pdata.new_model = new_req_ca_list_model;
+        pdata.last_parent_iter = NULL;
+        pdata.last_ca_iter = NULL;
 
-	ca_file_foreach_ca (__new_req_window_refresh_model_add_ca, new_req_ca_list_model);
+	ca_file_foreach_ca (__new_req_window_refresh_model_add_ca, &pdata);
 
-	last_parent_iter = g_dataset_get_data (new_req_ca_list_model, "parent_iter");
-	last_ca_iter = g_dataset_get_data (new_req_ca_list_model, "ca_iter");
+        if (pdata.last_parent_iter)
+                gtk_tree_iter_free (pdata.last_parent_iter);
 
-	gtk_tree_iter_free (last_parent_iter);
-	gtk_tree_iter_free (last_ca_iter);
+        if (pdata.last_ca_iter)
+                gtk_tree_iter_free (pdata.last_ca_iter);
 
 	g_dataset_destroy (new_req_ca_list_model);
 
@@ -246,9 +252,93 @@ void on_new_req_cn_entry_changed (GtkEditable *editable,
 		
 }
 
-void on_new_req_next1_clicked (GtkButton *widget,
+
+gboolean __new_req_window_lookup_country (GtkTreeModel *model,
+                                          GtkTreePath *path,
+                                          GtkTreeIter *iter,
+                                          gpointer data)
+{
+        gchar *country = (gchar *) data;
+        GValue value;
+        
+        gtk_tree_model_get_value (model, iter, 1, &value);
+        if (! strcmp (country, g_value_get_string(&value))) {
+                gtk_combo_box_set_active_iter (GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml,"country_combobox1")), iter);
+                return TRUE;
+        }
+        
+        return FALSE;
+
+}
+
+void on_new_req_next1_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
+	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview"));
+	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
+        GValue *value = g_new0(GValue, 1);
+        GtkTreeModel *model;
+	GtkTreeIter iter;
+        TlsCert * tlscert;
+        GtkWidget * widget; 
+        gint ca_id;
+
+
+        if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
+
+                gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_PEM, value);
+                tlscert = tls_parse_cert_pem (g_value_get_string(value));
+                
+                g_value_reset (value);
+
+                gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_ID, value);
+                ca_id = g_value_get_int(value);
+
+                if (ca_file_policy_get (ca_id, "C_INHERIT")) {
+                        widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "C_FORCE_SAME"));
+                        model = GTK_TREE_MODEL(gtk_combo_box_get_model (GTK_COMBO_BOX(widget)));
+                        gtk_tree_model_foreach (model, __new_req_window_lookup_country, tlscert->cn);
+                } else {
+                        gtk_widget_set_sensitive (widget, TRUE);
+                }
+                
+                if (ca_file_policy_get (ca_id, "ST_INHERIT")) {
+                        widget = glade_xml_get_widget(new_req_window_xml,"st_entry1");
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "ST_FORCE_SAME"));
+                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->st);
+                } else
+                        gtk_widget_set_sensitive (widget, TRUE);
+                
+                
+                if (ca_file_policy_get (ca_id, "L_INHERIT")) {
+                        widget = glade_xml_get_widget(new_req_window_xml,"city_entry1");
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "L_FORCE_SAME"));
+                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->l);
+                } else
+                        gtk_widget_set_sensitive (widget, TRUE);
+                
+                
+                if (ca_file_policy_get (ca_id, "O_INHERIT")) {
+                        widget = glade_xml_get_widget(new_req_window_xml,"o_entry1");
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "O_FORCE_SAME"));
+                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->o);
+                } else
+                        gtk_widget_set_sensitive (widget, TRUE);
+                
+                
+                widget = glade_xml_get_widget(new_req_window_xml,"ou_entry1");
+                if (ca_file_policy_get (ca_id, "OU_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (ca_id, "OU_FORCE_SAME"));
+                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->ou);
+                } else 
+                        gtk_widget_set_sensitive (widget, TRUE);
+
+                
+                tls_cert_free (tlscert);
+        }
+
+        g_free (value);
 	new_req_tab_activate (1);
 }
 

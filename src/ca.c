@@ -159,7 +159,12 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 
 	gtk_tree_store_set (new_model, &iter,
 			    0, atoi(argv[CSR_MODEL_COLUMN_ID]),
+                            1, 0,
+                            2, 0,
 			    3, argv[CSR_MODEL_COLUMN_SUBJECT],
+                            4, 0,
+                            5, 0,
+                            6, 0,
 			    7, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
 			    8, argv[CSR_MODEL_COLUMN_PEM],
 			    9, 1,

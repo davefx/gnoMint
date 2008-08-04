@@ -46,7 +46,7 @@ void ca_policy_populate (guint64 ca_id)
 {
 	GtkWidget * widget;
 	gint value;
-	GHashTable *policy_table = g_hash_table_new (g_str_hash, g_str_equal);	
+	GHashTable *policy_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);	
 
 	ca_file_foreach_policy (__ca_policy_populate_step, ca_id, policy_table);
 
@@ -164,6 +164,7 @@ void ca_policy_populate (guint64 ca_id)
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "any_purpose_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 	
+        g_hash_table_destroy (policy_table);
 }
 
 

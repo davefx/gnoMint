@@ -282,13 +282,12 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 
-	cert_creation_data->serial = ca_file_get_last_serial () + 1;
-
-	csr_pem = ca_get_selected_row_pem ();
 
 	// Here I am supossing that there's only one CA cert, and its serial is 1.
 	// We'll have to remake this when it is possible to hold more than one CA cert in DB.
 	ca_id = 1;
+	cert_creation_data->serial = ca_file_get_last_serial (ca_id) + 1;
+	csr_pem = ca_get_selected_row_pem ();
 	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
 	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);

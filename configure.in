@@ -79,7 +79,7 @@ dnl
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 
 if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall -Werror -O2 -g $CFLAGS" 
+	CFLAGS="-Wall -Werror -g " 
 fi
 
 dnl
