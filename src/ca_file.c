@@ -818,8 +818,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	cert_id = atoll (row[0]);
 	g_strfreev (row);
 
-	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%lld' WHERE name='ca_root_last_assigned_serial';", 
-			       serial);
+	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%lld' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", 
+			       serial, parent_id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 		sqlite3_free (sql);
@@ -829,7 +829,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	sqlite3_free (sql);
 
 	if (is_ca) {
-		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %d, 'ca_root_last_assigned_serial', 1);",
+		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %d, 'ca_root_last_assigned_serial', 0);",
 				       cert_id);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 			return error;
