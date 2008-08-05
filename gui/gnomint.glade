@@ -5015,6 +5015,7 @@ Common Name (CN):</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="headers_visible">False</property>
+                    <signal name="cursor_changed" handler="new_cert_signing_ca_treeview_cursor_changed"/>
                   </widget>
                 </child>
               </widget>
@@ -5045,6 +5046,7 @@ Common Name (CN):</property>
                     <property name="label">gtk-cancel</property>
                     <property name="use_stock">True</property>
                     <property name="response_id">0</property>
+                    <signal name="clicked" handler="on_new_cert_cancel_clicked"/>
                   </widget>
                   <packing>
                     <property name="position">1</property>
@@ -5067,6 +5069,7 @@ Common Name (CN):</property>
                 <child>
                   <widget class="GtkButton" id="new_cert_next2">
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
                     <property name="label">gtk-media-next</property>

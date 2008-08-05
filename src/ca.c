@@ -108,12 +108,10 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_PARENT_DN, 
 					  last_parent_dn_value);
 		
-                fprintf (stderr, G_VALUE_TYPE_NAME(last_dn_value));
 		string_value = g_value_get_string (last_dn_value);
                 g_assert (string_value);
 		
 
-		fprintf (stderr, "Parent DN: %s, last_cert_dn: %s\n", argv[CA_MODEL_COLUMN_PARENT_DN], string_value);
 		if (! strcmp (argv[CA_MODEL_COLUMN_PARENT_DN], string_value)) {
 			// Last node is parent of the current node
 			if (last_parent_iter)
@@ -1369,7 +1367,6 @@ void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_dat
 	filename = __ca_export_private_pkcs8 (iter, type);
 
 	if (! filename) {
-		fprintf (stderr, "uauaua\n");
 		return;
 	}
 	

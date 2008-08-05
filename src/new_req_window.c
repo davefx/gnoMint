@@ -353,6 +353,17 @@ void on_new_req_next1_clicked (GtkButton *button,
 		}
                 
                 tls_cert_free (tlscert);
+        } else {
+                widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
+                gtk_widget_set_sensitive (widget, TRUE);
+                widget = glade_xml_get_widget(new_req_window_xml,"st_entry1");
+                gtk_widget_set_sensitive (widget, TRUE);
+                widget = glade_xml_get_widget(new_req_window_xml,"city_entry1");
+                gtk_widget_set_sensitive (widget, TRUE);
+                widget = glade_xml_get_widget(new_req_window_xml,"o_entry1");
+                gtk_widget_set_sensitive (widget, TRUE);
+                widget = glade_xml_get_widget(new_req_window_xml,"ou_entry1");
+                gtk_widget_set_sensitive (widget, TRUE);
         }
 
         g_free (value);
