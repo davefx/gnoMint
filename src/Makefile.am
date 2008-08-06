@@ -1,4 +1,4 @@
-bin_PROGRAMS = gnomint 
+bin_PROGRAMS = gnomint #testuint160
 
 bin_SCRIPTS = gnomint-upgrade-db
 
@@ -26,13 +26,18 @@ gnomint_SOURCES = \
 	ca_policy.c \
 	csr_creation.c \
 	csr_properties.c \
-	pkey_manage.c
+	pkey_manage.c \
+	uint160.c
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)
 
 gnomint_LDFLAGS = \
 	-export-dynamic
+
+testuint160_SOURCES = \
+	uint160.c \
+	testuint160.c
 
 EXTRA_DIST = \
 	gnomint-upgrade-db \
@@ -48,5 +53,6 @@ EXTRA_DIST = \
 	new_req_window.h \
 	new_cert_window.h \
 	tls.h\
-	pkey_manage.h
+	pkey_manage.h \
+	uint160.h
 
