@@ -24,7 +24,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include "uint160.h"
 #include "tls.h"
 
 void tls_init ()
@@ -420,11 +420,14 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 					      gchar ** certificate)
 {
 	gnutls_x509_crt_t crt;
-	guint64 sn = G_GUINT64_CONSTANT(1);
-	gchar * serial = NULL;
+        UInt160 *sn = uint160_new();
 	guchar * keyid = NULL;
 	size_t keyidsize = 0;
+	guchar * serialstr = NULL;
+	size_t serialsize = 0;
 	size_t certificate_len = 0;
+
+	uint160_assign (sn, G_GUINT64_CONSTANT(1));
 
 	if (gnutls_x509_crt_init (&crt) < 0) {
 		return g_strdup_printf(_("Error when initializing certificate structure"));
@@ -435,12 +438,16 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
-	serial = g_strdup_printf ("%llX", (long long unsigned int) sn);
-	if (gnutls_x509_crt_set_serial (crt, serial, strlen (serial)) < 0) {
+        uint160_write (sn, NULL, &serialsize);
+        serialstr = g_new0 (guchar, serialsize);
+        uint160_write (sn, serialstr, &serialsize);
+
+	if (gnutls_x509_crt_set_serial (crt, serialstr, serialsize) < 0) {
 		gnutls_x509_crt_deinit (crt);
 		return g_strdup_printf(_("Error when setting certificate serial number"));
 	}
-	g_free (serial);
+
+        g_free (serialstr);
 
 	if (gnutls_x509_crt_set_activation_time (crt, creation_data->activation) < 0) {
 		gnutls_x509_crt_deinit (crt);
@@ -620,7 +627,6 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 	gnutls_x509_crt_t ca_crt;
 	gnutls_x509_privkey_t ca_pkey;
 
-	gchar * serial;
 	gint key_usage;
 	size_t certificate_len = 0;
 
@@ -667,15 +673,13 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
-	serial = g_strdup_printf ("%llX", (long long unsigned int) creation_data->serial);
-	if (gnutls_x509_crt_set_serial (crt, serial, strlen (serial)) < 0) {
+	if (gnutls_x509_crt_set_serial (crt, &(creation_data->serial), sizeof (creation_data->serial)) < 0) {
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (crt);
 		gnutls_x509_crt_deinit (ca_crt);
 		gnutls_x509_privkey_deinit (ca_pkey);
 		return g_strdup_printf(_("Error when setting certificate serial number"));
 	}
-	g_free (serial);
 
 	if (gnutls_x509_crt_set_activation_time (crt, creation_data->activation) < 0) {
 		gnutls_x509_crq_deinit (csr);
@@ -831,11 +835,11 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	size = 0;
 	gnutls_x509_crt_get_serial (*cert, NULL, &size);
 	if (size) {
-		aux = g_new0 (gchar, size+1);
-		gnutls_x509_crt_get_serial (*cert, aux, &size);
-		res->serial_number = strtoull (aux, NULL, 16);
-		g_free(aux);
-		aux = NULL;
+		uaux = g_new0 (guchar, size);
+		gnutls_x509_crt_get_serial (*cert, uaux, &size);
+                uint160_read (&res->serial_number, uaux, size);
+		g_free(uaux);
+		uaux = NULL;
 	}
 	
 

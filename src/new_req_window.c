@@ -131,8 +131,8 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	gtk_tree_store_append (new_model, &iter, pdata->last_parent_iter);
 	
 	gtk_tree_store_set (new_model, &iter,
-			    0, atoi(argv[NEW_REQ_CA_MODEL_COLUMN_ID]), 
-			    1, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL]),
+			    0, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_ID]), 
+			    1, argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL],
 			    2, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT],
 			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
 			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
@@ -158,7 +158,7 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 	guint column_number;
 
-	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT, G_TYPE_UINT64, G_TYPE_STRING,
+	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_STRING, G_TYPE_STRING,
 						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
         pdata.new_model = new_req_ca_list_model;

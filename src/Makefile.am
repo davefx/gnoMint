@@ -1,4 +1,4 @@
-bin_PROGRAMS = gnomint #testuint160
+bin_PROGRAMS = gnomint testuint160
 
 bin_SCRIPTS = gnomint-upgrade-db
 
@@ -28,6 +28,9 @@ gnomint_SOURCES = \
 	csr_properties.c \
 	pkey_manage.c \
 	uint160.c
+
+testuint160_LDADD = \
+	$(GNOMINT_LIBS)
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)

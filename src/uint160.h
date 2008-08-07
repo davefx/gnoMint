@@ -38,6 +38,11 @@ void uint160_shift (UInt160 *var, guint positions);
 gboolean uint160_write (UInt160 *var, guchar *buffer, gsize * max_size);
 gboolean uint160_read (UInt160 *var, guchar *buffer, gsize size);
 
+gboolean uint160_write_escaped (UInt160 *var, gchar *buffer, gsize * max_size);
+gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize size);
+
+
+
 gchar * uint160_strdup_printf (UInt160 *var);
 
 void uint160_free (UInt160 *var);

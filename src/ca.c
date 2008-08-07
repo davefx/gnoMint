@@ -149,9 +149,9 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 
         if (! argv[CA_MODEL_COLUMN_REVOCATION])        
                 gtk_tree_store_set (new_model, &iter,
-                                    0, atoi(argv[CA_MODEL_COLUMN_ID]),
+                                    0, atoll(argv[CA_MODEL_COLUMN_ID]),
                                     1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-                                    2, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
+                                    2, argv[CA_MODEL_COLUMN_SERIAL],
                                     3, argv[CA_MODEL_COLUMN_SUBJECT],
                                     4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
                                     5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
@@ -167,9 +167,9 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
                                                                    argv[CA_MODEL_COLUMN_SUBJECT]);
 
                 gtk_tree_store_set (new_model, &iter,
-                                    0, atoi(argv[CA_MODEL_COLUMN_ID]),
+                                    0, atoll(argv[CA_MODEL_COLUMN_ID]),
                                     1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-                                    2, atoll(argv[CA_MODEL_COLUMN_SERIAL]),
+                                    2, argv[CA_MODEL_COLUMN_SERIAL],
                                     3, revoked_subject,
                                     4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
                                     5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
@@ -215,7 +215,7 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 	gtk_tree_store_append (new_model, &iter, csr_parent_iter);
 
 	gtk_tree_store_set (new_model, &iter,
-			    0, atoi(argv[CSR_MODEL_COLUMN_ID]),
+			    0, atoll(argv[CSR_MODEL_COLUMN_ID]),
 			    3, argv[CSR_MODEL_COLUMN_SUBJECT],
 			    7, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
 			    8, argv[CSR_MODEL_COLUMN_PEM],
@@ -254,38 +254,6 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 	g_free (result);
 }
 
-
-void ca_tree_view_serial_datafunc (GtkTreeViewColumn *tree_column,
-				     GtkCellRenderer *cell,
-				     GtkTreeModel *tree_model,
-				     GtkTreeIter *iter,
-				     gpointer data)
-{
-	guint64 serial;
-	gchar *result = NULL;
-	gchar * aux = NULL;
-
-	gtk_tree_model_get(tree_model, iter, CA_MODEL_COLUMN_SERIAL, &serial, -1);
-
-	if (serial == 0) {
-		g_object_set (G_OBJECT(cell), "text", "", NULL);
-		return;
-	}
-
-	while (serial > 0) {
-		if (result) {
-			aux = result;
-			result = g_strdup_printf ("%02llX:%s", (long long unsigned int) serial%256, aux);
-			g_free (aux);
-		} else {
-			result = g_strdup_printf ("%02llX", (long long unsigned int) serial%256);
-		}
-
-		serial = serial >> 8;
-	}
-	g_object_set(G_OBJECT(cell), "text", result, NULL);
-	g_free (result);
-}
 
 void __ca_tree_view_is_ca_datafunc (GtkTreeViewColumn *tree_column,
                                     GtkCellRenderer *cell,
@@ -378,10 +346,12 @@ gboolean ca_refresh_model ()
            - Is revoked
            - Private key is in DB
            - PEM data
+           - DN
+           - Parent DN
            - Item type
 	*/
 
-	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_UINT64, G_TYPE_STRING, 
+	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING, 
 					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, 
 					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 
@@ -452,9 +422,10 @@ gboolean ca_refresh_model ()
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, _("Serial"), renderer,
-							    ca_tree_view_serial_datafunc, NULL, g_free);
+		gtk_tree_view_insert_column_with_attributes (treeview,
+                                                             -1, _("Serial"), renderer,
+                                                             "markup", CA_MODEL_COLUMN_SERIAL, 
+                                                             NULL);
 		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
@@ -498,6 +469,7 @@ void __ca_certificate_activated (GtkTreeView *tree_view,
                                  GtkTreeViewColumn *column,
                                  gpointer user_data)
 {	
+        GValue * valueid = g_new0 (GValue, 1);
 	GValue * valuestr = g_new0 (GValue, 1);
 	GValue * value_pkey_in_db = g_new0 (GValue, 1);
 	GValue * value_is_ca = g_new0 (GValue, 1);
@@ -505,11 +477,13 @@ void __ca_certificate_activated (GtkTreeView *tree_view,
 	GtkTreeModel * tree_model = gtk_tree_view_get_model (tree_view);
 	
 	gtk_tree_model_get_iter (tree_model, &iter, path);
+        gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_ID, valueid);
 	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PEM, valuestr);	
 	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, value_pkey_in_db);	
 	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_IS_CA, value_is_ca);	
 
-	certificate_properties_display (g_value_get_string(valuestr), g_value_get_boolean(value_pkey_in_db),
+	certificate_properties_display (g_value_get_uint64 (valueid),
+                                        g_value_get_string(valuestr), g_value_get_boolean(value_pkey_in_db),
 					g_value_get_boolean (value_is_ca));
 
 	g_free (valuestr);

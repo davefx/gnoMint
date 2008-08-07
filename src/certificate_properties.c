@@ -99,16 +99,14 @@ const certificate_properties_oid_function_couple_t certificate_properties_oid_fu
 
 GladeXML * certificate_properties_window_xml = NULL;
 
-guint64 __certificate_properties_populate (const char *certificate_pem);
+void __certificate_properties_populate (const char *certificate_pem);
 void __certificate_details_populate (const char *certificate_pem);
 
-void certificate_properties_display(const char *certificate_pem, gboolean privkey_in_db,
+void certificate_properties_display(guint64 cert_id, const char *certificate_pem, gboolean privkey_in_db,
 				    gboolean is_ca)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
-	guint64    serial_number = 0;
-
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
@@ -121,36 +119,37 @@ void certificate_properties_display(const char *certificate_pem, gboolean privke
 	
 	glade_xml_signal_autoconnect (certificate_properties_window_xml); 	
 	
-	serial_number = __certificate_properties_populate (certificate_pem);
+	__certificate_properties_populate (certificate_pem);
 	__certificate_details_populate (certificate_pem);
        
 	if (! is_ca) {
 		widget = glade_xml_get_widget (certificate_properties_window_xml, "notebook2");
 		gtk_notebook_remove_page (GTK_NOTEBOOK(widget), 2);
 	} else {
-		ca_policy_populate (serial_number);
+		ca_policy_populate (cert_id);
 	}
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
 
-	g_object_set_data (G_OBJECT(widget), "cert_serial_number", g_strdup_printf("%" G_GUINT64_FORMAT, 
-										   serial_number));
+	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT, 
+                                                                        cert_id));
 
 	gtk_widget_show (widget);
 }
 
 
-guint64 __certificate_properties_populate (const char *certificate_pem)
+void __certificate_properties_populate (const char *certificate_pem)
 {
 	GtkWidget *widget = NULL;
 	struct tm tim;
 	TlsCert * cert = NULL;
 	gchar model_time_str[100];
-	guint64 serial_number;
+        gchar * aux;
+	UInt160 * serial_number;
 
 	cert = tls_parse_cert_pem (certificate_pem);
 
-	serial_number = cert->serial_number;
+	serial_number = &cert->serial_number;
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certActivationDateLabel");
 	gmtime_r (&cert->activation_time, &tim);
@@ -163,8 +162,9 @@ guint64 __certificate_properties_populate (const char *certificate_pem)
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSNLabel");	
-	snprintf (model_time_str, 100, "%" G_GUINT64_FORMAT, cert->serial_number);
-	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
+        aux = uint160_strdup_printf (&cert->serial_number);
+	gtk_label_set_text (GTK_LABEL(widget), aux);
+        g_free (aux);
 
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSubjectCNLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->cn);
@@ -218,7 +218,7 @@ guint64 __certificate_properties_populate (const char *certificate_pem)
 
 	tls_cert_free (cert);
 	
-	return serial_number;
+	return;
 }
 
 void certificate_properties_close_clicked (const char *certificate_pem)

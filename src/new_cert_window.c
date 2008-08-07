@@ -434,7 +434,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	gchar *pkey_pem;
 	guint64 ca_id;
 	PkeyManageData *crypted_pkey;
-	
+
 	time_t tmp;
 	struct tm * expiration_time;
 
@@ -490,7 +490,9 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 
-	cert_creation_data->serial = ca_file_get_last_serial (ca_id) + 1;
+        ca_file_get_last_serial (&cert_creation_data->serial, ca_id);
+	uint160_inc(&cert_creation_data->serial);
+
 	csr_pem = ca_get_selected_row_pem ();
 	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);

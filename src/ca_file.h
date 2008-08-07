@@ -22,6 +22,7 @@
 
 #include <sqlite3.h>
 #include "ca_creation.h"
+#include "uint160.h"
 
 typedef int (*CaFileCallbackFunc) (void *pArg, int argc, char **argv, char **columnNames);
 
@@ -48,7 +49,7 @@ gboolean ca_file_delete_tmp_file ();
 
 //gchar ** ca_file_get_single_row (const gchar *query, ...);
 
-guint64 ca_file_get_last_serial (gint ca_id);
+void ca_file_get_last_serial (UInt160 *serial, guint64 ca_id);
 
 gchar * ca_file_insert_cert (CertCreationData * creation_data,
                              gboolean is_ca,
@@ -69,7 +70,6 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
 gboolean ca_file_foreach_csr (CaFileCallbackFunc func, gpointer userdata);
 gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointer userdata);
 
-guint64 ca_file_get_cert_serial_from_id (guint64 db_id);
 gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id);

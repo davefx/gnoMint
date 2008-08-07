@@ -22,6 +22,7 @@
 
 #include <glib.h>
 #include <time.h>
+#include "uint160.h"
 
 typedef struct {
 	gchar * country;
@@ -49,7 +50,7 @@ typedef struct {
 	time_t activation;
 	time_t expiration;
 	
-	guint64 serial;
+	UInt160 serial;
 
         gboolean ca;
         gboolean crl_signing;

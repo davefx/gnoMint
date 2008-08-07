@@ -21,6 +21,7 @@
 #define _TLS_H_
 
 #include "ca_creation.h"
+#include "uint160.h"
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -31,7 +32,7 @@
 #define TLS_NON_MATCHING_PRIVATE_KEY -2000
 
 typedef struct __TlsCert {	
-	guint64 serial_number;
+	UInt160 serial_number;
 
 	gchar * cn;
 	gchar * o;
