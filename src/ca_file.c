@@ -114,7 +114,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
 	gchar *sql = NULL;
 	gchar *error = NULL;
         gchar *aux = NULL;
-        guint size;
+        gsize size;
         UInt160 sn;
         gchar *serialstr;
 
@@ -196,7 +196,7 @@ gchar * ca_file_create (CaCreationData *creation_data,
         g_free (serialstr);
         
 	rootca_rowid = sqlite3_last_insert_rowid (ca_db);
-	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%llu ;",
+	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;",
 				      rootca_rowid);
 	rootca_id = atoll (row[0]);
 	g_strfreev (row);
@@ -575,7 +575,10 @@ gboolean ca_file_check_and_update_version ()
                                 gchar *new_serial;
                                 UInt160 aux160;
                                 guint64 old_serial = atoll(cert_table[(i*cols)+1]);
-                                gchar *aux = g_strdup_printf ("%0llX", old_serial);
+				gchar *hex_guint64_format_string = g_strdup_printf ("%%0%s", G_GUINT64_FORMAT);
+				hex_guint64_format_string[strlen(hex_guint64_format_string) - 1] = 'X';
+                                gchar *aux = g_strdup_printf (hex_guint64_format_string, old_serial);
+				g_free (hex_guint64_format_string);
                                 uint160_read (&aux160, (guchar *) aux, strlen(aux));
                                 new_serial = uint160_strdup_printf(&aux160);
 
@@ -606,7 +609,7 @@ gboolean ca_file_check_and_update_version ()
                         uint160_write_escaped (&aux160, NULL, &size);
                         aux = g_new0(gchar, size+1);
                         uint160_write_escaped (&aux160, aux, &size);
-                        sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=0;", 
+                        sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=1;", 
                                                aux);
                         if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
                                 return FALSE;
@@ -618,7 +621,7 @@ gboolean ca_file_check_and_update_version ()
 
                 if (sqlite3_exec (ca_db, 
                                   "INSERT INTO ca_properties (id, ca_id, name, value) "
-                                  "VALUES (NULL, 0, 'ca_root_must_check_serial_dups', 1);", 
+                                  "VALUES (NULL, 1, 'ca_root_must_check_serial_dups', 1);", 
                                   NULL, NULL, &error)) {
                         fprintf (stderr, "%s\n", error);
                         return FALSE;
@@ -801,14 +804,33 @@ gboolean ca_file_delete_tmp_file ()
 	return (! result);
 }
 
-void ca_file_get_last_serial (UInt160 *serial, guint64 ca_id)
+void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 {
-	gchar **serialstr = NULL;
+	gchar *serialstr = NULL;
+	gchar **row = NULL;
 
-	serialstr = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%"
+	row = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%"
                                             G_GUINT64_FORMAT";", ca_id);
-        uint160_read_escaped (serial, serialstr[0], strlen (serialstr[0]));
-	g_strfreev (serialstr);
+        uint160_read_escaped (serial, row[0], strlen (row[0]));
+	g_strfreev (row);
+
+        row = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE "
+				      "name='ca_root_must_check_serial_dups' AND ca_id=%"G_GUINT64_FORMAT";",
+                                      ca_id);
+        if (row) {
+                if (atoi(row[0])) {
+                        while (row) {
+                                uint160_inc (serial);
+                                g_strfreev (row);
+                                serialstr = uint160_strdup_printf (serial);
+                                row = ca_file_get_single_row ("SELECT id FROM certificates WHERE serial='%q' AND parent_id=%"G_GUINT64_FORMAT";", 
+                                                              serialstr, ca_id);
+                                g_free (serialstr);                                
+                        }
+                } else
+                        g_strfreev (row);
+        }
+
 
 	return;
 }
@@ -846,24 +868,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 		g_strfreev (parent_idstr);
 	}
 
-        ca_file_get_last_serial (&serial, parent_id);
-        uint160_inc (&serial);
-
-        row = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_must_check_serial_dups' AND ca_id=%"G_GUINT64_FORMAT";",
-                                      parent_id);
-        if (row) {
-                if (atoi(row[0])) {
-                        while (row) {
-                                uint160_inc (&serial);
-                                g_strfreev (row);
-                                serialstr = uint160_strdup_printf (&serial);
-                                row = ca_file_get_single_row ("SELECT id FROM certificates WHERE serial='%q' AND parent_id=%"G_GUINT64_FORMAT";", 
-                                                              serialstr, parent_id);
-                                g_free (serialstr);                                
-                        }
-                } else
-                        g_strfreev (row);
-        }
+	ca_file_get_next_serial (&serial, parent_id);
 
         serialstr = uint160_strdup_printf(&serial);
 
@@ -903,6 +908,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		fprintf (stderr, "%s\n", sql);
 		sqlite3_free (sql);
 		return error;
 	}
@@ -910,7 +916,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	sqlite3_free (sql);
 
 	cert_rowid = sqlite3_last_insert_rowid (ca_db);
-	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%llu ;",
+	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;",
 				      cert_rowid);
 	cert_id = atoll (row[0]);
 	g_strfreev (row);
@@ -923,6 +929,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 			       serialstr, parent_id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		fprintf (stderr, "%s\n", sql);
 		sqlite3_free (sql);
 		return error;
 	}
@@ -935,22 +942,31 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
                 uint160_write_escaped (&serial, NULL, &size);
                 serialstr = g_new0(gchar, size+1);
                 uint160_write_escaped (&serial, serialstr, &size);                
-		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %d, 'ca_root_last_assigned_serial', '%q');",
+		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
+				       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
 				       cert_id, serialstr);
-		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+			fprintf (stderr, "%s\n", sql);
+			sqlite3_free (sql);
 			return error;
+		}
 		sqlite3_free (sql);
                 g_free (serialstr);
 
-		ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60);
-		ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24);
-		ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1);
-		ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1);
-		ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1);
-		ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1);
-		ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1);
-		ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1);
-		ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1);
+		if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) || 
+		    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)||
+		    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)||
+		    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1) ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1)) {
+			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+			sqlite3_free (sql);
+			return g_strdup ("Error while establishing policies.");
+		}
 
 
 	}
@@ -1599,7 +1615,7 @@ gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gc
 
 guint ca_file_policy_get (guint64 ca_id, gchar *property_name)
 {
-	gchar **row = ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%llu ;", 
+	gchar **row = ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
 					      property_name, ca_id);
 
 	guint res;
@@ -1615,23 +1631,35 @@ guint ca_file_policy_get (guint64 ca_id, gchar *property_name)
 }
 
 
-void ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
+gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
 {
 	gchar **aux;
+	gchar *error = NULL;
+	gchar *sql = NULL;
 
-	aux = ca_file_get_single_row ("SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%llu ;", 
+	aux = ca_file_get_single_row ("SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
 				      property_name, ca_id);
 
 	if (! aux) {
-		aux = ca_file_get_single_row ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%llu, '%s', %d);",
-					      ca_id, property_name, value);
-		g_strfreev (aux);
+		sql = sqlite3_mprintf ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%"G_GUINT64_FORMAT", '%q', %d);",
+				       ca_id, property_name, value);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			fprintf (stderr, "%s\n", error);
+			sqlite3_free (sql);
+			return FALSE;
+		}
 	} else {
 		g_strfreev (aux);
-		aux = ca_file_get_single_row ("UPDATE ca_policies SET value=%d WHERE ca_id=%llu AND name='%s';",
-					      value, ca_id, property_name);
-		g_strfreev (aux);
+		sql = sqlite3_mprintf ("UPDATE ca_policies SET value=%d WHERE ca_id=%"G_GUINT64_FORMAT" AND name='%s';",
+				       value, ca_id, property_name);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			fprintf (stderr, "%s\n", error);
+			sqlite3_free (sql);
+			return FALSE;
+		}
 	}
+
+	return TRUE;
 		
 }
 

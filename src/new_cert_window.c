@@ -490,8 +490,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 
-        ca_file_get_last_serial (&cert_creation_data->serial, ca_id);
-	uint160_inc(&cert_creation_data->serial);
+        ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
 
 	csr_pem = ca_get_selected_row_pem ();
 	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);

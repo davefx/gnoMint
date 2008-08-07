@@ -626,6 +626,8 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 	gnutls_x509_crq_t csr;
 	gnutls_x509_crt_t ca_crt;
 	gnutls_x509_privkey_t ca_pkey;
+	guchar * serialstr = NULL;
+	size_t serialsize = 0;
 
 	gint key_usage;
 	size_t certificate_len = 0;
@@ -673,13 +675,19 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
-	if (gnutls_x509_crt_set_serial (crt, &(creation_data->serial), sizeof (creation_data->serial)) < 0) {
+        uint160_write (&creation_data->serial, NULL, &serialsize);
+        serialstr = g_new0 (guchar, serialsize);
+        uint160_write (&creation_data->serial, serialstr, &serialsize);
+
+	if (gnutls_x509_crt_set_serial (crt, serialstr, serialsize) < 0) {
+		g_free (serialstr);
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (crt);
 		gnutls_x509_crt_deinit (ca_crt);
 		gnutls_x509_privkey_deinit (ca_pkey);
 		return g_strdup_printf(_("Error when setting certificate serial number"));
 	}
+	g_free (serialstr);
 
 	if (gnutls_x509_crt_set_activation_time (crt, creation_data->activation) < 0) {
 		gnutls_x509_crq_deinit (csr);

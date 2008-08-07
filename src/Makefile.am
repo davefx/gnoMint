@@ -1,4 +1,4 @@
-bin_PROGRAMS = gnomint testuint160
+bin_PROGRAMS = gnomint #testuint160
 
 bin_SCRIPTS = gnomint-upgrade-db
 

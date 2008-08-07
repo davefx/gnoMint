@@ -49,7 +49,7 @@ gboolean ca_file_delete_tmp_file ();
 
 //gchar ** ca_file_get_single_row (const gchar *query, ...);
 
-void ca_file_get_last_serial (UInt160 *serial, guint64 ca_id);
+void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id);
 
 gchar * ca_file_insert_cert (CertCreationData * creation_data,
                              gboolean is_ca,
@@ -83,7 +83,7 @@ void ca_file_commit_new_crl_transaction ();
 void ca_file_rollback_new_crl_transaction ();
 
 guint ca_file_policy_get (guint64 ca_id, gchar *property_name);
-void ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value);
+gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value);
 
 gboolean ca_file_is_password_protected();
 gboolean ca_file_check_password (const gchar *password);

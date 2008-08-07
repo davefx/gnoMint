@@ -29,19 +29,22 @@ UInt160 * uint160_new()
         res->value1=0;
         res->value2=0;
 
-        fprintf (stderr, "Creado nuevo Uint160: %u:%llu:%llu\n", res->value2, res->value1, res->value0);
+        /* fprintf (stderr, "Creado nuevo Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
+	/* 	 res->value2, res->value1, res->value0); */
 
         return res;
 }
 
 void uint160_assign (UInt160 *var, guint64 new_value)
 {
-        fprintf (stderr, "Antes de asignar Uint160: %u:%llu:%llu\n", var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Antes de asignar Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
+	/* 	 var->value2, var->value1, var->value0); */
         var->value0=new_value;
         var->value1=0;
         var->value2=0;
 
-        fprintf (stderr, "Asignado valor %llu Uint160: %u:%llu:%llu\n", new_value, var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Asignado valor %"G_GUINT64_FORMAT" Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
+	/* 	 new_value, var->value2, var->value1, var->value0); */
         return;
 }
 
@@ -50,7 +53,8 @@ void uint160_add (UInt160 *var, guint64 new_value)
         guint64 value0_backup = var->value0;
         guint64 value1_backup = var->value1;
 
-        fprintf (stderr, "Sumando %llu a Uint160: %u:%llu:%llu\n", new_value, var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Sumando %"G_GUINT64_FORMAT" a Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
+	/* 	 new_value, var->value2, var->value1, var->value0); */
 
         var->value0 = var->value0 + new_value;
         if (var->value0 < value0_backup) {
@@ -59,7 +63,8 @@ void uint160_add (UInt160 *var, guint64 new_value)
                         var->value2++;
         }
 
-        fprintf (stderr, "Resultado: %u:%llu:%llu\n", var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Resultado: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
+	/* 	 var->value2, var->value1, var->value0); */
 
         return;
 }
@@ -73,7 +78,8 @@ void uint160_inc (UInt160 *var)
 
 void uint160_shift (UInt160 *var, guint positions)
 {
-        fprintf (stderr, "Shifting %u a Uint160: %u:%llu:%llu\n", positions, var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Shifting %u a Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
+	/* 	 positions, var->value2, var->value1, var->value0); */
         guint64 carry0_to_1;
         guint64 carry1_to_2;
 
@@ -110,9 +116,6 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
         gint i;
         guchar c;
         
-        if (buffer_size > 20)
-                return FALSE;
-
         var->value0=0;
         var->value1=0;
         var->value2=0;
