@@ -107,7 +107,7 @@ gboolean uint160_write (UInt160 *var, guchar *buffer, gsize * max_size)
 
 gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
 {
-        guint i;
+        gint i;
         guchar c;
         
         if (buffer_size > 20)
@@ -117,7 +117,7 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
         var->value1=0;
         var->value2=0;
 
-        for (i=0; i < buffer_size; i++) {
+        for (i=buffer_size - 1; i >= 0; i--) {
                 c = buffer[i];
                 uint160_shift (var, 8);
                 uint160_add (var, c);
