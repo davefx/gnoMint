@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-gnomint">
+         <comment xml:lang="en">gnoMint certificate database</comment>
+         <comment xml:lang="es">Base de datos de certificados de gnoMint</comment>
+         <glob pattern="*.gnomint"/>
+  </mime-type>
+</mime-info>
