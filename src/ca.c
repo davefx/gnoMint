@@ -1452,9 +1452,9 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 
 
 
-gboolean ca_open (gchar *filename) 
+gboolean ca_open (gchar *filename, gboolean create) 
 {
-	if (! ca_file_open (filename))
+	if (! ca_file_open (filename, create))
 		return FALSE;
 
 	__enable_widget ("new_certificate1");

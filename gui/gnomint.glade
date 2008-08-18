@@ -21,22 +21,67 @@
             <child>
               <widget class="GtkMenuItem" id="file1">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_File</property>
+                <property name="label" translatable="yes">_Certificates</property>
                 <property name="use_underline">True</property>
                 <child>
                   <widget class="GtkMenu" id="file1_menu1">
                     <child>
                       <widget class="GtkImageMenuItem" id="new1">
                         <property name="visible">True</property>
-                        <property name="label">gtk-new</property>
+                        <property name="label" translatable="yes">_New certificate database</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new1_activate"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image14">
+                            <property name="stock">gtk-new</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="open1">
+                        <property name="visible">True</property>
+                        <property name="label">_Open certificate database</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_open1_activate"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image13">
+                            <property name="stock">gtk-open</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="save_as1">
+                        <property name="visible">True</property>
+                        <property name="label">_Save certificate database as...</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_save_as1_activate"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image15">
+                            <property name="stock">gtk-save-as</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator1">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="gtk-add">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-add</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <child>
-                          <widget class="GtkMenu" id="new2_menu1">
+                          <widget class="GtkMenu" id="menu3">
+                            <property name="visible">True</property>
                             <child>
                               <widget class="GtkImageMenuItem" id="new2">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">_New CA</property>
+                                <property name="label" translatable="yes">_Add self-signed CA</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_new1_activate"/>
                                 <child internal-child="image">
@@ -44,7 +89,7 @@
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                     <property name="yalign">0</property>
-                                    <property name="stock">gtk-new</property>
+                                    <property name="stock">gtk-add</property>
                                   </widget>
                                 </child>
                               </widget>
@@ -52,7 +97,7 @@
                             <child>
                               <widget class="GtkMenuItem" id="new_certificate1">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">New _Certificate Request</property>
+                                <property name="label" translatable="yes">Add _Certificate Request</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_new_certificate1_activate"/>
                               </widget>
@@ -62,25 +107,42 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkImageMenuItem" id="open1">
+                      <widget class="GtkMenuItem" id="extractprivatekey1">
                         <property name="visible">True</property>
-                        <property name="label">gtk-open</property>
+                        <property name="sensitive">False</property>
+                        <property name="tooltip" translatable="yes">Extract the saved private key to an external file or device</property>
+                        <property name="label" translatable="yes">Extrac_t private key</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_open1_activate"/>
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkImageMenuItem" id="save_as1">
+                      <widget class="GtkMenuItem" id="revoke1">
                         <property name="visible">True</property>
-                        <property name="label">gtk-save-as</property>
+                        <property name="sensitive">False</property>
+                        <property name="label" translatable="yes">Revo_ke</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_save_as1_activate"/>
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator1">
+                      <widget class="GtkMenuItem" id="sign1">
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                        <property name="label" translatable="yes">_Sign</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="delete2">
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                        <property name="label">gtk-delete</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="ca_on_delete2_activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem4">
                         <property name="visible">True</property>
                       </widget>
                     </child>
@@ -103,7 +165,7 @@
                       <widget class="GtkMenuItem" id="change_pwd_menuitem">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">Change Pass_word</property>
+                        <property name="label" translatable="yes">Change database pass_word</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="ca_on_change_pwd_menuitem_activate"/>
                       </widget>
@@ -128,7 +190,15 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem3">
+                      <widget class="GtkMenuItem" id="export1">
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                        <property name="label" translatable="yes">E_xport</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
                         <property name="visible">True</property>
                       </widget>
                     </child>
@@ -172,108 +242,6 @@
                         <property name="label">gtk-preferences</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                      </widget>
-                    </child>
-                  </widget>
-                </child>
-              </widget>
-            </child>
-            <child>
-              <widget class="GtkMenuItem" id="actions1">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="label" translatable="yes">_Actions</property>
-                <property name="use_underline">True</property>
-                <child>
-                  <widget class="GtkMenu" id="actions1_menu1">
-                    <property name="visible">True</property>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="export1">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="label" translatable="yes">E_xport</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_on_export1_activate"/>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image2">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="yalign">0</property>
-                            <property name="stock">gtk-convert</property>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="extractprivatekey1">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="tooltip">Extract the saved private key to an external file or device</property>
-                        <property name="label" translatable="yes">Extrac_t private key</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image5">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="yalign">0</property>
-                            <property name="stock">gtk-floppy</property>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="revoke1">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="label" translatable="yes">Revo_ke</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_on_revoke_activate"/>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image4">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="yalign">0</property>
-                            <property name="stock">gtk-cancel</property>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem2">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="sign1">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="label" translatable="yes">_Sign</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_on_sign1_activate"/>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image3">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="yalign">0</property>
-                            <property name="stock">gtk-yes</property>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="delete2">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="label">gtk-delete</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="ca_on_delete2_activate"/>
                       </widget>
                     </child>
                   </widget>

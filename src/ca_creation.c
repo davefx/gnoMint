@@ -194,9 +194,9 @@ gchar * ca_creation_database_save (CaCreationData * creation_data,
 				   gchar * private_key, 
 				   gchar * root_certificate)
 {
-	return ca_file_create (creation_data, 
-			       private_key,
-			       root_certificate);
+	return ca_file_insert_self_signed_ca (creation_data, 
+                                              private_key,
+                                              root_certificate);
 }
 
 void ca_creation_data_free (CaCreationData *cd)

@@ -31,11 +31,9 @@ typedef enum {
 	CA_FILE_ELEMENT_TYPE_CSR=1 
 } CaFileElementType;
 
-gchar * ca_file_create (CaCreationData * creation_data, 
-			gchar *pem_ca_private_key,
-			gchar *pem_ca_certificate);
+gchar * ca_file_create (const gchar *filename);
 
-gboolean ca_file_open (gchar *file_name);
+gboolean ca_file_open (gchar *file_name, gboolean create);
 
 gboolean ca_file_check_and_update_version ();
 
@@ -43,13 +41,11 @@ void ca_file_close ();
 
 gboolean ca_file_save_as (gchar *new_file_name);
 
-gboolean ca_file_rename_tmp_file (gchar *new_file_name);
-
-gboolean ca_file_delete_tmp_file ();
-
-//gchar ** ca_file_get_single_row (const gchar *query, ...);
-
 void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id);
+
+gchar * ca_file_insert_self_signed_ca (CaCreationData * creation_data, 
+                                       gchar *pem_ca_private_key,
+                                       gchar *pem_ca_certificate);
 
 gchar * ca_file_insert_cert (CertCreationData * creation_data,
                              gboolean is_ca,

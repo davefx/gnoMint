@@ -163,6 +163,7 @@ Makefile
 src/Makefile
 gui/Makefile
 po/Makefile.in
+mime/Makefile
 gnomint.spec
 ])
 

@@ -43,7 +43,6 @@ GladeXML * csr_popup_menu_xml = NULL;
 GladeXML * cert_popup_menu_xml = NULL;
 
 gchar * gnomint_current_opened_file = NULL;
-gchar * gnomint_temp_created_file = NULL;
 
 void __disable_widget (gchar *widget_name)
 {
@@ -66,8 +65,8 @@ void __enable_widget (gchar *widget_name)
 int main (int   argc,
 	  char *argv[])
 {
-/* 	gboolean silent = FALSE; */
 /* 	gchar *savefile = NULL; */
+        gchar *defaultfile = NULL;
 	GOptionContext *ctx;
 	GError *err = NULL;
 	GOptionEntry entries[] = {
@@ -122,13 +121,13 @@ int main (int   argc,
 	__disable_widget ("preferences1");
 	
 
-	if (argc >= 2)
-		ca_open (g_strdup(argv[1]));
-
-/* 	printf("In: %s\nOut: %s\nInOutIn: %s\n", */
-/* 	       "lala",  */
-/* 	       pkey_cipher_aes_encrypt("lala","pedokakafeoauiuilosotatamicobbbb1234"),  */
-/* 	       pkey_cipher_aes_decrypt(pkey_cipher_aes_encrypt("lala","pedokakafeoauiuilosotatamicobbbb1234"), "pedokakafeoauiuilosotatamicobbbb1234")); */
+	if (argc >= 2 && ca_open (g_strdup(argv[1]), TRUE)) {
+                /* The file has opened OK */
+        } else {
+                /* No arguments, or failure when opening file */
+                defaultfile = g_build_filename (g_get_home_dir(), ".gnomint", "default.gnomint", NULL);
+                ca_open (defaultfile, TRUE);
+        }
 
 	gtk_main ();
 
@@ -188,7 +187,7 @@ void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 		return;
 	}		
 	
-	if (! ca_open (filename)) {
+	if (! ca_open (filename, FALSE)) {
 		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
 						 GTK_MESSAGE_ERROR,

@@ -24,7 +24,7 @@
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
-gboolean ca_open (gchar *filename);
+gboolean ca_open (gchar *filename, gboolean create);
 gboolean ca_refresh_model ();
 void ca_todo_callback();
 gint ca_get_selected_row_id ();
