@@ -61,7 +61,6 @@ void new_cert_creation_process_ca_error_dialog (gchar *message) {
 
 void new_cert_creation_process_ca_finish (void) {
 	GtkWidget *widget = NULL, *dialog = NULL;
-	/* gchar *filename = NULL; */
 	
 	g_thread_join (new_cert_creation_process_ca_thread);
 	gtk_timeout_remove (timer);	       
@@ -69,21 +68,6 @@ void new_cert_creation_process_ca_finish (void) {
 	
 	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
 	
-	/* dialog = gtk_file_chooser_dialog_new (_("Save CA database"), */
-	/* 				      GTK_WINDOW(widget), */
-	/* 				      GTK_FILE_CHOOSER_ACTION_SAVE, */
-	/* 				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, */
-	/* 				      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, */
-	/* 				      NULL); */
-	/* gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE); */
-	
-	/* if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) { */
-	/* 	filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)); */
-	/* 	if (! ca_file_rename_tmp_file (filename)) { */
-	/* 		gtk_widget_destroy (dialog); */
-	/* 		new_cert_creation_process_ca_error_dialog (_("Problem when saving new CA database")); */
-	/* 	} else { */
-	/* 		gtk_widget_destroy (dialog); */
         dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          GTK_MESSAGE_INFO,
@@ -96,14 +80,6 @@ void new_cert_creation_process_ca_finish (void) {
         gtk_widget_destroy (widget);
 			
         ca_refresh_model ();
-        /* ca_open (filename); */
-	
-/* } */
-/* 	} else { */
-/* 		gtk_widget_destroy (dialog); */
-/* 		ca_file_delete_tmp_file(); */
-/* 		gtk_widget_destroy (widget); */
-/* 	} */
 
 }
 

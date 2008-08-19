@@ -39,6 +39,9 @@ void uint160_assign (UInt160 *var, guint64 new_value)
 {
         /* fprintf (stderr, "Antes de asignar Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",  */
 	/* 	 var->value2, var->value1, var->value0); */
+	
+	memset (var, 0, sizeof(UInt160));
+
         var->value0=new_value;
         var->value1=0;
         var->value2=0;
@@ -116,6 +119,8 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
         gint i;
         guchar c;
         
+	memset (var, 0, sizeof(UInt160));
+
         var->value0=0;
         var->value1=0;
         var->value2=0;
@@ -166,6 +171,8 @@ gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize buffer_size)
         guchar c;
         guchar buffer_c[buffer_size];
         
+	memset (var, 0, sizeof (UInt160));
+
         var->value0=0;
         var->value1=0;
         var->value2=0;

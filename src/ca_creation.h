@@ -40,8 +40,13 @@ typedef struct {
 	time_t activation;
 	time_t expiration;
 
-	gboolean is_pwd_protected;
-	gchar * password;
+	/* Now, as the DB is not related to CAs anymore, the field is_pwd_protected has no sense
+	   in CA creation process */
+
+	/* gboolean is_pwd_protected; */
+
+	/* However, the password is needed */
+	gchar * password; 
 	
 } CaCreationData;
 

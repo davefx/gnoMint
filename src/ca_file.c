@@ -817,8 +817,6 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
 
-	sqlite3_close (ca_db);
-	ca_db = NULL;
 
 	tls_cert_free (tls_cert);
 	tls_cert = NULL;

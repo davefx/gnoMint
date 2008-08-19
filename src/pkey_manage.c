@@ -507,20 +507,12 @@ void pkey_manage_crypt_auto (CaCreationData *creation_data,
 			     const gchar *pem_ca_certificate)
 {
 	gchar *clean_private_key = *pem_private_key;
-	gchar *password = NULL;
 	gchar *res = NULL;
 	TlsCert *tls_cert = NULL;
 
-	if (! creation_data->is_pwd_protected)
-		return;
-
 	tls_cert = tls_parse_cert_pem (pem_ca_certificate);
 
-	password = g_strdup_printf ("gnoMintPrivateKey%s%s", creation_data->password, tls_cert->dn);
-
-	res = pkey_manage_aes_encrypt (clean_private_key, password);
-
-	g_free (password);
+	res = pkey_manage_crypt_w_pwd (clean_private_key, tls_cert->dn, creation_data->password);
 
 	tls_cert_free (tls_cert);
 

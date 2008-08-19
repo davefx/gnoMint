@@ -271,22 +271,25 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	g_free (expiration_time);
 
 
-	widget = glade_xml_get_widget (new_ca_window_xml, "new_ca_pwd_protect_yes_radiobutton");
-	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	ca_creation_data->is_pwd_protected = active;
+	/* widget = glade_xml_get_widget (new_ca_window_xml, "new_ca_pwd_protect_yes_radiobutton"); */
+	/* active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget)); */
+	/* ca_creation_data->is_pwd_protected = active; */
 
-	if (active) {
-		widget = glade_xml_get_widget (new_ca_window_xml, "new_ca_pwd_entry_1");
-		text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
-		if (strlen (text))
-			ca_creation_data->password = g_strdup (text);
-		else
-			ca_creation_data->password = NULL;
-	}
+	/* if (active) { */
+	/* 	widget = glade_xml_get_widget (new_ca_window_xml, "new_ca_pwd_entry_1"); */
+	/* 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget)); */
+	/* 	if (strlen (text)) */
+	/* 		ca_creation_data->password = g_strdup (text); */
+	/* 	else */
+	/* 		ca_creation_data->password = NULL; */
+	/* } */
 
 
 	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
+
+	if (ca_file_is_password_protected())
+		ca_creation_data->password = pkey_manage_ask_password();
 
 	new_cert_creation_process_ca_window_display (ca_creation_data);
 	
