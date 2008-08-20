@@ -717,7 +717,7 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 	gchar **row = NULL;
 
 	row = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%"
-                                            G_GUINT64_FORMAT";", ca_id);
+                                      G_GUINT64_FORMAT";", ca_id);
         uint160_read_escaped (serial, row[0], strlen (row[0]));
 	g_strfreev (row);
 
@@ -734,8 +734,12 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
                                                               serialstr, ca_id);
                                 g_free (serialstr);                                
                         }
-                } else
+                } else {
+                        uint160_inc (serial);
                         g_strfreev (row);
+                }
+        } else {
+                uint160_inc (serial);
         }
 
 
@@ -787,7 +791,7 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 	rootca_id = atoll (row[0]);
 	g_strfreev (row);
 
-	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %d, 'ca_root_certificate_pem', '%q');", 
+	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_certificate_pem', '%q');", 
 			       rootca_id, pem_ca_certificate);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
@@ -797,7 +801,7 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
         uint160_write_escaped (&sn, NULL, &size);
         aux = g_new0 (gchar, size + 1);
         uint160_write_escaped (&sn, aux, &size);
-	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %d, 'ca_root_last_assigned_serial', '%q');",
+	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
                                rootca_id, aux);
         g_free (aux);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
@@ -1096,14 +1100,14 @@ GList * ca_file_get_revoked_certs ()
 
 }
 
-gint ca_file_begin_new_crl_transaction (gint ca_id, time_t timestamp)
+gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp)
 {
         gchar * sql;
         gchar **last_crl;
         gint next_crl_version;
         gchar *error;
 
-        last_crl = ca_file_get_single_row ("SELECT crl_version FROM ca_crl WHERE ca_id=%u", ca_id);
+        last_crl = ca_file_get_single_row ("SELECT crl_version FROM ca_crl WHERE ca_id=%"G_GUINT64_FORMAT, ca_id);
         if (! last_crl)
                 next_crl_version = 1;
         else {
@@ -1114,7 +1118,7 @@ gint ca_file_begin_new_crl_transaction (gint ca_id, time_t timestamp)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return 0;
 
-        sql = sqlite3_mprintf ("INSERT INTO ca_crl VALUES (NULL, %u, %u, %u);",
+        sql = sqlite3_mprintf ("INSERT INTO ca_crl VALUES (NULL, %"G_GUINT64_FORMAT", %u, %u);",
                                ca_id, next_crl_version, timestamp);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
@@ -1650,6 +1654,8 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
 			return FALSE;
 		}
 	}
+
+        sqlite3_free (sql);
 
 	return TRUE;
 		

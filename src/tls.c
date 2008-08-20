@@ -430,11 +430,13 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 	uint160_assign (sn, G_GUINT64_CONSTANT(1));
 
 	if (gnutls_x509_crt_init (&crt) < 0) {
+                uint160_free (sn);
 		return g_strdup_printf(_("Error when initializing certificate structure"));
 	}
 
 	if (gnutls_x509_crt_set_version (crt, 3) < 0){
 		gnutls_x509_crt_deinit (crt);
+                uint160_free (sn);
 		return g_strdup_printf(_("Error when setting certificate version"));
 	}
 	
@@ -444,10 +446,13 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 
 	if (gnutls_x509_crt_set_serial (crt, serialstr, serialsize) < 0) {
 		gnutls_x509_crt_deinit (crt);
+                uint160_free (sn);
 		return g_strdup_printf(_("Error when setting certificate serial number"));
 	}
 
         g_free (serialstr);
+
+        uint160_free (sn);
 
 	if (gnutls_x509_crt_set_activation_time (crt, creation_data->activation) < 0) {
 		gnutls_x509_crt_deinit (crt);

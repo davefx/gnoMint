@@ -154,6 +154,7 @@ gpointer ca_creation_thread (gpointer data)
 	}
 
 	ca_creation_data_free (creation_data);
+        g_free (private_key);
 
 	return NULL;
 	
