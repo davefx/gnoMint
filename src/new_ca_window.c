@@ -285,11 +285,18 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	/* } */
 
 
+	if (ca_file_is_password_protected()) {
+		ca_creation_data->password = pkey_manage_ask_password();
+
+                if (! ca_creation_data->password) {
+                        /* The user hasn't provided a valid password */
+                        return;
+                }
+
+        }
+
 	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
-
-	if (ca_file_is_password_protected())
-		ca_creation_data->password = pkey_manage_ask_password();
 
 	new_cert_creation_process_ca_window_display (ca_creation_data);
 	

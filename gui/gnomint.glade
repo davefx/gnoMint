@@ -5,8 +5,8 @@
   <widget class="GtkWindow" id="main_window1">
     <property name="visible">True</property>
     <property name="title">gnoMint</property>
-    <property name="role">gnoMint_main</property>
     <property name="startup_id">gnoMint_main</property>
+    <property name="role">gnoMint_main</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
@@ -41,7 +41,7 @@
                     <child>
                       <widget class="GtkImageMenuItem" id="open1">
                         <property name="visible">True</property>
-                        <property name="label">_Open certificate database</property>
+                        <property name="label" translatable="yes">_Open certificate database</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_open1_activate"/>
                         <child internal-child="image">
@@ -54,7 +54,7 @@
                     <child>
                       <widget class="GtkImageMenuItem" id="save_as1">
                         <property name="visible">True</property>
-                        <property name="label">_Save certificate database as...</property>
+                        <property name="label" translatable="yes">_Save certificate database as...</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_save_as1_activate"/>
                         <child internal-child="image">
@@ -83,7 +83,7 @@
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">_Add self-signed CA</property>
                                 <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_new1_activate"/>
+                                <signal name="activate" handler="on_add_self_signed_ca_activate"/>
                                 <child internal-child="image">
                                   <widget class="GtkImage" id="menu-item-image1">
                                     <property name="visible">True</property>
@@ -99,7 +99,7 @@
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">Add _Certificate Request</property>
                                 <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_new_certificate1_activate"/>
+                                <signal name="activate" handler="on_add_csr_activate"/>
                               </widget>
                             </child>
                           </widget>

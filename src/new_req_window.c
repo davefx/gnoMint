@@ -468,11 +468,17 @@ void on_new_req_commit_clicked (GtkButton *widg,
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	csr_creation_data->key_bitlength = active;
 
+	if (ca_file_is_password_protected()) {
+		csr_creation_data->password = pkey_manage_ask_password();
+
+                if (! csr_creation_data->password) {
+                        /* The user hasn't provided a valid password */
+                        return;
+                }
+        }
+
 	window = GTK_WINDOW(glade_xml_get_widget (new_req_window_xml, "new_req_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
-
-	if (ca_file_is_password_protected())
-		csr_creation_data->password = pkey_manage_ask_password();
 
 	new_csr_creation_process_window_display (csr_creation_data);	
 

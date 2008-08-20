@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-18 18:08+0200\n"
-"PO-Revision-Date: 2008-08-18 18:12+0200\n"
+"POT-Creation-Date: 2008-08-20 19:52+0200\n"
+"PO-Revision-Date: 2008-08-20 20:06+0200\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -197,7 +197,7 @@ msgid "Add _Certificate Request"
 msgstr "Añadir _solicitud de certificación"
 
 #: ../gui/gnomint.glade.h:46 ../src/certificate_properties.c:1089
-#: ../src/tls.c:1035
+#: ../src/tls.c:1040
 msgid "Any purpose"
 msgstr "Cualquier propósito"
 
@@ -234,7 +234,7 @@ msgid "CAOU"
 msgstr "CAOU"
 
 #: ../gui/gnomint.glade.h:55 ../src/certificate_properties.c:336
-#: ../src/tls.c:1009
+#: ../src/tls.c:1014
 msgid "CRL signing"
 msgstr "Firma de CRLs"
 
@@ -270,7 +270,7 @@ msgstr "_Solicitudes de certificación"
 msgid "Certificate properties"
 msgstr "Propiedades del certificado"
 
-#: ../gui/gnomint.glade.h:64 ../src/tls.c:992
+#: ../gui/gnomint.glade.h:64 ../src/tls.c:997
 msgid "Certification Authority"
 msgstr "Autoridad de certificación"
 
@@ -295,7 +295,7 @@ msgid "City: "
 msgstr "Ciudad"
 
 #: ../gui/gnomint.glade.h:70 ../src/certificate_properties.c:1085
-#: ../src/tls.c:1027
+#: ../src/tls.c:1032
 msgid "Code signing"
 msgstr "Firma de código"
 
@@ -320,7 +320,7 @@ msgid "DSA"
 msgstr "DSA"
 
 #: ../gui/gnomint.glade.h:76 ../src/certificate_properties.c:330
-#: ../src/tls.c:1003
+#: ../src/tls.c:1008
 msgid "Data encipherment"
 msgstr "Cifrado de datos"
 
@@ -329,7 +329,7 @@ msgid "Details"
 msgstr "Detalles"
 
 #: ../gui/gnomint.glade.h:78 ../src/certificate_properties.c:324
-#: ../src/tls.c:997
+#: ../src/tls.c:1002
 msgid "Digital signature"
 msgstr "Firma digital"
 
@@ -342,7 +342,7 @@ msgid "E_xport"
 msgstr "E_xportar"
 
 #: ../gui/gnomint.glade.h:81 ../src/certificate_properties.c:1086
-#: ../src/tls.c:1029
+#: ../src/tls.c:1034
 msgid "Email protection"
 msgstr "Protección de correo electrónico"
 
@@ -426,12 +426,12 @@ msgstr ""
 "seleccionada."
 
 #: ../gui/gnomint.glade.h:103 ../src/certificate_properties.c:332
-#: ../src/tls.c:1005
+#: ../src/tls.c:1010
 msgid "Key agreement"
 msgstr "Negociación de claves"
 
 #: ../gui/gnomint.glade.h:104 ../src/certificate_properties.c:328
-#: ../src/tls.c:1001
+#: ../src/tls.c:1006
 msgid "Key encipherment"
 msgstr "Cifrado de claves"
 
@@ -466,12 +466,12 @@ msgstr ""
 "nuevo certificado:"
 
 #: ../gui/gnomint.glade.h:112 ../src/certificate_properties.c:326
-#: ../src/tls.c:999
+#: ../src/tls.c:1004
 msgid "Non repudiation"
 msgstr "No repudio"
 
 #: ../gui/gnomint.glade.h:113 ../src/certificate_properties.c:1088
-#: ../src/tls.c:1033
+#: ../src/tls.c:1038
 msgid "OCSP signing"
 msgstr "Firma de OCSP"
 
@@ -672,11 +672,13 @@ msgid ""
 "\n"
 "Please insert the database password."
 msgstr ""
-"Esta acción necesita emplear una o más claves privadas almacenadasen la base "
-"de datos de la AC.Por favor, introduzca la contraseña de la base de datos."
+"Esta acción necesita emplear una o más claves privadas almacenadas"
+"en la base de datos de la AC.\n"
+"\n"
+"Por favor, introduzca la contraseña de la base de datos."
 
 #: ../gui/gnomint.glade.h:165 ../src/certificate_properties.c:1087
-#: ../src/tls.c:1031
+#: ../src/tls.c:1036
 msgid "Time stamping"
 msgstr "Marcado de fecha"
 
@@ -717,67 +719,75 @@ msgid "_Import"
 msgstr "I_mportar"
 
 #: ../gui/gnomint.glade.h:173
+msgid "_New certificate database"
+msgstr "_Nueva base de datos de certificados"
+
+#: ../gui/gnomint.glade.h:174
 msgid "_No"
 msgstr "_No"
 
-#: ../gui/gnomint.glade.h:174
+#: ../gui/gnomint.glade.h:175
 msgid "_Open certificate database"
 msgstr "Abrir base de datos de certificados"
 
-#: ../gui/gnomint.glade.h:175
+#: ../gui/gnomint.glade.h:176
 msgid "_Revoked Certificates"
 msgstr "Certificados _revocados"
 
-#: ../gui/gnomint.glade.h:176
+#: ../gui/gnomint.glade.h:177
+msgid "_Save certificate database as..."
+msgstr "_Guardar base de datos de certificados como..."
+
+#: ../gui/gnomint.glade.h:178
 msgid "_Save filename in the database for automatic loading"
 msgstr ""
 "_Guardar nombre de fichero en base de datos para cargarlo automáticamente"
 
-#: ../gui/gnomint.glade.h:177
+#: ../gui/gnomint.glade.h:179
 msgid "_Sign"
 msgstr "_Firmar"
 
-#: ../gui/gnomint.glade.h:178
+#: ../gui/gnomint.glade.h:180
 msgid "_View"
 msgstr "_Ver"
 
-#: ../gui/gnomint.glade.h:179
+#: ../gui/gnomint.glade.h:181
 msgid "_Yes"
 msgstr "_Sí"
 
-#: ../gui/gnomint.glade.h:180
+#: ../gui/gnomint.glade.h:182
 msgid "gtk-add"
 msgstr "gtk-add"
 
-#: ../gui/gnomint.glade.h:181
+#: ../gui/gnomint.glade.h:183
 msgid "gtk-cancel"
 msgstr "gtk-cancel"
 
-#: ../gui/gnomint.glade.h:182
+#: ../gui/gnomint.glade.h:184
 msgid "gtk-delete"
 msgstr "gtk-delete"
 
-#: ../gui/gnomint.glade.h:183
+#: ../gui/gnomint.glade.h:185
 msgid "gtk-ok"
 msgstr "gtk-ok"
 
-#: ../gui/gnomint.glade.h:184
+#: ../gui/gnomint.glade.h:186
 msgid "gtk-properties"
 msgstr "gtk-properties"
 
-#: ../gui/gnomint.glade.h:185
+#: ../gui/gnomint.glade.h:187
 msgid "label"
 msgstr "etiqueta"
 
-#: ../gui/gnomint.glade.h:186
+#: ../gui/gnomint.glade.h:188
 msgid "may differ"
 msgstr "puede variar"
 
-#: ../gui/gnomint.glade.h:187
+#: ../gui/gnomint.glade.h:189
 msgid "must be the same"
 msgstr "debe coincidir"
 
-#: ../gui/gnomint.glade.h:188
+#: ../gui/gnomint.glade.h:190
 msgid "page 3"
 msgstr "página 3"
 
@@ -1085,12 +1095,12 @@ msgstr "Error al crear base de datos de la AC"
 msgid "CA generated successfully"
 msgstr "AC generada con éxito"
 
-#: ../src/ca_file.c:132
+#: ../src/ca_file.c:115
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr "Error al abrir fichero '%s'"
 
-#: ../src/ca_file.c:300
+#: ../src/ca_file.c:226
 msgid ""
 "The selected database has been created with a newer version of gnoMint than "
 "the currently installed."
@@ -1098,7 +1108,7 @@ msgstr ""
 "La base de datos seleccionada fue creada mediante una versión de gnoMint más "
 "reciente que la que se está ejecutando."
 
-#: ../src/certificate_properties.c:334 ../src/tls.c:1007
+#: ../src/certificate_properties.c:334 ../src/tls.c:1012
 msgid "Certificate signing"
 msgstr "Firma de certificados"
 
@@ -1255,7 +1265,7 @@ msgstr "Algoritmo de firma"
 msgid "Name"
 msgstr "Nombre"
 
-#: ../src/certificate_properties.c:1083 ../src/tls.c:1023
+#: ../src/certificate_properties.c:1083 ../src/tls.c:1028
 msgid "TLS WWW Server"
 msgstr "Servidor TLS WWW"
 
@@ -1343,38 +1353,55 @@ msgstr "La solicitud no se pudo guardar"
 msgid "CSR generated successfully"
 msgstr "Solicitud de certificación generada con éxito"
 
-#: ../src/main.c:98
+#: ../src/main.c:97
 msgid "- A graphical Certification Authority manager"
 msgstr "- Un gestor gráfico de Autoridades de Certificación"
 
-#: ../src/main.c:101
+#: ../src/main.c:100
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr "Fallo al inicializar: %s\n"
 
-#: ../src/main.c:170
+#: ../src/main.c:175
+msgid "Create new CA database"
+msgstr "Crear nueva base de datos de AC"
+
+#: ../src/main.c:213
+#, c-format
+msgid ""
+"Problem when creating '%s' CA database:\n"
+"%s"
+msgstr "Hubo problemas al crear la base de datos de la AC '%s':\n"
+"%s"
+
+#: ../src/main.c:226
+#, c-format
+msgid "Problem when opening new '%s' CA database"
+msgstr "Hubo problemas al abrir la nueva base de datos de la AC '%s'"
+
+#: ../src/main.c:245
 msgid "Open CA database"
 msgstr "Abrir base de datos de AC"
 
-#: ../src/main.c:191
+#: ../src/main.c:266
 #, c-format
 msgid "Problem when opening '%s' CA database"
 msgstr "Hubo problemas al abrir la base de datos de la AC '%s'"
 
-#: ../src/main.c:209
+#: ../src/main.c:284
 msgid "Save CA database as..."
 msgstr "Guardar base de datos de AC como..."
 
-#: ../src/main.c:239
+#: ../src/main.c:314
 msgid "Select PEM file to import"
 msgstr "Seleccione fichero PEM a importar"
 
-#: ../src/main.c:260
+#: ../src/main.c:335
 #, c-format
 msgid "Problem when importing '%s' file"
 msgstr "Hubo problemas al importar el fichero '%s'"
 
-#: ../src/main.c:323
+#: ../src/main.c:398
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
@@ -1382,7 +1409,7 @@ msgstr ""
 "gnoMint es un programa diseñado para crear y gestionar Autoridades de "
 "Certificación, así como sus certificados"
 
-#: ../src/main.c:324
+#: ../src/main.c:399
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -1412,31 +1439,23 @@ msgstr ""
 "con este programa; si no es así, escriba a la Free Software Foundation, "
 "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
 
-#: ../src/main.c:328
+#: ../src/main.c:403
 msgid "translator-credits"
 msgstr "David Marín Carreño <davefx@gmail.com>"
 
-#: ../src/new_cert_creation_process.c:72
-msgid "Save CA database"
-msgstr "Guardar base de datos de AC"
-
-#: ../src/new_cert_creation_process.c:84
-msgid "Problem when saving new CA database"
-msgstr "Problema al guardar nueva base de datos de AC"
-
-#: ../src/new_cert_creation_process.c:92
+#: ../src/new_cert_creation_process.c:76
 msgid "CA creation process finished"
 msgstr "Proceso de creación de la AC finalizado"
 
-#: ../src/new_cert_creation_process.c:202
+#: ../src/new_cert_creation_process.c:179
 msgid "Creation process cancelled"
 msgstr "Proceso de creación cancelado"
 
-#: ../src/new_cert_creation_process.c:230
+#: ../src/new_cert_creation_process.c:207
 msgid "CSR creation process finished"
 msgstr "Proceso de creación de solicitud finalizado"
 
-#: ../src/new_cert_creation_process.c:295
+#: ../src/new_cert_creation_process.c:272
 msgid "Creating Certificate Signing Request"
 msgstr "Creando solicitud de certificación"
 
@@ -1444,36 +1463,41 @@ msgstr "Creando solicitud de certificación"
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
 "the same as the one in the CA cert."
-msgstr "La política de esta AC obliga a que los campos \"país\" de los certificados expedidos sean"
-"igual al del certificado de la AC."
+msgstr ""
+"La política de esta AC obliga a que los campos \"país\" de los certificados "
+"expedidos seanigual al del certificado de la AC."
 
 #: ../src/new_cert_window.c:287
 msgid ""
 "The policy of this CA obligue the state/province field of the certificates "
 "to be the same as the one in the CA cert."
-msgstr "La política de esta AC obliga a que los campos \"estado/provincia\" de los certificados expedidos sean"
-"igual al del certificado de la AC."
+msgstr ""
+"La política de esta AC obliga a que los campos \"estado/provincia\" de los "
+"certificados expedidos seanigual al del certificado de la AC."
 
 #: ../src/new_cert_window.c:291
 msgid ""
 "The policy of this CA obligue the locality/city field of the certificates to "
 "be the same as the one in the CA cert."
-msgstr "La política de esta AC obliga a que los campos \"localidad/ciudad\" de los certificados expedidos sean"
-"igual al del certificado de la AC."
+msgstr ""
+"La política de esta AC obliga a que los campos \"localidad/ciudad\" de los "
+"certificados expedidos seanigual al del certificado de la AC."
 
 #: ../src/new_cert_window.c:295
 msgid ""
 "The policy of this CA obligue the organization field of the certificates to "
 "be the same as the one in the CA cert."
-msgstr "La política de esta AC obliga a que los campos \"organización\" de los certificados expedidos sean"
-"igual al del certificado de la AC."
+msgstr ""
+"La política de esta AC obliga a que los campos \"organización\" de los "
+"certificados expedidos seanigual al del certificado de la AC."
 
 #: ../src/new_cert_window.c:299
 msgid ""
 "The policy of this CA obligue the organizational unit field of the "
 "certificates to be the same as the one in the CA cert."
-msgstr "La política de esta AC obliga a que los campos \"unidad organizativa\" de los certificados expedidos sean"
-"igual al del certificado de la AC."
+msgstr ""
+"La política de esta AC obliga a que los campos \"unidad organizativa\" de "
+"los certificados expedidos seanigual al del certificado de la AC."
 
 #: ../src/pkey_manage.c:65
 #, c-format
@@ -1510,7 +1534,7 @@ msgstr "No se pudo abrir el fichero indicado."
 msgid "File designated in database doesn't exist."
 msgstr "El fichero indicado en la base de datos no existe."
 
-#: ../src/pkey_manage.c:582
+#: ../src/pkey_manage.c:574
 msgid "The given password doesn't match the one used in the database"
 msgstr ""
 "La contraseña que ha introducido no coincide con la contraseña de la base de "
@@ -1526,102 +1550,108 @@ msgstr "Error al inicializar estructura de clave privada."
 msgid "Error creating private key."
 msgstr "Error al crear clave privada."
 
-#: ../src/tls.c:62 ../src/tls.c:94 ../src/tls.c:543 ../src/tls.c:808
+#: ../src/tls.c:62 ../src/tls.c:94 ../src/tls.c:548 ../src/tls.c:813
 #, c-format
 msgid "Error exporting private key to PEM structure."
 msgstr "Error al exportar clave privada a estructura PEM."
 
-#: ../src/tls.c:433
+#: ../src/tls.c:434
 #, c-format
 msgid "Error when initializing certificate structure"
 msgstr "Error al inicializar estructura de certificado"
 
-#: ../src/tls.c:438 ../src/tls.c:675
+#: ../src/tls.c:440 ../src/tls.c:680
 #, c-format
 msgid "Error when setting certificate version"
 msgstr "Error al establecer versión de certificado"
 
-#: ../src/tls.c:447 ../src/tls.c:688
+#: ../src/tls.c:450 ../src/tls.c:693
 #, c-format
 msgid "Error when setting certificate serial number"
 msgstr "Error al establecer número de serie del certificado"
 
-#: ../src/tls.c:454 ../src/tls.c:697
+#: ../src/tls.c:459 ../src/tls.c:702
 #, c-format
 msgid "Error when setting activation time"
 msgstr "Error al establecer fecha de activación"
 
-#: ../src/tls.c:459 ../src/tls.c:705
+#: ../src/tls.c:464 ../src/tls.c:710
 #, c-format
 msgid "Error when setting expiration time"
 msgstr "Error al establecer fecha y hora de caducidad"
 
-#: ../src/tls.c:505 ../src/tls.c:738
+#: ../src/tls.c:510 ../src/tls.c:743
 #, c-format
 msgid "Error when setting basicConstraint extension"
 msgstr "Error al establecer extensión basicConstraint"
 
-#: ../src/tls.c:510 ../src/tls.c:763
+#: ../src/tls.c:515 ../src/tls.c:768
 #, c-format
 msgid "Error when setting keyUsage extension"
 msgstr "Error al establecer extensión keyUsage"
 
-#: ../src/tls.c:521
+#: ../src/tls.c:526
 #, c-format
 msgid "Error when setting subject key identifier extension"
 msgstr "Error al establecer extensión identificadora de titular"
 
-#: ../src/tls.c:531
+#: ../src/tls.c:536
 #, c-format
 msgid "Error when signing self-signed certificate"
 msgstr "Error al firmar certificado autofirmado"
 
-#: ../src/tls.c:561
+#: ../src/tls.c:566
 #, c-format
 msgid "Error when initializing csr structure"
 msgstr "Error al inicializar estructura de solicitud"
 
-#: ../src/tls.c:565
+#: ../src/tls.c:570
 #, c-format
 msgid "Error when setting csr version"
 msgstr "Error al establecer versión de solicitud"
 
-#: ../src/tls.c:598
+#: ../src/tls.c:603
 #, c-format
 msgid "Error when signing self-signed csr"
 msgstr "Error al firmar solicitud autofirmada"
 
-#: ../src/tls.c:609
+#: ../src/tls.c:614
 #, c-format
 msgid "Error exporting CSR to PEM structure."
 msgstr "Error al exportar solicitud de certificación a estructura PEM."
 
-#: ../src/tls.c:659
+#: ../src/tls.c:664
 #, c-format
 msgid "Error when initializing crt structure"
 msgstr "Error al inicializar estructura de solicitud"
 
-#: ../src/tls.c:667
+#: ../src/tls.c:672
 #, c-format
 msgid "Error when copying data from CSR to certificate structure"
 msgstr "Error al copiar datos de solicitud a la estructura del certificado"
 
-#: ../src/tls.c:793
+#: ../src/tls.c:798
 #, c-format
 msgid "Error when signing certificate"
 msgstr "Error al firmar certificado"
 
-#: ../src/tls.c:1011
+#: ../src/tls.c:1016
 msgid "Key encipher only"
 msgstr "Clave de sólo cifrado"
 
-#: ../src/tls.c:1013
+#: ../src/tls.c:1018
 msgid "Key decipher only"
 msgstr "Clave de sólo descifrado"
 
-#: ../src/tls.c:1025
+#: ../src/tls.c:1030
 msgid "TLS WWW Client."
 msgstr "Cliente TLS WWW"
+
+#~ msgid "Save CA database"
+#~ msgstr "Guardar base de datos de AC"
+
+#~ msgid "Problem when saving new CA database"
+#~ msgstr "Problema al guardar nueva base de datos de AC"
 
 #~ msgid "_Actions"
 #~ msgstr "A_cciones"
