@@ -1,3 +1,217 @@
+2008-08-19 18:39  davefx
+
+	* [r146] gui/gnomint.glade, src/ca_creation.h, src/ca_file.c,
+	  src/new_ca_window.c, src/new_cert_creation_process.c,
+	  src/pkey_manage.c, src/uint160.c:
+	  Fixed problems related with DB password protection
+
+2008-08-18 18:08  davefx
+
+	* [r145] configure.in, gui/gnomint.glade, po/es.po, src/ca.c,
+	  src/ca.h, src/ca_creation.c, src/ca_file.c, src/ca_file.h,
+	  src/main.c, src/new_cert_creation_process.c:
+	  Making possible to generate multiple rooted files, so now a file
+	  is not tied to a self-signed certificate. Now, gnoMint open
+	  ~/.gnomint/default.gnomint by default. Some problems need to be
+	  fixed yet.
+
+2008-08-18 17:14  davefx
+
+	* [r144] Makefile.am, gui/Makefile.am, gui/gnomint.desktop, mime,
+	  mime/Makefile.am, mime/gnomint.xml:
+	  Adding mimetype and desktop file
+
+2008-08-07 21:53  davefx
+
+	* [r143] src/Makefile.am, src/ca_file.c, src/ca_file.h,
+	  src/new_cert_window.c, src/tls.c, src/uint160.c:
+	  Fixing problems with the new 20-byte serial numbers. Now it seems
+	  OK, but more test must be taken
+
+2008-08-07 18:17  davefx
+
+	* [r142] src/uint160.c:
+	  Fixing uint160_read function
+
+2008-08-07 18:13  davefx
+
+	* [r141] certs/example-ca.gnomint, src/Makefile.am, src/ca.c,
+	  src/ca.h, src/ca_creation.h, src/ca_file.c, src/ca_file.h,
+	  src/certificate_properties.c, src/certificate_properties.h,
+	  src/new_cert_window.c, src/new_req_window.c, src/tls.c,
+	  src/tls.h, src/uint160.c, src/uint160.h:
+	  Highly unstable commit: working in natively support
+	  20byte-serials
+
+2008-08-06 16:44  davefx
+
+	* [r140] src/Makefile.am, src/ca.c, src/ca.h, src/ca_creation.c,
+	  src/ca_creation.h, src/ca_file.c, src/ca_file.h, src/ca_policy.c,
+	  src/ca_policy.h, src/certificate_properties.c,
+	  src/certificate_properties.h, src/csr_creation.c,
+	  src/csr_creation.h, src/csr_properties.c, src/csr_properties.h,
+	  src/main.c, src/new_ca_window.c, src/new_ca_window.h,
+	  src/new_cert_creation_process.c, src/new_cert_creation_process.h,
+	  src/new_cert_window.c, src/new_cert_window.h,
+	  src/new_req_window.c, src/new_req_window.h, src/pkey_manage.c,
+	  src/pkey_manage.h, src/tls.c, src/tls.h, src/uint160.c,
+	  src/uint160.h:
+	  Fixing date in header of files
+
+2008-08-06 15:50  davefx
+
+	* [r139] src/uint160.c, src/uint160.h:
+	  Adding new class for managing 160-bit (20 octets)
+
+2008-08-05 17:54  davefx
+
+	* [r138] src/ca_file.c:
+	  Fixing problems with assigned serial numbers if there are
+	  multiple CAs
+
+2008-08-05 16:23  davefx
+
+	* [r137] certs/example-ca.gnomint, gui/gnomint.glade, src/ca.c,
+	  src/new_cert_window.c, src/new_req_window.c:
+	  Now you can create a full hierarchy of Certification Authorities
+	  and their certificates
+
+2008-08-04 21:13  davefx
+
+	* [r136] certs/example-ca.gnomint, src/ca.c, src/ca_file.c,
+	  src/new_req_window.c:
+	  Autofilling of CSR fields. And now showing a full hierarchy of
+	  certificates.
+
+2008-08-04 18:17  davefx
+
+	* [r135] certs/example-ca.gnomint, configure.in, gui/gnomint.glade,
+	  src/ca.c, src/ca_file.c, src/ca_file.h, src/ca_policy.c,
+	  src/new_cert_window.c, src/new_req_window.c:
+	  Progressing in changes for inheriting values from CA subject
+
+2008-08-04 04:33  davefx
+
+	* [r134] gui/gnomint.glade, src/ca.c, src/ca.h, src/ca_file.c,
+	  src/new_req_window.c:
+	  Committing changes, so now the CA tree is shown correctly while
+	  creating a CSR
+
+2008-08-02 12:01  davefx
+
+	* [r133] certs/example-ca.gnomint, src/ca.c, src/ca_file.c,
+	  src/ca_file.h, src/new_req_window.c, src/tls.c:
+	  Completing data model of the CA view
+
+2008-08-01 15:23  davefx
+
+	* [r132] src/ca_file.c:
+	  Adding new sqlite function for concatening values, so we can get
+	  a tree-ordered list of certificates directly from a SQL sentence
+
+2008-08-01 15:22  davefx
+
+	* [r131] src/new_req_window.c:
+	  Commenting unfinished code, so it now compiles again
+
+2008-08-01 04:34  davefx
+
+	* [r130] gui/gnomint.glade, src/Makefile.am, src/ca.c,
+	  src/ca_file.c, src/ca_file.h, src/main.c, src/new_ca_window.c,
+	  src/new_ca_window.h, src/new_cert_window.c,
+	  src/new_cert_window.h, src/new_req_window.c,
+	  src/new_req_window.h:
+	  Commiting yesterday changes. Working on showing a hierarchical
+	  view of the CAs in DB
+
+2008-07-30 21:00  davefx
+
+	* [r129] certs/example-ca.5.gnomint, certs/example-ca.gnomint,
+	  src/ca_file.c, src/certificate_properties.c:
+	  Updating today's changes: improving translations and fixing the
+	  database version leap
+
+2008-07-30 17:55  davefx
+
+	* [r128] po/es.po:
+	  Updating Spanish translation
+
+2008-07-30 17:14  davefx
+
+	* [r127] certs/example-ca.gnomint, src/certificate_properties.c:
+	  Adding example ca file
+
+2008-07-29 18:19  davefx
+
+	* [r126] gui/gnomint.glade, src/ca.h, src/ca_creation.h,
+	  src/ca_file.c, src/ca_file.h, src/ca_policy.c,
+	  src/csr_properties.c, src/new_cert_window.c, src/tls.c:
+	  Updating: now is possible to create more than a CA in one DB.
+	  Only the first one is usable yet, though.
+
+2008-07-28 18:03  davefx
+
+	* [r125] gui/gnomint.glade, po/es.po, src/ca_policy.c,
+	  src/new_cert_window.c:
+	  Committing today's changes: adding support for inherit subject
+	  fields from certification authorities. Adding interface for
+	  selecting from multiple CAs
+
+2008-07-28 16:18  davefx
+
+	* [r124] gui/gnomint.glade:
+	  First version of interface for new features
+
+2008-07-28 14:12  davefx
+
+	* [r123] configure.in, po/fr.po:
+	  Adding French language (thanks to Ahmed Baizid
+	  <ahmed@baizid.org>)
+
+2008-01-06 01:47  davefx
+
+	* [r122] configure.in:
+	  Fixing compiler optimization
+
+2008-01-06 01:41  davefx
+
+	* [r121] configure.in:
+	  Checking for libgnutls >= v2.0
+
+2008-01-06 00:54  davefx
+
+	* [r120] gui/gnomint.glade, po/es.po:
+	  Fixing typo in organizational word, patch by
+	  aluminium@users.sourceforge.net
+
+2008-01-06 00:53  davefx
+
+	* [r119] gui/gnomint.glade, src/certificate_properties.c:
+	  Including detailed certificate view, patch by
+	  aluminium@users.sourceforge.net
+
+2008-01-06 00:42  davefx
+
+	* [r118] po/gnomint.pot:
+	  Deleting gnomint.pot from subversion repository, as it's
+	  automatically generated
+
+2008-01-06 00:39  davefx
+
+	* [r117] po/POTFILES.in:
+	  Adding pkey_manage.c to POTFILES.in
+
+2008-01-05 14:17  davefx
+
+	* [r116] configure.in:
+	  Allowing -O2 optimization
+
+2007-12-16 17:45  davefx
+
+	* [r115] ChangeLog, src/ca.c, src/pkey_manage.c:
+	  Applying patch from sf.net, fixing some uninitialized variables
+	  warnings
+
 2007-11-19 18:22  davefx
 
 	* [r110] doc/test_plan.txt:
@@ -303,10 +517,7 @@
 
 	* [r55] AUTHORS, BUGS, COPYING, ChangeLog, INSTALL, MAINTAINERS,
 	  Makefile.am, NEWS, README, TODO, autogen.sh, certs, configure.in,
-	  debian, gnomint.spec.in, gui, po, src, AUTHORS, BUGS, COPYING,
-	  ChangeLog, INSTALL, MAINTAINERS, Makefile.am, NEWS, README, TODO,
-	  autogen.sh, certs, configure.in, debian, gnomint.spec.in, gui,
-	  po, src:
+	  debian, gnomint.spec.in, gui, po, src:
 	  Moving everything to trunk directory
 
 2006-10-15 08:22  davefx
