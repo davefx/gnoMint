@@ -519,11 +519,11 @@ void on_new_cert_commit_clicked (GtkButton *widg,
                         
                         if (csr_pkey)
                                 if (csr_pkey->is_in_db)
-                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, csr_pkey->pkey_data, certificate);
+                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 1, csr_pkey->pkey_data, certificate);
                                 else
-                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, csr_pkey->external_file, certificate);			
+                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, csr_pkey->external_file, certificate);			
                         else
-                                error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, NULL, certificate);
+                                error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, NULL, certificate);
                         
                         if (!error)
                                 ca_file_remove_csr (ca_get_selected_row_id());

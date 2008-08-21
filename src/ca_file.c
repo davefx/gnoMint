@@ -833,7 +833,8 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 
 gchar * ca_file_insert_cert (CertCreationData *creation_data, 
                              gboolean is_ca,
-			     gchar *pem_private_key,                             
+                             gboolean private_key_in_db, 
+			     gchar *private_key_info,                             
 			     gchar *pem_certificate)
 {
 	gchar *sql = NULL;
@@ -868,16 +869,17 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
         serialstr = uint160_strdup_printf(&serial);
 
-	if (pem_private_key)
+	if (private_key_info)
 		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', "
-				       "NULL, '%q', 1, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", 
+				       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", 
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
 				       creation_data->activation,
 				       creation_data->expiration,
 				       pem_certificate,
-				       pem_private_key,
+                                       private_key_in_db,
+				       private_key_info,
 				       tlscert->dn,
 				       tlscert->i_dn,
 				       parent_id,

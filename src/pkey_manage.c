@@ -271,10 +271,12 @@ PkeyManageData * pkey_manage_get_csr_pkey (guint64 id)
 		res->is_in_db = TRUE;
 		res->is_ciphered_with_db_pwd = ca_file_is_password_protected();
 	} else {
-		// Retrieving external private keys for CSRs is not allowed, as it is impossible to check if 
+		// Retrieving external private keys for CSRs is not supported, as it is impossible to check if 
 		// a private key corresponds to a public key/CSR.
-		g_free (res);
-		res = NULL;
+                // However, we fill the structure with enough data for recovering the private key.
+                res->pkey_data = NULL;
+                res->is_in_db = FALSE;
+                res->external_file = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
 	}
 
 	return res;
