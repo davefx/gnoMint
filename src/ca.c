@@ -559,8 +559,6 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
 	gboolean pk_indb = FALSE;
 	gint is_revoked = FALSE;
 	
-	widget = glade_xml_get_widget (main_window_xml, "actions1");
-	gtk_widget_set_sensitive (widget, TRUE);
 	widget = glade_xml_get_widget (main_window_xml, "export1");
 	gtk_widget_set_sensitive (widget, TRUE);
 
@@ -589,8 +587,6 @@ void __ca_activate_csr_selection (GtkTreeIter *iter)
 	GtkWidget *widget;
 	gboolean pk_indb = FALSE;
 	
-	widget = glade_xml_get_widget (main_window_xml, "actions1");
-	gtk_widget_set_sensitive (widget, TRUE);
 	widget = glade_xml_get_widget (main_window_xml, "export1");
 	gtk_widget_set_sensitive (widget, TRUE);
 
@@ -614,9 +610,6 @@ void __ca_deactivate_actions ()
 {
 	GtkWidget *widget;
 	
-	widget = glade_xml_get_widget (main_window_xml, "actions1");
-	gtk_widget_set_sensitive (widget, FALSE);
-
 	widget = glade_xml_get_widget (main_window_xml, "export1");
 	gtk_widget_set_sensitive (widget, FALSE);
 

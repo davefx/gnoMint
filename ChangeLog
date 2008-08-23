@@ -1,3 +1,68 @@
+2008-08-23 13:01  davefx
+
+	* [r157] configure.in:
+	  Upgrading to version 0.5.1
+
+2008-08-23 13:00  davefx
+
+	* [r156] certs/example-ca.gnomint:
+	  Updating example CA for being valid against version 0.5.x
+
+2008-08-23 11:09  davefx
+
+	* [r155] src/new_req_window.c:
+	  Fixing problem when creating a new CSR that must import field
+	  values from CA
+
+2008-08-23 10:59  davefx
+
+	* [r154] src/ca_policy.c:
+	  Fixing bug that made impossible to change the policy of a CA
+
+2008-08-23 10:59  davefx
+
+	* [r153] src/ca.c:
+	  Removing some warnings due to gui changes
+
+2008-08-23 10:13  davefx
+
+	* [r152] configure.in, gui/gnomint.glade, src/main.c:
+	  Adding support for recent files
+
+2008-08-21 16:26  davefx
+
+	* [r151] configure.in:
+	  Correcting date in version 0.5.0
+
+2008-08-21 16:13  davefx
+
+	* [r150] ChangeLog, configure.in:
+	  Updating to version 0.5.0
+
+2008-08-21 15:46  davefx
+
+	* [r149] src/ca_file.c, src/ca_file.h, src/new_cert_window.c,
+	  src/pkey_manage.c:
+	  Fixing problem while signing CSRs which private key resides in an
+	  external file. The file was lost. Now the file info is kept while
+	  moving info from CSR to Certificate
+
+2008-08-20 18:12  davefx
+
+	* [r148] gui/gnomint.glade, po/es.po, src/main.c,
+	  src/new_ca_window.c, src/new_req_window.c:
+	  Allowing the creation of new databases. Fixing problems while
+	  creating CSRs or s-s CAs, if the DB is pwd-protected, and the
+	  user cancels the password-entry window. Fixing some minor
+	  problems in Spanish translation.
+
+2008-08-20 16:40  davefx
+
+	* [r147] src/ca_creation.c, src/ca_file.c, src/ca_file.h,
+	  src/tls.c:
+	  Fixed problem with serial number assignation when creating a new
+	  database (not importing an old one)
+
 2008-08-19 18:39  davefx
 
 	* [r146] gui/gnomint.glade, src/ca_creation.h, src/ca_file.c,

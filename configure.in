@@ -1,11 +1,11 @@
 AC_PREREQ(2.52)
 
-AC_INIT(gnomint, 0.5.0)
+AC_INIT(gnomint, 0.5.1)
 
 PACKAGE="gnoMint"
 PACKAGE_BUGREPORT="<davefx@gmail.com>"
 PACKAGE_NAME="gnomint"
-PACKAGE_VERSION="0.5.0"
+PACKAGE_VERSION="0.5.1"
 PACKAGE_COPYRIGHT="(c) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
 
@@ -114,7 +114,7 @@ AM_GLIB_GNU_GETTEXT
 
 PKG_CHECK_MODULES(GNOMINT, 
 	gconf-2.0 \
-        gtk+-2.0 >= 2.6.0 \
+        gtk+-2.0 >= 2.10.0 \
 	gdk-pixbuf-2.0 \
         libgnomeui-2.0 >= 2.0 \
         libglade-2.0 >= 2.5.0 )
