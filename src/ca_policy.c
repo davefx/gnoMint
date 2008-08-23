@@ -184,62 +184,58 @@ void ca_policy_set (guint64 ca_id, gchar *property_name, guint value)
 
 void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata)
 {
-	guint64 serial_number;
 	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
-	gchar * cert_serial_number = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_serial_number");
-
-	if (! cert_serial_number)
+	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
+	guint64 cert_id;
+ 
+	if (! cert_id_str)
 		return;
 
 	if (! spin_button)
 		return;
 
+	cert_id = atoll(cert_id_str);
 
-	serial_number = atoll (cert_serial_number);
-
-	
-	ca_policy_set (serial_number, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
+	ca_policy_set (cert_id, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
 
 }
 
 void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer userdata)
 {
-	guint64 serial_number;
 	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
-	gchar * cert_serial_number = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_serial_number");
+	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
+	guint64 cert_id;
 
-	if (! cert_serial_number)
+	if (! cert_id_str)
 		return;
 
 	if (! spin_button)
 		return;
 
+	cert_id = atoll(cert_id_str);
 
-	serial_number = atoll (cert_serial_number);
-
-	
-	ca_policy_set (serial_number, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
+	ca_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
 
 }
 
 
 void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 {
-	guint64 serial_number;
 	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
-	gchar * cert_serial_number = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_serial_number");
+	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
+	guint64 cert_id;
 
 	gchar *property_name = NULL;
         gboolean is_active;
 	
-	if (! cert_serial_number)
+	if (! cert_id_str)
 		return;
 
 	if (! button)
 		return;
-	
-	serial_number = atoll (cert_serial_number);
 
+	cert_id = atoll(cert_id_str);
+	
         is_active = gtk_toggle_button_get_active(button);
 
 	if (! strcmp(glade_get_widget_name (button), "country_inherited_check")) {
@@ -332,7 +328,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "ANY_PURPOSE";
 
 	if (property_name)
-		ca_policy_set (serial_number, property_name, is_active);
+		ca_policy_set (cert_id, property_name, is_active);
 
 }
 

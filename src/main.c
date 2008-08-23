@@ -33,6 +33,8 @@
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
+#define GNOMINT_MIME_TYPE "application/x-gnomint"
+
 gchar * PACKAGE_AUTHORS[] = {
 	"David Marín Carreño <davefx@gmail.com>",
 	NULL
@@ -43,6 +45,10 @@ GladeXML * csr_popup_menu_xml = NULL;
 GladeXML * cert_popup_menu_xml = NULL;
 
 gchar * gnomint_current_opened_file = NULL;
+
+static GtkRecentManager *recent_manager;
+void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data);
+void __recent_add_utf8_filename (const gchar *utf8_filename);
 
 void __disable_widget (gchar *widget_name)
 {
@@ -62,23 +68,41 @@ void __enable_widget (gchar *widget_name)
 	gtk_widget_set_sensitive (widget, TRUE);
 }
 
+/*****************************************************************************/
+/* Create a menu of recent files.                                            */
+/*****************************************************************************/
+GtkWidget * __recent_create_menu (void)
+{
+        GtkWidget               *recent_menu;
+        GtkRecentFilter         *recent_filter;
+	
+        recent_menu = gtk_recent_chooser_menu_new_for_manager (recent_manager);
+        gtk_recent_chooser_menu_set_show_numbers (GTK_RECENT_CHOOSER_MENU (recent_menu), FALSE);
+        gtk_recent_chooser_set_show_icons (GTK_RECENT_CHOOSER (recent_menu), TRUE);
+        gtk_recent_chooser_set_limit (GTK_RECENT_CHOOSER (recent_menu), 4);
+        gtk_recent_chooser_set_sort_type (GTK_RECENT_CHOOSER (recent_menu), GTK_RECENT_SORT_MRU);
+        gtk_recent_chooser_set_local_only (GTK_RECENT_CHOOSER (recent_menu), TRUE);
+
+        recent_filter = gtk_recent_filter_new ();
+        gtk_recent_filter_add_mime_type (recent_filter, GNOMINT_MIME_TYPE);
+        gtk_recent_chooser_set_filter (GTK_RECENT_CHOOSER (recent_menu), recent_filter);
+
+        return recent_menu;
+}
+
+
 int main (int   argc,
 	  char *argv[])
 {
-/* 	gchar *savefile = NULL; */
         gchar *defaultfile = NULL;
 	GOptionContext *ctx;
 	GError *err = NULL;
 	GOptionEntry entries[] = {
-/* 		{ "silent", 's', 0, G_OPTION_ARG_NONE, &silent, 0, */
-/* 		  "do not output status information", NULL }, */
-/* 		{ "output", 'o', 0, G_OPTION_ARG_STRING, &savefile, 0, */
-/* 		  "save xml representation of pipeline to FILE and exit", "FILE" }, */
 		{ NULL }
 	};
-
+	
 	gchar     * xml_file = NULL;
-
+	GtkWidget * recent_menu = NULL;
 
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -102,7 +126,6 @@ int main (int   argc,
 		return 1;
 	}
 	
-
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 
 	main_window_xml = glade_xml_new (xml_file, "main_window1", NULL);
@@ -115,6 +138,13 @@ int main (int   argc,
 	glade_xml_signal_autoconnect (cert_popup_menu_xml);	       	
 	glade_xml_signal_autoconnect (csr_popup_menu_xml);	       	
 
+	recent_manager = gtk_recent_manager_get_default ();
+	recent_menu = __recent_create_menu();
+	g_signal_connect (G_OBJECT (recent_menu), "item-activated",
+			  G_CALLBACK (on_open_recent_activate), NULL);
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (glade_xml_get_widget (main_window_xml, "openrecentsmenuitem")), recent_menu);
+
+
 	__disable_widget ("new_certificate1");
 	__disable_widget ("save_as1");
 	__disable_widget ("properties1");
@@ -123,9 +153,11 @@ int main (int   argc,
 
 	if (argc >= 2 && ca_open (g_strdup(argv[1]), TRUE)) {
                 /* The file has opened OK */
+		__recent_add_utf8_filename (argv[1]);
         } else {
                 /* No arguments, or failure when opening file */
                 defaultfile = g_build_filename (g_get_home_dir(), ".gnomint", "default.gnomint", NULL);
+		__recent_add_utf8_filename (defaultfile);
                 ca_open (defaultfile, TRUE);
         }
 
@@ -133,6 +165,7 @@ int main (int   argc,
 
 	return 0;
 }
+
 
 
 gboolean on_main_window1_delete (GtkWidget *widget,
@@ -234,6 +267,61 @@ void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data)
 
 }
 
+void __recent_add_utf8_filename (const gchar *utf8_filename)
+{
+        GtkRecentData *recent_data;
+        gchar         *filename;
+        gchar         *uri;
+	gchar         *pwd;
+
+        static gchar *groups[2] = {
+                "gnomint",
+                NULL
+        };
+
+
+        recent_data = g_slice_new (GtkRecentData);
+
+        recent_data->display_name = NULL;
+        recent_data->description  = NULL;
+        recent_data->mime_type    = GNOMINT_MIME_TYPE;
+        recent_data->app_name     = (gchar *) g_get_application_name ();
+        recent_data->app_exec     = g_strjoin (" ", g_get_prgname (), "%f", NULL);
+        recent_data->groups       = groups;
+        recent_data->is_private = FALSE;
+
+        filename = g_filename_from_utf8 (utf8_filename, -1, NULL, NULL, NULL);
+        if ( filename != NULL )
+        {
+
+		if (! g_path_is_absolute (filename)) {
+			gchar *absolute_filename;
+
+			pwd = g_get_current_dir ();
+			absolute_filename = g_build_filename (pwd, filename, NULL);
+			g_free (pwd);
+			g_free (filename);
+			filename = absolute_filename;
+		}
+
+
+                uri = g_filename_to_uri (filename, NULL, NULL);
+                if ( uri != NULL )
+                {
+
+                        gtk_recent_manager_add_full (recent_manager, uri, recent_data);
+                        g_free (uri);
+
+                }
+                g_free (filename);
+
+        }
+
+        g_free (recent_data->app_exec);
+        g_slice_free (GtkRecentData, recent_data);
+
+}
+
 void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	gchar *filename;
@@ -258,6 +346,8 @@ void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 		return;
 	}		
 	
+	
+
 	if (! ca_open (filename, FALSE)) {
 		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -269,9 +359,57 @@ void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 		gtk_dialog_run (GTK_DIALOG(dialog));
 		
 		gtk_widget_destroy (dialog);
+	} else {
+		__recent_add_utf8_filename (filename);
 	}
 	return;
 }
+
+void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data)
+{
+        GtkRecentInfo *item;
+	gchar *filename;
+	gchar *utf8_filename;
+	GtkWidget *dialog;
+	const gchar *uri;
+
+        g_return_if_fail (chooser && GTK_IS_RECENT_CHOOSER(chooser));
+
+        item = gtk_recent_chooser_get_current_item (chooser);
+        if (!item)
+                return;
+
+	uri = gtk_recent_info_get_uri (item);
+
+        filename = g_filename_from_uri (uri, NULL, NULL);
+        if ( filename != NULL )
+        {
+                utf8_filename = g_filename_to_utf8 (filename, -1, NULL, NULL, NULL);
+                g_free (filename);
+        }
+
+
+	if (! ca_open (utf8_filename, FALSE)) {
+		dialog = gtk_message_dialog_new (NULL,
+						 GTK_DIALOG_DESTROY_WITH_PARENT,
+						 GTK_MESSAGE_ERROR,
+						 GTK_BUTTONS_CLOSE,
+						 _("Problem when opening '%s' CA database"),
+						 utf8_filename);
+		
+		gtk_dialog_run (GTK_DIALOG(dialog));
+		
+		gtk_widget_destroy (dialog);
+	} else {
+		__recent_add_utf8_filename (utf8_filename);
+	}
+
+        gtk_recent_info_unref (item);
+
+
+	return;
+}
+
 
 void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {

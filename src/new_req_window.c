@@ -304,7 +304,7 @@ void on_new_req_next1_clicked (GtkButton *button,
                 g_value_unset (value);
 
                 gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_ID, value);
-                ca_id = g_value_get_uint(value);
+                ca_id = g_value_get_uint64(value);
 
 		widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
                 if (ca_file_policy_get (ca_id, "C_INHERIT")) {
