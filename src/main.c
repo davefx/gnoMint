@@ -29,6 +29,7 @@
 #include "tls.h"
 #include "ca.h"
 #include "ca_file.h"
+#include "preferences-gui.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -103,6 +104,7 @@ int main (int   argc,
 	
 	gchar     * xml_file = NULL;
 	GtkWidget * recent_menu = NULL;
+        gchar     * size_str = NULL;
 
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -117,6 +119,7 @@ int main (int   argc,
 
 	g_thread_init (NULL);
 	gtk_init (&argc, &argv);
+        preferences_init (argc, argv);
 
 	ctx = g_option_context_new (_("- A graphical Certification Authority manager"));
 	g_option_context_add_main_entries (ctx, entries, GETTEXT_PACKAGE);
@@ -134,6 +137,29 @@ int main (int   argc,
 
 	g_free (xml_file);
 
+        size_str = preferences_get_size ();
+        if (size_str) {
+                gchar ** result = NULL;
+                guint width, height;
+
+                result = g_strsplit_set (size_str, "(,)", -1);
+                
+                if (result[0] && result[1]) {
+                        width = atoi (result[1]);
+                        if (result[2]) {
+                                height = atoi (result[2]);
+                                gtk_window_resize (GTK_WINDOW(glade_xml_get_widget(main_window_xml, "main_window1")), width, height);
+                        }
+
+                }
+
+                g_free (size_str);
+                g_strfreev (result);
+        }
+        ca_update_revoked_view (preferences_get_revoked_visible(), FALSE);
+        ca_update_csr_view (preferences_get_crq_visible(), FALSE);
+        
+        
 	glade_xml_signal_autoconnect (main_window_xml);	       	
 	glade_xml_signal_autoconnect (cert_popup_menu_xml);	       	
 	glade_xml_signal_autoconnect (csr_popup_menu_xml);	       	
@@ -172,6 +198,18 @@ gboolean on_main_window1_delete (GtkWidget *widget,
 				  GdkEvent *event,
 				  gpointer user_data)
 {
+        GtkWindow *window = GTK_WINDOW(widget);
+        int width, height;
+        gchar *new_size_value;
+        
+        gtk_window_get_size (window, &width, &height);
+        new_size_value = g_strdup_printf ("(%d,%d)", width, height);
+        
+        preferences_set_size (new_size_value);
+
+        g_free (new_size_value);
+        preferences_deinit();
+
 	exit (0);
 	return TRUE;
 }

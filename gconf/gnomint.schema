@@ -1,0 +1,58 @@
+<gconfschemafile>
+  <schemalist>
+    <schema>
+      <key>/schemas/apps/gnomint/size</key>
+      <applyto>/apps/gnomint/size</applyto>
+      <owner>gnomint</owner>
+      <type>string</type>
+      <default>(500,400)</default>
+      <locale name="C">
+        <short>Window size</short> <long>The (width,length) size
+        gnoMint should take when started. This cannot be smaller than
+        (320,200).
+        </long>
+      </locale>
+    </schema>
+ 
+    <schema>
+      <key>/schemas/apps/gnomint/revoked_visible</key>
+      <applyto>/apps/gnomint/revoked_visible</applyto>
+      <owner>gnomint</owner>
+      <type>bool</type>
+      <default>0</default>
+      <locale name="C">
+        <short>Revoked certificates visibility</short>
+        <long>Whether the revoked certificates should be visible.
+        </long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/gnomint/crq_visible</key>
+      <applyto>/apps/gnomint/crq_visible</applyto>
+      <owner>gnomint</owner>
+      <type>bool</type>
+      <default>1</default>
+      <locale name="C">
+        <short>Certificate requests visibility</short>
+        <long>Whether the certificate requests should be visible.
+        </long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/gnomint/gnome_keyring_export</key>
+      <applyto>/apps/gnomint/gnome_keyring_export</applyto>
+      <owner>gnomint</owner>
+      <type>bool</type>
+      <default>1</default>
+      <locale name="C">
+        <short>Automatic exporting of certificates for gnome-keyring</short>
+        <long>Whether the created or imported certificates are
+        automatically exported to gnome-keyring certificate-store.
+        </long>
+      </locale>
+    </schema>
+
+  </schemalist>
+</gconfschemafile>

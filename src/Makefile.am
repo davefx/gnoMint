@@ -27,10 +27,11 @@ gnomint_SOURCES = \
 	csr_creation.c \
 	csr_properties.c \
 	pkey_manage.c \
+	preferences-gui.c \
 	uint160.c
 
-testuint160_LDADD = \
-	$(GNOMINT_LIBS)
+# testuint160_LDADD = \
+# 	$(GNOMINT_LIBS)
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS)
@@ -38,9 +39,9 @@ gnomint_LDADD = \
 gnomint_LDFLAGS = \
 	-export-dynamic
 
-testuint160_SOURCES = \
-	uint160.c \
-	testuint160.c
+# testuint160_SOURCES = \
+# 	uint160.c \
+# 	testuint160.c
 
 EXTRA_DIST = \
 	gnomint-upgrade-db \
@@ -57,5 +58,7 @@ EXTRA_DIST = \
 	new_cert_window.h \
 	tls.h\
 	pkey_manage.h \
+	preferences.h \
+	preferences-gui.h \
 	uint160.h
 

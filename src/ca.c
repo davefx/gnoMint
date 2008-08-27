@@ -39,21 +39,22 @@
 #include "new_req_window.h"
 #include "new_cert_window.h"
 #include "pkey_manage.h"
+#include "preferences-gui.h"
 
 extern GladeXML * main_window_xml;
 extern GladeXML * cert_popup_menu_xml;
 extern GladeXML * csr_popup_menu_xml;
 
-GtkTreeStore * ca_model = NULL;
-gboolean cert_title_inserted = FALSE;
-GtkTreeIter * cert_parent_iter = NULL;
-GtkTreeIter * last_parent_iter = NULL;
-GtkTreeIter * last_cert_iter = NULL;
-gboolean csr_title_inserted=FALSE;
-GtkTreeIter * csr_parent_iter = NULL;
+static GtkTreeStore * ca_model = NULL;
+static gboolean cert_title_inserted = FALSE;
+static GtkTreeIter * cert_parent_iter = NULL;
+static GtkTreeIter * last_parent_iter = NULL;
+static GtkTreeIter * last_cert_iter = NULL;
+static gboolean csr_title_inserted=FALSE;
+static GtkTreeIter * csr_parent_iter = NULL;
 
-gboolean view_csr = TRUE;
-gboolean view_rcrt = TRUE;
+static gboolean view_csr = TRUE;
+static gboolean view_rcrt = TRUE;
 
 enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_IS_CA=1,
@@ -1604,18 +1605,37 @@ gboolean ca_import (gchar *filename)
 
 }
 
+void ca_update_csr_view (gboolean new_value, gboolean refresh)
+{
+        view_csr = new_value;
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(glade_xml_get_widget(main_window_xml, "csr_view_menuitem")), new_value);
+        if (refresh)
+                ca_refresh_model ();
+}
+
 gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
 {
-        view_csr = gtk_check_menu_item_get_active (button);
-        ca_refresh_model ();
+        ca_update_csr_view (gtk_check_menu_item_get_active (button), TRUE);
+        if (view_csr != preferences_get_crq_visible())
+                preferences_set_crq_visible (view_csr);
+
         return TRUE;
+}
+
+void ca_update_revoked_view (gboolean new_value, gboolean refresh)
+{
+        view_rcrt = new_value;
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(glade_xml_get_widget(main_window_xml, "revoked_view_menuitem")), new_value);
+        if (refresh)
+                ca_refresh_model ();
 }
 
 gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
 {
-        view_rcrt = gtk_check_menu_item_get_active (button);
+        ca_update_revoked_view (gtk_check_menu_item_get_active (button), TRUE);
+        if (view_rcrt != preferences_get_revoked_visible())
+                preferences_set_revoked_visible (view_rcrt);
 
-        ca_refresh_model ();
         return TRUE;
 }
 
@@ -2109,3 +2129,4 @@ gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpoint
 
 	return FALSE;
 }
+

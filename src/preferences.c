@@ -17,24 +17,37 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_H_
-#define _CA_H_
+#include <libintl.h>
+#include <gconf/gconf-engine.h>
 
-#include <glib.h>
-#include <glib/gstdio.h>
-#include <gtk/gtk.h>
-
-gboolean ca_open (gchar *filename, gboolean create);
-gboolean ca_refresh_model ();
-void ca_update_csr_view (gboolean new_value, gboolean refresh);
-void ca_update_revoked_view (gboolean new_value, gboolean refresh);
-void ca_todo_callback();
-gint ca_get_selected_row_id ();
-gchar * ca_get_selected_row_pem ();
-gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
-gboolean ca_import (gchar *filename);
-void ca_error_dialog(gchar *message);
+#define _(x) gettext(x)
+#define N_(x) (x) gettext_noop(x)
 
 
 
-#endif
+static GConfEngine * preferences_engine;
+
+void preferences_init (int argc, char **argv)
+{
+        gconf_init (argc, argv, NULL);
+        preferences_engine = gconf_engine_get_default ();
+}
+
+
+gboolean preferences_get_gnome_keyring_export ()
+{
+        return gconf_engine_get_bool (preferences_engine, "/apps/gnomint/gnome_keyring_export", NULL);
+}
+
+void preferences_set_gnome_keyring_export (gboolean new_value)
+{
+        gconf_engine_set_bool (preferences_engine, "/apps/gnomint/gnome_keyring_export", new_value, NULL);
+}
+
+
+void preferences_deinit ()
+{
+        gconf_engine_unref (preferences_engine);
+        preferences_engine = NULL;
+}
+

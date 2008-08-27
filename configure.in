@@ -140,6 +140,19 @@ AC_ARG_ENABLE(debug-signal,
 	AC_DEFINE(debug_signal), use_debug_sig="No")
 
 
+dnl The following conditional is set in AM_GCONF_SOURCE_2.
+dnl Because we may skip its execution, we have to set a default here.
+m4_pattern_allow([^AM_GCONF_SOURCE_2$])
+AM_CONDITIONAL([GCONF_SCHEMAS_INSTALL], [false])
+
+GCONFTOOL=""
+AC_CHECK_PROG(GCONFTOOL, gconftool-2, gconftool-2)
+if test x"$GCONFTOOL" = x; then
+	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
+fi
+AM_GCONF_SOURCE_2
+
+
 dnl
 dnl where to install various files
 dnl
@@ -164,6 +177,7 @@ src/Makefile
 gui/Makefile
 po/Makefile.in
 mime/Makefile
+gconf/Makefile
 gnomint.spec
 ])
 

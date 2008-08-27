@@ -17,24 +17,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_H_
-#define _CA_H_
+#ifndef _PREFERENCES_H_
+#define _PREFERENCES_H_
 
-#include <glib.h>
-#include <glib/gstdio.h>
-#include <gtk/gtk.h>
+void preferences_init (int, char**);
 
-gboolean ca_open (gchar *filename, gboolean create);
-gboolean ca_refresh_model ();
-void ca_update_csr_view (gboolean new_value, gboolean refresh);
-void ca_update_revoked_view (gboolean new_value, gboolean refresh);
-void ca_todo_callback();
-gint ca_get_selected_row_id ();
-gchar * ca_get_selected_row_pem ();
-gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
-gboolean ca_import (gchar *filename);
-void ca_error_dialog(gchar *message);
+gchar *preferences_get_size();
+void preferences_set_size(gchar *new_value);
 
+gboolean preferences_get_revoked_visible();
+void preferences_set_revoked_visible();
+
+gboolean preferences_get_crq_visible();
+void preferences_set_crq_visible();
+
+gboolean preferences_get_gnome_keyring_export ();
+void preferences_set_gnome_keyring_export (gboolean new_value);
+
+void preferences_deinit ();
 
 
 #endif

@@ -1,4 +1,4 @@
-SUBDIRS = po src gui mime
+SUBDIRS = po src gui mime gconf
 
 INCLUDES =
 
