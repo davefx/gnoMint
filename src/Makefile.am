@@ -28,6 +28,7 @@ gnomint_SOURCES = \
 	csr_properties.c \
 	pkey_manage.c \
 	preferences-gui.c \
+	preferences-window.c \
 	uint160.c
 
 # testuint160_LDADD = \
@@ -60,5 +61,6 @@ EXTRA_DIST = \
 	pkey_manage.h \
 	preferences.h \
 	preferences-gui.h \
+	preferences-window.h \
 	uint160.h
 

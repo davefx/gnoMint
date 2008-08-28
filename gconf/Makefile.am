@@ -21,3 +21,4 @@ else
 install-data-local:
 endif
 
+all:

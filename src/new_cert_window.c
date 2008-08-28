@@ -31,6 +31,7 @@
 #include "tls.h"
 #include "ca.h"
 #include "pkey_manage.h"
+#include "preferences-gui.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -534,6 +535,33 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 		}
 	}
 		
+        if (!error && preferences_get_gnome_keyring_export()) {
+                TlsCert * cert = NULL;
+                gchar *filename = NULL;
+                gchar *directory = NULL;
+                gchar *aux = NULL;
+                cert = tls_parse_cert_pem (certificate);
+
+                // We must calculate the name of the file. 
+                // Basically, it will be the subject DN + issuer DN + sha1 fingerprint
+                // with substitution of non-valid filename characters
+
+                aux = g_strdup_printf ("%s_%s_%s.pem", cert->dn, cert->i_dn, cert->sha1);
+                
+                aux = g_strcanon (aux,
+                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.",
+                                  '_');
+                
+                directory = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", NULL);
+                filename = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", aux, NULL);
+
+                if (! g_mkdir_with_parents (directory, 0700)) {
+                        g_file_set_contents (filename, certificate, strlen(certificate), NULL);
+                }
+
+        }
+
+
 	g_free (pem);
 	pkey_manage_data_free (crypted_pkey);
 	g_free (dn);
