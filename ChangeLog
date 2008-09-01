@@ -1,3 +1,30 @@
+2008-08-28 17:47  davefx
+
+	* [r162] gconf/Makefile.am, gui/gnomint.glade, src/Makefile.am,
+	  src/main.c, src/new_cert_window.c, src/preferences-window.c,
+	  src/preferences-window.h:
+	  New preference for exporting just created certificates to
+	  gnome-keyring-manager. Closes bug #1842705
+
+2008-08-27 18:07  davefx
+
+	* [r161] Makefile.am, configure.in, gconf, gconf/Makefile.am,
+	  gconf/gnomint.schema, gui/gnomint.glade, src/Makefile.am,
+	  src/ca.c, src/ca.h, src/main.c, src/preferences-gui.c,
+	  src/preferences-gui.h, src/preferences.c, src/preferences.h:
+	  Adding gconf support for saving some preferences, as view
+	  preferences, window size. Adding preferences window
+
+2008-08-23 13:23  davefx
+
+	* [r160] po/es.po:
+	  Updating Spanish translation
+
+2008-08-23 13:09  davefx
+
+	* [r158] ChangeLog, update-svncl.sh:
+	  Updating changelog and adding update-svncl.sh for version 0.5.1
+
 2008-08-23 13:01  davefx
 
 	* [r157] configure.in:

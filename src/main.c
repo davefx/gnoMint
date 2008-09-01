@@ -30,6 +30,7 @@
 #include "ca.h"
 #include "ca_file.h"
 #include "preferences-gui.h"
+#include "preferences-window.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
@@ -544,7 +545,7 @@ void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
-
+        preferences_window_display ();
 }
 
 
