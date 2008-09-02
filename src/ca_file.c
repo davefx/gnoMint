@@ -65,6 +65,70 @@ void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value 
 }
 
 
+void __ca_file_zeropad (sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+        gchar * result = NULL;
+        const gchar *value;
+        int pad_size;
+        gchar *aux = NULL;
+
+        value = (const gchar *) sqlite3_value_text(argv[0]);
+        pad_size = sqlite3_value_int (argv[1]);
+        if (strlen(value) < pad_size) {
+                aux = g_strnfill (pad_size - strlen(value),'0');
+                result = g_strconcat (aux, value, NULL);
+                g_free (aux);                
+        } else {
+                result = g_strdup (value);
+        }
+        
+        sqlite3_result_text (context, result, -1, g_free);
+}
+
+void __ca_file_zeropad_route (sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+        gchar * result = NULL;
+        const gchar *aux1;
+        int pad_size;
+        gchar **aux2 = NULL;
+        gchar * aux3 = NULL;
+        GString * res_str = NULL;
+
+        aux1 = (const gchar *) sqlite3_value_text(argv[0]);
+        pad_size = sqlite3_value_int (argv[1]);
+
+        printf ("Orig:\t%s\n", aux1);
+
+        if (!strcmp (aux1, ":")) {
+                result = g_strdup (aux1);
+        } else {
+                int i;
+
+                aux2 = g_strsplit (aux1, ":", -1);                
+                res_str = g_string_new ("");
+
+                for (i=0; i<g_strv_length(aux2) - 1; i++) {
+                        if (strlen(aux2[i]) && strlen(aux2[i]) < pad_size) {
+                                aux3 = g_strnfill (pad_size - strlen(aux2[i]), '0');
+                                g_string_append_printf (res_str, "%s%s", aux3, aux2[i]);
+                                g_free (aux3);
+                        } else {
+                                g_string_append_printf (res_str, "%s", aux2[i]);
+                        }
+                        g_string_append_printf (res_str, ":");
+                }
+                
+                result = g_string_free (res_str, FALSE);
+        }
+
+
+        printf ("Res[%d]:\t%s\n\n", pad_size, result);
+        
+        sqlite3_result_text (context, result, -1, g_free);
+        
+}
+
+
 
 int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames)
 {
@@ -669,6 +733,8 @@ gboolean ca_file_open (gchar *file_name, gboolean create)
 	}
 
         sqlite3_create_function (ca_db, "concat", -1, SQLITE_ANY, NULL, __ca_file_concat_string, NULL, NULL);
+        sqlite3_create_function (ca_db, "zeropad", 2, SQLITE_ANY, NULL, __ca_file_zeropad, NULL, NULL);
+        sqlite3_create_function (ca_db, "zeropad_route", 2, SQLITE_ANY, NULL, __ca_file_zeropad_route, NULL, NULL);
 
         return TRUE;
 }
@@ -1458,11 +1524,33 @@ gboolean ca_file_password_change(const gchar *old_password, const gchar *new_pas
 gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 {
 	gchar *error_str;
+        gchar **result;
+        guint64 max_id;
+        gchar* aux;
+        guint num_chars;
+        gchar *sql;
 
-        sqlite3_exec (ca_db, 
-                      "SELECT id, serial, subject, dn, parent_dn, pem "
-                      "FROM certificates WHERE is_ca=1 AND revocation IS NULL ORDER BY concat(parent_route, id)", 
+        result = ca_file_get_single_row ("SELECT MAX(id) FROM certificates WHERE is_ca=1 AND revocation IS NULL");
+
+        if (!result)
+                return FALSE;
+
+        max_id = atoll(result[0]);
+        g_strfreev (result);
+        
+        aux = g_strdup_printf ("%"G_GUINT64_FORMAT, max_id);
+        num_chars = strlen (aux);
+        g_free (aux);
+
+        sql = sqlite3_mprintf ("SELECT id, serial, subject, dn, parent_dn, pem "
+                               "FROM certificates WHERE is_ca=1 AND revocation IS NULL "
+                               "ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u))",
+                               num_chars, num_chars);
+
+        sqlite3_exec (ca_db, sql,
                       func, userdata, &error_str);
+
+        sqlite3_free (sql);
 
 	return  (! error_str);
 }
@@ -1471,18 +1559,40 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gpointer userdata)
 {
 	gchar *error_str;
+        gchar **result;
+        guint64 max_id;
+        gchar* aux;
+        guint num_chars;
+        gchar *sql;
+
+        result = ca_file_get_single_row ("SELECT MAX(id) FROM certificates");
+
+        if (!result)
+                return FALSE;
+
+        max_id = atoll(result[0]);
+        g_strfreev (result);
+        
+        aux = g_strdup_printf ("%"G_GUINT64_FORMAT, max_id);
+        num_chars = strlen (aux);
+        g_free (aux);
+
 
 	if (view_revoked) {
-		sqlite3_exec (ca_db, 
-			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem,"
-			      " dn, parent_dn FROM certificates ORDER BY concat(parent_route,id) ", 
-			      func, userdata, &error_str);
+                sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem,"
+                                       " dn, parent_dn FROM certificates ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u)) ",
+                                       num_chars, num_chars);
 	} else {
-		sqlite3_exec (ca_db, 
-			      "SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
-			      "pem, dn, parent_dn FROM certificates WHERE revocation IS NULL ORDER BY concat(parent_route,id)", 
-			      func, userdata, &error_str);
+                sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
+                                       "pem, dn, parent_dn FROM certificates WHERE revocation IS NULL "
+                                       "ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u))",
+                                       num_chars, num_chars);
 	}
+
+        sqlite3_exec (ca_db, sql,
+                      func, userdata, &error_str);
+
+        sqlite3_free (sql);
 
 	return  (! error_str);
 }
