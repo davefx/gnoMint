@@ -1,9 +1,11 @@
-#SUBDIRS = pixmaps
-
+desktop_in_files = gnomint.desktop.in
 desktopdir = $(datadir)/applications
-desktop_DATA = \
-	gnomint.desktop
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
+@INTLTOOL_DESKTOP_RULE@
+
+deskicondir = $(datadir)/pixmaps
+deskicon_DATA = gnomint.png
 
 gladedir = $(datadir)/gnomint
 glade_DATA =   \
@@ -12,4 +14,6 @@ glade_DATA =   \
 	key-16.png \
 	ca-stamp-16.png
 
-EXTRA_DIST = $(glade_DATA) $(desktop_DATA)
+EXTRA_DIST = $(glade_DATA) $(deskicon_DATA) $(desktop_in_files)
+
+CLEANFILES = $(desktop_DATA)

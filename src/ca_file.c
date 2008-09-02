@@ -97,8 +97,6 @@ void __ca_file_zeropad_route (sqlite3_context *context, int argc, sqlite3_value 
         aux1 = (const gchar *) sqlite3_value_text(argv[0]);
         pad_size = sqlite3_value_int (argv[1]);
 
-        printf ("Orig:\t%s\n", aux1);
-
         if (!strcmp (aux1, ":")) {
                 result = g_strdup (aux1);
         } else {
@@ -122,8 +120,6 @@ void __ca_file_zeropad_route (sqlite3_context *context, int argc, sqlite3_value 
         }
 
 
-        printf ("Res[%d]:\t%s\n\n", pad_size, result);
-        
         sqlite3_result_text (context, result, -1, g_free);
         
 }

@@ -1,11 +1,12 @@
 [Desktop Entry]
 _Name=gnoMint X.509 CA Manager
+GenericName=gnoMint X.509 CA Manager
 _Comment=Manage X.509 certificates and CAs, easily and graphically
 Exec=gnomint
 Terminal=false
 Type=Application
-StartupNotify=true
 Icon=gnomint
 Categories=GNOME;Application;System;Security
 MimeType=application/x-gnomint;
-
+StartupNotify=true
+Encoding=UTF-8

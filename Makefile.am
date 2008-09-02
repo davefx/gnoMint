@@ -1,6 +1,8 @@
 SUBDIRS = po src gui mime gconf
 
-INCLUDES =
+INCLUDES =                      \
+    -I$(top_srcdir)             \
+    -DPACKAGE_LOCALE_DIR=\""$(gnomintlocaledir)"\"
 
 EXTRA_DIST = \
 	TODO \

@@ -18,8 +18,9 @@ AC_SUBST(PACKAGE_WEBSITE)
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME, $PACKAGE_VERSION)
 
+AC_CONFIG_MACRO_DIR([m4])
 dnl Put the ACLOCAL flags in the Makefile
-ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
+AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \${ACLOCAL_FLAGS}"])
 
 dnl Initialize maintainer mode
 AM_MAINTAINER_MODE
@@ -32,7 +33,7 @@ AC_PROG_CC
 AC_STDC_HEADERS
 AC_DISABLE_STATIC
 AM_PROG_LIBTOOL
-AC_PROG_INTLTOOL([0.11])
+AC_PROG_INTLTOOL([0.23])
 
 dnl #######################
 dnl # Check for libssl
@@ -95,13 +96,6 @@ fi
 
 AM_CONDITIONAL(HAVE_SCROLLKEEPER, test x$SCROLLKEEPER_CONFIG != xno)
 
-dnl Set PACKAGE_LOCALE_DIR in config.h.
-if test "x${prefix}" = "xNONE"; then
-  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${ac_default_prefix}/share/locale")
-else
-  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${prefix}/share/locale")
-fi
-
 
 dnl ================================================================
 dnl Gettext stuff.
@@ -109,8 +103,12 @@ dnl ================================================================
 GETTEXT_PACKAGE=gnomint
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE")
-ALL_LINGUAS="es fr"
+ALL_LINGUAS="cs es fr"
 AM_GLIB_GNU_GETTEXT
+
+dnl Set PACKAGE_LOCALE_DIR.
+gnomintlocaledir='${prefix:-${ac_default_prefix}}/${DATADIRNAME}/locale'
+AC_SUBST(gnomintlocaledir)
 
 PKG_CHECK_MODULES(GNOMINT, 
 	gconf-2.0 \

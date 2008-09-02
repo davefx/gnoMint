@@ -1,6 +1,9 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
+gconf/gnomint.schemas.in
 gui/gnomint.glade
+gui/gnomint.desktop.in
+mime/gnomint.xml.in
 src/ca.c
 src/ca_creation.c
 src/ca_file.c
@@ -9,8 +12,9 @@ src/certificate_properties.c
 src/csr_creation.c
 src/csr_properties.c
 src/main.c
+src/new_ca_window.c
 src/new_cert_creation_process.c
 src/new_cert_window.c
+src/new_req_window.c
 src/pkey_manage.c
 src/tls.c
-
