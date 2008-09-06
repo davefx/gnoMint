@@ -1523,20 +1523,20 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
         gchar **result;
         guint64 max_id;
         gchar* aux;
-        guint num_chars;
+        guint num_chars = 1;
         gchar *sql;
 
         result = ca_file_get_single_row ("SELECT MAX(id) FROM certificates WHERE is_ca=1 AND revocation IS NULL");
 
-        if (!result)
-                return FALSE;
-
-        max_id = atoll(result[0]);
-        g_strfreev (result);
+        if (result && result[0]) {
+	
+		max_id = atoll(result[0]);
+		g_strfreev (result);
         
-        aux = g_strdup_printf ("%"G_GUINT64_FORMAT, max_id);
-        num_chars = strlen (aux);
-        g_free (aux);
+		aux = g_strdup_printf ("%"G_GUINT64_FORMAT, max_id);
+		num_chars = strlen (aux);
+		g_free (aux);
+	} 
 
         sql = sqlite3_mprintf ("SELECT id, serial, subject, dn, parent_dn, pem "
                                "FROM certificates WHERE is_ca=1 AND revocation IS NULL "
@@ -1558,21 +1558,19 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
         gchar **result;
         guint64 max_id;
         gchar* aux;
-        guint num_chars;
+        guint num_chars = 1;
         gchar *sql;
 
         result = ca_file_get_single_row ("SELECT MAX(id) FROM certificates");
 
-        if (!result)
-                return FALSE;
-
-        max_id = atoll(result[0]);
-        g_strfreev (result);
+        if (result && result[0]) {
+		max_id = atoll(result[0]);
+		g_strfreev (result);
         
-        aux = g_strdup_printf ("%"G_GUINT64_FORMAT, max_id);
-        num_chars = strlen (aux);
-        g_free (aux);
-
+		aux = g_strdup_printf ("%"G_GUINT64_FORMAT, max_id);
+		num_chars = strlen (aux);
+		g_free (aux);
+	}
 
 	if (view_revoked) {
                 sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem,"
