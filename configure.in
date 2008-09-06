@@ -172,6 +172,7 @@ AC_SUBST(LDFLAGS)
 AC_OUTPUT([
 Makefile
 src/Makefile
+m4/Makefile
 gui/Makefile
 po/Makefile.in
 mime/Makefile
