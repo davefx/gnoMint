@@ -2130,3 +2130,90 @@ gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpoint
 	return FALSE;
 }
 
+
+void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data)
+{
+	GtkWidget * widget = NULL;
+	GtkDialog * dialog = NULL, * dialog2 = NULL;
+	GladeXML * dialog_xml = NULL;
+	GIOChannel * file = NULL;
+	gchar     * xml_file = NULL;
+	gchar *filename, * pem = NULL;
+	GError * error = NULL;
+	gint response = 0;
+	guint dh_size;
+
+	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+	dialog_xml = glade_xml_new (xml_file, "dh_parameters_dialog", NULL);
+	g_free (xml_file);
+	glade_xml_signal_autoconnect (dialog_xml); 	
+	
+
+	dialog = GTK_DIALOG(glade_xml_get_widget (dialog_xml, "dh_parameters_dialog"));
+	response = gtk_dialog_run(dialog); 
+	
+	if (!response) {
+		gtk_widget_destroy (GTK_WIDGET(dialog));
+		g_object_unref (G_OBJECT(dialog_xml));
+		return;
+	} 
+
+	widget = glade_xml_get_widget (dialog_xml, "dh_prime_size_spinbutton");
+	dh_size = gtk_spin_button_get_value (GTK_SPIN_BUTTON(widget));
+
+	pem = tls_generate_dh_params (dh_size);
+
+	dialog2 = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Save Diffie-Hellman parameters"),
+							  GTK_WINDOW(widget),
+							  GTK_FILE_CHOOSER_ACTION_SAVE,
+							  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+							  NULL));
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog2), TRUE);
+	
+	if (gtk_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
+		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog2));
+		file = g_io_channel_new_file (filename, "w", &error);
+		if (error) {
+			gtk_widget_destroy (GTK_WIDGET(dialog2));
+			gtk_widget_destroy (GTK_WIDGET(dialog));
+			ca_error_dialog (_("There was an error while saving Diffie-Hellman parameters."));
+			return;
+		} 
+
+                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+                if (error) {
+                        gtk_widget_destroy (GTK_WIDGET(dialog2));
+			gtk_widget_destroy (GTK_WIDGET(dialog));
+			ca_error_dialog (_("There was an error while saving Diffie-Hellman parameters."));
+			return;
+                } 
+
+                g_io_channel_shutdown (file, TRUE, &error);
+                if (error) {
+                        gtk_widget_destroy (GTK_WIDGET(dialog2));
+			gtk_widget_destroy (GTK_WIDGET(dialog));
+			ca_error_dialog (_("There was an error while saving Diffie-Hellman parameters."));
+                        return;
+                } 
+
+                g_io_channel_unref (file);
+
+                gtk_widget_destroy (GTK_WIDGET(dialog2));
+                gtk_widget_destroy (GTK_WIDGET(dialog));
+		dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+							    GTK_DIALOG_DESTROY_WITH_PARENT,
+							    GTK_MESSAGE_INFO,
+							    GTK_BUTTONS_CLOSE,
+							    "%s",
+							    _("Diffie-Hellman parameters saved successfully")));
+                gtk_dialog_run (GTK_DIALOG(dialog));
+			
+                gtk_widget_destroy (GTK_WIDGET(dialog));
+
+        }
+	
+	
+	return;
+}
+

@@ -114,4 +114,6 @@ gchar * tls_generate_crl (GList * revoked_certs,
                           time_t current_timestamp,
                           time_t next_crl_timestamp);
 
+gchar * tls_generate_dh_params (guint bits);
+
 #endif

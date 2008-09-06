@@ -1349,3 +1349,33 @@ gchar * tls_generate_crl (GList * revoked_certs,
         
         return result;
 }
+
+gchar * tls_generate_dh_params (guint bits)
+{
+	gnutls_dh_params_t dh_params;
+	size_t dh_params_pem_len = 0;
+	guchar * result = NULL;
+	gint ret;
+
+	gnutls_dh_params_init (&dh_params);
+	
+	ret = gnutls_dh_params_generate2 (dh_params, bits);
+	if (ret < 0)
+	{
+		fprintf (stderr, "Error generating parameters: %s\n",
+			 gnutls_strerror (ret));
+		return NULL;
+	}
+		
+	result = g_new (guchar, 0);
+	gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM, result, &dh_params_pem_len);
+	g_free (result);
+
+	result = g_new (guchar, dh_params_pem_len);
+	if (gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM, result, &dh_params_pem_len)) {
+		fprintf (stderr, "Error exporting DH params pem\n");
+		return NULL;
+	}
+	
+	return (gchar *) result;
+}
