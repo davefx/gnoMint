@@ -1,11 +1,11 @@
 AC_PREREQ(2.52)
 
-AC_INIT(gnomint, 0.5.2)
+AC_INIT(gnomint, 0.5.3)
 
 PACKAGE="gnoMint"
 PACKAGE_BUGREPORT="<davefx@gmail.com>"
 PACKAGE_NAME="gnomint"
-PACKAGE_VERSION="0.5.2"
+PACKAGE_VERSION="0.5.3"
 PACKAGE_COPYRIGHT="(c) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
 

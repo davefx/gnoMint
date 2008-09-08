@@ -1,3 +1,72 @@
+2008-09-08 14:41  davefx
+
+	* [r175] certs/example-ca.gnomint, src/ca.c, src/ca_file.c:
+	  Now exporting full certificate path when exporting public PEM
+
+2008-09-06 16:34  davefx
+
+	* [r174] Makefile.am, configure.in, m4/codeset.m4, m4/gettext.m4,
+	  m4/glibc21.m4, m4/iconv.m4, m4/intltool.m4, m4/isc-posix.m4,
+	  m4/lcmessage.m4, m4/progtest.m4:
+	  Fixing problem with m4 macros. Patch by Staněk Luboš.
+
+2008-09-06 16:31  davefx
+
+	* [r173] gui/gnomint.glade:
+	  Enabling the generation of DH parameters from gnoMint
+
+2008-09-06 10:20  davefx
+
+	* [r172] po/POTFILES.in, po/es.po:
+	  Updating Spanish translation
+
+2008-09-06 10:04  davefx
+
+	* [r171] src/ca.c, src/tls.c, src/tls.h:
+	  Enabling the generation of DH parameters from gnoMint
+
+2008-09-06 06:50  davefx
+
+	* [r170] src/ca_file.c:
+	  Fixing segmentation fault introduced in revision 165
+
+2008-09-02 18:27  davefx
+
+	* [r169] po/es.po:
+	  Updating Spanish translation
+
+2008-09-02 18:21  davefx
+
+	* [r168] mime/Makefile.am:
+	  Correcting little problem with previous patch. Thanks again to
+	  Staněk Luboš <lubek@users.sourceforge.net>
+
+2008-09-02 18:19  davefx
+
+	* [r167] INSTALL, Makefile.am, configure.in, gconf/Makefile.am,
+	  gconf/gnomint.schema, gconf/gnomint.schemas.in, gui/Makefile.am,
+	  gui/gnomint.desktop, gui/gnomint.desktop.in, m4,
+	  mime/Makefile.am, mime/gnomint.xml, mime/gnomint.xml.in,
+	  po/POTFILES.in, po/cs.po, src/ca_file.c:
+	  Applying patch for fixing i18n, and Czech translation. Thanks to
+	  Staněk Luboš <lubek@users.sourceforge.net>
+
+2008-09-02 18:08  davefx
+
+	* [r166] gui/gnomint.glade:
+	  Fixing problem while generating DSA-keyed CSRs
+
+2008-09-02 17:33  davefx
+
+	* [r165] src/ca_file.c:
+	  Fixing tracker request #2075599. Now the order of lists and trees
+	  is OK when more than 10 certs
+
+2008-09-01 16:43  davefx
+
+	* [r163] ChangeLog, configure.in:
+	  Updating version to 0.5.2
+
 2008-08-28 17:47  davefx
 
 	* [r162] gconf/Makefile.am, gui/gnomint.glade, src/Makefile.am,
