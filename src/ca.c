@@ -67,8 +67,9 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_PEM=8,
       CA_MODEL_COLUMN_DN=9,
       CA_MODEL_COLUMN_PARENT_DN=10,
-      CA_MODEL_COLUMN_ITEM_TYPE=11,
-      CA_MODEL_COLUMN_NUMBER=12}
+      CA_MODEL_COLUMN_PARENT_ROUTE=11,
+      CA_MODEL_COLUMN_ITEM_TYPE=12,
+      CA_MODEL_COLUMN_NUMBER=13}
         CaModelColumns;
 
 enum {CSR_MODEL_COLUMN_ID=0,
@@ -150,36 +151,38 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 
         if (! argv[CA_MODEL_COLUMN_REVOCATION])        
                 gtk_tree_store_set (new_model, &iter,
-                                    0, atoll(argv[CA_MODEL_COLUMN_ID]),
-                                    1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-                                    2, argv[CA_MODEL_COLUMN_SERIAL],
-                                    3, argv[CA_MODEL_COLUMN_SUBJECT],
-                                    4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
-                                    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
-                                    6, 0,
-                                    7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-                                    8, argv[CA_MODEL_COLUMN_PEM],
-				    9, argv[CA_MODEL_COLUMN_DN],
-				    10, argv[CA_MODEL_COLUMN_PARENT_DN],
-                                    11, 0,
+                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_MODEL_COLUMN_ID]),
+                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
+                                    CA_MODEL_COLUMN_SERIAL, argv[CA_MODEL_COLUMN_SERIAL],
+                                    CA_MODEL_COLUMN_SUBJECT, argv[CA_MODEL_COLUMN_SUBJECT],
+                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
+                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
+                                    CA_MODEL_COLUMN_REVOCATION, 0,
+                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+                                    CA_MODEL_COLUMN_PEM, argv[CA_MODEL_COLUMN_PEM],
+				    CA_MODEL_COLUMN_DN, argv[CA_MODEL_COLUMN_DN],
+				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_MODEL_COLUMN_PARENT_DN],
+				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_MODEL_COLUMN_PARENT_ROUTE],
+                                    CA_MODEL_COLUMN_ITEM_TYPE, 0,
                                     -1);
         else {
                 gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>", 
                                                                    argv[CA_MODEL_COLUMN_SUBJECT]);
 
                 gtk_tree_store_set (new_model, &iter,
-                                    0, atoll(argv[CA_MODEL_COLUMN_ID]),
-                                    1, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-                                    2, argv[CA_MODEL_COLUMN_SERIAL],
-                                    3, revoked_subject,
-                                    4, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
-                                    5, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
-                                    6, atoi(argv[CA_MODEL_COLUMN_REVOCATION]),
-                                    7, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-                                    8, argv[CA_MODEL_COLUMN_PEM],
-				    9, argv[CA_MODEL_COLUMN_DN],
-				    10, argv[CA_MODEL_COLUMN_PARENT_DN],
-                                    11, 0,
+                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_MODEL_COLUMN_ID]),
+                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
+                                    CA_MODEL_COLUMN_SERIAL, argv[CA_MODEL_COLUMN_SERIAL],
+                                    CA_MODEL_COLUMN_SUBJECT, revoked_subject,
+                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
+                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
+                                    CA_MODEL_COLUMN_REVOCATION, atoi(argv[CA_MODEL_COLUMN_REVOCATION]),
+                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+                                    CA_MODEL_COLUMN_PEM, argv[CA_MODEL_COLUMN_PEM],
+				    CA_MODEL_COLUMN_DN, argv[CA_MODEL_COLUMN_DN],
+				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_MODEL_COLUMN_PARENT_DN],
+				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_MODEL_COLUMN_PARENT_ROUTE],
+                                    CA_MODEL_COLUMN_ITEM_TYPE, 0,
                                     -1);
 
                 g_free (revoked_subject);
@@ -216,11 +219,11 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 	gtk_tree_store_append (new_model, &iter, csr_parent_iter);
 
 	gtk_tree_store_set (new_model, &iter,
-			    0, atoll(argv[CSR_MODEL_COLUMN_ID]),
-			    3, argv[CSR_MODEL_COLUMN_SUBJECT],
-			    7, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-			    8, argv[CSR_MODEL_COLUMN_PEM],
-			    11, 1,
+			    CA_MODEL_COLUMN_ID, atoll(argv[CSR_MODEL_COLUMN_ID]),
+			    CA_MODEL_COLUMN_SUBJECT, argv[CSR_MODEL_COLUMN_SUBJECT],
+			    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+			    CA_MODEL_COLUMN_PEM, argv[CSR_MODEL_COLUMN_PEM],
+			    CA_MODEL_COLUMN_ITEM_TYPE, 1,
 			    -1);
 
 	return 0;
@@ -354,7 +357,7 @@ gboolean ca_refresh_model ()
 
 	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING, 
 					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, 
-					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
+					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 
 	cert_title_inserted = FALSE;
 	cert_parent_iter = NULL;
@@ -708,6 +711,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 	GIOChannel * file = NULL;
 	gchar * filename = NULL;
 	gchar * pem = NULL;
+	gchar * parent_route = NULL;
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 
@@ -742,8 +746,33 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 			return;
 		} 
 
-                gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &pem, -1);			
+                gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &pem, -1);
+                if (type == 1)
+			gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PARENT_ROUTE, &parent_route, -1);
+			
                 g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+
+		if (parent_route && strcmp (parent_route, ":")) {
+			// The parent of the certificate is in the data base.
+			// We then export all the certificates up to the root, after the given certificate
+			// so it can be validated
+
+			gchar ** tokens = g_strsplit (parent_route, ":", -1);
+			// First and last tokens are always empty, as all parent ids start and end by ':'
+			guint num_tokens = g_strv_length (tokens) - 2;
+			gint i;
+
+			for (i=num_tokens; i>=1; i--) {
+				gchar * parent_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, atoll(tokens[i]));
+				if (parent_pem) {
+					g_io_channel_write_chars (file, parent_pem, strlen(parent_pem), NULL, &error);
+					g_free (parent_pem);		
+				}		
+			}
+
+			g_strfreev (tokens);
+		}
+
                 if (error) {
                         gtk_widget_destroy (GTK_WIDGET(dialog));
                         if (type == 1)

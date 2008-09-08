@@ -1574,11 +1574,13 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
 
 	if (view_revoked) {
                 sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem,"
-                                       " dn, parent_dn FROM certificates ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u)) ",
+                                       " dn, parent_dn, parent_route "
+				       "FROM certificates ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u)) ",
                                        num_chars, num_chars);
 	} else {
                 sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
-                                       "pem, dn, parent_dn FROM certificates WHERE revocation IS NULL "
+                                       "pem, dn, parent_dn, parent_route "
+				       "FROM certificates WHERE revocation IS NULL "
                                        "ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u))",
                                        num_chars, num_chars);
 	}
