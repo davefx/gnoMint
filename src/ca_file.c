@@ -39,7 +39,7 @@ extern gchar * gnomint_current_opened_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 6
+#define CURRENT_GNOMINT_DB_VERSION 7
 
 
 void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv)
@@ -185,7 +185,8 @@ gchar * ca_file_create (const gchar *filename)
 	if (sqlite3_exec (ca_db,
                           "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial TEXT, subject TEXT, "
 			  "activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, "
-			  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT);",
+			  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT, "
+                          "expired_already_in_crl INTEGER);",
                           NULL, NULL, &error)) {
 		return error;
 	}
@@ -682,6 +683,29 @@ gboolean ca_file_check_and_update_version ()
 			return FALSE;
 
         case 6:
+
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+                if (sqlite3_exec (ca_db, "ALTER TABLE certificates ADD COLUMN expired_already_in_crl INTEGER DEFAULT '0';",
+                                  NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version' AND ca_id=0;", 7);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+		sqlite3_free (sql);
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return FALSE;
+
+
+
+        case 7:
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -1143,25 +1167,61 @@ int __ca_file_get_revoked_certs_add_certificate (void *pArg, int argc, char **ar
         return 0;
 }
 
-GList * ca_file_get_revoked_certs ()
+GList * ca_file_get_revoked_certs (guint64 ca_id)
 {
         GList * list = NULL;
         gchar * error_str = NULL;
-        
-        sqlite3_exec (ca_db,
-                      "SELECT pem,revocation FROM certificates "
-                      "WHERE revocation IS NOT NULL "
-                      "AND expiration > strftime('%s','now') ORDER BY id",
-                      __ca_file_get_revoked_certs_add_certificate, &list, &error_str);
-        
+        gchar * sql = NULL;
+
+        sql = sqlite3_mprintf ("SELECT pem,revocation FROM certificates "
+                               "WHERE parent_id=%"G_GUINT64_FORMAT" AND revocation IS NOT NULL "
+                               "AND (expired_already_in_crl=0 OR expiration > strftime('%%s','now')) ORDER BY id",
+                               ca_id);
+
+        sqlite3_exec (ca_db, sql, __ca_file_get_revoked_certs_add_certificate, &list, &error_str);
+        sqlite3_free (sql);
+
         if (error_str) {
                 fprintf (stderr, "%s\n", error_str);
                 return NULL;
         }
+
         list = g_list_reverse (list);
 
         return list;
 
+}
+
+
+
+void __ca_file_mark_expired_and_revoked_certificates_as_already_shown_in_crl (guint64 ca_id, const GList *revoked_certs) 
+{
+        gchar *sql = NULL;
+        GList *cursor = NULL;
+        gchar * error_str = NULL;
+        guchar *certificate_pem;
+        time_t revocation;
+       
+        cursor = g_list_first ((GList *) revoked_certs);
+
+        while (cursor) {
+                certificate_pem = cursor->data;
+                cursor = g_list_next (cursor);
+                
+                revocation = atol (cursor->data);
+                cursor = g_list_next (cursor);
+                
+                sql = sqlite3_mprintf ("UPDATE certificates SET expired_already_in_crl=1 "
+                                       "WHERE parent_id=%"G_GUINT64_FORMAT" AND revocation IS NOT NULL AND pem='%q' AND "
+                                       "expired_already_in_crl=0 AND expiration < strftime('%%s','now'));",
+                                       ca_id, certificate_pem);
+
+
+                sqlite3_exec (ca_db, sql,
+                              __ca_file_get_revoked_certs_add_certificate, NULL, &error_str);
+
+                sqlite3_free (sql);
+        }
 }
 
 gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp)
@@ -1197,10 +1257,11 @@ gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp)
 
 }
 
-void ca_file_commit_new_crl_transaction ()
+void ca_file_commit_new_crl_transaction (guint64 ca_id, const GList *revoked_certs)
 {
         gchar *error;
 
+        __ca_file_mark_expired_and_revoked_certificates_as_already_shown_in_crl (ca_id, revoked_certs);
         sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error);
 
 }

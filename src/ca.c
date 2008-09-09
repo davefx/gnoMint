@@ -1716,18 +1716,20 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
 		return;
 	} 
 	
-        revoked_certs = ca_file_get_revoked_certs ();
+        /* FIXME */
+	ca_id = 1;
+	ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
+	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+        timestamp = time (NULL);
+
+        revoked_certs = ca_file_get_revoked_certs (ca_id);
 	
 	if (!revoked_certs) {
 		ca_error_dialog (_("There was an error while getting revoked certificates."));
 		return;
 	}
 
-	ca_id = 1;
-	ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
-	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-        timestamp = time (NULL);
 
         crl_version = ca_file_begin_new_crl_transaction (1, timestamp);
 
@@ -1782,11 +1784,11 @@ void ca_generate_crl (GtkTreeIter *iter, gint type)
                         return;
         }
         
+        ca_file_commit_new_crl_transaction (ca_id, revoked_certs);
+		
         g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
         g_list_free (revoked_certs);
 	
-        ca_file_commit_new_crl_transaction ();
-		
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
 		ca_error_dialog (_("There was an error while exporting CRL."));

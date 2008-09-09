@@ -59,7 +59,7 @@ gchar * ca_file_insert_csr (CaCreationData * creation_data,
 gchar * ca_file_remove_csr (gint id);
 gchar * ca_file_revoke_crt (gint id);
 
-GList * ca_file_get_revoked_certs (void);
+GList * ca_file_get_revoked_certs (guint64 ca_id);
 
 
 gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata);
