@@ -1,4 +1,4 @@
-To-do list in Gnomint
+To-do list in gnoMint
 =====================
 
 * Fix RSA CA-generation  (OK)
@@ -17,21 +17,21 @@ To-do list in Gnomint
 
 * First public release 0.1.0 (Sep. 15, 2006)
 
-* Define CA policies
-* Import CSRs
+* Define CA policies (OK)
+* Import CSRs (OK)
 * Secure private key data in database (now is readable opening the
-  database, without password)
+  database, without password) (OK)
 
-* Second public release
+* Second public release 
 
-* Export PKCS#12 structures.
-* Revoke certificates
-* Generate and export CRLs
-* Export private key to file (Removing the key from database)
+* Export PKCS#12 structures. (OK)
+* Revoke certificates (OK)
+* Generate and export CRLs (OK)
+* Export private key to file (Removing the key from database) (OK)
 
 * Third public release
 
-* Enable CA-hierarchy construction (multi-CA database)
+* Enable CA-hierarchy construction (multi-CA database) (OK)
 * Import pre-existing CA
 
 * Fourth public release

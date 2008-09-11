@@ -4,7 +4,7 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-PKG_NAME="Gnomint"
+PKG_NAME="gnoMint"
 AUTOCONF=autoconf
 REQUIRED_AUTOCONF_VERSION=2.59
 AUTOMAKE=automake-1.9
@@ -14,7 +14,7 @@ REQUIRED_AUTOMAKE_VERSION=1.9
   && test -d $srcdir/src \
   && test -f $srcdir/src/main.c) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
-    echo " top-level Gnomint directory"
+    echo " top-level gnoMint directory"
     exit 1
 }
 
