@@ -52,53 +52,53 @@ void ca_policy_populate (guint64 ca_id)
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_INHERIT"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "country_inherited_check");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton"), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_differ_radiobutton"), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_INHERIT"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "state_inherited_check");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton"), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_differ_radiobutton"), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_INHERIT"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "city_inherited_check");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton"), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_differ_radiobutton"), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_INHERIT"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "organization_inherited_check");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton"), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_differ_radiobutton"), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_INHERIT"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "ou_inherited_check");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton"), value);
         gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_differ_radiobutton"), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_FORCE_SAME"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_FORCE_SAME"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_FORCE_SAME"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_FORCE_SAME"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_FORCE_SAME"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton");
-	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON(widget), value);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES"));
 	widget = glade_xml_get_widget (certificate_properties_window_xml, "hours_between_crl_updates_spinbutton");
