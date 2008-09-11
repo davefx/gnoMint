@@ -22,19 +22,19 @@
 
 void preferences_init (int, char**);
 
-gchar *preferences_get_size();
-void preferences_set_size(gchar *new_value);
+gchar *preferences_get_size(void);
+void preferences_set_size (const gchar *new_value);
 
-gboolean preferences_get_revoked_visible();
-void preferences_set_revoked_visible();
+gboolean preferences_get_revoked_visible(void);
+void preferences_set_revoked_visible (gboolean new_value);
 
-gboolean preferences_get_crq_visible();
-void preferences_set_crq_visible();
+gboolean preferences_get_crq_visible(void);
+void preferences_set_crq_visible (gboolean new_value);
 
-gboolean preferences_get_gnome_keyring_export ();
+gboolean preferences_get_gnome_keyring_export (void);
 void preferences_set_gnome_keyring_export (gboolean new_value);
 
-void preferences_deinit ();
+void preferences_deinit (void);
 
 
 #endif

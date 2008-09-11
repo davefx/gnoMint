@@ -22,10 +22,10 @@
 
 void preferences_init (int, char**);
 
-gboolean preferences_get_gnome_keyring_export ();
+gboolean preferences_get_gnome_keyring_export (void);
 void preferences_set_gnome_keyring_export (gboolean new_value);
 
-void preferences_deinit ();
+void preferences_deinit (void);
 
 
 #endif

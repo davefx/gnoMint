@@ -32,6 +32,7 @@
 #include "ca.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
+#include "new_cert_window.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)

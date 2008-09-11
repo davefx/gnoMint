@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "preferences-gui.h"
+#include "preferences-window.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)

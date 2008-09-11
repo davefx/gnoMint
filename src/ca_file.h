@@ -35,9 +35,9 @@ gchar * ca_file_create (const gchar *filename);
 
 gboolean ca_file_open (gchar *file_name, gboolean create);
 
-gboolean ca_file_check_and_update_version ();
+gboolean ca_file_check_and_update_version (void);
 
-void ca_file_close ();
+void ca_file_close (void);
 
 gboolean ca_file_save_as (gchar *new_file_name);
 
@@ -76,13 +76,13 @@ gboolean ca_file_set_pkey_field_for_id (CaFileElementType type, const gchar *new
 gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gchar *filename, guint64 db_id);
 
 gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp);
-void ca_file_commit_new_crl_transaction ();
-void ca_file_rollback_new_crl_transaction ();
+void ca_file_commit_new_crl_transaction (guint64 ca_id, const GList *revoked_certs);
+void ca_file_rollback_new_crl_transaction (void);
 
 guint ca_file_policy_get (guint64 ca_id, gchar *property_name);
 gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value);
 
-gboolean ca_file_is_password_protected();
+gboolean ca_file_is_password_protected(void);
 gboolean ca_file_check_password (const gchar *password);
 gboolean ca_file_password_unprotect(const gchar *old_password);
 gboolean ca_file_password_protect(const gchar *new_password);

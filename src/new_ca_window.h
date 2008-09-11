@@ -20,7 +20,7 @@
 #ifndef _NEW_CA_WINDOW_H_
 #define _NEW_CA_WINDOW_H_
 
-void new_ca_window_display ();
+void new_ca_window_display (void);
 void new_ca_populate_country_combobox(GtkComboBox *country_combobox);
 
 

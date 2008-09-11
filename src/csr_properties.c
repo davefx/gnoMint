@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "tls.h"
+#include "csr_properties.h"
 
 
 #define _(x) gettext(x)

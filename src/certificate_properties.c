@@ -26,6 +26,7 @@
 
 #include "tls.h"
 #include "ca_policy.h"
+#include "certificate_properties.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)

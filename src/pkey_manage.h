@@ -41,7 +41,7 @@ void pkey_manage_crypt_auto (CaCreationData *creation_data,
 			     gchar **pem_private_key,
 			     const gchar *pem_root_certificate);
 
-gchar * pkey_manage_ask_password ();
+gchar * pkey_manage_ask_password (void);
 gboolean pkey_manage_check_password (const gchar *checking_password, const gchar *hashed_password);
 
 gchar * pkey_manage_crypt   (const gchar *pem_private_key, const gchar *dn);

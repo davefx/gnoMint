@@ -71,7 +71,7 @@ typedef struct __TlsCsr {
 	gchar * dn;
 } TlsCsr;
 
-void tls_init ();
+void tls_init (void);
 
 gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 			       gchar ** private_key,

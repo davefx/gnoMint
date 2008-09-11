@@ -28,7 +28,7 @@ typedef struct _UInt160 {
         guint32 value2;
 } UInt160;
 
-UInt160 * uint160_new();
+UInt160 * uint160_new(void);
 
 void uint160_assign (UInt160 *var, guint64 new_value);
 void uint160_add (UInt160 *var, guint64 new_value);

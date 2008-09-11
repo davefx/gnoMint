@@ -26,6 +26,7 @@
 #include <ca_file.h> 
 
 #include "tls.h"
+#include "ca_policy.h"
 
 
 #define _(x) gettext(x)

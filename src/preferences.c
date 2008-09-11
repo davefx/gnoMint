@@ -23,6 +23,7 @@
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)
 
+#include "preferences.h"
 
 
 static GConfEngine * preferences_engine;

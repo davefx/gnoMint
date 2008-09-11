@@ -21,6 +21,6 @@
 #define _NEW_REQ_WINDOW_H_
 
 
-void new_req_window_display ();
+void new_req_window_display (void);
 
 #endif

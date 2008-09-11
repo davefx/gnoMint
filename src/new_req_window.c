@@ -32,6 +32,7 @@
 #include "tls.h"
 #include "ca.h"
 #include "pkey_manage.h"
+#include "new_req_window.h"
 
 #define _(x) gettext(x)
 #define N_(x) (x) gettext_noop(x)

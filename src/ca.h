@@ -25,12 +25,12 @@
 #include <gtk/gtk.h>
 
 gboolean ca_open (gchar *filename, gboolean create);
-gboolean ca_refresh_model ();
+gboolean ca_refresh_model (void);
 void ca_update_csr_view (gboolean new_value, gboolean refresh);
 void ca_update_revoked_view (gboolean new_value, gboolean refresh);
-void ca_todo_callback();
-gint ca_get_selected_row_id ();
-gchar * ca_get_selected_row_pem ();
+void ca_todo_callback(void);
+gint ca_get_selected_row_id (void);
+gchar * ca_get_selected_row_pem (void);
 gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
 gboolean ca_import (gchar *filename);
 void ca_error_dialog(gchar *message);

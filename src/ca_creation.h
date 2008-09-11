@@ -80,13 +80,13 @@ typedef struct {
 GThread * ca_creation_launch_thread (CaCreationData *creation_data);
 
 
-void ca_creation_lock_status_mutex ();
-void ca_creation_unlock_status_mutex ();
+void ca_creation_lock_status_mutex (void);
+void ca_creation_unlock_status_mutex (void);
 
-gint ca_creation_get_thread_status ();
+gint ca_creation_get_thread_status (void);
 
-gchar * ca_creation_get_thread_message();
+gchar * ca_creation_get_thread_message(void);
 
-void ca_creation_data_free ();
+void ca_creation_data_free (CaCreationData *cd);
 
 #endif

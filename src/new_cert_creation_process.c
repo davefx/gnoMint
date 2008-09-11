@@ -32,6 +32,7 @@
 #include "ca_file.h"
 #include "ca_policy.h"
 #include "ca.h"
+#include "new_cert_creation_process.h"
 
 GladeXML * new_ca_window_process_xml = NULL;
 

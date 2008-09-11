@@ -20,6 +20,6 @@
 #ifndef _PREFERENCES_WINDOW_H_
 #define _PREFERENCES_WINDOW_H_
 
-void preferences_window_display ();
+void preferences_window_display (void);
 
 #endif
