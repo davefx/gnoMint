@@ -21,5 +21,7 @@
 #define _PREFERENCES_WINDOW_H_
 
 void preferences_window_display (void);
+void preferences_window_gnomekeyring_export_toggled (GtkToggleButton *togglebutton, gpointer user_data);
+void preferences_window_ok_button_clicked_cb (GtkButton *button, gpointer user_data);
 
 #endif

@@ -52,11 +52,11 @@ GladeXML * new_ca_window_xml = NULL;
 void new_ca_window_display()
 {
 	gchar     * xml_file = NULL;
+	// Workaround for libglade
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
-	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 	tst = foo;
 	new_ca_window_xml = glade_xml_new (xml_file, "new_ca_window", NULL);
 	

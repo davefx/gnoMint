@@ -61,6 +61,10 @@ typedef struct {
         GtkTreeIter * last_ca_iter;
 } __NewCertWindowRefreshModelAddCaUserData;
 
+int __new_cert_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
+void __new_cert_populate_ca_treeview (GtkTreeView *treeview);
+
+
 
 int __new_cert_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
 {
@@ -201,13 +205,13 @@ void new_cert_window_display(gchar *csr_pem)
 	gchar     * xml_file = NULL;
 	GtkWidget * widget;
         TlsCsr * csr_info = NULL;
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
 	csr_info = tls_parse_csr_pem (csr_pem);
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
 	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 	tst = foo;
 	new_cert_window_xml = glade_xml_new (xml_file, "new_cert_window", NULL);
 	

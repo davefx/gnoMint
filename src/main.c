@@ -23,6 +23,7 @@
 #include <glade/glade.h>
 #include <stdlib.h>
 
+#include "main.h"
 #include "new_ca_window.h"
 #include "new_req_window.h"
 #include "new_cert_window.h"
@@ -49,8 +50,14 @@ GladeXML * cert_popup_menu_xml = NULL;
 gchar * gnomint_current_opened_file = NULL;
 
 static GtkRecentManager *recent_manager;
-void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data);
+
 void __recent_add_utf8_filename (const gchar *utf8_filename);
+void __disable_widget (gchar *widget_name);
+void __enable_widget (gchar *widget_name);
+GtkWidget * __recent_create_menu (void);
+void __recent_add_utf8_filename (const gchar *utf8_filename);
+
+
 
 void __disable_widget (gchar *widget_name)
 {
@@ -408,7 +415,7 @@ void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data)
 {
         GtkRecentInfo *item;
 	gchar *filename;
-	gchar *utf8_filename;
+	gchar *utf8_filename = NULL;
 	GtkWidget *dialog;
 	const gchar *uri;
 
@@ -427,8 +434,7 @@ void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data)
                 g_free (filename);
         }
 
-
-	if (! ca_open (utf8_filename, FALSE)) {
+        if (utf8_filename || ! ca_open (utf8_filename, FALSE)) {
 		dialog = gtk_message_dialog_new (NULL,
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
 						 GTK_MESSAGE_ERROR,

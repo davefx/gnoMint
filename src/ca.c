@@ -79,6 +79,41 @@ enum {CSR_MODEL_COLUMN_ID=0,
       CSR_MODEL_COLUMN_NUMBER=4}
         CsrModelColumns;
 
+int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
+int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames);
+void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
+				   GtkCellRenderer *cell,
+				   GtkTreeModel *tree_model,
+				   GtkTreeIter *iter,
+				   gpointer data);
+void __ca_tree_view_is_ca_datafunc (GtkTreeViewColumn *tree_column,
+                                    GtkCellRenderer *cell,
+                                    GtkTreeModel *tree_model,
+                                    GtkTreeIter *iter,
+                                    gpointer data);
+void __ca_tree_view_private_key_in_db_datafunc (GtkTreeViewColumn *tree_column,
+						GtkCellRenderer *cell,
+						GtkTreeModel *tree_model,
+						GtkTreeIter *iter,
+						gpointer data);
+void __ca_certificate_activated (GtkTreeView *tree_view,
+                                 GtkTreePath *path,
+                                 GtkTreeViewColumn *column,
+                                 gpointer user_data);
+void __ca_csr_activated (GtkTreeView *tree_view,
+                         GtkTreePath *path,
+                         GtkTreeViewColumn *column,
+                         gpointer user_data);
+void __ca_activate_certificate_selection (GtkTreeIter *iter);
+void __ca_activate_csr_selection (GtkTreeIter *iter);
+void __ca_deactivate_actions (void);
+gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter);
+void __ca_export_public_pem (GtkTreeIter *iter, gint type);
+gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type);
+void __ca_export_private_pem (GtkTreeIter *iter, gint type);
+void __ca_export_pkcs12 (GtkTreeIter *iter, gint type);
+void __ca_gfree_gfunc (gpointer data, gpointer user_data);
+
 void __disable_widget (gchar *widget_name);
 void __enable_widget (gchar *widget_name);
 
@@ -522,7 +557,10 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 				    GtkTreeViewColumn *column,
 				    gpointer user_data)
 {
-	if (tree_view == NULL) {
+
+        GtkTreePath *parent = NULL;
+	
+        if (tree_view == NULL) {
                 GtkTreeSelection *selection;
                 GtkTreeIter selection_iter;
 		
@@ -538,7 +576,7 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 			
 	}
 	
-	GtkTreePath *parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
+	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
 	if (gtk_tree_path_is_ancestor (parent, path) && gtk_tree_path_compare (parent, path)) {
 		__ca_certificate_activated (tree_view, path, column, user_data);
 	} else {
@@ -1492,10 +1530,10 @@ gboolean ca_open (gchar *filename, gboolean create)
 	return TRUE;
 }
 
-gint ca_get_selected_row_id ()
+guint64 ca_get_selected_row_id ()
 {
 	GtkTreeIter *iter;
-	gint result;
+	guint64 result;
 
 	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
@@ -2115,6 +2153,8 @@ gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data
 gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data)
 {
 	GladeXML * dialog_xml;
+	GtkWidget * widget = NULL;
+
 
 	if (! G_IS_OBJECT(button))
 		return TRUE;
@@ -2122,8 +2162,6 @@ gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpoint
 	dialog_xml = g_object_get_data (G_OBJECT(button), "dialog_xml");
 	if (! dialog_xml)
 		return TRUE;
-
-	GtkWidget * widget = NULL;
 
 	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
 	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {

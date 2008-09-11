@@ -24,5 +24,15 @@ void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_d
 
 void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
 
+void new_cert_creation_process_ca_error_dialog (gchar *message);
+void new_cert_creation_process_ca_finish (void);
+gint new_ca_creation_pulse (gpointer data);
+void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data);
+void on_cancel_creation_process_clicked (GtkButton *button,
+                                         gpointer user_data);
+void new_csr_creation_process_finish (void);
+gint new_csr_creation_pulse (gpointer data);
+void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
+
 
 #endif

@@ -30,6 +30,7 @@ GThread * csr_creation_launch_thread (CaCreationData *creation_data);
 void csr_creation_lock_status_mutex (void);
 void csr_creation_unlock_status_mutex (void);
 
+gpointer csr_creation_thread (gpointer data);
 gint csr_creation_get_thread_status (void);
 
 gchar * csr_creation_get_thread_message(void);

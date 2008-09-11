@@ -22,4 +22,6 @@
 
 void csr_properties_display (const char *, gboolean);
 
+void csr_properties_close_clicked (const char *csr_pem);
+
 #endif

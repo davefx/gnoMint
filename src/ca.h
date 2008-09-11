@@ -24,16 +24,44 @@
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
-gboolean ca_open (gchar *filename, gboolean create);
+
+
 gboolean ca_refresh_model (void);
-void ca_update_csr_view (gboolean new_value, gboolean refresh);
-void ca_update_revoked_view (gboolean new_value, gboolean refresh);
-void ca_todo_callback(void);
-gint ca_get_selected_row_id (void);
+gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
+				    GtkTreePath *path,
+				    GtkTreeViewColumn *column,
+				    gpointer user_data);
+gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
+				       gpointer user_data);
+void ca_error_dialog (gchar *message);
+gchar * ca_dialog_get_password (gchar *info_message, 
+                                gchar *password_message, gchar *confirm_message, 
+                                gchar *distinct_error_message, guint minimum_length);
+void ca_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data);
+void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_todo_callback (void);
+void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data);
+gboolean ca_open (gchar *filename, gboolean create);
+guint64 ca_get_selected_row_id (void);
 gchar * ca_get_selected_row_pem (void);
-gboolean ca_treeview_row_activated (GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data);
 gboolean ca_import (gchar *filename);
-void ca_error_dialog(gchar *message);
+void ca_update_csr_view (gboolean new_value, gboolean refresh);
+gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
+void ca_update_revoked_view (gboolean new_value, gboolean refresh);
+gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
+void __ca_gfree_gfunc (gpointer data, gpointer user_data);
+void ca_generate_crl (GtkTreeIter *iter, gint type);
+gboolean ca_treeview_popup_timeout_program_cb (gpointer data);
+void ca_treeview_popup_timeout_program (GdkEventButton *event);
+gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
+				    GdkEvent *event, gpointer user_data);
+void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data);
+gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data);
+gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data);
+void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data);
 
 
 

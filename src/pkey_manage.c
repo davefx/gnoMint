@@ -40,6 +40,14 @@
 #define PKEY_MANAGE_ENCRYPTED_PKCS8_HEADER "-----BEGIN ENCRYPTED PRIVATE KEY-----"
 #define PKEY_MANAGE_UNCRYPTED_PKCS8_HEADER "-----BEGIN PRIVATE KEY-----"
 
+gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn);
+gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem);
+gchar * __pkey_manage_to_hex (const guchar *buffer, size_t len);
+guchar * __pkey_manage_from_hex (const gchar *input);
+guchar *__pkey_manage_create_key(const gchar *password);
+gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password);
+gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password);
+
 
 gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 {
@@ -311,7 +319,7 @@ unsigned char ctr[16] =
 gchar *saved_password = NULL;
 
 
-gchar * pkey_manage_to_hex (const guchar *buffer, size_t len)
+gchar * __pkey_manage_to_hex (const guchar *buffer, size_t len)
 {
 	gchar *res = g_new0 (gchar, len*2+1);
 	guint i;
@@ -323,7 +331,7 @@ gchar * pkey_manage_to_hex (const guchar *buffer, size_t len)
 	return res;
 }
 
-guchar * pkey_manage_from_hex (const gchar *input)
+guchar * __pkey_manage_from_hex (const gchar *input)
 {
 	guint i;
 
@@ -368,7 +376,7 @@ guchar *__pkey_manage_create_key(const gchar *password)
 	return key;
 }
 
-gchar * pkey_manage_aes_encrypt (const gchar *in, const gchar *password)
+gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password)
 {
 	guchar *key = __pkey_manage_create_key (password);
 	guchar *out = (guchar *) g_strdup(in);
@@ -408,16 +416,16 @@ gchar * pkey_manage_aes_encrypt (const gchar *in, const gchar *password)
 
 	gcry_cipher_close (cry_ctxt);	
 
-	res = pkey_manage_to_hex (out, strlen(in));
+	res = __pkey_manage_to_hex (out, strlen(in));
 	
 	g_free (out);
 
 	return res;
 }
 
-gchar * pkey_manage_aes_decrypt (const gchar *string, const gchar *password)
+gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password)
 {
-	guchar *out = pkey_manage_from_hex(string);
+	guchar *out = __pkey_manage_from_hex(string);
 
 	guchar *key = __pkey_manage_create_key (password);
 
@@ -471,7 +479,7 @@ gchar *pkey_manage_encrypt_password (const gchar *pwd)
 
 	password = g_strdup_printf ("%sgnoMintPassword%s", salt, pwd);
 
-	res1 = pkey_manage_aes_encrypt (password, password);
+	res1 = __pkey_manage_aes_encrypt (password, password);
 	res2 = g_strdup_printf ("%s%s", salt, res1);
 
 	g_free (res1);
@@ -494,7 +502,7 @@ gboolean pkey_manage_check_password (const gchar *checking_password, const gchar
 
 	password = g_strdup_printf ("%sgnoMintPassword%s", salt, checking_password);
 
-	cp = pkey_manage_aes_encrypt (password, password);
+	cp = __pkey_manage_aes_encrypt (password, password);
 
 	res = (! strcmp(cp, &hashed_password[2]));
 
@@ -617,7 +625,7 @@ gchar * pkey_manage_crypt_w_pwd (const gchar *pem_private_key, const gchar *dn, 
 		
 	password = g_strdup_printf ("gnoMintPrivateKey%s%s", pwd, dn);
 
-	res = pkey_manage_aes_encrypt (pem_private_key, password);
+	res = __pkey_manage_aes_encrypt (pem_private_key, password);
 
 	g_free (password);
 
@@ -650,7 +658,7 @@ gchar * pkey_manage_uncrypt_w_pwd (PkeyManageData *pem_private_key, const gchar 
 		
 	password = g_strdup_printf ("gnoMintPrivateKey%s%s", pwd, dn);
 
-	res = pkey_manage_aes_decrypt (pem_private_key->pkey_data, password);
+	res = __pkey_manage_aes_decrypt (pem_private_key->pkey_data, password);
 
 	g_free (password);
 

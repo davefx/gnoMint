@@ -40,7 +40,8 @@ gint timer=0;
 GThread * new_cert_creation_process_ca_thread = NULL;
 
 
-void new_cert_creation_process_ca_error_dialog (gchar *message) {
+void new_cert_creation_process_ca_error_dialog (gchar *message) 
+{
 
    GtkWidget *dialog, *widget;
    
@@ -60,7 +61,8 @@ void new_cert_creation_process_ca_error_dialog (gchar *message) {
    gtk_widget_destroy (dialog);
 }
 
-void new_cert_creation_process_ca_finish (void) {
+void new_cert_creation_process_ca_finish (void) 
+{
 	GtkWidget *widget = NULL, *dialog = NULL;
 	
 	g_thread_join (new_cert_creation_process_ca_thread);

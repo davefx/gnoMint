@@ -42,11 +42,11 @@ void csr_properties_display(const char *csr_pem, gboolean privkey_in_db)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
 	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 	tst = foo;
 	csr_properties_window_xml = glade_xml_new (xml_file, "csr_properties_dialog", NULL);
 	

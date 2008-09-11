@@ -21,5 +21,6 @@
 #define _CERTIFICATE_PROPERTIES_H_
 
 void certificate_properties_display (guint64, const char *, gboolean, gboolean);
+void certificate_properties_close_clicked (const char *certificate_pem);
 
 #endif

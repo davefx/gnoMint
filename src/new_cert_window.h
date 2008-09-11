@@ -21,6 +21,19 @@
 #define _NEW_CERT_WINDOW_H_
 
 void new_cert_window_display (char * csr_pem);
-
-
+void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointer userdata);
+void new_cert_window_display(gchar *csr_pem);
+void new_cert_tab_activate (int tab_number);
+void on_new_cert_next2_clicked (GtkButton *button,
+                                gpointer user_data); 
+void on_new_cert_previous2_clicked (GtkButton *widget,
+                                    gpointer user_data) ;
+void on_new_cert_next1_clicked (GtkButton *button,
+                                gpointer user_data);
+void on_new_cert_previous3_clicked (GtkButton *widget,
+                                    gpointer user_data);
+void on_new_cert_cancel_clicked (GtkButton *widget,
+                                 gpointer user_data);
+void on_new_cert_commit_clicked (GtkButton *widg,
+				 gpointer user_data);
 #endif

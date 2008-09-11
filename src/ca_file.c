@@ -45,6 +45,19 @@ sqlite3 * ca_db = NULL;
 
 #define CURRENT_GNOMINT_DB_VERSION 7
 
+void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv);
+void __ca_file_zeropad (sqlite3_context *context, int argc, sqlite3_value **argv);
+void __ca_file_zeropad_route (sqlite3_context *context, int argc, sqlite3_value **argv);
+int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **columnNames);
+gchar ** __ca_file_get_single_row (const gchar *query, ...);
+int __ca_file_get_revoked_certs_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
+void __ca_file_mark_expired_and_revoked_certificates_as_already_shown_in_crl (guint64 ca_id, const GList *revoked_certs);
+int  __ca_file_password_unprotect_cb (void *pArg, int argc, char **argv, char **columnNames);
+int  __ca_file_password_protect_cb (void *pArg, int argc, char **argv, char **columnNames);
+int  __ca_file_password_change_cb (void *pArg, int argc, char **argv, char **columnNames);
+gchar * __ca_file_get_field_from_id (CaFileElementType type, guint64 db_id, const gchar *field);
+
+
 
 void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv)
 {
@@ -146,7 +159,7 @@ int __ca_file_get_single_row_cb (void *pArg, int argc, char **argv, char **colum
 	return 0;
 }
 
-gchar ** ca_file_get_single_row (const gchar *query, ...)
+gchar ** __ca_file_get_single_row (const gchar *query, ...)
 {
 	gchar **result = NULL;
 	gchar *sql = NULL;
@@ -274,7 +287,7 @@ gboolean ca_file_check_and_update_version ()
 	gchar * sql = NULL;
 	gchar * error;
 
-	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name = 'ca_db_version';");
+	result = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name = 'ca_db_version';");
 
 	if (result && result[0] && atoi(result[0]) == CURRENT_GNOMINT_DB_VERSION) {
 		g_strfreev (result);
@@ -570,8 +583,9 @@ gboolean ca_file_check_and_update_version ()
                                 UInt160 aux160;
                                 guint64 old_serial = atoll(cert_table[(i*cols)+1]);
 				gchar *hex_guint64_format_string = g_strdup_printf ("%%0%s", G_GUINT64_FORMAT);
+                                gchar *aux = NULL;
 				hex_guint64_format_string[strlen(hex_guint64_format_string) - 1] = 'X';
-                                gchar *aux = g_strdup_printf (hex_guint64_format_string, old_serial);
+                                aux = g_strdup_printf (hex_guint64_format_string, old_serial);
 				g_free (hex_guint64_format_string);
                                 uint160_read (&aux160, (guchar *) aux, strlen(aux));
                                 new_serial = uint160_strdup_printf(&aux160);
@@ -809,12 +823,12 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 	gchar *serialstr = NULL;
 	gchar **row = NULL;
 
-	row = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%"
+	row = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%"
                                       G_GUINT64_FORMAT";", ca_id);
         uint160_read_escaped (serial, row[0], strlen (row[0]));
 	g_strfreev (row);
 
-        row = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE "
+        row = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE "
 				      "name='ca_root_must_check_serial_dups' AND ca_id=%"G_GUINT64_FORMAT";",
                                       ca_id);
         if (row) {
@@ -823,7 +837,7 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
                                 uint160_inc (serial);
                                 g_strfreev (row);
                                 serialstr = uint160_strdup_printf (serial);
-                                row = ca_file_get_single_row ("SELECT id FROM certificates WHERE serial='%q' AND parent_id=%"G_GUINT64_FORMAT";", 
+                                row = __ca_file_get_single_row ("SELECT id FROM certificates WHERE serial='%q' AND parent_id=%"G_GUINT64_FORMAT";", 
                                                               serialstr, ca_id);
                                 g_free (serialstr);                                
                         }
@@ -881,7 +895,7 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
         g_free (serialstr);
         
 	rootca_rowid = sqlite3_last_insert_rowid (ca_db);
-	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;",
+	row = __ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;",
 				      rootca_rowid);
 	rootca_id = atoll (row[0]);
 	g_strfreev (row);
@@ -950,7 +964,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	parent_idstr = ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn);
+	parent_idstr = __ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn);
 	if (parent_idstr == NULL) {
 		parent_id = 0;
 		parent_route = g_strdup(":");
@@ -1013,7 +1027,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 	sqlite3_free (sql);
 
 	cert_rowid = sqlite3_last_insert_rowid (ca_db);
-	row = ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;",
+	row = __ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;",
 				      cert_rowid);
 	cert_id = atoll (row[0]);
 	g_strfreev (row);
@@ -1244,7 +1258,7 @@ gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp)
         gint next_crl_version;
         gchar *error;
 
-        last_crl = ca_file_get_single_row ("SELECT crl_version FROM ca_crl WHERE ca_id=%"G_GUINT64_FORMAT, ca_id);
+        last_crl = __ca_file_get_single_row ("SELECT crl_version FROM ca_crl WHERE ca_id=%"G_GUINT64_FORMAT, ca_id);
         if (! last_crl)
                 next_crl_version = 1;
         else {
@@ -1294,7 +1308,7 @@ gboolean ca_file_is_password_protected()
 	if (! ca_db)
 		return FALSE;
 	
-	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_is_password_protected';");
+	result = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_is_password_protected';");
 	res = ((result != NULL) && (strcmp(result[0], "0")));
 	
 	if (result)
@@ -1311,7 +1325,7 @@ gboolean ca_file_check_password (const gchar *password)
 	if (! ca_file_is_password_protected())
 		return FALSE;
 
-	result = ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_hashed_password';");
+	result = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_hashed_password';");
 	if (! result)
 		return FALSE;	
 
@@ -1334,16 +1348,16 @@ int  __ca_file_password_unprotect_cb (void *pArg, int argc, char **argv, char **
 	const gchar *table = pwd_change->table;
 	const gchar *pwd = pwd_change->old_password;
 	PkeyManageData pkey;
+	gchar *error;
+	gchar *sql;
+	gchar *new_pkey;
+	
 	
 	pkey.pkey_data = argv[2];
 	pkey.is_in_db = TRUE;
 	pkey.is_ciphered_with_db_pwd = TRUE;
 	pkey.external_file = NULL;
 
-	gchar *error;
-	gchar *sql;
-	gchar *new_pkey;
-	
 	if (atoi(argv[1]) == 0)
 		return 0;
 
@@ -1600,7 +1614,7 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
         guint num_chars = 1;
         gchar *sql;
 
-        result = ca_file_get_single_row ("SELECT MAX(id) FROM certificates WHERE is_ca=1 AND revocation IS NULL");
+        result = __ca_file_get_single_row ("SELECT MAX(id) FROM certificates WHERE is_ca=1 AND revocation IS NULL");
 
         if (result && result[0]) {
 	
@@ -1635,7 +1649,7 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
         guint num_chars = 1;
         gchar *sql;
 
-        result = ca_file_get_single_row ("SELECT MAX(id) FROM certificates");
+        result = __ca_file_get_single_row ("SELECT MAX(id) FROM certificates");
 
         if (result && result[0]) {
 		max_id = atoll(result[0]);
@@ -1695,15 +1709,15 @@ gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointe
 }
 
 
-gchar * ca_file_get_field_from_id (CaFileElementType type, guint64 db_id, const gchar *field)
+gchar * __ca_file_get_field_from_id (CaFileElementType type, guint64 db_id, const gchar *field)
 {
 	gchar ** aux;
 	gchar * res;
 
 	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
-		aux = ca_file_get_single_row ("SELECT %s FROM certificates WHERE id=%" G_GUINT64_FORMAT ";", field, db_id);
+		aux = __ca_file_get_single_row ("SELECT %s FROM certificates WHERE id=%" G_GUINT64_FORMAT ";", field, db_id);
 	} else {
-		aux = ca_file_get_single_row ("SELECT %s FROM cert_requests WHERE id=%" G_GUINT64_FORMAT ";", field, db_id);
+		aux = __ca_file_get_single_row ("SELECT %s FROM cert_requests WHERE id=%" G_GUINT64_FORMAT ";", field, db_id);
 	}
 	
 	if (! aux)
@@ -1724,12 +1738,12 @@ gchar * ca_file_get_field_from_id (CaFileElementType type, guint64 db_id, const 
 
 gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id)
 {
-	return ca_file_get_field_from_id (type, db_id, "dn");
+	return __ca_file_get_field_from_id (type, db_id, "dn");
 }
 
 gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id)
 {
-	return ca_file_get_field_from_id (type, db_id, "pem");
+	return __ca_file_get_field_from_id (type, db_id, "pem");
 }
 
 gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id)
@@ -1737,7 +1751,7 @@ gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id)
 	gboolean res;
 	gchar *aux;
 
-	aux = ca_file_get_field_from_id (type, db_id, "private_key_in_db");
+	aux = __ca_file_get_field_from_id (type, db_id, "private_key_in_db");
 	res = atoi(aux);
 	g_free (aux);
 	return res;
@@ -1745,7 +1759,7 @@ gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id)
 
 gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id)
 {
-	return ca_file_get_field_from_id (type, db_id, "private_key");
+	return __ca_file_get_field_from_id (type, db_id, "private_key");
 }
 
 gboolean ca_file_set_pkey_field_for_id (CaFileElementType type, const gchar *new_value, guint64 db_id)
@@ -1793,7 +1807,7 @@ gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gc
 
 guint ca_file_policy_get (guint64 ca_id, gchar *property_name)
 {
-	gchar **row = ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
+	gchar **row = __ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
 					      property_name, ca_id);
 
 	guint res;
@@ -1815,7 +1829,7 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
 	gchar *error = NULL;
 	gchar *sql = NULL;
 
-	aux = ca_file_get_single_row ("SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
+	aux = __ca_file_get_single_row ("SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
 				      property_name, ca_id);
 
 	if (! aux) {

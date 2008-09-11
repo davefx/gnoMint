@@ -89,4 +89,6 @@ gchar * ca_creation_get_thread_message(void);
 
 void ca_creation_data_free (CaCreationData *cd);
 
+gpointer ca_creation_thread (gpointer data);
+
 #endif

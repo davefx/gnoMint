@@ -36,11 +36,11 @@ void preferences_window_display()
 {
 	gchar     * xml_file = NULL;
         GtkWidget * widget = NULL;
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
 	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 	tst = foo;
 	preferences_window_xml = glade_xml_new (xml_file, "preferences_dialog", NULL);
 	

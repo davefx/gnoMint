@@ -34,6 +34,9 @@
 
 extern GladeXML * certificate_properties_window_xml;
 
+gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **columnNames);
+
+
 gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **columnNames)
 {
 	GHashTable * policy_table = (GHashTable *) pArg;

@@ -66,6 +66,16 @@ typedef struct {
         GtkTreeIter * last_ca_iter;
 } __NewReqWindowRefreshModelAddCaUserData;
 
+int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
+void __new_req_populate_ca_treeview (GtkTreeView *treeview);
+gboolean __new_req_window_lookup_country (GtkTreeModel *model,
+                                          GtkTreePath *path,
+                                          GtkTreeIter *iter,
+                                          gpointer data);
+
+
+
+
 
 int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
 {
@@ -220,11 +230,11 @@ void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data
 void new_req_window_display()
 {
 	gchar     * xml_file = NULL;
+	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
 	// Workaround for libglade
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 	tst = foo;
 	new_req_window_xml = glade_xml_new (xml_file, "new_req_window", NULL);
 	

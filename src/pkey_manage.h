@@ -20,6 +20,8 @@
 #ifndef _PKEY_MANAGE_H_
 #define _PKEY_MANAGE_H_
 
+#include <gtk/gtk.h>
+
 /* FUNCTIONS RELATED WITH PRIVATE KEY BEING SAVED IN EXTERNAL FILES */
 
 typedef struct {
@@ -50,5 +52,10 @@ gchar * pkey_manage_crypt_w_pwd   (const gchar *pem_private_key, const gchar *dn
 gchar * pkey_manage_uncrypt_w_pwd (PkeyManageData *pkey, const gchar *dn, const gchar *pwd);
 
 gchar * pkey_manage_encrypt_password (const gchar *pwd);
+
+
+// CALLBACKS
+
+gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data);
 
 #endif
