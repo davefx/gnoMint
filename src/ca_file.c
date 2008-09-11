@@ -171,6 +171,9 @@ gchar * ca_file_create (const gchar *filename)
 	gchar *sql = NULL;
 	gchar *error = NULL;
 
+        // We create a empty file, with correct permissions
+        close(open(filename, O_CREAT, 0600));
+
 	if (sqlite3_open (filename, &ca_db))
 		return g_strdup_printf(_("Error opening filename '%s'"), filename) ;
         
@@ -856,7 +859,9 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, 1, '%q', '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q', 0, ':');", 
+	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, pem, private_key_in_db, "
+                               "private_key, dn, parent_dn, parent_id, parent_route) "
+                               "VALUES (NULL, 1, '%q', '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q', 0, ':');", 
                                serialstr,
 			       creation_data->cn,
 			       creation_data->activation,
@@ -956,7 +961,9 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
         serialstr = uint160_strdup_printf(&serial);
 
 	if (private_key_info)
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', "
+		sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
+                                       "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) "
+                                       "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', "
 				       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", 
                                        is_ca,
 				       serialstr,
@@ -971,7 +978,9 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       parent_id,
                                        parent_route);
 	else
-		sql = sqlite3_mprintf ("INSERT INTO certificates VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
+		sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
+                                       "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) "
+                                       "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
 				       "%"G_GUINT64_FORMAT", '%q');", 
                                        is_ca,
 				       serialstr,
