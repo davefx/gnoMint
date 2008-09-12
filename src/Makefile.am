@@ -53,6 +53,7 @@ EXTRA_DIST = \
 	certificate_properties.h \
 	csr_creation.h \
 	csr_properties.h \
+	main.h \
 	new_cert_creation_process.h \
 	new_ca_window.h \
 	new_req_window.h \
