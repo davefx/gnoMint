@@ -1194,7 +1194,7 @@ int __ca_file_get_revoked_certs_add_certificate (void *pArg, int argc, char **ar
         return 0;
 }
 
-GList * ca_file_get_revoked_certs (guint64 ca_id)
+GList * ca_file_get_revoked_certs (guint64 ca_id, gchar **error)
 {
         GList * list = NULL;
         gchar * error_str = NULL;
@@ -1210,11 +1210,13 @@ GList * ca_file_get_revoked_certs (guint64 ca_id)
 
         if (error_str) {
                 fprintf (stderr, "%s\n", error_str);
+                (*error) = g_strdup (error_str);
                 return NULL;
         }
 
         list = g_list_reverse (list);
 
+        (*error) = NULL;
         return list;
 
 }

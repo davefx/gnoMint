@@ -52,8 +52,7 @@ void ca_update_csr_view (gboolean new_value, gboolean refresh);
 gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
 void ca_update_revoked_view (gboolean new_value, gboolean refresh);
 gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
-void __ca_gfree_gfunc (gpointer data, gpointer user_data);
-void ca_generate_crl (GtkTreeIter *iter, gint type);
+void ca_generate_crl (GtkCheckMenuItem *button, gpointer user_data);
 gboolean ca_treeview_popup_timeout_program_cb (gpointer data);
 void ca_treeview_popup_timeout_program (GdkEventButton *event);
 gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
@@ -62,7 +61,6 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data);
 gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data);
 void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data);
-
 
 
 #endif

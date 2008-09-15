@@ -33,6 +33,7 @@
 #include "ca_policy.h"
 #include "ca_file.h"
 #include "certificate_properties.h"
+#include "crl.h"
 #include "csr_properties.h"
 #include "tls.h"
 #include "new_ca_window.h"
@@ -112,7 +113,6 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type);
 gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type);
 void __ca_export_private_pem (GtkTreeIter *iter, gint type);
 void __ca_export_pkcs12 (GtkTreeIter *iter, gint type);
-void __ca_gfree_gfunc (gpointer data, gpointer user_data);
 
 void __disable_widget (gchar *widget_name);
 void __enable_widget (gchar *widget_name);
@@ -1706,148 +1706,9 @@ gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
         return TRUE;
 }
 
-void __ca_gfree_gfunc (gpointer data, gpointer user_data)
+void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data)
 {
-        g_free (data);
-}
-
-void ca_generate_crl (GtkTreeIter *iter, gint type)
-{
-	GtkWidget *widget = NULL;
-	GIOChannel * file = NULL;
-	gchar * filename = NULL;
-	GtkDialog * dialog = NULL;
-	GError * error = NULL;
-	gchar * pem = NULL;
-        GList * revoked_certs = NULL;
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * dn = NULL;
-	gchar * ca_pem = NULL;
-	gchar * private_key = NULL;
-        gint crl_version = 0;
-	guint64 ca_id = 0;
-        time_t timestamp;
-
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
-	
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export Certificate Revocation List"),
-							  GTK_WINDOW(widget),
-							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-							  NULL));
-		
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
-	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_widget_destroy (GTK_WIDGET(dialog));
-		return;
-	}
-
-	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	
-	file = g_io_channel_new_file (filename, "w", &error);
-	g_free (filename);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting CRL."));
-		return;
-	} 
-	
-        /* FIXME */
-	ca_id = 1;
-	ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
-	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-        timestamp = time (NULL);
-
-        revoked_certs = ca_file_get_revoked_certs (ca_id);
-	
-	if (!revoked_certs) {
-		ca_error_dialog (_("There was an error while getting revoked certificates."));
-		return;
-	}
-
-
-        crl_version = ca_file_begin_new_crl_transaction (1, timestamp);
-
-        if (ca_id && ca_pem && crypted_pkey && dn) {
-
-		private_key = pkey_manage_uncrypt (crypted_pkey, dn);		
-                if (!private_key) {
-			g_free (ca_pem);
-			pkey_manage_data_free (crypted_pkey);
-			g_free (dn);
-                        ca_error_dialog (_("There was an error while generating CRL."));
-                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return;
-                }
-
-                pem = tls_generate_crl (revoked_certs, 
-                                        (guchar *) ca_pem, 
-                                        (guchar *) private_key,
-                                        crl_version,
-                                        timestamp,
-                                        timestamp + (3600 * ca_policy_get (ca_id, "HOURS_BETWEEN_CRL_UPDATES")));           
-                
-
-		g_free (ca_pem);
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-
-                if (!pem) {
-                        ca_error_dialog (_("There was an error while generating CRL."));
-                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return;
-                }
-                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-
-                if (error) {
-                        ca_error_dialog (_("There was an error while writing CRL."));
-                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return;
-                } 
-                g_free (pem);
-
-	} else {
-                        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return;
-        }
-        
-        ca_file_commit_new_crl_transaction (ca_id, revoked_certs);
-		
-        g_list_foreach (revoked_certs, __ca_gfree_gfunc, NULL);       
-        g_list_free (revoked_certs);
-	
-	g_io_channel_shutdown (file, TRUE, &error);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting CRL."));
-		g_io_channel_unref (file);
-		return;
-	} 
-	
-	g_io_channel_unref (file);
-	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_INFO,
-						    GTK_BUTTONS_CLOSE,
-						    "%s",
-						    _("CRL generated successfully")));
-	gtk_dialog_run (GTK_DIALOG(dialog));
-	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	
-	
+        crl_window_display ();
 }
 
 
