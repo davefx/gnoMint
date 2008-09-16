@@ -4225,6 +4225,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">1</property>
@@ -4238,6 +4239,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">2</property>
@@ -4252,6 +4254,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">3</property>
@@ -4267,6 +4270,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                     </child>
                     <child>
@@ -4277,6 +4281,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -4291,6 +4296,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -4307,6 +4313,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -4354,6 +4361,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -4369,6 +4377,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -4383,6 +4392,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">1</property>
@@ -4397,6 +4407,7 @@ Common Name (CN):</property>
                         <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                     </child>
                     <child>
@@ -4406,6 +4417,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">2</property>
@@ -4419,6 +4431,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">3</property>
@@ -4432,6 +4445,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
