@@ -70,14 +70,16 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_PARENT_DN=10,
       CA_MODEL_COLUMN_PARENT_ROUTE=11,
       CA_MODEL_COLUMN_ITEM_TYPE=12,
-      CA_MODEL_COLUMN_NUMBER=13}
+      CA_MODEL_COLUMN_PARENT_ID=13, /* Only for CSRs */
+      CA_MODEL_COLUMN_NUMBER=14}
         CaModelColumns;
 
 enum {CSR_MODEL_COLUMN_ID=0,
       CSR_MODEL_COLUMN_SUBJECT=1,
       CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB=2,
       CSR_MODEL_COLUMN_PEM=3,
-      CSR_MODEL_COLUMN_NUMBER=4}
+      CSR_MODEL_COLUMN_PARENT_ID=4,
+      CSR_MODEL_COLUMN_NUMBER=5}
         CsrModelColumns;
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
@@ -253,14 +255,14 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 	
 	gtk_tree_store_append (new_model, &iter, csr_parent_iter);
 
-	gtk_tree_store_set (new_model, &iter,
-			    CA_MODEL_COLUMN_ID, atoll(argv[CSR_MODEL_COLUMN_ID]),
-			    CA_MODEL_COLUMN_SUBJECT, argv[CSR_MODEL_COLUMN_SUBJECT],
-			    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-			    CA_MODEL_COLUMN_PEM, argv[CSR_MODEL_COLUMN_PEM],
-			    CA_MODEL_COLUMN_ITEM_TYPE, 1,
-			    -1);
-
+        gtk_tree_store_set (new_model, &iter,
+                            CA_MODEL_COLUMN_ID, atoll(argv[CSR_MODEL_COLUMN_ID]),
+                            CA_MODEL_COLUMN_SUBJECT, argv[CSR_MODEL_COLUMN_SUBJECT],
+                            CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
+                            CA_MODEL_COLUMN_PEM, argv[CSR_MODEL_COLUMN_PEM],
+                            CA_MODEL_COLUMN_PARENT_ID, argv[CSR_MODEL_COLUMN_PARENT_ID],
+                            CA_MODEL_COLUMN_ITEM_TYPE, 1,
+                            -1);
 	return 0;
 }
 
@@ -382,17 +384,19 @@ gboolean ca_refresh_model ()
            - Subject
            - Activation
            - Expiration
-           - Is revoked
+           - Revocation
            - Private key is in DB
            - PEM data
            - DN
            - Parent DN
+           - Parent route
            - Item type
+           - Parent ID (only for CSR)
 	*/
 
 	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING, 
 					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, 
-					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
+					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING);
 
 	cert_title_inserted = FALSE;
 	cert_parent_iter = NULL;
@@ -1500,15 +1504,19 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 
 	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
 	gchar * csr_pem;
+	gchar * csr_parent_id;
 
 	if (type != 2)
 		return;
 		
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &csr_pem, -1);
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
 
-	new_cert_window_display (csr_pem);
+        fprintf (stderr, "parent_id: %s\n", csr_parent_id);
+
+	new_cert_window_display (csr_pem, csr_parent_id);
 	
 	g_free (csr_pem);
+        g_free (csr_parent_id);
 }
 
 

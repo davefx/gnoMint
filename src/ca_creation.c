@@ -218,6 +218,8 @@ void ca_creation_data_free (CaCreationData *cd)
 		g_free (cd->emailAddress);
 	if (cd->password)
 		g_free (cd->password);
+        if (cd->parent_ca_id_str)
+                g_free (cd->parent_ca_id_str);
 	g_free (cd);
 }
 

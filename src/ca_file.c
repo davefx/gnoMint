@@ -43,7 +43,7 @@ extern gchar * gnomint_current_opened_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 7
+#define CURRENT_GNOMINT_DB_VERSION 8
 
 void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv);
 void __ca_file_zeropad (sqlite3_context *context, int argc, sqlite3_value **argv);
@@ -212,7 +212,7 @@ gchar * ca_file_create (const gchar *filename)
 	}
 	if (sqlite3_exec (ca_db,
                           "CREATE TABLE cert_requests (id INTEGER PRIMARY KEY, subject TEXT, pem TEXT, private_key_in_db BOOLEAN, "
-			  "private_key TEXT, dn TEXT UNIQUE);",
+			  "private_key TEXT, dn TEXT UNIQUE, parent_ca INTEGER);",
                           NULL, NULL, &error)) {
 		return error;
 	}
@@ -724,9 +724,28 @@ gboolean ca_file_check_and_update_version ()
 		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 			return FALSE;
 
-
-
         case 7:
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+                if (sqlite3_exec (ca_db, "ALTER TABLE cert_requests ADD COLUMN parent_ca INTEGER DEFAULT NULL;",
+                                  NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version' AND ca_id=0;", 8);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+                        fprintf (stderr, "%s\n", error);
+			return FALSE;
+		}
+		sqlite3_free (sql);
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return FALSE;
+
+
+        case 8:
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -1103,16 +1122,20 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 		return error;
 
 	if (pem_csr_private_key)
-		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 1, '%q','%q');", 
+		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 1, '%q','%q', %q);", 
 				       creation_data->cn,
 				       pem_csr,
 				       pem_csr_private_key,
-				       tlscsr->dn);
+				       tlscsr->dn,
+                                       (creation_data->parent_ca_id_str ? creation_data->parent_ca_id_str : "NULL")
+                        );
 	else
-		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 0, NULL, '%q');", 
+		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 0, NULL, '%q', %q);", 
 				       creation_data->cn,
 				       pem_csr,
-				       tlscsr->dn);
+				       tlscsr->dn,
+                                       (creation_data->parent_ca_id_str ? creation_data->parent_ca_id_str : "NULL")
+                        );
 
 	tls_csr_free (tlscsr);
 	tlscsr = NULL;
@@ -1689,7 +1712,7 @@ gboolean ca_file_foreach_csr (CaFileCallbackFunc func, gpointer userdata)
 
 	sqlite3_exec 
 		(ca_db, 
-		 "SELECT id, subject, private_key_in_db, pem FROM cert_requests ORDER BY id",
+		 "SELECT id, subject, private_key_in_db, pem, parent_ca FROM cert_requests ORDER BY id",
 		 func, userdata, &error_str);
 
 	return  (! error_str);

@@ -20,9 +20,8 @@
 #ifndef _NEW_CERT_WINDOW_H_
 #define _NEW_CERT_WINDOW_H_
 
-void new_cert_window_display (char * csr_pem);
+void new_cert_window_display (const gchar * csr_pem, const gchar * csr_parent_id);
 void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointer userdata);
-void new_cert_window_display(gchar *csr_pem);
 void new_cert_tab_activate (int tab_number);
 void on_new_cert_next2_clicked (GtkButton *button,
                                 gpointer user_data); 

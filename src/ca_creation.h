@@ -47,7 +47,8 @@ typedef struct {
 
 	/* However, the password is needed */
 	gchar * password; 
-	
+
+        gchar * parent_ca_id_str;
 } CaCreationData;
 
 typedef struct {

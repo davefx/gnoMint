@@ -200,7 +200,7 @@ void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointe
                 gtk_widget_set_sensitive (glade_xml_get_widget (new_cert_window_xml, "new_cert_next2"), TRUE);
 }
 
-void new_cert_window_display(gchar *csr_pem)
+void new_cert_window_display(const gchar *csr_pem, const gchar *csr_parent_id)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget;
@@ -242,6 +242,13 @@ void new_cert_window_display(gchar *csr_pem)
 	
         widget = glade_xml_get_widget (new_cert_window_xml, "signing_ca_treeview");
         __new_cert_populate_ca_treeview (GTK_TREE_VIEW(widget));
+
+        if (csr_parent_id) {
+                GtkTreeIter iter; 
+                GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(widget)); 
+
+        /*         gtk_tree_model_foreach (model, __new_cert_window_find_ca, csr_parent_id); */
+        }
 
 }
 
