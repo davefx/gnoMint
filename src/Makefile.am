@@ -6,11 +6,14 @@ INCLUDES = \
 	-I$(top_srcdir) \
 	-I$(top_builddir) \
 	$(GNOMINT_CFLAGS) \
+	$(LIBGNUTLS_CFLAGS) \
+	$(SQLITE_CFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DPACKAGE_COPYRIGHT=\""$(PACKAGE_COPYRIGHT)"\" \
 	-DPACKAGE_WEBSITE=\""$(PACKAGE_WEBSITE)"\" \
-	-DHAVE_CONFIG_H  -DCOMPILATION_DATE=`date +%s` -g -Wall -Werror
+	-DCOMPILATION_DATE=`date +%s` \
+	-DHAVE_CONFIG_H
 
 gnomint_SOURCES = \
 	main.c \
@@ -36,7 +39,10 @@ gnomint_SOURCES = \
 # 	$(GNOMINT_LIBS)
 
 gnomint_LDADD = \
-	$(GNOMINT_LIBS)
+	$(GNOMINT_LIBS) \
+	$(LIBGNUTLS_LIBS) \
+	$(SQLITE_LIBS) \
+	$(LTLIBINTL)
 
 gnomint_LDFLAGS = \
 	-export-dynamic

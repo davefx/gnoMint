@@ -16,7 +16,7 @@ AC_SUBST(PACKAGE_VERSION)
 AC_SUBST(PACKAGE_COPYRIGHT)
 AC_SUBST(PACKAGE_WEBSITE)
 
-AM_INIT_AUTOMAKE($PACKAGE_NAME, $PACKAGE_VERSION)
+AM_INIT_AUTOMAKE([1.9 foreign])
 
 AC_CONFIG_MACRO_DIR([m4])
 dnl Put the ACLOCAL flags in the Makefile
@@ -25,33 +25,64 @@ AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \${ACLOCAL_FLAGS}"])
 dnl Initialize maintainer mode
 AM_MAINTAINER_MODE
 
-AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "gnomint")
-
 # Check for programs
 AC_ISC_POSIX
 AC_PROG_CC
-AC_STDC_HEADERS
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
 AC_DISABLE_STATIC
 AM_PROG_LIBTOOL
+AM_PROG_CC_C_O
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([libintl.h locale.h stdlib.h string.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+AC_STRUCT_TM
+AC_C_VOLATILE
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_FUNC_MKTIME
+AC_FUNC_STRFTIME
+AC_CHECK_FUNCS([memset strcasecmp strdup])
+
+# gettext stuff
+GETTEXT_PACKAGE=gnomint
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE")
+AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "gnomint")
+ALL_LINGUAS="cs es fr"
+AM_GLIB_GNU_GETTEXT
 AC_PROG_INTLTOOL([0.23])
 
-dnl #######################
-dnl # Check for libssl
-dnl ########################
-AC_MSG_CHECKING(for gnuTLS development files)
-echo " "
-AC_CHECK_HEADER(gnutls/gnutls.h, , AC_MSG_ERROR(*** cannot find gnutls.h header); exit)
-AC_CHECK_LIB(gnutls, gnutls_x509_privkey_sign_hash, , AC_MSG_ERROR(*** Cannot find gnuTLS library >= version 2.0 ); exit)
+# Set PACKAGE_LOCALE_DIR.
+gnomintlocaledir='${prefix:-${ac_default_prefix}}/${DATADIRNAME}/locale'
+AC_SUBST(gnomintlocaledir)
 
+# required versions
+GNUTLS_REQUIRED=2.0
+SQLITE_REQUIRED=3.0
+GLIB_REQUIRED=2.6.0
+GCONF_REQUIRED=2.0
+GTK_REQUIRED=2.10.0
+LIBGNOMEUI_REQUIRED=2.0
+LIBGLADE_REQUIRED=2.5.0
 
-dnl #######################
-dnl # Check for libsqlite
-dnl ########################
-AC_MSG_CHECKING(for LibSQLite3 development files)
-echo " "
-AC_CHECK_HEADER(sqlite3.h, , AC_MSG_ERROR(*** cannot find sqlite3.h header); exit)
-AC_CHECK_LIB(sqlite3, sqlite3_open, , AC_MSG_ERROR(*** Cannot find sqlite library); exit)
+# check for gnutls
+AM_PATH_LIBGNUTLS([$GNUTLS_REQUIRED])
+AC_SUBST(LIBGNUTLS_CFLAGS)
+AC_SUBST(LIBGNUTLS_LIBS)
 
+# check for sqlite
+PKG_CHECK_MODULES(SQLITE, sqlite3 >= $SQLITE_REQUIRED)
+AC_SUBST(SQLITE_CFLAGS)
+AC_SUBST(SQLITE_LIBS)
 
 dnl 
 dnl gtk-doc
@@ -96,26 +127,14 @@ fi
 
 AM_CONDITIONAL(HAVE_SCROLLKEEPER, test x$SCROLLKEEPER_CONFIG != xno)
 
-
-dnl ================================================================
-dnl Gettext stuff.
-dnl ================================================================
-GETTEXT_PACKAGE=gnomint
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE")
-ALL_LINGUAS="cs es fr"
-AM_GLIB_GNU_GETTEXT
-
-dnl Set PACKAGE_LOCALE_DIR.
-gnomintlocaledir='${prefix:-${ac_default_prefix}}/${DATADIRNAME}/locale'
-AC_SUBST(gnomintlocaledir)
-
 PKG_CHECK_MODULES(GNOMINT, 
-	gconf-2.0 \
-        gtk+-2.0 >= 2.10.0 \
+	glib-2.0 >= $GLIB_REQUIRED \
+	gconf-2.0 >= $GCONF_REQUIRED \
+	gtk+-2.0 >= $GTK_REQUIRED \
 	gdk-pixbuf-2.0 \
-        libgnomeui-2.0 >= 2.0 \
-        libglade-2.0 >= 2.5.0 )
+	libgnomeui-2.0 >= $LIBGNOMEUI_REQUIRED \
+	libglade-2.0 >= $LIBGLADE_REQUIRED
+)
 AC_SUBST(GNOMINT_CFLAGS)
 AC_SUBST(GNOMINT_LIBS)
 
@@ -152,19 +171,6 @@ AM_GCONF_SOURCE_2
 
 
 dnl
-dnl where to install various files
-dnl
-dnl just for info:
-dnl $datadir will be $prefix/share
-dnl $pkgdatadir will be $datadir/gnomint
-
-GNOMINT_Pixmapdir=${datadir}/pixmaps/${PACKAGE}
-AC_SUBST(GNOMINT_Pixmapdir)
-GNOMINT_Appdir=${datadir}/gnome/applications
-AC_SUBST(GNOMINT_Appdir)
-GNOMINT_Helpdir=${datadir}/gnome/help/${PACKAGE}
-AC_SUBST(GNOMINT_Helpdir)
-
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
@@ -183,11 +189,16 @@ gnomint.spec
 dnl
 dnl Print a little note
 dnl
-echo ""
-echo "* Install directories:"
-echo "   - Help is in " $GNOMINT_Helpdir
-echo "   - Pixmaps are in " $GNOMINT_Pixmapdir
-echo "   - .desktop entry is in " $GNOMINT_Appdir
-echo "* Compiler flags: " $CFLAGS
-echo "* Type make to build gnomint in" $prefix
-echo ""
+echo "
+
+Configure summary:
+
+	Source code location .......: ${srcdir}
+	Compiler ...................: ${CC}
+	Compiler flags .............: ${CFLAGS}
+	Installing into prefix .....: ${prefix}
+	ALL_LINGUAS ................: ${ALL_LINGUAS}
+
+Type make to build ${PACKAGE_STRING}
+
+"
