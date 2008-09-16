@@ -298,22 +298,138 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "crl_signing_check1"))
 		property_name = "CRL_SIGN";
 		
-	if (! strcmp(glade_get_widget_name (button), "non_repudiation_check2"))
+	if (! strcmp(glade_get_widget_name (button), "non_repudiation_check2")) {
+                if (! is_active) {
+                        // TIME_STAMPING cannot be inactive
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                              "time_stamping_check2")), FALSE);
+                        // We must check if EMAIL_PROTECTION can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
+                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                                // If none is active, we must deactivate EMAIL_PROTECTION
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml,
+                                                                                                      "email_protection_check2")), FALSE);
+                        }
+
+                        // We must check if OCSP_SIGNING can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
+                                // If is not active, we must deactivate OCSP_SIGNING
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml,
+                                                                                                      "ocsp_signing_check2")), FALSE);
+                        }
+                        
+                }
 		property_name = "NON_REPUDIATION";
+        }
 		
-	if (! strcmp(glade_get_widget_name (button), "digital_signature_check4"))
+	if (! strcmp(glade_get_widget_name (button), "digital_signature_check4")) {
+                if (! is_active) {
+                        // We must check if TLS_WEB_SERVER can be active
+                        if (! ca_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
+                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                                // If none is active, we must deactivate TLS_WEB_SERVER
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "webserver_check2")), FALSE);
+                        }
+
+                        // We must check if TLS_WEB_CLIENT can be active
+                        if (! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                                // If none is active, we must deactivate TLS_WEB_CLIENT
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "webclient_check2")), FALSE);
+                        }
+
+                        // TIME_STAMPING and CODE_SIGNING cannot be active if digital signature is deactivated
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(certificate_properties_window_xml,
+                                                                                             "time_stamping_check2")), FALSE);
+
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(certificate_properties_window_xml,
+                                                                                             "code_signing_check2")), FALSE);
+
+                        // We must check if EMAIL_PROTECTION can be active
+                        if (! ca_policy_get (cert_id, "NON_REPUDIATION") &&
+                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
+                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                                // If none is active, we must deactivate EMAIL_PROTECTION
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "email_protection_check2")), FALSE);
+                        }
+
+                        // We must check if OCSP_SIGNING can be active
+                        if (! ca_policy_get (cert_id, "NON_REPUDIATION")) {
+                                // If none is active, we must deactivate OCSP_SIGNING
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "ocsp_signing_check2")), FALSE);
+                        }
+
+
+                }
 		property_name = "DIGITAL_SIGNATURE";
+        }
 		
-	if (! strcmp(glade_get_widget_name (button), "key_encipherment_check2"))
-		property_name = "KEY_ENCIPHERMENT";
-		
-	if (! strcmp(glade_get_widget_name (button), "key_agreement_check2"))
+	if (! strcmp(glade_get_widget_name (button), "key_encipherment_check2")) {
+                if (! is_active) {
+                        // We must check if TLS_WEB_SERVER can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                                // If none is active, we must deactivate TLS_WEB_SERVER
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "webserver_check2")), FALSE);
+                        }
+
+                        // We must check if EMAIL_PROTECTION can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_policy_get (cert_id, "NON_REPUDIATION") &&
+                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                                // If none is active, we must deactivate EMAIL_PROTECTION
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "email_protection_check2")), FALSE);
+                        }
+
+
+                }
+		property_name = "KEY_ENCIPHERMENT";		
+        }
+
+	if (! strcmp(glade_get_widget_name (button), "key_agreement_check2")) {
+                if (! is_active) {
+                        // We must check if TLS_WEB_SERVER can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
+                                // If none is active, we must deactivate TLS_WEB_SERVER
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "webserver_check2")), FALSE);
+                        }
+                        // We must check if TLS_WEB_CLIENT can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
+                                // If none is active, we must deactivate TLS_WEB_CLIENT
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "webclient_check2")), FALSE);
+                        }
+
+                        // We must check if EMAIL_PROTECTION can be active
+                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_policy_get (cert_id, "NON_REPUDIATION") &&
+                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
+                                // If none is active, we must deactivate EMAIL_PROTECTION
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                                                                                      "email_protection_check2")), FALSE);
+                        }
+                }
+
 		property_name = "KEY_AGREEMENT";
+        }
+
 		
 	if (! strcmp(glade_get_widget_name (button), "data_encipherment_check2"))
 		property_name = "DATA_ENCIPHERMENT";
 
 
+
+
+
+        // Purposes
 
 
 	if (! strcmp(glade_get_widget_name (button), "webserver_check2")) {
@@ -397,7 +513,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                         // We must check digitalSignature || nonRepudiation
                         if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
                                ca_policy_get (cert_id, "NON_REPUDIATION"))) {
-                                // If none is active, we activate them both
+                                // If none is active, we activate digital signature
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "digital_signature_check4")), TRUE);
                         }
