@@ -34,6 +34,9 @@ void on_new_cert_previous3_clicked (GtkButton *widget,
                                     gpointer user_data);
 void on_new_cert_cancel_clicked (GtkButton *widget,
                                  gpointer user_data);
+void on_new_cert_property_toggled (GtkWidget *toggle, 
+                                   gpointer user_data);
 void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data);
+
 #endif
