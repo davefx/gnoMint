@@ -1511,8 +1511,6 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 		
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
 
-        fprintf (stderr, "parent_id: %s\n", csr_parent_id);
-
 	new_cert_window_display (csr_pem, csr_parent_id);
 	
 	g_free (csr_pem);

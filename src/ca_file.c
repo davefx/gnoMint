@@ -1122,7 +1122,7 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 		return error;
 
 	if (pem_csr_private_key)
-		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 1, '%q','%q', %q);", 
+		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 1, '%q','%q', %s);", 
 				       creation_data->cn,
 				       pem_csr,
 				       pem_csr_private_key,
@@ -1130,7 +1130,7 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
                                        (creation_data->parent_ca_id_str ? creation_data->parent_ca_id_str : "NULL")
                         );
 	else
-		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 0, NULL, '%q', %q);", 
+		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 0, NULL, '%q', %s);", 
 				       creation_data->cn,
 				       pem_csr,
 				       tlscsr->dn,
@@ -1141,6 +1141,7 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 	tlscsr = NULL;
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                fprintf (stderr, "%s: %s\n", sql, error);
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 		
 		return error;

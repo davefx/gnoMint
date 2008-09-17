@@ -61,8 +61,15 @@ typedef struct {
         GtkTreeIter * last_ca_iter;
 } __NewCertWindowRefreshModelAddCaUserData;
 
+typedef struct {
+        gboolean found;
+        GtkTreeIter * iter;
+        const gchar *ca_id;        
+} __NewCertWindowFindCaUserData;
+
 int __new_cert_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
 void __new_cert_populate_ca_treeview (GtkTreeView *treeview);
+gboolean __new_cert_window_find_ca (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
 
 
 
@@ -131,7 +138,7 @@ int __new_cert_window_refresh_model_add_ca (void *pArg, int argc, char **argv, c
 	gtk_tree_store_append (new_model, &iter, pdata->last_parent_iter);
 	
 	gtk_tree_store_set (new_model, &iter,
-			    0, atoi(argv[NEW_CERT_CA_MODEL_COLUMN_ID]), 
+			    0, atoll(argv[NEW_CERT_CA_MODEL_COLUMN_ID]), 
 			    1, atoll(argv[NEW_CERT_CA_MODEL_COLUMN_SERIAL]),
 			    2, argv[NEW_CERT_CA_MODEL_COLUMN_SUBJECT],
 			    3, argv[NEW_CERT_CA_MODEL_COLUMN_DN],
@@ -158,7 +165,7 @@ void __new_cert_populate_ca_treeview (GtkTreeView *treeview)
 
 	guint column_number;
 
-	new_cert_ca_list_model = gtk_tree_store_new (NEW_CERT_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT, G_TYPE_UINT64, G_TYPE_STRING,
+	new_cert_ca_list_model = gtk_tree_store_new (NEW_CERT_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_STRING,
 						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
         pdata.new_model = new_cert_ca_list_model;
@@ -199,6 +206,24 @@ void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointe
         else
                 gtk_widget_set_sensitive (glade_xml_get_widget (new_cert_window_xml, "new_cert_next2"), TRUE);
 }
+
+gboolean __new_cert_window_find_ca (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
+{
+        __NewCertWindowFindCaUserData *userdata = (__NewCertWindowFindCaUserData *) data;
+        
+        guint64 ca_id;
+
+        gtk_tree_model_get (model, iter, NEW_CERT_CA_MODEL_COLUMN_ID, &ca_id, -1);
+
+        if (ca_id == atoll(userdata->ca_id)) {
+                userdata->found = TRUE;
+                *(userdata->iter) = (*iter);
+                return TRUE;
+        }
+        
+        return FALSE;
+}
+
 
 void new_cert_window_display(const gchar *csr_pem, const gchar *csr_parent_id)
 {
@@ -246,8 +271,20 @@ void new_cert_window_display(const gchar *csr_pem, const gchar *csr_parent_id)
         if (csr_parent_id) {
                 GtkTreeIter iter; 
                 GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(widget)); 
+                __NewCertWindowFindCaUserData *userdata = g_new0 (__NewCertWindowFindCaUserData, 1);
 
-        /*         gtk_tree_model_foreach (model, __new_cert_window_find_ca, csr_parent_id); */
+                userdata->iter = &iter;
+                userdata->ca_id = csr_parent_id;
+
+                gtk_tree_model_foreach (model, __new_cert_window_find_ca, userdata);
+                
+                if (userdata->found) {
+                        GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(widget));
+                        gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+                        gtk_tree_selection_select_iter (selection, &iter);
+                }
+
+                g_free (userdata);
         }
 
 }
@@ -275,14 +312,14 @@ void on_new_cert_next2_clicked (GtkButton *button,
 	GtkTreeIter iter;
 	GtkWidget * widget;
 	guint i_value;
-	guint ca_id;
+	guint64 ca_id;
         const gchar *ca_pem;
         TlsCert *tls_ca_cert = NULL;
         TlsCsr * tls_csr = g_object_get_data (G_OBJECT(glade_xml_get_widget(new_cert_window_xml, "new_cert_window")), "csr_info");
 
         gtk_tree_selection_get_selected (selection, &model, &iter);
         gtk_tree_model_get_value (model, &iter, NEW_CERT_CA_MODEL_COLUMN_ID, value);
-        ca_id = g_value_get_uint(value);
+        ca_id = g_value_get_uint64(value);
         
         g_value_unset (value);
 
@@ -668,7 +705,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
         gtk_tree_selection_get_selected (selection, &model, &iter);
         gtk_tree_model_get_value (model, &iter, NEW_CERT_CA_MODEL_COLUMN_ID, value);
-        ca_id = g_value_get_uint(value);
+        ca_id = g_value_get_uint64(value);
 
 	cert_creation_data = g_new0 (CertCreationData, 1);
 		
