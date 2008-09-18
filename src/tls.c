@@ -632,6 +632,10 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 	gnutls_x509_crt_t ca_crt;
 	gnutls_x509_privkey_t ca_pkey;
 	guchar * serialstr = NULL;
+        guchar * keyid = NULL;
+        guchar * ca_keyid = NULL;
+        size_t keyidsize = 0;
+        size_t ca_keyidsize = 0;
 	size_t serialsize = 0;
 
 	gint key_usage;
@@ -735,6 +739,21 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 						      0, ca_cert_data->cn, strlen(ca_cert_data->cn));	
 
 	
+        ca_keyid = g_new0 (guchar,1);	
+        gnutls_x509_crt_get_key_id(ca_crt, 0, ca_keyid, &ca_keyidsize);
+        g_free (ca_keyid);
+        
+        ca_keyid = g_new0 (guchar,ca_keyidsize);
+        gnutls_x509_crt_get_key_id(ca_crt, 0, ca_keyid, &ca_keyidsize);
+        if (gnutls_x509_crt_set_authority_key_id(crt, ca_keyid, ca_keyidsize) !=0) {
+                gnutls_x509_crq_deinit (csr);
+                gnutls_x509_crt_deinit (crt);
+                gnutls_x509_crt_deinit (ca_crt);
+                gnutls_x509_privkey_deinit (ca_pkey);
+                return g_strdup_printf(_("Error when setting authority key identifier extension"));
+        }
+
+
 	if (gnutls_x509_crt_set_ca_status (crt, creation_data->ca) != 0) {
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (crt);
@@ -743,6 +762,23 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 		return g_strdup_printf(_("Error when setting basicConstraint extension"));
 	}
 	
+
+        if (creation_data->ca) {
+                keyid = g_new0 (guchar,1);	
+                gnutls_x509_crt_get_key_id(crt, 0, keyid, &keyidsize);
+                g_free (keyid);
+                
+                keyid = g_new0 (guchar,keyidsize);
+                gnutls_x509_crt_get_key_id(crt, 0, keyid, &keyidsize);
+                if (gnutls_x509_crt_set_subject_key_id(crt, keyid, keyidsize) !=0) {
+                        gnutls_x509_crq_deinit (csr);
+                        gnutls_x509_crt_deinit (crt);
+                        gnutls_x509_crt_deinit (ca_crt);
+                        gnutls_x509_privkey_deinit (ca_pkey);
+                        return g_strdup_printf(_("Error when setting subject key identifier extension"));
+                }
+        }       
+        
 	key_usage = 0;
 	if (creation_data->ca)
 		key_usage |= GNUTLS_KEY_KEY_CERT_SIGN;
