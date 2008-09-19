@@ -770,7 +770,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	csr_pem = ca_get_selected_row_pem ();
 	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
-	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 					      
 	if (pem && crypted_pkey && dn) {
 		
