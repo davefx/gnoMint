@@ -329,23 +329,33 @@ void on_new_cert_next2_clicked (GtkButton *button,
         g_free (value);
 	
         /* Check for differences in fields that must be equal according to the CA policy */
-        if (ca_policy_get (ca_id, "C_FORCE_SAME") && strcmp(tls_ca_cert->c, tls_csr->c)) {
+        if (ca_policy_get (ca_id, "C_FORCE_SAME") && 
+            (tls_ca_cert->c != tls_csr->c) && // If they are the same, they both are NULL, so it is OK
+            (tls_ca_cert->c == NULL || tls_csr->c == NULL || strcmp(tls_ca_cert->c, tls_csr->c))) {
                 ca_error_dialog (_("The policy of this CA obligue the country field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_policy_get (ca_id, "ST_FORCE_SAME") && strcmp(tls_ca_cert->st, tls_csr->st)) {
+        if (ca_policy_get (ca_id, "ST_FORCE_SAME") && 
+            (tls_ca_cert->st != tls_csr->st) && // If they are the same, they both are NULL, so it is OK
+            (tls_ca_cert->st == NULL || tls_csr->st == NULL || strcmp(tls_ca_cert->st, tls_csr->st))) {
                 ca_error_dialog (_("The policy of this CA obligue the state/province field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_policy_get (ca_id, "L_FORCE_SAME") && strcmp(tls_ca_cert->l, tls_csr->l)) {
+        if (ca_policy_get (ca_id, "L_FORCE_SAME") && 
+            (tls_ca_cert->l != tls_csr->l) && // If they are the same, they both are NULL, so it is OK
+            (tls_ca_cert->l == NULL || tls_csr->st == NULL || strcmp(tls_ca_cert->l, tls_csr->l))) {
                 ca_error_dialog (_("The policy of this CA obligue the locality/city field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_policy_get (ca_id, "O_FORCE_SAME") && strcmp(tls_ca_cert->o, tls_csr->o)) {
+        if (ca_policy_get (ca_id, "O_FORCE_SAME") && 
+            (tls_ca_cert->o != tls_csr->o) && // If they are the same, they both are NULL, so it is OK
+            (tls_ca_cert->o == NULL || tls_csr->o == NULL || strcmp(tls_ca_cert->o, tls_csr->o))) {
                 ca_error_dialog (_("The policy of this CA obligue the organization field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_policy_get (ca_id, "OU_FORCE_SAME") && strcmp(tls_ca_cert->ou, tls_csr->ou)) {
+        if (ca_policy_get (ca_id, "OU_FORCE_SAME") && 
+            (tls_ca_cert->ou != tls_csr->ou) && // If they are the same, they both are NULL, so it is OK
+            (tls_ca_cert->ou == NULL || tls_csr->ou == NULL || strcmp(tls_ca_cert->ou, tls_csr->ou))) {
                 ca_error_dialog (_("The policy of this CA obligue the organizational unit field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
@@ -776,6 +786,8 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 		}
 
 		error = tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
+                if (error)
+                        ca_error_dialog (error);
 
 		g_free (pkey_pem);
                 if (! error) {
