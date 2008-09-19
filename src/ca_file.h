@@ -45,13 +45,18 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id);
 
 gchar * ca_file_insert_self_signed_ca (CaCreationData * creation_data, 
                                        gchar *pem_ca_private_key,
-                                       gchar *pem_ca_certificate);
+                                       gchar *pem_ca_certificate);                                      
 
 gchar * ca_file_insert_cert (CertCreationData * creation_data,
                              gboolean is_ca,
                              gboolean private_key_in_db,
 			     gchar *pem_private_key_info,
 			     gchar *pem_certificate);
+
+gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
+                                      gboolean is_ca,
+                                      const UInt160 serial,
+                                      const gchar *pem_certificate);
 
 gchar * ca_file_insert_csr (CaCreationData * creation_data,
 			    gchar *pem_private_key,

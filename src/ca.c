@@ -22,12 +22,10 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <libintl.h>
+#include <glib/gi18n.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
 
 #include "ca.h"
 #include "ca_policy.h"
@@ -41,6 +39,7 @@
 #include "new_cert_window.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
+#include "import.h"
 
 extern GladeXML * main_window_xml;
 extern GladeXML * cert_popup_menu_xml;
@@ -1562,111 +1561,34 @@ gchar * ca_get_selected_row_pem ()
 
 gboolean ca_import (gchar *filename) 
 {	
+        gboolean successful_import = FALSE;
+
 	// We start to check each type of file, in PEM and DER
 	// formats, for see if some of them matches with the actual file
 
-	gboolean successful_import = FALSE;
-
 	// Certificate request
-	gnutls_x509_crq_t crq;
-	gnutls_datum_t file_datum;
+        successful_import = import_csr (filename);
 
-	gchar *aux = NULL;
-
-	GError *error = NULL;
-	
-	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
-	
-	if (error) {
-		ca_error_dialog (_(error->message));
-		return FALSE;
-	}
-
-	file_datum.size = g_mapped_file_get_length (mapped_file);
-	file_datum.data = g_new0 (guchar, file_datum.size);
-	memcpy (file_datum.data, g_mapped_file_get_contents (mapped_file), file_datum.size);
-	
-	g_mapped_file_free (mapped_file);
-
-	// Trying to import a Certificate Signing Request in PEM format
-
-	if (gnutls_x509_crq_init (&crq) < 0)
-		return FALSE;
-
-	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_PEM) == 0) {
-		CaCreationData * creation_data = g_new0(CaCreationData, 1);
-		gchar * pem_csr=NULL;
-		size_t size;
-		gchar * error_msg;
-
-		size = 0;
-		gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-		if (size) {
-			aux = g_new0(gchar, size);
-			gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-			creation_data->cn = strdup (aux);
-			g_free (aux);
-			aux = NULL;
-		}	        
-
-		pem_csr = (gchar *) file_datum.data; 
-		
-		error_msg = ca_file_insert_csr (creation_data, NULL, pem_csr);
-
-		
-		if (error_msg) {
-			gchar *message = g_strdup_printf (_("Couldn't import the certificate request. \n"
-							    "The database returned this error: \n\n'%s'"),
-							  error_msg);
-			ca_error_dialog (message);
-			g_free (message);
-		}
-		successful_import = TRUE;
-		
-	}
-
-	// Trying to import a Certificate Signing Request in DER format
-
-	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
-		CaCreationData * creation_data = g_new0(CaCreationData, 1);
-		gchar * pem_csr=NULL;
-		size_t size;
-
-		size = 0;
-		gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-		if (size) {
-			aux = g_new0(gchar, size);
-			gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-			creation_data->cn = strdup (aux);
-			g_free (aux);
-			aux = NULL;
-		}	        
-
-		size = 0;
-		gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, pem_csr, &size)  ; 
-		if (size) {
-			pem_csr = g_new0(gchar, size);
-			gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, pem_csr, &size);
-			
-		}
-
-		ca_file_insert_csr (creation_data, NULL, pem_csr);
-
-		successful_import = TRUE;
-	}
-
-	// Certificate list
-
-	// Single certificate
+	// Certificate list (or single certificate)
+        if (! successful_import)
+                successful_import = import_certlist (filename);
 
 	// Private key without password
+        if (! successful_import)
+                successful_import = import_pkey_wo_passwd (filename);
 
 	// Certificate revocation list
+        if (! successful_import)
+                successful_import = import_crl (filename);
 	
 	// PKCS7 structure
-	
-	g_free (file_datum.data);
+        if (! successful_import)
+                successful_import = import_pkcs7 (filename);
 
+	// PKCS12 structure
+        if (! successful_import)
+                successful_import = import_pkcs12 (filename);
+	
 
 	if (successful_import) {
 		ca_refresh_model();

@@ -985,14 +985,15 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	parent_idstr = __ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn);
 	if (parent_idstr == NULL) {
-		parent_id = 0;
-		parent_route = g_strdup(":");
+                error = _("Cannot find parent CA in database");
+                return error;
 	} else {
 		parent_id = atoll (parent_idstr[0]);
                 parent_route = g_strdup_printf("%s%s:",parent_idstr[1], parent_idstr[0]);
 		g_strfreev (parent_idstr);
 	}
 
+        uint160_assign (&serial, 0);
 	ca_file_get_next_serial (&serial, parent_id);
 
         serialstr = uint160_strdup_printf(&serial);
@@ -1104,6 +1105,152 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
+
+	return NULL;
+
+}
+
+gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data, 
+                                      gboolean is_ca,
+                                      const UInt160 serial,
+                                      const gchar *pem_certificate)
+{
+	/* gchar *sql = NULL; */
+	/* gchar *error = NULL; */
+	/* gchar **row;         */
+        /* gchar *serialstr; */
+        /* gsize size; */
+	/* gint64 cert_rowid; */
+	/* guint64 cert_id; */
+
+	/* gchar **parent_idstr = NULL; */
+	/* guint64 parent_id; */
+        /* gchar *parent_route = NULL; */
+
+	/* TlsCert *tlscert = tls_parse_cert_pem (pem_certificate); */
+
+	/* if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) */
+	/* 	return error; */
+
+	/* parent_idstr = __ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn); */
+	/* if (parent_idstr == NULL) { */
+	/* 	parent_id = 0; */
+	/* 	parent_route = g_strdup(":"); */
+	/* } else { */
+	/* 	parent_id = atoll (parent_idstr[0]); */
+        /*         parent_route = g_strdup_printf("%s%s:",parent_idstr[1], parent_idstr[0]); */
+	/* 	g_strfreev (parent_idstr); */
+	/* } */
+
+        /* serialstr = uint160_strdup_printf(&serial); */
+
+	/* if (private_key_info) */
+	/* 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, " */
+        /*                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) " */
+        /*                                "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', " */
+	/* 			       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');",  */
+        /*                                is_ca, */
+	/* 			       serialstr, */
+	/* 			       tlscert->cn, */
+	/* 			       creation_data->activation, */
+	/* 			       creation_data->expiration, */
+	/* 			       pem_certificate, */
+        /*                                private_key_in_db, */
+	/* 			       private_key_info, */
+	/* 			       tlscert->dn, */
+	/* 			       tlscert->i_dn, */
+	/* 			       parent_id, */
+        /*                                parent_route); */
+	/* else */
+	/* 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, " */
+        /*                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) " */
+        /*                                "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q'," */
+	/* 			       "%"G_GUINT64_FORMAT", '%q');",  */
+        /*                                is_ca, */
+	/* 			       serialstr, */
+	/* 			       tlscert->cn, */
+	/* 			       creation_data->activation, */
+	/* 			       creation_data->expiration, */
+	/* 			       pem_certificate, */
+	/* 			       tlscert->dn, */
+	/* 			       tlscert->i_dn, */
+	/* 			       parent_id, */
+        /*                                parent_route); */
+
+        /* g_free (serialstr); */
+	/* tls_cert_free (tlscert); */
+	/* tlscert = NULL; */
+
+	/* g_free (parent_route); */
+
+	/* if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
+	/* 	sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
+	/* 	fprintf (stderr, "%s\n", sql); */
+	/* 	sqlite3_free (sql); */
+	/* 	return error; */
+	/* } */
+
+	/* sqlite3_free (sql); */
+
+	/* cert_rowid = sqlite3_last_insert_rowid (ca_db); */
+	/* row = __ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;", */
+	/* 			      cert_rowid); */
+	/* cert_id = atoll (row[0]); */
+	/* g_strfreev (row); */
+
+        /* size = 0; */
+        /* uint160_write_escaped (&serial, NULL, &size); */
+        /* serialstr = g_new0(gchar, size+1); */
+        /* uint160_write_escaped (&serial, serialstr, &size); */
+	/* sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";",  */
+	/* 		       serialstr, parent_id); */
+	/* if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
+	/* 	sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
+	/* 	fprintf (stderr, "%s\n", sql); */
+	/* 	sqlite3_free (sql); */
+	/* 	return error; */
+	/* } */
+        /* g_free (serialstr); */
+	/* sqlite3_free (sql); */
+
+	/* if (is_ca) { */
+        /*         size = 0; */
+        /*         uint160_assign (&serial, 0); */
+        /*         uint160_write_escaped (&serial, NULL, &size); */
+        /*         serialstr = g_new0(gchar, size+1); */
+        /*         uint160_write_escaped (&serial, serialstr, &size);                 */
+	/* 	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) " */
+	/* 			       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');", */
+	/* 			       cert_id, serialstr); */
+	/* 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
+	/* 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
+	/* 		fprintf (stderr, "%s\n", sql); */
+	/* 		sqlite3_free (sql); */
+	/* 		return error; */
+	/* 	} */
+	/* 	sqlite3_free (sql); */
+        /*         g_free (serialstr); */
+
+	/* 	if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) ||  */
+	/* 	    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)|| */
+	/* 	    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)|| */
+	/* 	    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) || */
+	/* 	    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1) || */
+	/* 	    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1) || */
+	/* 	    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1) || */
+	/* 	    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1) || */
+	/* 	    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1)) { */
+	/* 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
+	/* 		sqlite3_free (sql); */
+	/* 		return g_strdup ("Error while establishing policies."); */
+	/* 	} */
+
+
+	/* } */
+	
+
+	/* if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error)) */
+	/* 	return error; */
 
 	return NULL;
 

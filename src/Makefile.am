@@ -33,7 +33,8 @@ gnomint_SOURCES = \
 	preferences-gui.c \
 	preferences-window.c \
 	crl.c \
-	uint160.c
+	uint160.c \
+	import.c
 
 # testuint160_LDADD = \
 # 	$(GNOMINT_LIBS)
@@ -71,5 +72,6 @@ EXTRA_DIST = \
 	preferences-gui.h \
 	preferences-window.h \
 	crl.h \
-	uint160.h
+	uint160.h \
+	import.h
 
