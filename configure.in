@@ -1,20 +1,11 @@
 AC_PREREQ(2.52)
 
-AC_INIT(gnomint, 0.5.3)
+AC_INIT(gnoMint, [0.5.3], [<davefx@gmail.com>], gnomint)
 
-PACKAGE="gnoMint"
-PACKAGE_BUGREPORT="<davefx@gmail.com>"
-PACKAGE_NAME="gnomint"
-PACKAGE_VERSION="0.5.3"
 PACKAGE_COPYRIGHT="(c) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
-
-AC_SUBST(PACKAGE)
-AC_SUBST(PACKAGE_BUGREPORT)
-AC_SUBST(PACKAGE_NAME)
-AC_SUBST(PACKAGE_VERSION)
-AC_SUBST(PACKAGE_COPYRIGHT)
-AC_SUBST(PACKAGE_WEBSITE)
+AC_DEFINE_UNQUOTED(PACKAGE_COPYRIGHT, "$PACKAGE_COPYRIGHT")
+AC_DEFINE_UNQUOTED(PACKAGE_WEBSITE, "$PACKAGE_WEBSITE")
 
 AM_INIT_AUTOMAKE([1.9 foreign])
 
@@ -53,17 +44,14 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([memset strcasecmp strdup])
 
 # gettext stuff
-GETTEXT_PACKAGE=gnomint
+GETTEXT_PACKAGE=${PACKAGE}
 AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE")
-AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "gnomint")
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
+AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "$GETTEXT_PACKAGE")
 ALL_LINGUAS="cs es fr"
 AM_GLIB_GNU_GETTEXT
+AM_GLIB_DEFINE_LOCALEDIR(PACKAGE_LOCALE_DIR)
 AC_PROG_INTLTOOL([0.23])
-
-# Set PACKAGE_LOCALE_DIR.
-gnomintlocaledir='${prefix:-${ac_default_prefix}}/${DATADIRNAME}/locale'
-AC_SUBST(gnomintlocaledir)
 
 # required versions
 GNUTLS_REQUIRED=2.0
@@ -73,6 +61,7 @@ GCONF_REQUIRED=2.0
 GTK_REQUIRED=2.10.0
 LIBGNOMEUI_REQUIRED=2.0
 LIBGLADE_REQUIRED=2.5.0
+ISO_CODES_REQUIRED=0.35
 
 # check for gnutls
 AM_PATH_LIBGNUTLS([$GNUTLS_REQUIRED])
@@ -83,49 +72,6 @@ AC_SUBST(LIBGNUTLS_LIBS)
 PKG_CHECK_MODULES(SQLITE, sqlite3 >= $SQLITE_REQUIRED)
 AC_SUBST(SQLITE_CFLAGS)
 AC_SUBST(SQLITE_LIBS)
-
-dnl 
-dnl gtk-doc
-dnl 
-AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test -n "$LIBTOOL")
-AC_CHECK_PROG(GTKDOC, gtkdoc-mkdb, true, false)
-AM_CONDITIONAL(HAVE_GTK_DOC, $GTKDOC)
-AC_SUBST(HAVE_GTK_DOC)
-                                                                                                                     
-dnl AC_ARG_ENABLE(gtk-doc, [  --enable-gtk-doc        Use gtk-doc to build documentation [default=auto]], enable_gtk_doc="$enableval", enable_gtk_doc=auto)
-                                                                                                                     
-dnl if test x$enable_gtk_doc = xauto ; then
-dnl    if test x$GTKDOC = xtrue ; then
-dnl       enable_gtk_doc=yes
-dnl    else
-dnl       enable_gtk_doc=no
-dnl    fi
-dnl fi
-
-dnl AM_CONDITIONAL(ENABLE_GTK_DOC, test x$enable_gtk_doc = xyes)
-
-
-dnl
-dnl glib-genmarshal
-dnl
-AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
-
-if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall -Werror -g " 
-fi
-
-dnl
-dnl Scrollkeeper
-dnl
-AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
-if test x$SCROLLKEEPER_CONFIG = xno; then
-   AC_MSG_WARN(Couldn't find scrollkeeper-config -- please install the scrollkeeper package)
-else
-   SCROLLKEEPER_LOCALSTATE_DIR=`scrollkeeper-config --pkglocalstatedir`
-   AC_SUBST(SCROLLKEEPER_LOCALSTATE_DIR)
-fi
-
-AM_CONDITIONAL(HAVE_SCROLLKEEPER, test x$SCROLLKEEPER_CONFIG != xno)
 
 PKG_CHECK_MODULES(GNOMINT, 
 	glib-2.0 >= $GLIB_REQUIRED \
@@ -138,6 +84,42 @@ PKG_CHECK_MODULES(GNOMINT,
 AC_SUBST(GNOMINT_CFLAGS)
 AC_SUBST(GNOMINT_LIBS)
 
+dnl Check iso-codes
+dnl (just a chek for packagers, it is required for l10n at runtime)
+PKG_CHECK_EXISTS([iso-codes >= $ISO_CODES_REQUIRED],
+		 [have_iso_codes=yes],[have_iso_codes=no])
+if test "x$have_iso_codes" = "xyes"; then
+	AC_MSG_CHECKING([whether iso-codes has iso-639 and iso-3166 domains])
+	if $PKG_CONFIG --variable=domains iso-codes | grep 639 > /dev/null && \
+	   $PKG_CONFIG --variable=domains iso-codes | grep 3166 > /dev/null ; then
+		result=yes
+	else
+		result=no
+		have_iso_codes=no
+	fi
+	AC_MSG_RESULT([$result])
+fi
+
+dnl glib-genmarshal
+GLIB_GENMARSHAL=`$PKG_CONFIG --variable=glib_genmarshal glib-2.0`
+AC_SUBST(GLIB_GENMARSHAL)
+
+dnl The following conditional is set in AM_GCONF_SOURCE_2.
+dnl Because we may skip its execution, we have to set a default here.
+m4_pattern_allow([^AM_GCONF_SOURCE_2$])
+AM_CONDITIONAL([GCONF_SCHEMAS_INSTALL], [false])
+GCONFTOOL=""
+AC_CHECK_PROG(GCONFTOOL, gconftool-2, gconftool-2)
+if test x"$GCONFTOOL" = x; then
+	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
+fi
+AM_GCONF_SOURCE_2
+
+dnl
+if test "x$GCC" = "xyes"; then
+	CFLAGS="-Wall -Werror -g "
+fi
+
 dnl
 dnl Check if src should be build with the debug mode
 dnl
@@ -146,8 +128,6 @@ AC_ARG_ENABLE(debug,
 	use_debug="Yes";
 	AC_DEFINE(debug), use_debug="No")
 
-
-
 dnl
 dnl Check if src should be build with the debug_signals mode
 dnl
@@ -155,20 +135,6 @@ AC_ARG_ENABLE(debug-signal,
 	[  --enable-debug-signal   debug signals sent [default=no]],
 	use_debug_sig="Yes";
 	AC_DEFINE(debug_signal), use_debug_sig="No")
-
-
-dnl The following conditional is set in AM_GCONF_SOURCE_2.
-dnl Because we may skip its execution, we have to set a default here.
-m4_pattern_allow([^AM_GCONF_SOURCE_2$])
-AM_CONDITIONAL([GCONF_SCHEMAS_INSTALL], [false])
-
-GCONFTOOL=""
-AC_CHECK_PROG(GCONFTOOL, gconftool-2, gconftool-2)
-if test x"$GCONFTOOL" = x; then
-	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
-fi
-AM_GCONF_SOURCE_2
-
 
 dnl
 AC_SUBST(CFLAGS)

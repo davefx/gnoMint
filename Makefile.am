@@ -2,9 +2,8 @@ SUBDIRS = m4 src po gui mime gconf
 
 ACLOCAL_AMFLAGS = -I m4
 
-INCLUDES =                      \
-    -I$(top_srcdir)             \
-    -DPACKAGE_LOCALE_DIR=\""$(gnomintlocaledir)"\"
+INCLUDES = \
+    -I$(top_srcdir)
 
 EXTRA_DIST = \
 	AUTHORS \

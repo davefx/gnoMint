@@ -19,5 +19,3 @@ install-data-local: $(schemas_DATA)
 else
 install-data-local:
 endif
-
-all:
