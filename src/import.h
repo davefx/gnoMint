@@ -23,11 +23,11 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 
-gboolean import_csr (gchar *filename);
-gboolean import_certlist (gchar *filename);
-gboolean import_pkey_wo_passwd (gchar *filename);
-gboolean import_crl (gchar *filename);
-gboolean import_pkcs7 (gchar *filename);
-gboolean import_pkcs12 (gchar *filename);
+gboolean import_csr (guchar *file_contents, gsize file_contents_size);
+gboolean import_certlist (guchar *file_contents, gsize file_contents_size);
+gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size);
+gboolean import_crl (guchar *file_contents, gsize file_contents_size);
+gboolean import_pkcs7 (guchar *file_contents, gsize file_contents_size);
+gboolean import_pkcs12 (guchar *file_contents, gsize file_contents_size);
 
 #endif

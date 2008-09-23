@@ -43,7 +43,7 @@ extern gchar * gnomint_current_opened_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 8
+#define CURRENT_GNOMINT_DB_VERSION 9
 
 void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv);
 void __ca_file_zeropad (sqlite3_context *context, int argc, sqlite3_value **argv);
@@ -206,7 +206,7 @@ gchar * ca_file_create (const gchar *filename)
                           "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial TEXT, subject TEXT, "
 			  "activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, "
 			  "private_key TEXT, dn TEXT, parent_dn TEXT, parent_id INTEGER DEFAULT 0, parent_route TEXT, "
-                          "expired_already_in_crl INTEGER);",
+                          "expired_already_in_crl INTEGER, subject_key_id TEXT);",
                           NULL, NULL, &error)) {
 		return error;
 	}
@@ -746,6 +746,52 @@ gboolean ca_file_check_and_update_version ()
 
 
         case 8:
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+                
+		if (sqlite3_exec (ca_db, "ALTER TABLE certificates ADD COLUMN subject_key_id TEXT DEFAULT NULL;", NULL, NULL, &error)) {
+			return FALSE;
+		}
+
+		{
+			gchar **cert_table;
+			gint rows, cols;
+			gint i;
+			if (sqlite3_get_table (ca_db, 
+					       "SELECT id, pem FROM certificates;",
+					       &cert_table,
+					       &rows,
+					       &cols,
+					       &error)) {
+				return FALSE;
+			}
+			for (i = 0; i < rows; i++) {
+                                TlsCert *tls_cert = tls_parse_cert_pem (cert_table[(i*2)+3]);
+                                
+				sql = sqlite3_mprintf ("UPDATE certificates SET subject_key_id='%q' WHERE id='%q';",
+						       tls_cert->subject_key_id, cert_table[(i*2)+2]);
+
+				if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+					return FALSE;
+				}
+                                tls_cert_free(tls_cert);
+
+                                sqlite3_free (sql);
+
+			}
+
+			sqlite3_free_table (cert_table);
+
+		}
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return FALSE;
+
+
+        case 9:
+
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -897,8 +943,8 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 		return error;
 
 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, pem, private_key_in_db, "
-                               "private_key, dn, parent_dn, parent_id, parent_route) "
-                               "VALUES (NULL, 1, '%q', '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q', 0, ':');", 
+                               "private_key, dn, parent_dn, parent_id, parent_route, subject_key_id) "
+                               "VALUES (NULL, 1, '%q', '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q', 0, ':', '%q');", 
                                serialstr,
 			       creation_data->cn,
 			       creation_data->activation,
@@ -906,7 +952,8 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 			       pem_ca_certificate,
 			       pem_ca_private_key,
 			       tls_cert->dn,
-			       tls_cert->i_dn );
+			       tls_cert->i_dn,
+                               tls_cert->subject_key_id );
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
@@ -1000,9 +1047,9 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 	if (private_key_info)
 		sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
-                                       "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) "
+                                       "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route, subject_key_id) "
                                        "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', "
-				       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", 
+				       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q', '%q');", 
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
@@ -1014,12 +1061,13 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       tlscert->dn,
 				       tlscert->i_dn,
 				       parent_id,
-                                       parent_route);
+                                       parent_route,
+                                       tlscert->subject_key_id);
 	else
 		sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
                                        "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) "
                                        "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
-				       "%"G_GUINT64_FORMAT", '%q');", 
+				       "%"G_GUINT64_FORMAT", '%q', '%q');", 
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
@@ -1029,7 +1077,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 				       tlscert->dn,
 				       tlscert->i_dn,
 				       parent_id,
-                                       parent_route);
+                                       parent_route,
+                                       tlscert->subject_key_id);
 
         g_free (serialstr);
 	tls_cert_free (tlscert);
@@ -1117,7 +1166,7 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 {
 	/* gchar *sql = NULL; */
 	/* gchar *error = NULL; */
-	/* gchar **row;         */
+	/* gchar **row; */
         /* gchar *serialstr; */
         /* gsize size; */
 	/* gint64 cert_rowid; */
@@ -1131,6 +1180,9 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 
 	/* if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) */
 	/* 	return error; */
+
+        /* // We first look up if the issuer is already in the database */
+
 
 	/* parent_idstr = __ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn); */
 	/* if (parent_idstr == NULL) { */
@@ -1148,7 +1200,7 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 	/* 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, " */
         /*                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) " */
         /*                                "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', " */
-	/* 			       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');",  */
+	/* 			       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", */
         /*                                is_ca, */
 	/* 			       serialstr, */
 	/* 			       tlscert->cn, */
@@ -1165,7 +1217,7 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 	/* 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, " */
         /*                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) " */
         /*                                "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q'," */
-	/* 			       "%"G_GUINT64_FORMAT", '%q');",  */
+	/* 			       "%"G_GUINT64_FORMAT", '%q');", */
         /*                                is_ca, */
 	/* 			       serialstr, */
 	/* 			       tlscert->cn, */
@@ -1202,7 +1254,7 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
         /* uint160_write_escaped (&serial, NULL, &size); */
         /* serialstr = g_new0(gchar, size+1); */
         /* uint160_write_escaped (&serial, serialstr, &size); */
-	/* sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";",  */
+	/* sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", */
 	/* 		       serialstr, parent_id); */
 	/* if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
 	/* 	sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
@@ -1218,7 +1270,7 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
         /*         uint160_assign (&serial, 0); */
         /*         uint160_write_escaped (&serial, NULL, &size); */
         /*         serialstr = g_new0(gchar, size+1); */
-        /*         uint160_write_escaped (&serial, serialstr, &size);                 */
+        /*         uint160_write_escaped (&serial, serialstr, &size); */
 	/* 	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) " */
 	/* 			       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');", */
 	/* 			       cert_id, serialstr); */
@@ -1231,7 +1283,7 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 	/* 	sqlite3_free (sql); */
         /*         g_free (serialstr); */
 
-	/* 	if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) ||  */
+	/* 	if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) || */
 	/* 	    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)|| */
 	/* 	    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)|| */
 	/* 	    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) || */
@@ -1269,7 +1321,8 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 		return error;
 
 	if (pem_csr_private_key)
-		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 1, '%q','%q', %s);", 
+		sql = sqlite3_mprintf ("INSERT INTO cert_requests (id, subject, pem, private_key_in_db, private_key, dn, parent_ca) "
+                                       "VALUES (NULL, '%q', '%q', 1, '%q','%q', %s);", 
 				       creation_data->cn,
 				       pem_csr,
 				       pem_csr_private_key,
@@ -1277,7 +1330,8 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
                                        (creation_data->parent_ca_id_str ? creation_data->parent_ca_id_str : "NULL")
                         );
 	else
-		sql = sqlite3_mprintf ("INSERT INTO cert_requests VALUES (NULL, '%q', '%q', 0, NULL, '%q', %s);", 
+		sql = sqlite3_mprintf ("INSERT INTO cert_requests (id, subject, pem, private_key_in_db, private_key, dn, parent_ca) "
+                                       "VALUES (NULL, '%q', '%q', 0, NULL, '%q', %s);", 
 				       creation_data->cn,
 				       pem_csr,
 				       tlscsr->dn,
@@ -1442,7 +1496,7 @@ gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return 0;
 
-        sql = sqlite3_mprintf ("INSERT INTO ca_crl VALUES (NULL, %"G_GUINT64_FORMAT", %u, %u);",
+        sql = sqlite3_mprintf ("INSERT INTO ca_crl (id, ca_id, crl_version, date) VALUES (NULL, %"G_GUINT64_FORMAT", %u, %u);",
                                ca_id, next_crl_version, timestamp);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){

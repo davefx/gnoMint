@@ -525,6 +525,10 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 		gnutls_x509_crt_deinit (crt);
 		return g_strdup_printf(_("Error when setting subject key identifier extension"));
 	}
+	if (gnutls_x509_crt_set_authority_key_id(crt, keyid, keyidsize) !=0) {
+		gnutls_x509_crt_deinit (crt);
+		return g_strdup_printf(_("Error when setting authority key identifier extension"));
+	}
        
 
 	// __add_ext (certificate, NID_netscape_cert_type, "sslCA");
@@ -1092,6 +1096,33 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	}
 	g_free (uaux);
 	uaux = NULL;
+
+
+	size = 0;
+	gnutls_x509_crt_get_subject_key_id (*cert, uaux, &size, NULL);
+        uaux = g_new0(guchar, size);
+        gnutls_x509_crt_get_subject_key_id (*cert, uaux, &size, NULL);
+        res->subject_key_id = g_new0(gchar, size*3);
+        for (i=0; i<size; i++) {
+                snprintf (&res->subject_key_id[i*3], 3, "%02X", uaux[i]);
+                if (i != size - 1)
+                        res->subject_key_id[(i*3) + 2] = ':';
+        }
+        g_free (uaux);
+        uaux = NULL;
+
+        size = 0;
+        gnutls_x509_crt_get_authority_key_id (*cert, uaux, &size, NULL);
+        uaux = g_new0(guchar, size);
+        gnutls_x509_crt_get_authority_key_id (*cert, uaux, &size, NULL);
+        res->issuer_key_id = g_new0(gchar, size*3);
+        for (i=0; i<size; i++) {
+                snprintf (&res->issuer_key_id[i*3], 3, "%02X", uaux[i]);
+                if (i != size - 1)
+                        res->issuer_key_id[(i*3) + 2] = ':';
+        }
+        g_free (uaux);
+        uaux = NULL;
 
 	gnutls_x509_crt_deinit (*cert);
 	g_free (cert);

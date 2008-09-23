@@ -55,6 +55,9 @@ typedef struct __TlsCert {
 
 	gchar * key_id;
 
+        gchar * subject_key_id;
+        gchar * issuer_key_id;
+
 	GList * uses;
 
 	time_t expiration_time;

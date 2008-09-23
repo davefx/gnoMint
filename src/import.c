@@ -28,7 +28,7 @@
 #include "ca.h"
 #include "ca_file.h"
 
-gboolean import_csr (gchar *filename) 
+gboolean import_csr (guchar *file_contents, gsize file_contents_size) 
 {	
 	gboolean successful_import = FALSE;
 	gnutls_x509_crq_t crq;
@@ -36,20 +36,8 @@ gboolean import_csr (gchar *filename)
 
 	gchar *aux = NULL;
 
-	GError *error = NULL;
-	
-	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
-	
-	if (error) {
-		ca_error_dialog (_(error->message));
-		return FALSE;
-	}
-
-	file_datum.size = g_mapped_file_get_length (mapped_file);
-	file_datum.data = g_new0 (guchar, file_datum.size);
-	memcpy (file_datum.data, g_mapped_file_get_contents (mapped_file), file_datum.size);
-	
-	g_mapped_file_free (mapped_file);
+        file_datum.data = file_contents;
+        file_datum.size = file_contents_size;
 
 	// Trying to import a Certificate Signing Request in PEM format
 
@@ -118,15 +106,13 @@ gboolean import_csr (gchar *filename)
 		successful_import = TRUE;
 	}
 	
-	g_free (file_datum.data);
-
 	return successful_import;
 
 }
 
 
 
-gboolean import_certlist (gchar *filename)
+gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
 {
  	gboolean successful_import = FALSE;
 	gnutls_x509_crt_t cert;
@@ -136,20 +122,8 @@ gboolean import_certlist (gchar *filename)
 
 	gchar *aux = NULL;
 
-	GError *error = NULL;
-	
-	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
-	
-	if (error) {
-		ca_error_dialog (_(error->message));
-		return FALSE;
-	}
-
-	file_datum.size = g_mapped_file_get_length (mapped_file);
-	file_datum.data = g_new0 (guchar, file_datum.size);
-	memcpy (file_datum.data, g_mapped_file_get_contents (mapped_file), file_datum.size);
-	
-	g_mapped_file_free (mapped_file);
+	file_datum.size = file_contents_size;
+	file_datum.data = file_contents;
 
 
 	// Trying to import a list of certificates in PEM format
@@ -231,7 +205,6 @@ gboolean import_certlist (gchar *filename)
                 }
                 successful_import = TRUE;
                         
-                g_free (file_datum.data);
                 return successful_import;
 	}
 
@@ -312,22 +285,22 @@ gboolean import_certlist (gchar *filename)
 	return successful_import;
 }
 
-gboolean import_pkey_wo_passwd (gchar *filename)
+gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 {
         return FALSE;
 }
 
-gboolean import_crl (gchar *filename)
+gboolean import_crl (guchar *file_contents, gsize file_contents_size)
 {
         return FALSE;
 }
 
-gboolean import_pkcs7 (gchar *filename)
+gboolean import_pkcs7 (guchar *file_contents, gsize file_contents_size)
 {
         return FALSE;
 }
 
-gboolean import_pkcs12 (gchar *filename)
+gboolean import_pkcs12 (guchar *file_contents, gsize file_contents_size)
 {
         return FALSE;
 }

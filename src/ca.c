@@ -1562,33 +1562,52 @@ gchar * ca_get_selected_row_pem ()
 gboolean ca_import (gchar *filename) 
 {	
         gboolean successful_import = FALSE;
+	GError *error = NULL;
+	guchar *file_contents = NULL;
+        gsize   file_contents_size = 0;
+	
+	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
+
+	if (error) {
+		ca_error_dialog (_(error->message));
+		return FALSE;
+	}
+
+	file_contents_size = g_mapped_file_get_length (mapped_file);
+	file_contents = g_new0 (guchar, file_contents_size);
+	memcpy (file_contents, g_mapped_file_get_contents (mapped_file), file_contents_size);
+	
+	g_mapped_file_free (mapped_file);
+
 
 	// We start to check each type of file, in PEM and DER
 	// formats, for see if some of them matches with the actual file
 
+
 	// Certificate request
-        successful_import = import_csr (filename);
+        successful_import = import_csr (file_contents, file_contents_size);
 
 	// Certificate list (or single certificate)
         if (! successful_import)
-                successful_import = import_certlist (filename);
+                successful_import = import_certlist (file_contents, file_contents_size);
 
 	// Private key without password
         if (! successful_import)
-                successful_import = import_pkey_wo_passwd (filename);
+                successful_import = import_pkey_wo_passwd (file_contents, file_contents_size);
 
 	// Certificate revocation list
         if (! successful_import)
-                successful_import = import_crl (filename);
+                successful_import = import_crl (file_contents, file_contents_size);
 	
 	// PKCS7 structure
         if (! successful_import)
-                successful_import = import_pkcs7 (filename);
+                successful_import = import_pkcs7 (file_contents, file_contents_size);
 
 	// PKCS12 structure
         if (! successful_import)
-                successful_import = import_pkcs12 (filename);
-	
+                successful_import = import_pkcs12 (file_contents, file_contents_size);
+
+        g_free (file_contents);
 
 	if (successful_import) {
 		ca_refresh_model();
