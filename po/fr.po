@@ -7,18 +7,55 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint 0.4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-19 18:45+0100\n"
-"PO-Revision-Date: 2007-12-16 16:47+0100\n"
-"Last-Translator: Ahmed <ahmed@baizid.org>\n"
+"POT-Creation-Date: 2008-09-24 08:49+0200\n"
+"PO-Revision-Date: 2008-09-12 11:58+0000\n"
+"Last-Translator: David Marín <Unknown>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Launchpad-Export-Date: 2008-09-24 06:40+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: ../gconf/gnomint.schemas.in.h:1
+msgid "Automatic exporting of certificates for gnome-keyring"
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:2
+msgid "Certificate requests visibility"
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:3
+msgid "Revoked certificates visibility"
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:4
+msgid ""
+"The (width,length) size gnoMint should take when started. This cannot be "
+"smaller than (320,200)."
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:5
+msgid "Whether the certificate requests should be visible."
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:6
+msgid ""
+"Whether the created or imported certificates are automatically exported to "
+"gnome-keyring certificate-store."
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:7
+msgid "Whether the revoked certificates should be visible."
+msgstr ""
+
+#: ../gconf/gnomint.schemas.in.h:8
+msgid "Window size"
+msgstr "Taille de fenêtre"
 
 #: ../gui/gnomint.glade.h:1
 msgid " "
-msgstr ""
+msgstr " "
 
 #: ../gui/gnomint.glade.h:2
 msgid "<b>CSR subject</b>"
@@ -49,12 +86,12 @@ msgid "<b>Emmited by</b>"
 msgstr "<b>Émis par</b>"
 
 #: ../gui/gnomint.glade.h:9
-msgid "<b>Field value</b>"
-msgstr "<b>Valeur du champ</b>"
-
-#: ../gui/gnomint.glade.h:10
 msgid "<b>Fingerprints</b>"
 msgstr "<b>Empreintes numériques</b>"
+
+#: ../gui/gnomint.glade.h:10
+msgid "<b>Inherited fields from CA subject</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:11
 msgid "<b>Purposes of new generated certificates</b>"
@@ -64,7 +101,9 @@ msgstr ""
 msgid ""
 "<b>This Certificate Signing Request has its corresponding private key saved "
 "in the internal database.</b>"
-msgstr "<b>La clé privée associée à ce CSR est sauvegardé dans la base de données interne.</b>"
+msgstr ""
+"<b>La clé privée associée à ce CSR est sauvegardé dans la base de données "
+"interne.</b>"
 
 #: ../gui/gnomint.glade.h:13
 msgid "<b>This certificate has been verified for the following uses:</b>"
@@ -79,22 +118,23 @@ msgid "<b>Validity</b>"
 msgstr "<b>Validité</b>"
 
 #: ../gui/gnomint.glade.h:16
+#, fuzzy
+msgid "<big><b>New Certificate Revocation List</b></big>"
+msgstr "<big>Propriétés du nouveau certificat</big>\n"
+
+#: ../gui/gnomint.glade.h:17
 msgid "<big>CA Properties</big>\n"
 msgstr "<big>Propriétés du CA</big>\n"
 
-#: ../gui/gnomint.glade.h:18
+#: ../gui/gnomint.glade.h:19
 msgid "<big>CA Root certificate properties</big>\n"
 msgstr "<big>Propriétés du certificat racine du CA</big>\n"
 
-#: ../gui/gnomint.glade.h:20
+#: ../gui/gnomint.glade.h:21
 msgid "<big>Certificate Request Properties</big>\n"
 msgstr "<big>Propriétés de CSR</big>\n"
 
-#: ../gui/gnomint.glade.h:22
-msgid "<big>Certificate properties</big>\n"
-msgstr "<big>Propriétés du certificat</big>\n"
-
-#: ../gui/gnomint.glade.h:24
+#: ../gui/gnomint.glade.h:23
 msgid ""
 "<big>Choose private key file</big>\n"
 "\n"
@@ -103,51 +143,51 @@ msgid ""
 msgstr ""
 "<big>Choisissez le fichier de la clé privée</big>\n"
 "\n"
-"Pour effectuer l'opération sélectionnée, vous devez fournir le fichier qui contient "
-"la clé privée qui correspond au certificat:"
+"Pour effectuer l'opération sélectionnée, vous devez fournir le fichier qui "
+"contient la clé privée qui correspond au certificat:"
 
-#: ../gui/gnomint.glade.h:27
+#: ../gui/gnomint.glade.h:26
 msgid "<big>New Certificate Properties</big>\n"
 msgstr "<big>Propriétés du nouveau certificat</big>\n"
 
-#: ../gui/gnomint.glade.h:29
-msgid "<big>New certificate properties</big>\n"
-msgstr "<big>Propriétés du nouveau certificat</big>\n"
-
-#: ../gui/gnomint.glade.h:31
+#: ../gui/gnomint.glade.h:28
 msgid "<big>Password protection</big>\n"
 msgstr "<big>Protection par mot de passe</big>\n"
 
-#: ../gui/gnomint.glade.h:33
+#: ../gui/gnomint.glade.h:30
 msgid ""
 "<i>Export both (private and public) parts to a password-protected PKCS#12 "
 "file. This kind of file can be imported by other common programs, such as "
 "web or mail clients.</i>"
 msgstr ""
-"<i>Exporter et la partie privée et la partie publique vers un fichier protégé par mot de passe au format PKCS#12. "
-"Ce type de fichier peut être importé par d'autres programmes courants, "
-"comme les lecteurs de courrier et les navigateurs web.</i>"
+"<i>Exporter et la partie privée et la partie publique vers un fichier "
+"protégé par mot de passe au format PKCS#12. Ce type de fichier peut être "
+"importé par d'autres programmes courants, comme les lecteurs de courrier et "
+"les navigateurs web.</i>"
 
-#: ../gui/gnomint.glade.h:34
+#: ../gui/gnomint.glade.h:31
 msgid "<i>Export only the certificate to a public file, in PEM format.</i>"
-msgstr "<i>Exporter seulement le certificat vers un fichier public au format PEM.</i>"
+msgstr ""
+"<i>Exporter seulement le certificat vers un fichier public au format PEM.</i>"
 
-#: ../gui/gnomint.glade.h:35
+#: ../gui/gnomint.glade.h:32
 msgid ""
 "<i>Export the saved private key to a PEM file. This option should only be "
 "used for exporting certificates that will be used in unattended servers.</i>"
-msgstr "<i>Exporter la clé privée vers un fichier au format PEM. "
-"Cette option ne doit être utilisée que pour exporter les certificats utilisés par des serveurs autonomes.</i>"
+msgstr ""
+"<i>Exporter la clé privée vers un fichier au format PEM. Cette option ne "
+"doit être utilisée que pour exporter les certificats utilisés par des "
+"serveurs autonomes.</i>"
 
-#: ../gui/gnomint.glade.h:36
+#: ../gui/gnomint.glade.h:33
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the certificate.</i>"
 msgstr ""
-"<i>Exporter la clé privée vers un fichier protégé par mot de passe au format PKCS#8. "
-"Ce fichier ne doit être accessible que du sujet du certificat.</i>"
+"<i>Exporter la clé privée vers un fichier protégé par mot de passe au format "
+"PKCS#8. Ce fichier ne doit être accessible que du sujet du certificat.</i>"
 
-#: ../gui/gnomint.glade.h:37
+#: ../gui/gnomint.glade.h:34
 msgid ""
 "<small><i>\n"
 "It is recommended that all the certificates generated by a CA share the same "
@@ -160,138 +200,193 @@ msgid ""
 "CA will be able to generate:\n"
 msgstr ""
 "<small><i>\n"
-"Il est recommandé de faire partager les mêmes propriétés "
-"à tous les certificats générés par un CA.\n"
-"Si vous voulez générer des certificats aux propriétés différentes, "
-"vous devriez créer une hiérarchie de CAs, "
-"chacun avec sa propre policy de génération de certificats.</i>\n"
+"Il est recommandé de faire partager les mêmes propriétés à tous les "
+"certificats générés par un CA.\n"
+"Si vous voulez générer des certificats aux propriétés différentes, vous "
+"devriez créer une hiérarchie de CAs, chacun avec sa propre policy de "
+"génération de certificats.</i>\n"
 "</small>\n"
-"Définissez le plus grand ensemble de propriétés que les certificats générés par ce CA "
-"pourront avoir:\n"
+"Définissez le plus grand ensemble de propriétés que les certificats générés "
+"par ce CA pourront avoir:\n"
+
+#: ../gui/gnomint.glade.h:40
+msgid ""
+"<small><i>PKCS#3 files containing Diffie·Hellman parameters are used by some "
+"cryptographic \n"
+"applications for a secure interchange of their keys over insecure channels.</"
+"i></small>"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:42
+msgid ""
+"<small>The subject of the new certificate request can inherit information "
+"from one of the existing Certification Authorities. This is a must if the "
+"policy of the CA you are going to use is defined to force some fields of a "
+"certificate subject to be the same as the ones in the CA cert subject.</"
+"small>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:43
 msgid "Activated on"
 msgstr "Émis le"
 
-#: ../gui/gnomint.glade.h:44 ../src/tls.c:1019
+#: ../gui/gnomint.glade.h:44
+msgid "Add _Certificate Request"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:45 ../src/certificate_properties.c:1131
+#: ../src/tls.c:1080
 msgid "Any purpose"
 msgstr "Tout usage"
 
-#: ../gui/gnomint.glade.h:45
+#: ../gui/gnomint.glade.h:46
+msgid ""
+"Automatically export created certificates to \n"
+"Gnome-keyring certificate store"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:48
 msgid "Both parts."
 msgstr "Les deux parties."
 
-#: ../gui/gnomint.glade.h:46
+#: ../gui/gnomint.glade.h:49
 msgid "CA Policy"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:47
+#: ../gui/gnomint.glade.h:50
 msgid ""
 "CA Root Certificate \n"
 "Common Name (CN):"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:49
+#: ../gui/gnomint.glade.h:52
 msgid "CA properties"
 msgstr "Proptiétés du CA"
 
-#: ../gui/gnomint.glade.h:50
+#: ../gui/gnomint.glade.h:53
 msgid "CACN"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:51
+#: ../gui/gnomint.glade.h:54
 msgid "CAO"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:52
+#: ../gui/gnomint.glade.h:55
 msgid "CAOU"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:53 ../src/tls.c:993
+#: ../gui/gnomint.glade.h:56 ../src/certificate_properties.c:359
+#: ../src/tls.c:1054
 msgid "CRL signing"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:54
+#: ../gui/gnomint.glade.h:57
 msgid "CertActivationDate"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:55
+#: ../gui/gnomint.glade.h:58
 msgid "CertExpirationDate"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:56
+#: ../gui/gnomint.glade.h:59
 msgid "CertSN"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:57
+#: ../gui/gnomint.glade.h:60
+msgid ""
+"Certificate \n"
+"Common Name (CN):"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:62
 msgid "Certificate DN"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:58
+#: ../gui/gnomint.glade.h:63
 msgid "Certificate _Signing Requests"
-msgstr "Demandes en signature de certificats"
+msgstr "Demandes en _signature de certificats"
 
-#: ../gui/gnomint.glade.h:59 ../src/tls.c:991
-msgid "Certificate signing"
-msgstr "Signature de certificat"
+#: ../gui/gnomint.glade.h:64
+msgid "Certificate properties"
+msgstr ""
 
-#: ../gui/gnomint.glade.h:60 ../src/tls.c:976
+#: ../gui/gnomint.glade.h:65 ../src/tls.c:1037
 msgid "Certification Authority"
 msgstr "Autorité de certification"
 
-#: ../gui/gnomint.glade.h:61
-msgid "Change Pass_word"
-msgstr "Modifier le _mot de passe"
+#: ../gui/gnomint.glade.h:66
+msgid "Change database pass_word"
+msgstr ""
 
-#: ../gui/gnomint.glade.h:62
+#: ../gui/gnomint.glade.h:67
+msgid "Choose CA for signing the CSR"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:68
 msgid "Choose private key file. gnoMint"
 msgstr "Choisir un fichier de clé privée - gnoMint"
 
-#: ../gui/gnomint.glade.h:63
+#: ../gui/gnomint.glade.h:69
+msgid "City"
+msgstr "Ville"
+
+#: ../gui/gnomint.glade.h:70
 msgid "City: "
 msgstr "Ville: "
 
-#: ../gui/gnomint.glade.h:64 ../src/tls.c:1011
+#: ../gui/gnomint.glade.h:71 ../src/certificate_properties.c:1127
+#: ../src/tls.c:1072
 msgid "Code signing"
 msgstr "Signature de code"
 
-#: ../gui/gnomint.glade.h:65
+#: ../gui/gnomint.glade.h:72
 msgid "Common Name (CN)"
 msgstr "Nom commun (CN)"
 
-#: ../gui/gnomint.glade.h:66
-msgid "Country:"
-msgstr "Pays: "
+#: ../gui/gnomint.glade.h:73
+msgid "Country"
+msgstr "Pays"
 
-#: ../gui/gnomint.glade.h:67
+#: ../gui/gnomint.glade.h:74
+msgid "Country:"
+msgstr "Pays:"
+
+#: ../gui/gnomint.glade.h:75
 msgid "Creating CA Root Certificate"
 msgstr "Création du certificat racine en cours..."
 
-#: ../gui/gnomint.glade.h:68
+#: ../gui/gnomint.glade.h:76
 msgid "DSA"
-msgstr ""
+msgstr "DSA"
 
-#: ../gui/gnomint.glade.h:69 ../src/tls.c:987
+#: ../gui/gnomint.glade.h:77 ../src/certificate_properties.c:353
+#: ../src/tls.c:1048
 msgid "Data encipherment"
 msgstr "Chiffrement des données"
 
-#: ../gui/gnomint.glade.h:70
+#: ../gui/gnomint.glade.h:78
 msgid "Details"
 msgstr "Détails"
 
-#: ../gui/gnomint.glade.h:71 ../src/tls.c:981
+#: ../gui/gnomint.glade.h:79 ../src/certificate_properties.c:347
+#: ../src/tls.c:1042
 msgid "Digital signature"
 msgstr "Signature numérique"
 
-#: ../gui/gnomint.glade.h:72
+#: ../gui/gnomint.glade.h:80
+msgid "Don't inherit any fields from existing Certification Authorities"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:81
 msgid "E_xport"
 msgstr "E_xporter"
 
-#: ../gui/gnomint.glade.h:73 ../src/tls.c:1013
+#: ../gui/gnomint.glade.h:82 ../src/certificate_properties.c:1128
+#: ../src/tls.c:1074
 msgid "Email protection"
 msgstr "Protection d'e-mail"
 
-#: ../gui/gnomint.glade.h:74
+#: ../gui/gnomint.glade.h:83
 msgid ""
 "Enter new password again \n"
 "for confirmation:"
@@ -299,27 +394,38 @@ msgstr ""
 "Entrez le nouveau mot de passe encore \n"
 "pour confirmation:"
 
-#: ../gui/gnomint.glade.h:76
+#: ../gui/gnomint.glade.h:85
 msgid "Enter password again for confirmation:"
 msgstr "Entrez le mot de passe encore, pour confirmation:"
 
-#: ../gui/gnomint.glade.h:77
+#: ../gui/gnomint.glade.h:86
 msgid "Expires on"
 msgstr "Expire le"
 
-#: ../gui/gnomint.glade.h:78
+#: ../gui/gnomint.glade.h:87
+msgid "Export options"
+msgstr "Options d'export"
+
+#: ../gui/gnomint.glade.h:88
 msgid "Exports the CSR so it can be imported by any other application"
-msgstr "Exporte le CSR de sorte qu'il puisse être importé par d'autre applications"
+msgstr ""
+"Exporte le CSR de sorte qu'il puisse être importé par d'autre applications"
 
-#: ../gui/gnomint.glade.h:79
+#: ../gui/gnomint.glade.h:89
 msgid "Exports the certificate so it can be imported by any other application"
-msgstr "Exporte le certificat de sorte qu'il puisse être importé par d'autre applications"
+msgstr ""
+"Exporte le certificat de sorte qu'il puisse être importé par d'autre "
+"applications"
 
-#: ../gui/gnomint.glade.h:80
+#: ../gui/gnomint.glade.h:90
 msgid "Extrac_t private key"
 msgstr "Ex_traire clé privée"
 
-#: ../gui/gnomint.glade.h:81
+#: ../gui/gnomint.glade.h:91
+msgid "Extract the saved private key to an external file or device"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:92
 msgid ""
 "Extracts the private key of the selected \n"
 "certificate from the database to an \n"
@@ -331,7 +437,7 @@ msgstr ""
 "fichier externe. Ce fichier doit être fourni \n"
 "chaque fois que le CSR est utilisé."
 
-#: ../gui/gnomint.glade.h:85
+#: ../gui/gnomint.glade.h:96
 msgid ""
 "Extracts the private key of the selected \n"
 "certificate from the database to an \n"
@@ -343,113 +449,144 @@ msgstr ""
 "fichier externe. Ce fichier doit être fourni \n"
 "chaque fois que le certificat est utilisé."
 
-#: ../gui/gnomint.glade.h:89
+#: ../gui/gnomint.glade.h:100
 msgid "General"
 msgstr "Général"
 
-#: ../gui/gnomint.glade.h:90
+#: ../gui/gnomint.glade.h:101
+msgid "General Preferences - gnoMint"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:102
+msgid "Generate D_H parameters..."
+msgstr ""
+
+#: ../gui/gnomint.glade.h:103
 msgid "Generate _CRL"
 msgstr "Générer _CRL"
 
-#: ../gui/gnomint.glade.h:91
+#: ../gui/gnomint.glade.h:104
 msgid "Generate the current Certificate Revocation List"
 msgstr "Génére la liste des certificats révoqués"
 
-#: ../gui/gnomint.glade.h:92
+#: ../gui/gnomint.glade.h:105
 msgid "Hours between CRL updates:"
 msgstr "Durée en heures entre les mise à jour de la CRL:"
 
-#: ../gui/gnomint.glade.h:93 ../src/tls.c:989
+#: ../gui/gnomint.glade.h:106
+msgid ""
+"Inherit fields according to selected Certification Authority and its policy."
+msgstr ""
+
+#: ../gui/gnomint.glade.h:107 ../src/certificate_properties.c:355
+#: ../src/tls.c:1050
 msgid "Key agreement"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:94 ../src/tls.c:985
+#: ../gui/gnomint.glade.h:108 ../src/certificate_properties.c:351
+#: ../src/tls.c:1046
 msgid "Key encipherment"
 msgstr "Chiffrement de clés"
 
-#: ../gui/gnomint.glade.h:95
+#: ../gui/gnomint.glade.h:109
 msgid "MD5 fingerprint"
 msgstr "Empreinte numérique MD5"
 
-#: ../gui/gnomint.glade.h:96
+#: ../gui/gnomint.glade.h:110
 msgid "MD5FINGERPRINT"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:97
+#: ../gui/gnomint.glade.h:111
 msgid ""
 "Maximum number of months before expiration of the new generated certificates:"
 msgstr ""
 "Nombre maximum de mois avant l'expiration des nouveaux certificat générés:"
 
-#: ../gui/gnomint.glade.h:98
+#: ../gui/gnomint.glade.h:112
 msgid "Months before certificate expiration:"
 msgstr "Mois avant l'expiration du certificat:"
 
-#: ../gui/gnomint.glade.h:99
+#: ../gui/gnomint.glade.h:113
 msgid "Months before root certificate expiration:"
 msgstr "Mois avant l'expiration du certificat racine:"
 
-#: ../gui/gnomint.glade.h:100
-msgid "New _Certificate Request"
-msgstr "Nouvelle _CSR"
+#: ../gui/gnomint.glade.h:114
+msgid ""
+"New certificate \n"
+"Common Name (CN):"
+msgstr ""
 
-#: ../gui/gnomint.glade.h:101 ../src/tls.c:983
+#: ../gui/gnomint.glade.h:116 ../src/certificate_properties.c:349
+#: ../src/tls.c:1044
 msgid "Non repudiation"
 msgstr "Non répudiation"
 
-#: ../gui/gnomint.glade.h:102 ../src/tls.c:1017
+#: ../gui/gnomint.glade.h:117 ../src/certificate_properties.c:1130
+#: ../src/tls.c:1078
 msgid "OCSP signing"
 msgstr "Signature OCSP"
 
-#: ../gui/gnomint.glade.h:103
+#: ../gui/gnomint.glade.h:118
 msgid "Only the private key (crypted)."
 msgstr "Seulement la clé privée (chiffrée)"
 
-#: ../gui/gnomint.glade.h:104
+#: ../gui/gnomint.glade.h:119
 msgid "Only the private key (uncrypted)."
 msgstr "Seulement la clé privée (non-chiffrée)"
 
-#: ../gui/gnomint.glade.h:105
+#: ../gui/gnomint.glade.h:120
 msgid "Only the pu_blic part."
 msgstr "Seulement la partie publique"
 
-#: ../gui/gnomint.glade.h:106
-msgid "Organizational Unit (OU)"
-msgstr "Unité d'organisation (OU)"
+#: ../gui/gnomint.glade.h:121
+msgid "Open _recents"
+msgstr ""
 
-#: ../gui/gnomint.glade.h:107
+#: ../gui/gnomint.glade.h:122
+msgid "Organization"
+msgstr "Organisation"
+
+#: ../gui/gnomint.glade.h:123
 msgid "Organization (O)"
 msgstr "Organisation (O)"
 
-#: ../gui/gnomint.glade.h:108
+#: ../gui/gnomint.glade.h:124
 msgid "Organization Unit:"
 msgstr "Unité d'organisation:"
 
-#: ../gui/gnomint.glade.h:109
+#: ../gui/gnomint.glade.h:125
 msgid "Organization:"
 msgstr "Organisation:"
 
-#: ../gui/gnomint.glade.h:111
+#: ../gui/gnomint.glade.h:126
+msgid "Organizational Unit (OU)"
+msgstr "Unité d'organisation (OU)"
+
+#: ../gui/gnomint.glade.h:127
+msgid "Organizational unit"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:128
 msgid "Password (confirm):"
 msgstr "Mot de passe (confirmation):"
 
-#: ../gui/gnomint.glade.h:112
+#: ../gui/gnomint.glade.h:129
 msgid "Password protect"
 msgstr "Protection par mot de passe"
 
-#: ../gui/gnomint.glade.h:113
+#: ../gui/gnomint.glade.h:130
 msgid "Password:"
-msgstr "Mot de passe"
+msgstr "Mot de passe:"
 
-#: ../gui/gnomint.glade.h:114
+#: ../gui/gnomint.glade.h:131
 msgid "Please, choose the file:"
 msgstr "Choisir le fichier:"
 
-#: ../gui/gnomint.glade.h:115
+#: ../gui/gnomint.glade.h:132
 msgid "Please, choose which part of the saved certificate you want to export:"
 msgstr "Choisir la partie du certificat à exporter:"
 
-#: ../gui/gnomint.glade.h:116
+#: ../gui/gnomint.glade.h:133
 msgid ""
 "Please, enter current\n"
 "password:"
@@ -457,7 +594,7 @@ msgstr ""
 "Entrez le mot de passe\n"
 "actuel:"
 
-#: ../gui/gnomint.glade.h:118
+#: ../gui/gnomint.glade.h:135
 msgid ""
 "Please, enter new \n"
 "password:"
@@ -465,38 +602,36 @@ msgstr ""
 "Entrez le nouveau \n"
 "mot de passe:"
 
-#: ../gui/gnomint.glade.h:120
+#: ../gui/gnomint.glade.h:137
 msgid "Please, enter password"
 msgstr "Entrez le mot de passe"
 
-#: ../gui/gnomint.glade.h:121
+#: ../gui/gnomint.glade.h:138
 msgid "Please, enter password:"
 msgstr "Entrez le mot de passe:"
 
-#: ../gui/gnomint.glade.h:122
-msgid ""
-"Please, insert the data corresponding to the subject of the new "
-"certificate:\n"
+#: ../gui/gnomint.glade.h:139
+#, fuzzy
+msgid "Please, enter the prime size, in bits:"
 msgstr ""
-"Entrez les données qui correspondent au titulaire du nouveau "
-"certificat:\n"
+"Entrez le nouveau \n"
+"mot de passe:"
 
-#: ../gui/gnomint.glade.h:124
+#: ../gui/gnomint.glade.h:140
 msgid ""
-"Please, select the Certification Authority that will create the new "
-"certificate:"
+"Please, select the CA for which a Certificate \n"
+"Revocation List is going to be created:"
 msgstr ""
-"Sélectionnez l'autorité de certification qui créera le nouveau certificat:"
 
-#: ../gui/gnomint.glade.h:125
+#: ../gui/gnomint.glade.h:142
 msgid "Private key bit length:"
 msgstr "Taille de la clé privée en bits:"
 
-#: ../gui/gnomint.glade.h:126
+#: ../gui/gnomint.glade.h:143
 msgid "Private key type:"
 msgstr "Type de clé privée:"
 
-#: ../gui/gnomint.glade.h:127
+#: ../gui/gnomint.glade.h:144
 msgid ""
 "Protect CA database private \n"
 "keys with password:"
@@ -504,7 +639,7 @@ msgstr ""
 "Protéger les clés privée de la base de données du CA\n"
 "avec le mot de passe:"
 
-#: ../gui/gnomint.glade.h:129
+#: ../gui/gnomint.glade.h:146
 msgid ""
 "Protect CA database private keys\n"
 "with password:"
@@ -512,79 +647,75 @@ msgstr ""
 "Protéger les clés privée de la base de données du CA\n"
 "avec le mot de passe:"
 
-#: ../gui/gnomint.glade.h:131
+#: ../gui/gnomint.glade.h:148
 msgid "RSA"
-msgstr ""
+msgstr "RSA"
 
-#: ../gui/gnomint.glade.h:132
+#: ../gui/gnomint.glade.h:149
 msgid "Remember this password during this gnoMint session"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:133
+#: ../gui/gnomint.glade.h:150
 msgid "Revo_ke"
 msgstr "Révo_quer"
 
-#: ../gui/gnomint.glade.h:134
+#: ../gui/gnomint.glade.h:151
 msgid "Revokes the selected certificate"
 msgstr "Révoquer le certificat sélectionné"
 
-#: ../gui/gnomint.glade.h:135
+#: ../gui/gnomint.glade.h:152
 msgid "Root certificate prop"
 msgstr "Propriétés du certificat racine"
 
-#: ../gui/gnomint.glade.h:136
+#: ../gui/gnomint.glade.h:153
 msgid "SHA1 fingerprint"
 msgstr "Empreinte numérique SHA1"
 
-#: ../gui/gnomint.glade.h:137
+#: ../gui/gnomint.glade.h:154
 msgid "SHA1FINGERPRINT"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:138
-msgid "Select the CA to sign this new certificate"
-msgstr "Choisir le CA qui signera ce nouveau certificat"
-
-#: ../gui/gnomint.glade.h:139
+#: ../gui/gnomint.glade.h:155
 msgid "Serial number"
 msgstr "Numéro de série"
 
-#: ../gui/gnomint.glade.h:140
+#: ../gui/gnomint.glade.h:156
 msgid "Shows the CSR properties window"
 msgstr "Affiche les propriétés du CSR"
 
-#: ../gui/gnomint.glade.h:141
+#: ../gui/gnomint.glade.h:157
 msgid "Shows the certificate properties window"
 msgstr "Affiche les propriétés du certificat"
 
-#: ../gui/gnomint.glade.h:142
-msgid "State or Province name: "
-msgstr "État ou province"
-
-#: ../gui/gnomint.glade.h:143
-msgid "Subject Common Name (CN):"
+#: ../gui/gnomint.glade.h:158
+msgid "State or Province name"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:144
+#: ../gui/gnomint.glade.h:159
+msgid "State or Province name: "
+msgstr "État ou province "
+
+#: ../gui/gnomint.glade.h:160
 msgid "SubjectCN"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:145
+#: ../gui/gnomint.glade.h:161
 msgid "SubjectO"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:146
+#: ../gui/gnomint.glade.h:162
 msgid "SubjectOU"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:147
+#: ../gui/gnomint.glade.h:163
 msgid "TLS Web client"
 msgstr "Client Web TLS"
 
-#: ../gui/gnomint.glade.h:148
+#: ../gui/gnomint.glade.h:164
 msgid "TLS Web server"
 msgstr "Serveur Web TLS"
 
-#: ../gui/gnomint.glade.h:149
+#: ../gui/gnomint.glade.h:165
 msgid ""
 "This action requires using one or more private keys saved in the CA "
 "database.\n"
@@ -592,346 +723,369 @@ msgid ""
 "Please insert the database password."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:152 ../src/tls.c:1015
+#: ../gui/gnomint.glade.h:168 ../src/certificate_properties.c:1129
+#: ../src/tls.c:1076
 msgid "Time stamping"
 msgstr "Horodotage"
 
-#: ../gui/gnomint.glade.h:153
+#: ../gui/gnomint.glade.h:169
+msgid ""
+"You are about to create and export a set of Diffie·Hellman parameters into a "
+"PKCS#3 structure file."
+msgstr ""
+
+#: ../gui/gnomint.glade.h:170
 msgid ""
 "You are about to sign a Certificate Signing Request, and this way, creating "
 "a new certificate. Please check the certificate properties."
 msgstr ""
-"Vous êtes sur le point de signer un CSR et ainsi de créer un nouveau certificat. "
-"Vérifiez les propriétés du certificat."
+"Vous êtes sur le point de signer un CSR et ainsi de créer un nouveau "
+"certificat. Vérifiez les propriétés du certificat."
 
-#: ../gui/gnomint.glade.h:154
-msgid "_Actions"
-msgstr "Ac_tions"
+#: ../gui/gnomint.glade.h:171
+msgid ""
+"You are about to sign a Certificate Signing Request. Please, choose the "
+"Certification Authority you are going to use for signing it."
+msgstr ""
 
-#: ../gui/gnomint.glade.h:155
+#: ../gui/gnomint.glade.h:172
+msgid "_Add self-signed CA"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:173
+msgid "_Certificates"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:174
 msgid "_Edit"
 msgstr "_Editer"
 
-#: ../gui/gnomint.glade.h:156
-msgid "_File"
-msgstr "_Fichier"
-
-#: ../gui/gnomint.glade.h:157
+#: ../gui/gnomint.glade.h:175
 msgid "_Help"
 msgstr "_Aide"
 
-#: ../gui/gnomint.glade.h:158
+#: ../gui/gnomint.glade.h:176
 msgid "_Import"
 msgstr "_Importer"
 
-#: ../gui/gnomint.glade.h:159
-msgid "_New CA"
-msgstr "_Nouveau CA"
+#: ../gui/gnomint.glade.h:177
+msgid "_New certificate database"
+msgstr ""
 
-#: ../gui/gnomint.glade.h:160
+#: ../gui/gnomint.glade.h:178
 msgid "_No"
 msgstr "_Non"
 
-#: ../gui/gnomint.glade.h:161
+#: ../gui/gnomint.glade.h:179
+msgid "_Open certificate database"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:180
 msgid "_Revoked Certificates"
 msgstr "Certificat _révoqués"
 
-#: ../gui/gnomint.glade.h:162
+#: ../gui/gnomint.glade.h:181
+msgid "_Save certificate database as..."
+msgstr ""
+
+#: ../gui/gnomint.glade.h:182
 msgid "_Save filename in the database for automatic loading"
 msgstr "_Sauvegarder la clé privée dans la base de données"
 
-#: ../gui/gnomint.glade.h:163
+#: ../gui/gnomint.glade.h:183
 msgid "_Sign"
 msgstr "_Signer"
 
-#: ../gui/gnomint.glade.h:164
+#: ../gui/gnomint.glade.h:184
 msgid "_View"
 msgstr "_Vue"
 
-#: ../gui/gnomint.glade.h:165
+#: ../gui/gnomint.glade.h:185
 msgid "_Yes"
 msgstr "_Oui"
 
-#: ../gui/gnomint.glade.h:166
+#: ../gui/gnomint.glade.h:186
+msgid "gtk-add"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:187
 msgid "gtk-cancel"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:167
+#: ../gui/gnomint.glade.h:188
 msgid "gtk-delete"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:168
+#: ../gui/gnomint.glade.h:189
 msgid "gtk-ok"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:169
+#: ../gui/gnomint.glade.h:190
 msgid "gtk-properties"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:170
+#: ../gui/gnomint.glade.h:191
 msgid "label"
 msgstr ""
 
-#: ../src/ca.c:87
+#: ../gui/gnomint.glade.h:192
+msgid "may differ"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:193
+msgid "must be the same"
+msgstr ""
+
+#: ../gui/gnomint.glade.h:194
+msgid "page 3"
+msgstr ""
+
+#: ../gui/gnomint.desktop.in.h:1
+msgid "Manage X.509 certificates and CAs, easily and graphically"
+msgstr ""
+
+#: ../gui/gnomint.desktop.in.h:2
+msgid "gnoMint X.509 CA Manager"
+msgstr ""
+
+#: ../src/ca.c:133
 msgid "<b>Certificates</b>"
 msgstr "<b>Certificats</b>"
 
-#: ../src/ca.c:149
+#: ../src/ca.c:248
 msgid "<b>Certificate Signing Requests</b>"
 msgstr "<b>Demandes en signature de certificat</b>"
 
-#: ../src/ca.c:190 ../src/certificate_properties.c:88
-#: ../src/certificate_properties.c:93
+#: ../src/ca.c:289 ../src/certificate_properties.c:179
+#: ../src/certificate_properties.c:184
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: ../src/ca.c:360
+#: ../src/ca.c:433 ../src/certificate_properties.c:532 ../src/crl.c:172
+#: ../src/new_cert_window.c:188 ../src/new_req_window.c:193
 msgid "Subject"
 msgstr "Titulaire"
 
-#: ../src/ca.c:395
+#: ../src/ca.c:468
 msgid "Serial"
 msgstr "Numéro"
 
-#: ../src/ca.c:401
+#: ../src/ca.c:475
 msgid "Activation"
 msgstr "Activation"
 
-#: ../src/ca.c:408
+#: ../src/ca.c:482
 msgid "Expiration"
 msgstr "Expiration"
 
-#: ../src/ca.c:415
+#: ../src/ca.c:489
 msgid "Revocation"
 msgstr "Révocation"
 
-#: ../src/ca.c:688
+#: ../src/ca.c:762
 msgid "Export certificate"
 msgstr "Exporter un certificat"
 
-#: ../src/ca.c:695
+#: ../src/ca.c:769
 msgid "Export certificate signing request"
 msgstr "Exporter une CSR"
 
-#: ../src/ca.c:710 ../src/ca.c:721 ../src/ca.c:731 ../src/ca.c:1156
+#: ../src/ca.c:784 ../src/ca.c:820 ../src/ca.c:830 ../src/ca.c:1255
 msgid "There was an error while exporting certificate."
 msgstr "Erreur à l'export du certificat!"
 
-#: ../src/ca.c:712 ../src/ca.c:723 ../src/ca.c:733
+#: ../src/ca.c:786 ../src/ca.c:822 ../src/ca.c:832
 msgid "There was an error while exporting CSR."
 msgstr "Erreur à l'export du CSR!"
 
-#: ../src/ca.c:746 ../src/ca.c:1188
+#: ../src/ca.c:845 ../src/ca.c:1287
 msgid "Certificate exported successfully"
 msgstr "Certificat exporté avec succès."
 
-#: ../src/ca.c:753
+#: ../src/ca.c:852
 msgid "Certificate signing request exported successfully"
 msgstr "CSR exporté avec succès."
 
-#: ../src/ca.c:855
+#: ../src/ca.c:954
 msgid "Export crypted private key"
 msgstr "Exporter la clé privé en chiffré"
 
-#: ../src/ca.c:875 ../src/ca.c:934 ../src/ca.c:943 ../src/ca.c:999
-#: ../src/ca.c:1031 ../src/ca.c:1039
+#: ../src/ca.c:974 ../src/ca.c:1033 ../src/ca.c:1042 ../src/ca.c:1098
+#: ../src/ca.c:1130 ../src/ca.c:1138
 msgid "There was an error while exporting private key."
 msgstr "Erreur à l'export de la clé privée!"
 
-#: ../src/ca.c:895 ../src/ca.c:1015
+#: ../src/ca.c:994 ../src/ca.c:1114
 msgid "There was an error while getting private key."
 msgstr "Erreur à l'accès à la clé privée!"
 
-#: ../src/ca.c:909
+#: ../src/ca.c:1008
 msgid ""
 "You need to supply a passphrase for protecting the exported private key, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
 "by any application that will make use of the private key."
 msgstr ""
-"Vous devez fournir un mot de passe pour protéger la clé privée exportée, "
-"de sorte que seules les personnes autorisées puissent l'utiliser. "
-"La mot de passe est demandée par toute application qui utilisera la clé privée."
+"Vous devez fournir un mot de passe pour protéger la clé privée exportée, de "
+"sorte que seules les personnes autorisées puissent l'utiliser. La mot de "
+"passe est demandée par toute application qui utilisera la clé privée."
 
-#: ../src/ca.c:912 ../src/ca.c:1129
+#: ../src/ca.c:1011 ../src/ca.c:1228
 msgid "Insert passphrase (8 characters or more):"
 msgstr "Entrer un mot de passe (8 caractères et plus)"
 
-#: ../src/ca.c:912 ../src/ca.c:1129
+#: ../src/ca.c:1011 ../src/ca.c:1228
 msgid "Insert passphrase (confirm):"
 msgstr "Entrer un mot de passe (confirmer)"
 
-#: ../src/ca.c:913 ../src/ca.c:1130
+#: ../src/ca.c:1012 ../src/ca.c:1229
 msgid "The introduced passphrases are distinct."
 msgstr "Les mots de passe entrés sont différents."
 
-#: ../src/ca.c:926
+#: ../src/ca.c:1025
 msgid "There was an error while password-protecting private key."
 msgstr "Erreur à la protection par mot de passe de la clé privée!"
 
-#: ../src/ca.c:956 ../src/ca.c:1052
+#: ../src/ca.c:1055 ../src/ca.c:1151
 msgid "Private key exported successfully"
 msgstr "Clé privée exportée avec succès."
 
-#: ../src/ca.c:979
+#: ../src/ca.c:1078
 msgid "Export uncrypted private key"
 msgstr "Exporter la clé privée sans chiffrer"
 
-#: ../src/ca.c:1025
+#: ../src/ca.c:1124
 msgid "There was an error while decrypting private key."
 msgstr "Erreur au déchiffrement de la clé privée!"
 
-#: ../src/ca.c:1079
+#: ../src/ca.c:1178
 msgid "Export whole certificate in PKCS#12 package"
 msgstr "Exporter tout le certificat vers un paquet PKCS#12"
 
-#: ../src/ca.c:1107 ../src/ca.c:1118
+#: ../src/ca.c:1206 ../src/ca.c:1217
 msgid ""
 "There was an error while getting the certificate and private key from the "
 "internal database."
 msgstr ""
-"Erreur à l'accès au certificat et à la clé privé à partir de la "
-"base de données interne."
+"Erreur à l'accès au certificat et à la clé privé à partir de la base de "
+"données interne."
 
-#: ../src/ca.c:1126
+#: ../src/ca.c:1225
 msgid ""
 "You need to supply a passphrase for protecting the exported certificate, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
 "by any application that will import the certificate."
 msgstr ""
 "Vous devez fournir un mot de passe pour protéger le certificat exporté, de "
-"sorte que seules les personnes autorisées puissent l'utiliser. "
-"La mot de passe est demandée par toute application qui importera le certificat."
+"sorte que seules les personnes autorisées puissent l'utiliser. La mot de "
+"passe est demandée par toute application qui importera le certificat."
 
-
-#: ../src/ca.c:1149
+#: ../src/ca.c:1248
 msgid "There was an error while generating the PKCS#12 package."
 msgstr "Erreur à la génération du paquet PKCS#12!"
 
-#: ../src/ca.c:1164 ../src/ca.c:1175
+#: ../src/ca.c:1263 ../src/ca.c:1274
 msgid "There was an error while exporting the certificate."
 msgstr "Erreur à l'export du certificat!"
 
-#: ../src/ca.c:1219
+#: ../src/ca.c:1318
 msgid "Export CSR - gnoMint"
 msgstr "Export de CSR - gnoMint"
 
-#: ../src/ca.c:1224
+#: ../src/ca.c:1323
 msgid ""
 "Please, choose which part of the saved Certificate Signing Request you want "
 "to export:"
-msgstr ""
-"Choisir la partie de CSR à exporter:"
+msgstr "Choisir la partie de CSR à exporter:"
 
-#: ../src/ca.c:1229
+#: ../src/ca.c:1328
 msgid ""
 "<i>Export the Certificate Signing Request to a public file, in PEM format.</"
 "i>"
-msgstr "<i>Exporter la CSR vers un fichier public, au format PEM.</"
-"i>"
+msgstr "<i>Exporter la CSR vers un fichier public, au format PEM.</i>"
 
-#: ../src/ca.c:1234
+#: ../src/ca.c:1333
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the Certificate Signing "
 "Request.</i>"
 msgstr ""
-"<i>Exporter la clé privée sauvegardée vers un fichier protégé par mot de passe, au format PKCS#8. "
-"Ce fichier ne devrait être accessible que par le titulaire du CSR.</i>"
+"<i>Exporter la clé privée sauvegardée vers un fichier protégé par mot de "
+"passe, au format PKCS#8. Ce fichier ne devrait être accessible que par le "
+"titulaire du CSR.</i>"
 
-#: ../src/ca.c:1292
+#: ../src/ca.c:1391
 msgid "Unexpected error"
 msgstr "Erreur inattendue!"
 
-#: ../src/ca.c:1325
+#: ../src/ca.c:1423
 msgid "To do. Feature not implemented yet."
 msgstr "A faire. Fonctionnalité non implémentée encore."
 
-#: ../src/ca.c:1348
+#: ../src/ca.c:1446
 msgid "Are you sure you want to revoke this certificate?"
 msgstr "Etes-vous sûr de vouloir révoquer ce certificat?"
 
-#: ../src/ca.c:1387
+#: ../src/ca.c:1485
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr "Etes-vous sûr de vouloir supprimer ce CSR?"
 
-#: ../src/ca.c:1517
-#, c-format
-msgid ""
-"Couldn't import the certificate request. \n"
-"The database returned this error: \n"
-"\n"
-"'%s'"
-msgstr ""
-"Erreur à l'import de CSR. \n"
-"La base de données a retourné l'erreur: \n"
-"\n"
-"'%s'"
-
-#: ../src/ca.c:1573
+#: ../src/ca.c:1615
 msgid "Couldn't find any supported format in the given file"
 msgstr "Le fichier donnée n'a pas aucun des formats supportés."
 
-#: ../src/ca.c:1619
-msgid "Export Certificate Revocation List"
-msgstr "Exporter la liste des certificats révoqués"
-
-#: ../src/ca.c:1639 ../src/ca.c:1716
-msgid "There was an error while exporting CRL."
-msgstr "Erreur à l'export de la CRL!"
-
-#: ../src/ca.c:1646
-msgid "There was an error while getting revoked certificates."
-msgstr "Erreur à l'accès aux certificats révoqués!"
-
-#: ../src/ca.c:1665 ../src/ca.c:1685
-msgid "There was an error while generating CRL."
-msgstr "Erreur à la génération de la CRL!"
-
-#: ../src/ca.c:1694
-msgid "There was an error while writing CRL."
-msgstr "Erreur à l'écriture de la CRL!"
-
-#: ../src/ca.c:1729
-msgid "CRL generated successfully"
-msgstr "LCR générée avec succès."
-
-#: ../src/ca.c:1897
+#: ../src/ca.c:1821
 msgid "Change CA password - gnoMint"
 msgstr "Modifier le mot de passe du CA - gnoMint"
 
-#: ../src/ca.c:1915
+#: ../src/ca.c:1839
 msgid ""
 "The current password you have entered  doesn't match with the actual current "
 "database password."
-msgstr "Le mot de passe que vous venez d'entrer ne correspond pas "
-"à celui de la base de données."
+msgstr ""
+"Le mot de passe que vous venez d'entrer ne correspond pas à celui de la base "
+"de données."
 
-#: ../src/ca.c:1930
+#: ../src/ca.c:1854
 msgid "Error while changing database password. The operation was cancelled."
 msgstr ""
 
-#: ../src/ca.c:1939
+#: ../src/ca.c:1863
 msgid "Password changed successfully"
 msgstr "Mot de passe modifié avec succès."
 
-#: ../src/ca.c:1949
+#: ../src/ca.c:1873
 msgid ""
 "Error while establishing database password. The operation was cancelled."
-msgstr "Erreur à l'établissemnt du mot de passe de la base de données. "
-"L'opération a été annulée."
+msgstr ""
+"Erreur à l'établissemnt du mot de passe de la base de données. L'opération a "
+"été annulée."
 
-#: ../src/ca.c:1959
+#: ../src/ca.c:1883
 msgid "Password established successfully"
 msgstr "Mot de passe mis en place avec succès."
 
-#: ../src/ca.c:1969
+#: ../src/ca.c:1893
 msgid "Error while removing database password. The operation was cancelled."
-msgstr "Erreur à la suppression du mot de passe de la base de données. "
-"L'opération a été annulée."
+msgstr ""
+"Erreur à la suppression du mot de passe de la base de données. L'opération a "
+"été annulée."
 
-#: ../src/ca.c:1978
+#: ../src/ca.c:1902
 msgid "Password removed successfully"
 msgstr "Mot de passe supprimé avec succès."
+
+#: ../src/ca.c:2043
+msgid "Save Diffie-Hellman parameters"
+msgstr ""
+
+#: ../src/ca.c:2057 ../src/ca.c:2065 ../src/ca.c:2073
+#, fuzzy
+msgid "There was an error while saving Diffie-Hellman parameters."
+msgstr "Erreur à l'export du certificat!"
+
+#: ../src/ca.c:2086
+msgid "Diffie-Hellman parameters saved successfully"
+msgstr ""
 
 #: ../src/ca_creation.c:56 ../src/csr_creation.c:58
 msgid "Generating new RSA key pair"
@@ -966,10 +1120,270 @@ msgstr "La création de la base de données du CA a échouée!"
 msgid "CA generated successfully"
 msgstr "CA créé avec succès."
 
-#: ../src/ca_file.c:103
+#: ../src/ca_file.c:195
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr "Erreur à l'ouverture du fichier '%s'!"
+
+#: ../src/ca_file.c:307
+msgid ""
+"The selected database has been created with a newer version of gnoMint than "
+"the currently installed."
+msgstr ""
+
+#: ../src/ca_file.c:1035
+#, fuzzy
+msgid "Cannot find parent CA in database"
+msgstr "Création de la base de données du CA en cours..."
+
+#: ../src/certificate_properties.c:357 ../src/tls.c:1052
+msgid "Certificate signing"
+msgstr "Signature de certificat"
+
+#: ../src/certificate_properties.c:361
+msgid "Key encipherment only"
+msgstr ""
+
+#: ../src/certificate_properties.c:363
+msgid "Key decipherment only"
+msgstr ""
+
+#: ../src/certificate_properties.c:377
+msgid "Version"
+msgstr "Version"
+
+#: ../src/certificate_properties.c:412
+msgid "Serial Number"
+msgstr "Numéro de série"
+
+#: ../src/certificate_properties.c:428 ../src/certificate_properties.c:1061
+msgid "Signature"
+msgstr "Signature"
+
+#: ../src/certificate_properties.c:431 ../src/certificate_properties.c:559
+#: ../src/certificate_properties.c:562 ../src/certificate_properties.c:1028
+msgid "Algorithm"
+msgstr "Algorithme"
+
+#: ../src/certificate_properties.c:434 ../src/certificate_properties.c:567
+#: ../src/certificate_properties.c:595 ../src/certificate_properties.c:623
+#: ../src/certificate_properties.c:1031
+msgid "Parameters"
+msgstr "Paramètres"
+
+#: ../src/certificate_properties.c:434 ../src/certificate_properties.c:567
+#: ../src/certificate_properties.c:623 ../src/certificate_properties.c:625
+#: ../src/certificate_properties.c:636 ../src/certificate_properties.c:645
+#: ../src/certificate_properties.c:1032
+msgid "(unknown)"
+msgstr "(inconnu)"
+
+#: ../src/certificate_properties.c:466
+msgid "Issuer"
+msgstr "Émetteur"
+
+#: ../src/certificate_properties.c:494
+msgid "Validity"
+msgstr "Validité"
+
+#: ../src/certificate_properties.c:497
+msgid "Not Before"
+msgstr ""
+
+#: ../src/certificate_properties.c:500
+msgid "Not After"
+msgstr ""
+
+#: ../src/certificate_properties.c:556
+msgid "Subject Public Key Info"
+msgstr "Info sur la clé publique du sujet"
+
+#: ../src/certificate_properties.c:569
+msgid "RSA PublicKey"
+msgstr "Clé publique RSA"
+
+#: ../src/certificate_properties.c:579
+msgid "Modulus"
+msgstr ""
+
+#: ../src/certificate_properties.c:585
+msgid "Public Exponent"
+msgstr ""
+
+#: ../src/certificate_properties.c:618
+msgid "DSA PublicKey"
+msgstr "Clé publique DSA"
+
+#: ../src/certificate_properties.c:625
+msgid "Subject Public Key"
+msgstr "Clé publique du sujet"
+
+#: ../src/certificate_properties.c:636
+msgid "Issuer Unique ID"
+msgstr ""
+
+#: ../src/certificate_properties.c:645
+msgid "Subject Unique ID"
+msgstr "ID unique du sujet"
+
+#: ../src/certificate_properties.c:667 ../src/certificate_properties.c:690
+#: ../src/certificate_properties.c:759 ../src/certificate_properties.c:863
+#: ../src/certificate_properties.c:891 ../src/certificate_properties.c:931
+#: ../src/certificate_properties.c:988 ../src/certificate_properties.c:1113
+msgid "Value"
+msgstr "Valeur"
+
+#: ../src/certificate_properties.c:729 ../src/certificate_properties.c:833
+msgid "DNS Name"
+msgstr "Nom DNS"
+
+#: ../src/certificate_properties.c:734 ../src/certificate_properties.c:838
+msgid "RFC822 Name"
+msgstr "Nom RFC822"
+
+#: ../src/certificate_properties.c:739 ../src/certificate_properties.c:843
+msgid "URI"
+msgstr "URI"
+
+#: ../src/certificate_properties.c:745
+msgid "IP"
+msgstr "IP"
+
+#: ../src/certificate_properties.c:752 ../src/certificate_properties.c:856
+msgid "Directory Name"
+msgstr ""
+
+#: ../src/certificate_properties.c:786 ../src/certificate_properties.c:971
+msgid "TRUE"
+msgstr ""
+
+#: ../src/certificate_properties.c:786 ../src/certificate_properties.c:971
+msgid "FALSE"
+msgstr ""
+
+#: ../src/certificate_properties.c:791
+msgid "CA"
+msgstr ""
+
+#: ../src/certificate_properties.c:795
+msgid "Path Length Constraint"
+msgstr ""
+
+#: ../src/certificate_properties.c:849
+msgid "IP Address"
+msgstr "Adresse IP"
+
+#: ../src/certificate_properties.c:964
+msgid "Extensions"
+msgstr "Extentions"
+
+#: ../src/certificate_properties.c:973
+msgid "Critical"
+msgstr "Critique"
+
+#: ../src/certificate_properties.c:1001
+msgid "Certificate"
+msgstr "Certificat"
+
+#: ../src/certificate_properties.c:1026
+msgid "Signature Algorithm"
+msgstr "Algorithme de signature"
+
+#: ../src/certificate_properties.c:1109
+msgid "Name"
+msgstr "Nom"
+
+#: ../src/certificate_properties.c:1125 ../src/tls.c:1068
+msgid "TLS WWW Server"
+msgstr "Serveur WWW TLS"
+
+#: ../src/certificate_properties.c:1126
+msgid "TLS WWW Client"
+msgstr ""
+
+#: ../src/certificate_properties.c:1132
+msgid "Subject Directory Attributes"
+msgstr ""
+
+#: ../src/certificate_properties.c:1133
+msgid "Subject Key Identifier"
+msgstr ""
+
+#: ../src/certificate_properties.c:1134
+msgid "Key Usage"
+msgstr ""
+
+#: ../src/certificate_properties.c:1135
+msgid "Private Key Usage Period"
+msgstr ""
+
+#: ../src/certificate_properties.c:1136
+msgid "Subject Alternative Name"
+msgstr ""
+
+#: ../src/certificate_properties.c:1137
+msgid "Basic Constraints"
+msgstr ""
+
+#: ../src/certificate_properties.c:1138
+msgid "Name Constraints"
+msgstr ""
+
+#: ../src/certificate_properties.c:1139
+msgid "CRL Distribution Points"
+msgstr ""
+
+#: ../src/certificate_properties.c:1140
+msgid "Certificate Policies"
+msgstr ""
+
+#: ../src/certificate_properties.c:1141
+msgid "Policy Mappings"
+msgstr ""
+
+#: ../src/certificate_properties.c:1142
+msgid "Authority Key Identifier"
+msgstr ""
+
+#: ../src/certificate_properties.c:1143
+msgid "Policy Constraints"
+msgstr ""
+
+#: ../src/certificate_properties.c:1144
+msgid "Extended Key Usage"
+msgstr ""
+
+#: ../src/certificate_properties.c:1145
+msgid "Delta CRL Distribution Point"
+msgstr ""
+
+#: ../src/certificate_properties.c:1146
+msgid "Inhibit Any-Policy"
+msgstr ""
+
+#: ../src/crl.c:259
+msgid "Export Certificate Revocation List"
+msgstr "Exporter la liste des certificats révoqués"
+
+#: ../src/crl.c:279 ../src/crl.c:356
+msgid "There was an error while exporting CRL."
+msgstr "Erreur à l'export de la CRL!"
+
+#: ../src/crl.c:291
+msgid "There was an error while getting revoked certificates."
+msgstr "Erreur à l'accès aux certificats révoqués!"
+
+#: ../src/crl.c:305 ../src/crl.c:325
+msgid "There was an error while generating CRL."
+msgstr "Erreur à la génération de la CRL!"
+
+#: ../src/crl.c:334
+msgid "There was an error while writing CRL."
+msgstr "Erreur à l'écriture de la CRL!"
+
+#: ../src/crl.c:369
+msgid "CRL generated successfully"
+msgstr "LCR générée avec succès."
 
 #: ../src/csr_creation.c:104
 msgid "Generating CSR"
@@ -991,46 +1405,88 @@ msgstr "La CSR n'a pu être sauvegardée!"
 msgid "CSR generated successfully"
 msgstr "CSR générée avec succès."
 
-#: ../src/main.c:96
+#: ../src/import.c:69
+#, c-format
+msgid ""
+"Couldn't import the certificate request. \n"
+"The database returned this error: \n"
+"\n"
+"'%s'"
+msgstr ""
+"Erreur à l'import de CSR. \n"
+"La base de données a retourné l'erreur: \n"
+"\n"
+"'%s'"
+
+#: ../src/import.c:198 ../src/import.c:274
+#, fuzzy, c-format
+msgid ""
+"Couldn't import the certificate. \n"
+"The database returned this error: \n"
+"\n"
+"'%s'"
+msgstr ""
+"Erreur à l'import de CSR. \n"
+"La base de données a retourné l'erreur: \n"
+"\n"
+"'%s'"
+
+#: ../src/main.c:132
 msgid "- A graphical Certification Authority manager"
 msgstr "- Un gestionnaire graphique d'autorité de certification"
 
-#: ../src/main.c:99
+#: ../src/main.c:135
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr "Erreur à l'initialisation: %s\n"
 
-#: ../src/main.c:173
+#: ../src/main.c:254
+msgid "Create new CA database"
+msgstr ""
+
+#: ../src/main.c:292
+#, c-format
+msgid ""
+"Problem when creating '%s' CA database:\n"
+"%s"
+msgstr ""
+
+#: ../src/main.c:305
+#, c-format
+msgid "Problem when opening new '%s' CA database"
+msgstr ""
+
+#: ../src/main.c:379
 msgid "Open CA database"
 msgstr "Ouvrir la base de données du CA"
 
-#: ../src/main.c:194
+#: ../src/main.c:402 ../src/main.c:442
 #, c-format
 msgid "Problem when opening '%s' CA database"
 msgstr "Erreur à l'ouverture la base de données du CA '%s'!"
 
-#: ../src/main.c:212
+#: ../src/main.c:467
 msgid "Save CA database as..."
 msgstr "Sauvegarder la base de données du CA sous..."
 
-#: ../src/main.c:242
+#: ../src/main.c:497
 msgid "Select PEM file to import"
 msgstr "Choisir le fichier PEM à importer"
 
-#: ../src/main.c:263
+#: ../src/main.c:518
 #, c-format
 msgid "Problem when importing '%s' file"
 msgstr "Erreur à l'import du fichier '%s'!"
 
-#: ../src/main.c:326
+#: ../src/main.c:581
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
 msgstr ""
-"gnoMint est un programme pour créer et "
-"gérer des autorités de certification et leur certificats."
+"gnoMint est un programme pour créer et gérer des autorités de certification "
+"et leur certificats."
 
-#: ../src/main.c:327
+#: ../src/main.c:582
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -1047,33 +1503,92 @@ msgid ""
 "Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
 msgstr ""
 
-#: ../src/main.c:331
+#: ../src/main.c:586
 msgid "translator-credits"
 msgstr ""
+"Launchpad Contributions:\n"
+"  Ahmed https://launchpad.net/~ahmed-baizid\n"
+"  David Marín https://launchpad.net/~davefx"
 
-#: ../src/new_cert_creation_process.c:72
-msgid "Save CA database"
-msgstr "Sauvegarder la base de données du CA"
-
-#: ../src/new_cert_creation_process.c:84
-msgid "Problem when saving new CA database"
-msgstr "Erreur à la sauvegarde de la base de données du nouveau CA!"
-
-#: ../src/new_cert_creation_process.c:92
+#: ../src/new_cert_creation_process.c:79
 msgid "CA creation process finished"
 msgstr "Création du CA terminée."
 
-#: ../src/new_cert_creation_process.c:202
+#: ../src/new_cert_creation_process.c:182
 msgid "Creation process cancelled"
 msgstr "La procédure de création a été annulée!"
 
-#: ../src/new_cert_creation_process.c:230
+#: ../src/new_cert_creation_process.c:210
 msgid "CSR creation process finished"
 msgstr "La création de CSR est terminée."
 
-#: ../src/new_cert_creation_process.c:295
+#: ../src/new_cert_creation_process.c:275
 msgid "Creating Certificate Signing Request"
 msgstr "Création de CSR en cours..."
+
+#: ../src/new_cert_window.c:335
+msgid ""
+"The policy of this CA obligue the country field of the certificates to be "
+"the same as the one in the CA cert."
+msgstr ""
+
+#: ../src/new_cert_window.c:341
+msgid ""
+"The policy of this CA obligue the state/province field of the certificates "
+"to be the same as the one in the CA cert."
+msgstr ""
+
+#: ../src/new_cert_window.c:347
+msgid ""
+"The policy of this CA obligue the locality/city field of the certificates to "
+"be the same as the one in the CA cert."
+msgstr ""
+
+#: ../src/new_cert_window.c:353
+msgid ""
+"The policy of this CA obligue the organization field of the certificates to "
+"be the same as the one in the CA cert."
+msgstr ""
+
+#: ../src/new_cert_window.c:359
+msgid ""
+"The policy of this CA obligue the organizational unit field of the "
+"certificates to be the same as the one in the CA cert."
+msgstr ""
+
+#: ../src/pkey_manage.c:73
+#, c-format
+msgid ""
+"The file that holds private key for certificate '%s' is password-protected.\n"
+"\n"
+"Please, insert the password corresponding to this file."
+msgstr ""
+
+#. The file could be opened, but it didn't contain any recognized private key
+#: ../src/pkey_manage.c:154
+msgid ""
+"The designated file contains a private key, but it is not the private key "
+"corresponding to the certificate."
+msgstr ""
+
+#. The file could be opened, but it didn't contain any recognized private key
+#: ../src/pkey_manage.c:158
+msgid "The designated file didn't contain any recognized private key."
+msgstr ""
+
+#. The file cannot be opened
+#: ../src/pkey_manage.c:163
+msgid "The designated file couldn't be opened."
+msgstr ""
+
+#. The file doesn't exist
+#: ../src/pkey_manage.c:168
+msgid "File designated in database doesn't exist."
+msgstr ""
+
+#: ../src/pkey_manage.c:584
+msgid "The given password doesn't match the one used in the database"
+msgstr ""
 
 #: ../src/tls.c:45 ../src/tls.c:77
 #, c-format
@@ -1085,103 +1600,146 @@ msgstr "Erreur à l'initialisation de la clé privée!"
 msgid "Error creating private key."
 msgstr "Erreur à la création de la clé privée!"
 
-#: ../src/tls.c:62 ../src/tls.c:94 ../src/tls.c:536 ../src/tls.c:792
+#: ../src/tls.c:62 ../src/tls.c:94 ../src/tls.c:552 ../src/tls.c:853
 #, c-format
 msgid "Error exporting private key to PEM structure."
 msgstr "Erreur à l'export de la clé privé vers le format PEM!"
 
-#: ../src/tls.c:430
+#: ../src/tls.c:434
 #, c-format
 msgid "Error when initializing certificate structure"
 msgstr "Erreur à l'initialisation du certificat!"
 
-#: ../src/tls.c:435 ../src/tls.c:667
+#: ../src/tls.c:440 ../src/tls.c:688
 #, c-format
 msgid "Error when setting certificate version"
 msgstr "Erreur à l'établissement de la version du certificat!"
 
-#: ../src/tls.c:441 ../src/tls.c:676
+#: ../src/tls.c:450 ../src/tls.c:701
 #, c-format
 msgid "Error when setting certificate serial number"
 msgstr "Erreur à l'établissement du numéro de série du certificat!"
 
-#: ../src/tls.c:447 ../src/tls.c:685
+#: ../src/tls.c:459 ../src/tls.c:710
 #, c-format
 msgid "Error when setting activation time"
 msgstr "Erreur à l'établissement de la date d'activation!"
 
-#: ../src/tls.c:452 ../src/tls.c:693
+#: ../src/tls.c:464 ../src/tls.c:718
 #, c-format
 msgid "Error when setting expiration time"
 msgstr "Erreur à l'établissement de la date d'expiration!"
 
-#: ../src/tls.c:498 ../src/tls.c:726
+#: ../src/tls.c:510 ../src/tls.c:766
 #, c-format
 msgid "Error when setting basicConstraint extension"
 msgstr "Erreur à l'établissement de l'extension basicConstraint!"
 
-#: ../src/tls.c:503 ../src/tls.c:747
+#: ../src/tls.c:515 ../src/tls.c:808
 #, c-format
 msgid "Error when setting keyUsage extension"
 msgstr "Erreur à l'établissement de l'extension keyUsage!"
 
-#: ../src/tls.c:514
+#: ../src/tls.c:526 ../src/tls.c:782
 #, c-format
 msgid "Error when setting subject key identifier extension"
 msgstr "Erreur à l'établissement de l'extension SubjectKeyIdentifier!"
 
-#: ../src/tls.c:524
+#: ../src/tls.c:530 ../src/tls.c:757
+#, fuzzy, c-format
+msgid "Error when setting authority key identifier extension"
+msgstr "Erreur à l'établissement de l'extension SubjectKeyIdentifier!"
+
+#: ../src/tls.c:540
 #, c-format
 msgid "Error when signing self-signed certificate"
 msgstr "Erreur à la signature du certificat auto-signé"
 
-#: ../src/tls.c:554
+#: ../src/tls.c:570
 #, c-format
 msgid "Error when initializing csr structure"
 msgstr "Erreur à l'initialisation du CSR!"
 
-#: ../src/tls.c:558
+#: ../src/tls.c:574
 #, c-format
 msgid "Error when setting csr version"
 msgstr "Erreur à l'établissement de la version du CSR!"
 
-#: ../src/tls.c:591
+#: ../src/tls.c:607
 #, c-format
 msgid "Error when signing self-signed csr"
 msgstr "Erreur à la signature du CSR auto-signé!"
 
-#: ../src/tls.c:602
+#: ../src/tls.c:618
 #, c-format
 msgid "Error exporting CSR to PEM structure."
 msgstr "Erreur à l'export du CSR vers le format PEM!"
 
-#: ../src/tls.c:651
+#: ../src/tls.c:672
 #, c-format
 msgid "Error when initializing crt structure"
 msgstr "Erreur à l'initialisation du certificat!"
 
-#: ../src/tls.c:659
+#: ../src/tls.c:680
 #, c-format
 msgid "Error when copying data from CSR to certificate structure"
 msgstr "Erreur à la copie de données du CSR vers le certificat!"
 
-#: ../src/tls.c:777
+#: ../src/tls.c:838
 #, c-format
 msgid "Error when signing certificate"
 msgstr "Erreur à la signature du certificat!"
 
-#: ../src/tls.c:995
+#: ../src/tls.c:1056
 msgid "Key encipher only"
 msgstr "Chiffrement de clé seulement"
 
-#: ../src/tls.c:997
+#: ../src/tls.c:1058
 msgid "Key decipher only"
 msgstr "Déchiffrement de clé seulement"
 
-#: ../src/tls.c:1007
-msgid "TLS WWW Server"
-msgstr "Serveur WWW TLS"
-
-#: ../src/tls.c:1009
+#: ../src/tls.c:1070
 msgid "TLS WWW Client."
 msgstr "Client WWW TLS"
+
+#~ msgid "<big>Certificate properties</big>\n"
+#~ msgstr "<big>Propriétés du certificat</big>\n"
+
+#~ msgid "<big>New certificate properties</big>\n"
+#~ msgstr "<big>Propriétés du nouveau certificat</big>\n"
+
+#~ msgid ""
+#~ "Please, insert the data corresponding to the subject of the new "
+#~ "certificate:\n"
+#~ msgstr ""
+#~ "Entrez les données qui correspondent au titulaire du nouveau certificat:\n"
+
+#~ msgid ""
+#~ "Please, select the Certification Authority that will create the new "
+#~ "certificate:"
+#~ msgstr ""
+#~ "Sélectionnez l'autorité de certification qui créera le nouveau certificat:"
+
+#~ msgid "Select the CA to sign this new certificate"
+#~ msgstr "Choisir le CA qui signera ce nouveau certificat"
+
+#~ msgid "Save CA database"
+#~ msgstr "Sauvegarder la base de données du CA"
+
+#~ msgid "Problem when saving new CA database"
+#~ msgstr "Erreur à la sauvegarde de la base de données du nouveau CA!"
+
+#~ msgid "_File"
+#~ msgstr "_Fichier"
+
+#~ msgid "_New CA"
+#~ msgstr "_Nouveau CA"
+
+#~ msgid "<b>Field value</b>"
+#~ msgstr "<b>Valeur du champ</b>"
+
+#~ msgid "Change Pass_word"
+#~ msgstr "Modifier le _mot de passe"
+
+#~ msgid "New _Certificate Request"
+#~ msgstr "Nouvelle _CSR"
