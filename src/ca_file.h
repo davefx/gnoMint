@@ -35,8 +35,6 @@ gchar * ca_file_create (const gchar *filename);
 
 gboolean ca_file_open (gchar *file_name, gboolean create);
 
-gboolean ca_file_check_and_update_version (void);
-
 void ca_file_close (void);
 
 gboolean ca_file_save_as (gchar *new_file_name);
