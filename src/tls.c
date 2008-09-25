@@ -744,17 +744,18 @@ gchar * tls_generate_certificate (CertCreationData * creation_data,
 
 	
         ca_keyid = g_new0 (guchar,1);	
-        gnutls_x509_crt_get_key_id(ca_crt, 0, ca_keyid, &ca_keyidsize);
-        g_free (ca_keyid);
-        
-        ca_keyid = g_new0 (guchar,ca_keyidsize);
-        gnutls_x509_crt_get_key_id(ca_crt, 0, ca_keyid, &ca_keyidsize);
-        if (gnutls_x509_crt_set_authority_key_id(crt, ca_keyid, ca_keyidsize) !=0) {
-                gnutls_x509_crq_deinit (csr);
-                gnutls_x509_crt_deinit (crt);
-                gnutls_x509_crt_deinit (ca_crt);
-                gnutls_x509_privkey_deinit (ca_pkey);
-                return g_strdup_printf(_("Error when setting authority key identifier extension"));
+        gnutls_x509_crt_get_subject_key_id(ca_crt, ca_keyid, &ca_keyidsize, NULL);
+        g_free (ca_keyid);        
+        if (ca_keyidsize) {
+                ca_keyid = g_new0 (guchar,ca_keyidsize);
+                gnutls_x509_crt_get_subject_key_id(ca_crt, ca_keyid, &ca_keyidsize, NULL);
+                if (gnutls_x509_crt_set_authority_key_id(crt, ca_keyid, ca_keyidsize) !=0) {
+                        gnutls_x509_crq_deinit (csr);
+                        gnutls_x509_crt_deinit (crt);
+                        gnutls_x509_crt_deinit (ca_crt);
+                        gnutls_x509_privkey_deinit (ca_pkey);
+                        return g_strdup_printf(_("Error when setting authority key identifier extension"));
+                }
         }
 
 
