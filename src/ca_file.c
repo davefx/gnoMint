@@ -1341,25 +1341,48 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
                 gint i;
 
                 // Now we look all "orphan" certificates, for seeing if the just inserted certificate is their issuer
+                // so we only look up if their issuer_key_id is the same as the just-inserted-cert subject_key_id, or if
+                // their parent_dn is the same as the just-inserted-cert DN.
+                sql = sqlite3_mprintf ("SELECT id, pem FROM certificates WHERE "
+                                       "parent_route=':' AND parent_id=0 AND (subject_key_id <> issuer_key_id OR dn <> parent_dn) "
+                                       "AND (issuer_key_id = %s OR parent_dn = '%q');",
+                                       sql_subject_key_id, tlscert->dn);
+
                 if (sqlite3_get_table (ca_db,
-                                       "SELECT id, pem FROM certificates WHERE "
-                                       "parent_route=':' AND parent_id=0 AND (subject_key_id <> issuer_key_id OR dn <> parent_dn);",
+                                       sql,
                                        &orphan_res, &rows, &cols, &error)) {
                         sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);
+                        sqlite3_free (sql);
                         return error;
                 }
                 
-                // * So, for each orphan certificate, 
+                sqlite3_free (sql);
+
+                // * So, for each orphan certificate that could have been issued by the just-inserted certificate, 
                 for (i=1; i<=rows; i++) {
-                        //   we see if its issuer_key_id is not null, 
-                        //   and if is the subject_key_id of the imported certificate
+                        // We verify if the imported certificate has issued it
+                        if (tls_cert_check_issuer (orphan_res[(i*2)+1], pem_certificate)) {
+                                // * If it has, we update the certificate parent_id, and parent_route
+                                //   so it matches with the imported certificate
+
+                                sql = sqlite3_mprintf ("UPDATE certificates SET "
+                                                       "parent_dn='%q', "
+                                                       "parent_id=%"G_GUINT64_FORMAT", "
+                                                       "parent_route='%s%"G_GUINT64_FORMAT":'"
+                                                       "WHERE id=%s;",
+                                                       tlscert->dn,
+                                                       cert_id,
+                                                       parent_route,cert_id,
+                                                       orphan_res[i*2]);
+                                if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                                        sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+                                        fprintf (stderr, "%s\n", sql);
+                                        sqlite3_free (sql);
+                                        tls_cert_free (tlscert);
+                                        return error;
+                                }
+                        }
                         
-                        // * If not, we check if its parent_dn is the dn of the imported certificate
-                        
-                        // * Then, if we have found a possible issued certificate, we verify if the imported certificate has issued it
-                        
-                        // * If it has, we update the certificate parent_dn, parent_id, parent_route and issuer_key_id so it matches with the imported
-                        //   certificate
                 }
         }
 

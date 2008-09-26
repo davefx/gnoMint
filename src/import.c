@@ -118,7 +118,7 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
 	gnutls_x509_crt_t cert;
 	gnutls_x509_crt_t *certs = NULL;
 	gnutls_datum_t file_datum;
-        guint num_certs = 999;
+        guint num_certs = 0;
 
 	gchar *aux = NULL;
 
@@ -127,8 +127,11 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
 
 
 	// Trying to import a list of certificates in PEM format
+        gnutls_x509_crt_list_import (NULL, &num_certs, &file_datum, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
 
-	if (gnutls_x509_crt_list_import (certs, &num_certs, &file_datum, GNUTLS_X509_FMT_PEM, 0) > 0) {
+        certs = g_new0 (gnutls_x509_crt_t, num_certs);
+
+	if (gnutls_x509_crt_list_import (certs, &num_certs, &file_datum, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED) > 0) {
 
                 int i;
 
@@ -204,6 +207,8 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
 
                 }
                 successful_import = TRUE;
+
+                g_free (certs);
                         
                 return successful_import;
 	}

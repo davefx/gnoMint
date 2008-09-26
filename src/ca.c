@@ -160,6 +160,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 			// current certificate.
 			
 			while (last_parent_iter && 
+                               g_value_get_string(last_parent_dn_value) && argv[CA_MODEL_COLUMN_PARENT_DN] &&
 			       strcmp (argv[CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
 				
 				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
