@@ -1238,145 +1238,135 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
                                       const UInt160 serial,
                                       const gchar *pem_certificate)
 {
-	/* gchar *sql = NULL; */
-	/* gchar *error = NULL; */
-	/* gchar **row; */
-        /* gchar *serialstr; */
-        /* gsize size; */
-	/* gint64 cert_rowid; */
-	/* guint64 cert_id; */
+	guint64 cert_id;
+	guint64 parent_id;
+        gchar *parent_route = NULL;
+        gchar *parent_pem = NULL;
+	gchar *serialstr = NULL;
 
-	/* gchar **parent_idstr = NULL; */
-	/* guint64 parent_id; */
-        /* gchar *parent_route = NULL; */
+        gchar **issuer_res = NULL;
+        gchar **orphan_res = NULL;
+        gchar *error = NULL;
+        gchar *sql_subject_key_id = NULL;
+        gchar *sql_issuer_key_id = NULL;
+        gchar *sql = NULL;
 
-	/* TlsCert *tlscert = tls_parse_cert_pem (pem_certificate); */
+	TlsCert *tlscert = tls_parse_cert_pem (pem_certificate);
 
-	/* if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) */
-	/* 	return error; */
-
-        /* // We first look up if the issuer is already in the database */
-
-
-	/* parent_idstr = __ca_file_get_single_row ("SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn); */
-	/* if (parent_idstr == NULL) { */
-	/* 	parent_id = 0; */
-	/* 	parent_route = g_strdup(":"); */
-	/* } else { */
-	/* 	parent_id = atoll (parent_idstr[0]); */
-        /*         parent_route = g_strdup_printf("%s%s:",parent_idstr[1], parent_idstr[0]); */
-	/* 	g_strfreev (parent_idstr); */
-	/* } */
-
-        /* serialstr = uint160_strdup_printf(&serial); */
-
-	/* if (private_key_info) */
-	/* 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, " */
-        /*                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) " */
-        /*                                "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', " */
-	/* 			       "NULL, '%q', %d, '%q', '%q', '%q', %"G_GUINT64_FORMAT", '%q');", */
-        /*                                is_ca, */
-	/* 			       serialstr, */
-	/* 			       tlscert->cn, */
-	/* 			       creation_data->activation, */
-	/* 			       creation_data->expiration, */
-	/* 			       pem_certificate, */
-        /*                                private_key_in_db, */
-	/* 			       private_key_info, */
-	/* 			       tlscert->dn, */
-	/* 			       tlscert->i_dn, */
-	/* 			       parent_id, */
-        /*                                parent_route); */
-	/* else */
-	/* 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, " */
-        /*                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route) " */
-        /*                                "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q'," */
-	/* 			       "%"G_GUINT64_FORMAT", '%q');", */
-        /*                                is_ca, */
-	/* 			       serialstr, */
-	/* 			       tlscert->cn, */
-	/* 			       creation_data->activation, */
-	/* 			       creation_data->expiration, */
-	/* 			       pem_certificate, */
-	/* 			       tlscert->dn, */
-	/* 			       tlscert->i_dn, */
-	/* 			       parent_id, */
-        /*                                parent_route); */
-
-        /* g_free (serialstr); */
-	/* tls_cert_free (tlscert); */
-	/* tlscert = NULL; */
-
-	/* g_free (parent_route); */
-
-	/* if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
-	/* 	sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
-	/* 	fprintf (stderr, "%s\n", sql); */
-	/* 	sqlite3_free (sql); */
-	/* 	return error; */
-	/* } */
-
-	/* sqlite3_free (sql); */
-
-	/* cert_rowid = sqlite3_last_insert_rowid (ca_db); */
-	/* row = __ca_file_get_single_row ("SELECT id FROM certificates WHERE ROWID=%"G_GUINT64_FORMAT" ;", */
-	/* 			      cert_rowid); */
-	/* cert_id = atoll (row[0]); */
-	/* g_strfreev (row); */
-
-        /* size = 0; */
-        /* uint160_write_escaped (&serial, NULL, &size); */
-        /* serialstr = g_new0(gchar, size+1); */
-        /* uint160_write_escaped (&serial, serialstr, &size); */
-	/* sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", */
-	/* 		       serialstr, parent_id); */
-	/* if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
-	/* 	sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
-	/* 	fprintf (stderr, "%s\n", sql); */
-	/* 	sqlite3_free (sql); */
-	/* 	return error; */
-	/* } */
-        /* g_free (serialstr); */
-	/* sqlite3_free (sql); */
-
-	/* if (is_ca) { */
-        /*         size = 0; */
-        /*         uint160_assign (&serial, 0); */
-        /*         uint160_write_escaped (&serial, NULL, &size); */
-        /*         serialstr = g_new0(gchar, size+1); */
-        /*         uint160_write_escaped (&serial, serialstr, &size); */
-	/* 	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) " */
-	/* 			       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');", */
-	/* 			       cert_id, serialstr); */
-	/* 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) { */
-	/* 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
-	/* 		fprintf (stderr, "%s\n", sql); */
-	/* 		sqlite3_free (sql); */
-	/* 		return error; */
-	/* 	} */
-	/* 	sqlite3_free (sql); */
-        /*         g_free (serialstr); */
-
-	/* 	if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) || */
-	/* 	    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)|| */
-	/* 	    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)|| */
-	/* 	    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) || */
-	/* 	    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1) || */
-	/* 	    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1) || */
-	/* 	    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1) || */
-	/* 	    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1) || */
-	/* 	    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1)) { */
-	/* 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL); */
-	/* 		sqlite3_free (sql); */
-	/* 		return g_strdup ("Error while establishing policies."); */
-	/* 	} */
+        sql_subject_key_id = (tlscert->subject_key_id ? 
+                              g_strdup_printf ("'%s'",tlscert->subject_key_id) :
+                              g_strdup_printf ("NULL"));
+        sql_issuer_key_id = (tlscert->issuer_key_id ? 
+                             g_strdup_printf ("'%s'",tlscert->issuer_key_id) :
+                             g_strdup_printf ("NULL"));
 
 
-	/* } */
-	
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+        
+        // We first look up if the issuer is already in the database
+        // * We first search using issuer_key_id (if the imported certificate has this field)
+        if (tlscert->issuer_key_id) {
+                issuer_res = __ca_file_get_single_row ("SELECT id, parent_route, pem FROM certificates WHERE is_ca=1 AND subject_key_id='%q';", 
+                                                   tlscert->issuer_key_id);
+        }
 
-	/* if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error)) */
-	/* 	return error; */
+        if ((! issuer_res) && (tlscert->i_dn)) {
+                // * If is not found, we seek the issuer through the issuer_dn field
+                issuer_res = __ca_file_get_single_row ("SELECT id, parent_route, pem FROM certificates WHERE is_ca=1 AND dn='%q';",
+                                                   tlscert->i_dn);
+        }
+        
+        if (issuer_res) {
+                parent_id = atoll (issuer_res[0]);
+                parent_route = g_strdup_printf("%s%s:",issuer_res[1], issuer_res[0]);
+                parent_pem = g_strdup (issuer_res[2]);
+                g_strfreev (issuer_res);
+        } else {
+                // No possible parent certificate was found 
+                parent_id = 0; 
+                parent_route = g_strdup(":");
+                parent_pem = NULL;
+        }
+
+        // * Now, if we have found a possible issuer, we verify if the imported certificate has been issued by it
+        if (parent_id != 0) {
+                if (! tls_cert_check_issuer (pem_certificate, parent_pem)) {
+                        // The possible parent is not the issuer.
+                        parent_id = 0;
+                        g_free (parent_route);
+                        parent_route = g_strdup(":");
+                }
+        }
+        g_free (parent_pem);
+        parent_pem = NULL;
+
+        // We insert the certificate, with the correct issuer, if this has been found
+
+        serialstr = uint160_strdup_printf(&serial);
+        sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
+                               "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, "
+                               "issuer_key_id) "
+                               "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
+                               "%"G_GUINT64_FORMAT", '%q', %s, %s);",
+                               is_ca,
+                               serialstr,
+                               tlscert->cn,
+                               creation_data->activation,
+                               creation_data->expiration,
+                               pem_certificate,
+                               tlscert->dn,
+                               tlscert->i_dn,
+                               parent_id,
+                               parent_route,
+                               sql_subject_key_id,
+                               sql_issuer_key_id);
+        g_free (serialstr);
+        g_free (parent_route);
+
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+		fprintf (stderr, "%s\n", sql);
+		sqlite3_free (sql);
+		tls_cert_free (tlscert);
+                return error;
+	}
+
+        sqlite3_free (sql);
+
+        cert_id = sqlite3_last_insert_rowid(ca_db);
+
+        if (is_ca) {
+                gint rows, cols;
+                gint i;
+
+                // Now we look all "orphan" certificates, for seeing if the just inserted certificate is their issuer
+                if (sqlite3_get_table (ca_db,
+                                       "SELECT id, pem FROM certificates WHERE "
+                                       "parent_route=':' AND parent_id=0 AND (subject_key_id <> issuer_key_id OR dn <> parent_dn);",
+                                       &orphan_res, &rows, &cols, &error)) {
+                        sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);
+                        return error;
+                }
+                
+                // * So, for each orphan certificate, 
+                for (i=1; i<=rows; i++) {
+                        //   we see if its issuer_key_id is not null, 
+                        //   and if is the subject_key_id of the imported certificate
+                        
+                        // * If not, we check if its parent_dn is the dn of the imported certificate
+                        
+                        // * Then, if we have found a possible issued certificate, we verify if the imported certificate has issued it
+                        
+                        // * If it has, we update the certificate parent_dn, parent_id, parent_route and issuer_key_id so it matches with the imported
+                        //   certificate
+                }
+        }
+
+        tls_cert_free (tlscert);
+
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		return error;
 
 	return NULL;
 

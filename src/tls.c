@@ -902,7 +902,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-		res->cn = strdup (aux);
+		res->cn = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -912,7 +912,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-		res->o = strdup (aux);
+		res->o = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -922,7 +922,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-		res->ou = strdup (aux);
+		res->ou = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -933,7 +933,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn (*cert, aux, &size);
-		res->dn = strdup (aux);
+		res->dn = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -943,7 +943,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-		res->i_cn = strdup (aux);
+		res->i_cn = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -953,7 +953,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-		res->i_o = strdup (aux);
+		res->i_o = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -963,7 +963,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-		res->i_ou = strdup (aux);
+		res->i_ou = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -973,7 +973,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_issuer_dn (*cert, aux, &size);
-		res->i_dn = strdup (aux);
+		res->i_dn = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -983,7 +983,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_COUNTRY_NAME, 0, 0, aux, &size);
-		res->c = strdup (aux);
+		res->c = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -993,7 +993,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 0, aux, &size);
-		res->st = strdup (aux);
+		res->st = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1003,7 +1003,7 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_LOCALITY_NAME, 0, 0, aux, &size);
-		res->l = strdup (aux);
+		res->l = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1205,7 +1205,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-		res->cn = strdup (aux);
+		res->cn = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1215,7 +1215,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 0, aux, &size);
-		res->o = strdup (aux);
+		res->o = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1225,7 +1225,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 0, aux, &size);
-		res->ou = strdup (aux);
+		res->ou = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1235,7 +1235,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_X520_COUNTRY_NAME, 0, 0, aux, &size);
-		res->c = strdup (aux);
+		res->c = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1245,7 +1245,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 0, aux, &size);
-		res->st = strdup (aux);
+		res->st = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1255,7 +1255,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_X520_LOCALITY_NAME, 0, 0, aux, &size);
-		res->l = strdup (aux);
+		res->l = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1265,7 +1265,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	if (size) {
 		aux = g_new0(gchar, size);
 		gnutls_x509_crq_get_dn (*csr, aux, &size);
-		res->dn = strdup (aux);
+		res->dn = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1446,4 +1446,44 @@ gchar * tls_generate_dh_params (guint bits)
 	}
 	
 	return (gchar *) result;
+}
+
+gboolean tls_cert_check_issuer (const gchar *cert_pem, const gchar *ca_pem) 
+{
+	gnutls_datum_t pem_datum;
+        gnutls_x509_crt_t crt;
+        gnutls_x509_crt_t ca_crt;
+        gboolean result = FALSE;
+
+	if (gnutls_x509_crt_init (&crt) < 0) {
+		return FALSE;
+	}
+
+        pem_datum.data = (unsigned char *) cert_pem;
+        pem_datum.size = strlen(cert_pem);
+
+	if (gnutls_x509_crt_import (crt, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+                gnutls_x509_crt_deinit (crt);
+		return FALSE;
+	}
+
+	if (gnutls_x509_crt_init (&ca_crt) < 0) {
+                gnutls_x509_crt_deinit (crt);
+		return FALSE;
+	}
+
+        pem_datum.data = (unsigned char *) ca_pem;
+        pem_datum.size = strlen(ca_pem);
+
+	if (gnutls_x509_crt_import (ca_crt, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+                gnutls_x509_crt_deinit (crt);
+                gnutls_x509_crt_deinit (ca_crt);
+		return FALSE;
+	}
+
+        result = gnutls_x509_crt_check_issuer(crt, ca_crt);
+        gnutls_x509_crt_deinit (crt);
+        gnutls_x509_crt_deinit (ca_crt);
+
+        return result;
 }

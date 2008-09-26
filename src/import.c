@@ -55,7 +55,7 @@ gboolean import_csr (guchar *file_contents, gsize file_contents_size)
 		if (size) {
 			aux = g_new0(gchar, size);
 			gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-			creation_data->cn = strdup (aux);
+			creation_data->cn = g_strdup (aux);
 			g_free (aux);
 			aux = NULL;
 		}	        
@@ -88,7 +88,7 @@ gboolean import_csr (guchar *file_contents, gsize file_contents_size)
 		if (size) {
 			aux = g_new0(gchar, size);
 			gnutls_x509_crq_get_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-			creation_data->cn = strdup (aux);
+			creation_data->cn = g_strdup (aux);
 			g_free (aux);
 			aux = NULL;
 		}	        
@@ -183,7 +183,7 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
                         if (size) {
                                 aux = g_new0(gchar, size);
                                 gnutls_x509_crt_export (certs[i], GNUTLS_X509_FMT_PEM, aux, &size);
-                                pem_cert = strdup (aux);
+                                pem_cert = g_strdup (aux);
                                 g_free (aux);
                                 aux = NULL;
                         }
@@ -259,7 +259,7 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
                 if (size) {
                         aux = g_new0(gchar, size);
                         gnutls_x509_crt_export (cert, GNUTLS_X509_FMT_PEM, aux, &size);
-                        pem_cert = strdup (aux);
+                        pem_cert = g_strdup (aux);
                         g_free (aux);
                         aux = NULL;
                 }

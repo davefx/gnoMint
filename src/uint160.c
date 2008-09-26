@@ -101,7 +101,7 @@ void uint160_shift (UInt160 *var, guint positions)
 }
 
 
-gboolean uint160_write (UInt160 *var, guchar *buffer, gsize * max_size)
+gboolean uint160_write (const UInt160 *var, guchar *buffer, gsize * max_size)
 {
         if (*max_size < sizeof(UInt160)) {
                 *max_size = sizeof(UInt160);
@@ -133,7 +133,7 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
         return TRUE;
 }
 
-gboolean uint160_write_escaped (UInt160 *var, gchar *buffer, gsize * max_size)
+gboolean uint160_write_escaped (const UInt160 *var, gchar *buffer, gsize * max_size)
 {
         int i;
         guchar *current = (guchar *) var;
@@ -196,7 +196,7 @@ gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize buffer_size)
         return TRUE;
 }
 
-gchar * uint160_strdup_printf (UInt160 *var)
+gchar * uint160_strdup_printf (const UInt160 *var)
 {
 
         if (var->value2==0 && var->value1==0) {

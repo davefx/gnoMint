@@ -119,4 +119,7 @@ gchar * tls_generate_crl (GList * revoked_certs,
 
 gchar * tls_generate_dh_params (guint bits);
 
+gboolean tls_cert_check_issuer (const gchar *cert_pem, const gchar *ca_pem);
+
+
 #endif

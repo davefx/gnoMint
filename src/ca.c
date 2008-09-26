@@ -287,7 +287,7 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 	gmtime_r (&model_time, &model_time_tm);
 	
 	size = strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
-	result = strdup (model_time_str);
+	result = g_strdup (model_time_str);
 
 	g_object_set(G_OBJECT(cell), "text", result, NULL);
 	
