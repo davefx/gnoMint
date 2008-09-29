@@ -1487,3 +1487,92 @@ gboolean tls_cert_check_issuer (const gchar *cert_pem, const gchar *ca_pem)
 
         return result;
 }
+
+gchar * tls_get_private_key_id (const gchar *privkey_pem)
+{
+	gnutls_datum_t pem_datum;
+        gnutls_x509_privkey_t privkey;
+
+	gchar * pkey_key_id = NULL;
+        gsize pkey_key_id_len;
+        guchar *uaux = NULL;
+
+        guint i;
+        
+	if (gnutls_x509_privkey_init (&privkey) < 0) {
+		return FALSE;
+	}
+
+        pem_datum.data = (unsigned char *) privkey_pem;
+        pem_datum.size = strlen(privkey_pem);
+
+	if (gnutls_x509_privkey_import (privkey, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+                gnutls_x509_privkey_deinit (privkey);
+		return FALSE;
+	}
+
+	uaux = NULL;
+	pkey_key_id_len = 0;
+	gnutls_x509_privkey_get_key_id (privkey, 0, uaux, &pkey_key_id_len);
+	uaux = g_new0(guchar, pkey_key_id_len);
+	if (gnutls_x509_privkey_get_key_id (privkey, 0, uaux, &pkey_key_id_len)) {
+		g_free (uaux);
+		gnutls_x509_privkey_deinit (privkey);
+		return NULL;
+	}
+	pkey_key_id = g_new0(gchar, pkey_key_id_len*3);
+	for (i=0; i<pkey_key_id_len; i++) {
+		snprintf (&pkey_key_id[i*3], 3, "%02X", uaux[i]);
+		if (i != pkey_key_id_len - 1)
+			pkey_key_id[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+
+        return pkey_key_id;
+        
+}
+
+gchar * tls_get_public_key_id (const gchar *certificate_pem)
+{
+	gnutls_datum_t pem_datum;
+        gnutls_x509_crt_t crt;
+
+	gchar * key_id = NULL;
+        gsize key_id_len;
+        guchar *uaux = NULL;
+        
+        guint i;
+
+	if (gnutls_x509_crt_init (&crt) < 0) {
+		return FALSE;
+	}
+
+        pem_datum.data = (unsigned char *) certificate_pem;
+        pem_datum.size = strlen(certificate_pem);
+
+	if (gnutls_x509_crt_import (crt, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+                gnutls_x509_crt_deinit (crt);
+		return FALSE;
+	}
+
+	uaux = NULL;
+	key_id_len = 0;
+	gnutls_x509_crt_get_key_id (crt, 0, uaux, &key_id_len);
+	uaux = g_new0(guchar, key_id_len);
+	if (gnutls_x509_crt_get_key_id (crt, 0, uaux, &key_id_len)) {
+		g_free (uaux);
+		gnutls_x509_crt_deinit (crt);
+		return NULL;
+	}
+	key_id = g_new0(gchar, key_id_len*3);
+	for (i=0; i<key_id_len; i++) {
+		snprintf (&key_id[i*3], 3, "%02X", uaux[i]);
+		if (i != key_id_len - 1)
+			key_id[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+
+        return key_id;
+        
+
+}

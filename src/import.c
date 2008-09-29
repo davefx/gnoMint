@@ -292,7 +292,58 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
 
 gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 {
-        return FALSE;
+	gboolean successful_import = FALSE;
+	gnutls_x509_privkey_t privkey;
+	gnutls_datum_t file_datum;
+
+        file_datum.data = file_contents;
+        file_datum.size = file_contents_size;
+
+	// Trying to import a Certificate Signing Request in PEM format
+
+	if (gnutls_x509_privkey_init (&privkey) < 0)
+		return FALSE;
+
+	if (gnutls_x509_privkey_import (privkey, &file_datum, GNUTLS_X509_FMT_PEM) == 0) {
+		gchar * pem_privkey=NULL;
+		gchar * error_msg;
+
+		pem_privkey = (gchar *) file_datum.data; 
+		
+		error_msg = ca_file_import_privkey (pem_privkey);
+		
+		if (error_msg) {
+			gchar *message = g_strdup_printf (_("Couldn't import the given private key. \n"
+							    "%s"),
+							  error_msg);
+			ca_error_dialog (message);
+			g_free (message);
+		}
+		successful_import = TRUE;
+		
+	}
+
+	// Trying to import a Certificate Signing Request in DER format
+
+	if (gnutls_x509_privkey_import (privkey, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
+		gchar * pem_privkey=NULL;
+		size_t size;
+
+
+		size = 0;
+		gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size)  ; 
+		if (size) {
+			pem_privkey = g_new0(gchar, size);
+			gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size);
+			
+		}
+
+		ca_file_import_privkey (pem_privkey);
+
+		successful_import = TRUE;
+	}
+	
+	return successful_import;
 }
 
 gboolean import_crl (guchar *file_contents, gsize file_contents_size)

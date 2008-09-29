@@ -1490,6 +1490,54 @@ gchar * ca_file_revoke_crt (gint id)
 }
 
 
+gchar * ca_file_import_privkey (const gchar *privkey_pem)
+{
+        gchar *pkey_key_id = NULL;
+        /* gchar *sql = NULL; */
+        gchar *error = NULL;
+
+        // We calculate key-id from the private key
+        pkey_key_id = tls_get_private_key_id(privkey_pem);
+
+        {
+                gint rows, cols;
+                gint i;
+                gchar **table;
+                
+                // I get all certificates in dateabase that have not their private key in
+                // the database, and it is not locatable.
+                if (sqlite3_get_table (ca_db,
+                                       "SELECT id, pem FROM certificates WHERE "
+                                       "private_key_in_db=FALSE;",
+                                       &table, &rows, &cols, &error)) {
+                        return error;
+                }
+                
+                for (i=1; i<=rows; i++) {
+                        gchar *public_key_id = NULL;
+
+                        // Foreach of them, we get their key-id from the public-key
+                        public_key_id = tls_get_public_key_id (table[(i*cols) + 1]);
+
+                        // If both key-ids match, we cipher (it we must) the private key,
+                        // and insert it into the database.
+                        if (! strcmp (pkey_key_id, public_key_id)) {
+                                
+
+                                // sql = "UPDATE certificates SET private_key_in_db=TRUE WHERE";
+                        }
+
+                        g_free (public_key_id);
+                }
+
+        }
+
+        
+        return NULL;
+
+}
+
+
 int __ca_file_get_revoked_certs_add_certificate (void *pArg, int argc, char **argv, char **columnNames)
 {
         GList **p_list = (GList **) pArg;

@@ -121,5 +121,7 @@ gchar * tls_generate_dh_params (guint bits);
 
 gboolean tls_cert_check_issuer (const gchar *cert_pem, const gchar *ca_pem);
 
+gchar * tls_get_private_key_id (const gchar *privkey_pem);
+gchar * tls_get_public_key_id (const gchar *certificate_pem);
 
 #endif
