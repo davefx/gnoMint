@@ -299,7 +299,7 @@ gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
         file_datum.data = file_contents;
         file_datum.size = file_contents_size;
 
-	// Trying to import a Certificate Signing Request in PEM format
+	// Trying to import a Private Key in PEM format
 
 	if (gnutls_x509_privkey_init (&privkey) < 0)
 		return FALSE;
@@ -323,7 +323,7 @@ gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 		
 	}
 
-	// Trying to import a Certificate Signing Request in DER format
+	// Trying to import a Private Key in DER format
 
 	if (gnutls_x509_privkey_import (privkey, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
 		gchar * pem_privkey=NULL;
@@ -348,7 +348,98 @@ gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 
 gboolean import_crl (guchar *file_contents, gsize file_contents_size)
 {
-        return FALSE;
+	gboolean successful_import = FALSE;
+	gnutls_x509_crl_t crl;
+	gnutls_x509_crt_t issuer_crt;
+	gnutls_datum_t file_datum;
+
+        gsize size = 0;
+        gchar *issuer_dn = NULL;
+        gchar *cert_pem = NULL;
+        guint64 issuer_id;
+
+        file_datum.data = file_contents;
+        file_datum.size = file_contents_size;
+
+	// Trying to import a Certificate Revocation List in PEM format
+
+	if (gnutls_x509_crl_init (&crl) < 0)
+		return FALSE;
+
+	if (gnutls_x509_crl_import (crl, &file_datum, GNUTLS_X509_FMT_PEM) != 0 && 
+            gnutls_x509_crl_import (crl, &file_datum, GNUTLS_X509_FMT_DER) != 0) {
+                // The given file is not a DER-coded CRL, neither a PEM-coded CRL
+
+                gnutls_x509_crl_deinit (crl);
+                return FALSE;
+        }
+                
+        size = 0;
+        gnutls_x509_crl_get_issuer_dn (crl, issuer_dn, &size)  ; 
+        if (size) {
+                issuer_dn = g_new0(gchar, size);
+                gnutls_x509_crl_get_issuer_dn (crl, issuer_dn, &size);		
+        }
+
+        // First, we search the issuer in the database, using DN
+        if (ca_file_get_id_from_dn (CA_FILE_ELEMENT_TYPE_CERT, issuer_dn, &issuer_id)) {
+        
+                // We check if the supposed issuer is the actual issuer
+                cert_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, issuer_id);
+
+                if (gnutls_x509_crt_init (&issuer_crt) < 0) {
+                        gnutls_x509_crl_deinit(crl);
+                        g_free (issuer_dn);
+                        g_free (cert_pem);
+                        return FALSE;
+                }
+
+                file_datum.data = (guchar *) cert_pem;
+                file_datum.size = strlen(cert_pem);
+
+                if (gnutls_x509_crt_import (issuer_crt, &file_datum, GNUTLS_X509_FMT_PEM) != 0) {
+
+                        if (gnutls_x509_crl_check_issuer (crl, issuer_crt)) {
+                                int number_of_certs;
+                                int i;
+
+                                // If it is, we recover all the certificates 
+                                number_of_certs = gnutls_x509_crl_get_crt_count(crl);
+
+                                for (i=0; i<number_of_certs; i++) {
+                                        guchar *serialcrt = NULL;
+                                        UInt160 serial;
+                                        time_t revocation = 0;
+
+                                        // We look up each of the certificates in the crl
+
+                                        size = 0;
+                                        gnutls_x509_crl_get_crt_serial (crl, i, serialcrt, &size, &revocation);
+                                        if (size) {
+                                                guint64 cert_id;
+
+                                                serialcrt = g_new0 (guchar, size);
+                                                gnutls_x509_crl_get_crt_serial (crl, i, serialcrt, &size, &revocation);
+                                                uint160_read (&serial, serialcrt, size);
+                                                g_free (serialcrt);
+                                                serialcrt = NULL;
+
+                                                if (ca_file_get_id_from_serial_issuer_id (&serial, issuer_id, &cert_id)) {
+                                                        // If found, we revoke it with the correct date
+                                                        ca_file_revoke_crt_with_date (cert_id, revocation);
+                                                }
+                                        }
+                                }
+
+                        }
+                }
+
+                gnutls_x509_crt_deinit (issuer_crt);
+        }        
+                		
+        successful_import = TRUE;                        
+	
+	return successful_import;
 }
 
 gboolean import_pkcs7 (guchar *file_contents, gsize file_contents_size)

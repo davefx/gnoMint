@@ -1444,7 +1444,7 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 }
 
 
-gchar * ca_file_remove_csr (gint id)
+gchar * ca_file_remove_csr (guint64 id)
 {
 	gchar *sql = NULL;
 	gchar *error = NULL;
@@ -1452,7 +1452,7 @@ gchar * ca_file_remove_csr (gint id)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	sql = sqlite3_mprintf ("DELETE FROM cert_requests WHERE id = %d ;", 
+	sql = sqlite3_mprintf ("DELETE FROM cert_requests WHERE id = %"G_GUINT64_FORMAT" ;", 
 			       id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
@@ -1465,7 +1465,7 @@ gchar * ca_file_remove_csr (gint id)
 
 }
 
-gchar * ca_file_revoke_crt (gint id)
+gchar * ca_file_revoke_crt (guint64 id)
 {
 	gchar *sql = NULL;
 	gchar *error = NULL;
@@ -1475,9 +1475,30 @@ gchar * ca_file_revoke_crt (gint id)
 
         fprintf (stderr, "%ld\n", time(NULL));
 
-	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %d ;", 
+	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %"G_GUINT64_FORMAT" ;", 
 			       time(NULL),
                                id);
+	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
+		return error;
+	sqlite3_free (sql);
+	
+	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+		return error;
+
+	return NULL;
+
+}
+
+gchar * ca_file_revoke_crt_with_date (guint64 id, time_t date)
+{
+	gchar *sql = NULL;
+	gchar *error = NULL;
+
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+		return error;
+
+	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %"G_GUINT64_FORMAT" ;", 
+			       date, id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	sqlite3_free (sql);
@@ -2082,6 +2103,57 @@ gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointe
 
 	return  (! error_str);
 	
+}
+
+gboolean ca_file_get_id_from_serial_issuer_id (const UInt160 *serial, const guint64 issuer_id, guint64 *db_id)
+{
+        gchar **aux;
+        gchar *serial_str = uint160_strdup_printf(serial);
+
+        aux = __ca_file_get_single_row ("SELECT id FROM certificates WHERE parent_id=%"G_GUINT64_FORMAT" AND serial='%q';", 
+                                        issuer_id, serial_str);
+	
+        g_free (serial_str);
+        
+	if (! aux)
+		return FALSE;
+        
+	if (! aux[0]) {
+		g_strfreev (aux);
+		return FALSE;
+	}
+
+	*db_id = atoll (aux[0]);
+
+        g_strfreev (aux);
+
+        return TRUE;
+
+}
+
+gboolean ca_file_get_id_from_dn (CaFileElementType type, const gchar *dn, guint64 *db_id)
+{
+        gchar **aux;
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
+		aux = __ca_file_get_single_row ("SELECT id FROM certificates WHERE dn='%q';", dn);
+	} else {
+		aux = __ca_file_get_single_row ("SELECT id FROM cert_requests WHERE dn='%q';", dn);
+	}
+	
+	if (! aux)
+		return FALSE;
+        
+	if (! aux[0]) {
+		g_strfreev (aux);
+		return FALSE;
+	}
+
+	*db_id = atoll (aux[0]);
+
+        g_strfreev (aux);
+
+        return TRUE;
 }
 
 

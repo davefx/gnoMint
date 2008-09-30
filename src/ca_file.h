@@ -59,8 +59,9 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 gchar * ca_file_insert_csr (CaCreationData * creation_data,
 			    gchar *pem_private_key,
 			    gchar *pem_csr);
-gchar * ca_file_remove_csr (gint id);
-gchar * ca_file_revoke_crt (gint id);
+gchar * ca_file_remove_csr (guint64 id);
+gchar * ca_file_revoke_crt (guint64 id);
+gchar * ca_file_revoke_crt_with_date (guint64 id, time_t date);
 
 gchar * ca_file_import_privkey (const gchar *privkey_pem);
 
@@ -72,6 +73,8 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
 gboolean ca_file_foreach_csr (CaFileCallbackFunc func, gpointer userdata);
 gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointer userdata);
 
+gboolean ca_file_get_id_from_serial_issuer_id (const UInt160 *serial, const guint64 issuer_id, guint64 *db_id);
+gboolean ca_file_get_id_from_dn (CaFileElementType type, const gchar *dn, guint64 *db_id);
 gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id);
