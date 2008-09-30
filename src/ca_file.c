@@ -1493,47 +1493,61 @@ gchar * ca_file_revoke_crt (gint id)
 gchar * ca_file_import_privkey (const gchar *privkey_pem)
 {
         gchar *pkey_key_id = NULL;
-        /* gchar *sql = NULL; */
+        gchar *sql = NULL;
         gchar *error = NULL;
+
+        gint rows, cols;
+        gint i;
+        gchar **table;
+                
 
         // We calculate key-id from the private key
         pkey_key_id = tls_get_private_key_id(privkey_pem);
 
-        {
-                gint rows, cols;
-                gint i;
-                gchar **table;
-                
-                // I get all certificates in dateabase that have not their private key in
-                // the database, and it is not locatable.
-                if (sqlite3_get_table (ca_db,
-                                       "SELECT id, pem FROM certificates WHERE "
-                                       "private_key_in_db=FALSE;",
-                                       &table, &rows, &cols, &error)) {
-                        return error;
-                }
-                
-                for (i=1; i<=rows; i++) {
-                        gchar *public_key_id = NULL;
-
-                        // Foreach of them, we get their key-id from the public-key
-                        public_key_id = tls_get_public_key_id (table[(i*cols) + 1]);
-
-                        // If both key-ids match, we cipher (it we must) the private key,
-                        // and insert it into the database.
-                        if (! strcmp (pkey_key_id, public_key_id)) {
-                                
-
-                                // sql = "UPDATE certificates SET private_key_in_db=TRUE WHERE";
-                        }
-
-                        g_free (public_key_id);
-                }
-
+        // I get all certificates in dateabase that have not their private key in
+        // the database, and it is not locatable.
+        if (sqlite3_get_table (ca_db,
+                               "SELECT id, pem FROM certificates WHERE "
+                               "private_key_in_db=0;",
+                               &table, &rows, &cols, &error)) {
+                return error;
         }
-
         
-        return NULL;
+        for (i=1; i<=rows; i++) {
+                gchar *public_key_id = NULL;
+                
+                // Foreach of them, we get their key-id from the public-key
+                public_key_id = tls_get_public_key_id (table[(i*cols) + 1]);
+                
+                // If both key-ids match, we cipher (it we must) the private key,
+                // and insert it into the database.
+                if (! strcmp (pkey_key_id, public_key_id)) {
+                        TlsCert *certificate = tls_parse_cert_pem (table[(i*cols) + 1]);
+                        gchar *crypted_pkey_pem = pkey_manage_crypt (privkey_pem, certificate->dn);
+                        
+                        sql = sqlite3_mprintf ("UPDATE certificates SET private_key_in_db=1, private_key='%q' "
+                                               "WHERE id=%s", crypted_pkey_pem, table[i*cols]);
+                        if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                                tls_cert_free (certificate);
+                                g_free (crypted_pkey_pem);
+                                g_free (public_key_id);
+                                sqlite3_free_table (table);
+                                return error;
+                        }
+                        
+                        tls_cert_free (certificate);
+                        g_free (crypted_pkey_pem);
+                        g_free (public_key_id);
+                        sqlite3_free_table (table);
+                        return NULL;
+                }
+                
+                g_free (public_key_id);
+        }       
+
+        sqlite3_free_table (table);
+                        
+        return _("The given private key doesn't match any key-less certificate in the database.");
 
 }
 
