@@ -263,7 +263,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	ca_creation_data->activation = tmp;
 	
 	expiration_time = g_new (struct tm,1);
-	gmtime_r (&tmp, expiration_time);      
+	localtime_r (&tmp, expiration_time);      
 	expiration_time->tm_mon = expiration_time->tm_mon + ca_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
 	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
