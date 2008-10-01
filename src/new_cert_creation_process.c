@@ -71,6 +71,8 @@ void new_cert_creation_process_ca_finish (void)
 	
 	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
 	
+        ca_refresh_model();
+
         dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          GTK_MESSAGE_INFO,
@@ -82,7 +84,6 @@ void new_cert_creation_process_ca_finish (void)
         gtk_widget_destroy (GTK_WIDGET(dialog));
         gtk_widget_destroy (widget);
 			
-        ca_refresh_model ();
 
 }
 

@@ -39,6 +39,7 @@ gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 {
 
 	size_t private_key_len = 0;
+        gint error;
 
 	(*key) = g_new0 (gnutls_x509_privkey_t, 1);
 	if (gnutls_x509_privkey_init (*key) < 0) {
@@ -46,8 +47,9 @@ gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 	}
 
 	/* Generate a RSA private key. */
-	if (gnutls_x509_privkey_generate ((** key), GNUTLS_PK_RSA, creation_data->key_bitlength, 0) < 0) {
-		return g_strdup_printf(_("Error creating private key."));
+        error = gnutls_x509_privkey_generate ((** key), GNUTLS_PK_RSA, creation_data->key_bitlength, 0);
+	if (error < 0) {
+		return g_strdup_printf(_("Error creating private key: %d"), error);
 	}
 
 
@@ -71,6 +73,7 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 {
 
 	size_t private_key_len = 0;
+        gint error;
 
 	(*key) = g_new0 (gnutls_x509_privkey_t, 1);
 	if (gnutls_x509_privkey_init (*key) < 0) {
@@ -78,8 +81,9 @@ gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
 	}
 
 	/* Generate DSA private key. */
-	if (gnutls_x509_privkey_generate ((** key), GNUTLS_PK_DSA, creation_data->key_bitlength, 0) < 0) {
-		return g_strdup_printf(_("Error creating private key."));
+        error = gnutls_x509_privkey_generate ((** key), GNUTLS_PK_DSA, creation_data->key_bitlength, 0);
+	if (error < 0) {
+		return g_strdup_printf(_("Error creating private key: %d"), error);
 	}
 
 

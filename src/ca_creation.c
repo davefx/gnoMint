@@ -68,7 +68,7 @@ gpointer ca_creation_thread (gpointer data)
 			g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
 			ca_creation_data_free (creation_data);
-			return NULL;
+			return ca_creation_message;
 			// return error_message;
 		}
 
@@ -94,7 +94,7 @@ gpointer ca_creation_thread (gpointer data)
 
  			//return error_message; 
 			ca_creation_data_free (creation_data);
-			return NULL;
+			return ca_creation_message;
  		} 
 
 		break;
@@ -117,7 +117,7 @@ gpointer ca_creation_thread (gpointer data)
 		g_free (error_message);
  		//return error_message; 
 		ca_creation_data_free (creation_data);
-		return NULL;
+		return ca_creation_message;
  	} 
 
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
@@ -138,7 +138,7 @@ gpointer ca_creation_thread (gpointer data)
 		g_free (error_message);
 		ca_creation_data_free (creation_data);
 
-		return NULL;
+		return ca_creation_message;
 	}
 
 	printf ("\n\n%s\n\n", root_certificate);
