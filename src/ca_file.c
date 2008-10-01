@@ -2099,7 +2099,7 @@ gboolean ca_file_foreach_policy (CaFileCallbackFunc func, guint64 ca_id, gpointe
 
 	sqlite3_exec (ca_db, query, func, userdata, &error_str);
 
-	sqlite3_free (query);
+	g_free (query);
 
 	return  (! error_str);
 	
