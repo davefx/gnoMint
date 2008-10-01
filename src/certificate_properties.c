@@ -78,30 +78,30 @@ const certificate_properties_oid_label_couple_t certificate_properties_oid_label
 	{0, 0},
 };
 
-void __certificate_properties_fill_tbsCertificate_extensions_SubjectKeyIdentifier(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_tbsCertificate_extensions_KeyUsage(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_tbsCertificate_extensions_SubjectAltName(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_tbsCertificate_extensions_BasicConstraints(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_tbsCertificate_extensions_CRLDistributionPoints(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_tbsCertificate_extensions_AuthorityKeyIdentifier(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_tbsCertificate_extensions_ExtKeyUsage(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_KeyUsage(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_SubjectAltName(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_BasicConstraints(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_CRLDistributionPoints(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_ExtKeyUsage(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
 gchar * __certificate_properties_dump_raw_data(const unsigned char *buffer, size_t buffer_size);
 const gchar * __certificate_properties_lookup_oid_label(const certificate_properties_oid_label_couple_t *oid_label_table, const gchar *oid);
 certificate_properties_fill_t __certificate_properties_lookup_oid_function (const certificate_properties_oid_function_couple_t *oid_func_table, 
 									    const gchar *oid);
 gchar * __certificate_properties_dump_RDNSequence(const gchar *buffer, gsize buffer_size);
 gchar * __certificate_properties_dump_key_usage(guint key_usage);
-void __certificate_properties_fill_tbsCertificate_version(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_signature(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_issuerUniqueID (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_subjectUniqueID (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate_extensions (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_tbsCertificate (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_version(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_signature(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_subjectPublicKeyInfo (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_issuerUniqueID (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_subjectUniqueID (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_ext (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
 void __certificate_properties_fill_signatureAlgorithm (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
 void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
 void __certificate_properties_fill_certificate(GtkTreeStore *store, gnutls_x509_crt_t *certificate);
@@ -109,13 +109,13 @@ void __certificate_properties_fill_certificate(GtkTreeStore *store, gnutls_x509_
 
 
 const certificate_properties_oid_function_couple_t certificate_properties_oid_function_table[] = {
-	{"2.5.29.14", __certificate_properties_fill_tbsCertificate_extensions_SubjectKeyIdentifier},
-	{"2.5.29.15", __certificate_properties_fill_tbsCertificate_extensions_KeyUsage},
-	{"2.5.29.17", __certificate_properties_fill_tbsCertificate_extensions_SubjectAltName},
-	{"2.5.29.19", __certificate_properties_fill_tbsCertificate_extensions_BasicConstraints},
-	{"2.5.29.31", __certificate_properties_fill_tbsCertificate_extensions_CRLDistributionPoints},
-	{"2.5.29.35", __certificate_properties_fill_tbsCertificate_extensions_AuthorityKeyIdentifier},
-	{"2.5.29.37", __certificate_properties_fill_tbsCertificate_extensions_ExtKeyUsage},
+	{"2.5.29.14", __certificate_properties_fill_cert_ext_SubjectKeyIdentifier},
+	{"2.5.29.15", __certificate_properties_fill_cert_ext_KeyUsage},
+	{"2.5.29.17", __certificate_properties_fill_cert_ext_SubjectAltName},
+	{"2.5.29.19", __certificate_properties_fill_cert_ext_BasicConstraints},
+	{"2.5.29.31", __certificate_properties_fill_cert_ext_CRLDistributionPoints},
+	{"2.5.29.35", __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier},
+	{"2.5.29.37", __certificate_properties_fill_cert_ext_ExtKeyUsage},
 	{0, 0},
 };
 
@@ -365,7 +365,7 @@ gchar * __certificate_properties_dump_key_usage(guint key_usage)
 	return result;
 }
 
-void __certificate_properties_fill_tbsCertificate_version(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_version(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	gint result;
 	gchar value[4];
@@ -377,7 +377,7 @@ void __certificate_properties_fill_tbsCertificate_version(GtkTreeStore *store, G
 	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Version"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 }
 
-void __certificate_properties_fill_tbsCertificate_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	gint result;
 	gsize buffer_size = 0;
@@ -414,7 +414,7 @@ void __certificate_properties_fill_tbsCertificate_serialNumber(GtkTreeStore *sto
 	g_free(value);
 }
 
-void __certificate_properties_fill_tbsCertificate_signature(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_signature(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	int result;
 	GtkTreeIter j;
@@ -434,7 +434,7 @@ void __certificate_properties_fill_tbsCertificate_signature(GtkTreeStore *store,
 	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 }
 
-void __certificate_properties_fill_tbsCertificate_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	int result;
 	size_t buffer_size = 0;
@@ -468,7 +468,7 @@ void __certificate_properties_fill_tbsCertificate_issuer(GtkTreeStore *store, Gt
 	g_free(value);
 }
 
-void __certificate_properties_fill_tbsCertificate_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	time_t not_before;
 	struct tm not_before_broken_down_time;
@@ -500,7 +500,7 @@ void __certificate_properties_fill_tbsCertificate_validity (GtkTreeStore *store,
 	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Not After"), CERTIFICATE_PROPERTIES_COL_VALUE, not_after_asctime, -1);
 }
 
-void __certificate_properties_fill_tbsCertificate_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	int result;
 	size_t buffer_size = 0;
@@ -534,9 +534,9 @@ void __certificate_properties_fill_tbsCertificate_subject (GtkTreeStore *store, 
 	g_free(value);
 }
 
-void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeStore *store, 
-									GtkTreeIter *parent, 
-									gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_subjectPublicKeyInfo (GtkTreeStore *store, 
+                                                              GtkTreeIter *parent, 
+                                                              gnutls_x509_crt_t *certificate)
 {
 	int result;
 	unsigned int bits = 0;
@@ -615,7 +615,7 @@ void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeS
 		value = __certificate_properties_dump_raw_data(y.data, y.size);
 		gnutls_free(y.data);
 		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("DSA PublicKey"), value, -1);
+		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("DSA PublicKey"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 		g_free(value);
 		break;
 	default:
@@ -627,7 +627,7 @@ void __certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo (GtkTreeS
 	}
 }
 
-void __certificate_properties_fill_tbsCertificate_issuerUniqueID (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_issuerUniqueID (GtkTreeStore *store, 
 								  GtkTreeIter *parent, 
 								  gnutls_x509_crt_t *certificate)
 {
@@ -636,7 +636,7 @@ void __certificate_properties_fill_tbsCertificate_issuerUniqueID (GtkTreeStore *
 	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Issuer Unique ID"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 } 
 
-void __certificate_properties_fill_tbsCertificate_subjectUniqueID (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_subjectUniqueID (GtkTreeStore *store, 
 								   GtkTreeIter *parent, 
 								   gnutls_x509_crt_t *certificate)
 {
@@ -645,7 +645,7 @@ void __certificate_properties_fill_tbsCertificate_subjectUniqueID (GtkTreeStore 
 	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Unique ID"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_SubjectKeyIdentifier (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier (GtkTreeStore *store, 
 										   GtkTreeIter *parent, 
 										   gnutls_x509_crt_t *certificate)
 {
@@ -668,7 +668,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_SubjectKeyIdentifie
 	g_free(hex_buffer);
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_KeyUsage (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_KeyUsage (GtkTreeStore *store, 
 								       GtkTreeIter *parent, 
 								       gnutls_x509_crt_t *certificate)
 {
@@ -691,7 +691,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_KeyUsage (GtkTreeSt
 	g_free(buffer);
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_SubjectAltName (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store, 
 									     GtkTreeIter *parent, 
 									     gnutls_x509_crt_t *certificate)
 {
@@ -764,7 +764,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_SubjectAltName (Gtk
 	}
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_BasicConstraints (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_BasicConstraints (GtkTreeStore *store, 
 									       GtkTreeIter *parent, 
 									       gnutls_x509_crt_t *certificate)
 {
@@ -798,7 +798,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_BasicConstraints (G
 	g_free (pathlen_as_string);
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_CRLDistributionPoints (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_CRLDistributionPoints (GtkTreeStore *store, 
 										    GtkTreeIter *parent, 
 										    gnutls_x509_crt_t *certificate)
 {
@@ -868,7 +868,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_CRLDistributionPoin
 	}
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_AuthorityKeyIdentifier (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier (GtkTreeStore *store, 
 										     GtkTreeIter *parent, 
 										     gnutls_x509_crt_t *certificate)
 {
@@ -894,7 +894,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_AuthorityKeyIdentif
 	g_free(hex_buffer);
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions_ExtKeyUsage (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext_ExtKeyUsage (GtkTreeStore *store, 
 									  GtkTreeIter *parent, 
 									  gnutls_x509_crt_t *certificate)
 {
@@ -932,7 +932,7 @@ void __certificate_properties_fill_tbsCertificate_extensions_ExtKeyUsage (GtkTre
 			   CERTIFICATE_PROPERTIES_COL_VALUE, usage_buffer, -1);
 }
 
-void __certificate_properties_fill_tbsCertificate_extensions (GtkTreeStore *store, 
+void __certificate_properties_fill_cert_ext (GtkTreeStore *store, 
 							      GtkTreeIter *parent, 
 							      gnutls_x509_crt_t *certificate)
 {
@@ -992,23 +992,23 @@ void __certificate_properties_fill_tbsCertificate_extensions (GtkTreeStore *stor
 	}
 }
 
-void __certificate_properties_fill_tbsCertificate (GtkTreeStore *store, 
+void __certificate_properties_fill_cert (GtkTreeStore *store, 
 						   GtkTreeIter *parent, 
 						   gnutls_x509_crt_t *certificate)
 {
 	GtkTreeIter i;
 	gtk_tree_store_append(store, &i, parent);
 	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Certificate"), -1);
-	__certificate_properties_fill_tbsCertificate_version(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_serialNumber(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_signature(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_issuer(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_validity(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_subject(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_subjectPublicKeyInfo(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_issuerUniqueID(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_subjectUniqueID(store, &i, certificate);
-	__certificate_properties_fill_tbsCertificate_extensions(store, &i, certificate);
+	__certificate_properties_fill_cert_version(store, &i, certificate);
+	__certificate_properties_fill_cert_serialNumber(store, &i, certificate);
+	__certificate_properties_fill_cert_signature(store, &i, certificate);
+	__certificate_properties_fill_cert_issuer(store, &i, certificate);
+	__certificate_properties_fill_cert_validity(store, &i, certificate);
+	__certificate_properties_fill_cert_subject(store, &i, certificate);
+	__certificate_properties_fill_cert_subjectPublicKeyInfo(store, &i, certificate);
+	__certificate_properties_fill_cert_issuerUniqueID(store, &i, certificate);
+	__certificate_properties_fill_cert_subjectUniqueID(store, &i, certificate);
+	__certificate_properties_fill_cert_ext(store, &i, certificate);
 }
 
 void __certificate_properties_fill_signatureAlgorithm (GtkTreeStore *store, 
@@ -1066,7 +1066,7 @@ void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeI
 
 void __certificate_properties_fill_certificate(GtkTreeStore *store, gnutls_x509_crt_t *certificate)
 {
-	__certificate_properties_fill_tbsCertificate(store, 0, certificate);
+	__certificate_properties_fill_cert(store, 0, certificate);
 	__certificate_properties_fill_signatureAlgorithm(store, 0, certificate);
 	__certificate_properties_fill_signatureValue(store, 0, certificate);
 }
