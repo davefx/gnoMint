@@ -1,3 +1,253 @@
+2008-10-01 18:04  davefx
+
+	* [r215] po, po/es.po, po/gnoMint.pot, src/ca_creation.c,
+	  src/new_cert_creation_process.c, src/tls.c:
+	  Beeing more verbose when having a failure when creating a CA
+	  certificate
+
+2008-10-01 18:02  davefx
+
+	* [r214] src/new_ca_window.c, src/new_cert_window.c:
+	  Fixing problem with expiration time, related to UTC-localtime
+	  difference
+
+2008-10-01 17:31  davefx
+
+	* [r213] src/ca_file.c:
+	  Fixing segmentation fault in some architectures, and modern
+	  compilers
+
+2008-10-01 17:29  davefx
+
+	* [r212] src/certificate_properties.c:
+	  Reducing function names. Fixing warning
+
+2008-09-30 17:56  davefx
+
+	* [r211] src/ca_file.c, src/ca_file.h, src/import.c:
+	  Advancing in CRL importing
+
+2008-09-30 06:37  davefx
+
+	* [r210] src/ca_file.c:
+	  Finished import of uncrypted private keys
+
+2008-09-29 17:43  davefx
+
+	* [r209] src/ca_file.c, src/ca_file.h, src/import.c, src/tls.c,
+	  src/tls.h:
+	  Advancing in private key import
+
+2008-09-29 16:47  davefx
+
+	* [r208] gui, gui/gnomint14x14.png, gui/gnomint192x192.png,
+	  gui/gnomint64x64.png:
+	  Adding graphic files. Completing svnignore
+
+2008-09-26 14:51  davefx
+
+	* [r207] src/ca.c, src/ca_file.c, src/import.c:
+	  Certificate import finished
+
+2008-09-26 06:11  davefx
+
+	* [r206] src/ca.c, src/ca_file.c, src/import.c, src/tls.c,
+	  src/tls.h, src/uint160.c, src/uint160.h:
+	  Advancing in certificate import
+
+2008-09-25 06:30  davefx
+
+	* [r205] src/tls.c:
+	  If the signing CA has not subject key identifier extension, don't
+	  generate issuer key identifier extension. If it has, use it to
+	  generate issuer key identifier extension, instead of forging a
+	  new issuer key id with the gnutls method (that could be distinct
+	  from the one in the extension)
+
+2008-09-24 18:19  davefx
+
+	* [r204] src/ca_file.c, src/ca_file.h:
+	  Database now ready for importing hierarchies of certificates
+
+2008-09-24 06:56  davefx
+
+	* [r203] po/gnoMint.pot:
+	  Adding po template
+
+2008-09-24 06:54  davefx
+
+	* [r202] configure.in, po/cs.po, po/es.po, po/fr.po, po/sv.po:
+	  Upgrading translations from Launchpad. Added language sv.
+
+2008-09-23 18:25  davefx
+
+	* [r201] src/ca.c, src/ca_file.c, src/import.c, src/import.h,
+	  src/tls.c, src/tls.h:
+	  Keeping subject_key_id in certificate database. Some errors with
+	  NULL values: still not finished.
+
+2008-09-19 17:58  davefx
+
+	* [r200] src/new_cert_window.c:
+	  Fixing error: only the first certificate in database could sign
+	  CSRs in password-protected databases.
+
+2008-09-19 06:27  davefx
+
+	* [r199] Makefile.am, configure.in, gconf/Makefile.am,
+	  src/Makefile.am:
+	  Another batch of configure changes, thanks to Staněk Luboš
+
+2008-09-19 06:23  davefx
+
+	* [r198] po/POTFILES.in, src/Makefile.am, src/ca.c, src/ca_file.c,
+	  src/ca_file.h, src/import.c, src/import.h:
+	  Starting support for importing certificates
+
+2008-09-19 06:06  davefx
+
+	* [r197] src/new_cert_window.c:
+	  Fixing segmentation fault when the CSR or the CA cert have NULL
+	  fields
+
+2008-09-18 18:27  davefx
+
+	* [r196] src/tls.c:
+	  Making compliant to RFC5280: now authority key identifier and
+	  subject key identifiers are set properly
+
+2008-09-17 06:46  davefx
+
+	* [r195] src/ca.c, src/ca_file.c, src/new_cert_window.c:
+	  Now the CA used when inheriting fields for a CSR is remembered,
+	  and used as default when signing it.
+
+2008-09-16 18:18  davefx
+
+	* [r194] src/ca.c, src/ca_creation.c, src/ca_creation.h,
+	  src/ca_file.c, src/new_cert_window.c, src/new_cert_window.h,
+	  src/new_req_window.c:
+	  First steps for saving the CA used for generating CSRs, so it
+	  will be the default while signing the CSRs
+
+2008-09-16 18:17  davefx
+
+	* [r193] gui/gnomint.glade:
+	  Finishing implementation of dependences between certificate uses
+	  and certificate purposes
+
+2008-09-16 18:08  davefx
+
+	* [r192] configure.in, src/Makefile.am:
+	  Fixing configure.in and src/Makefile.am: * fixes AM_INIT_AUTOMAKE
+	  * adds some test discovered by autoscan * removes wrong gnutls
+	  and libsqlite test * defines required versions of particular
+	  libraries * adds proper gnutls and sqlite test including
+	  appropriate CFLAGS and LIBS, exports this info for use in
+	  Makefile * removes installations dirs, they are defined the
+	  standard way * modifies the summary output * removes second
+	  compiler flags from Makefile.am
+	  
+	  Thanks to Staněk Luboš <lubek@users.sourceforge.net> for the
+	  patch
+
+2008-09-16 16:53  davefx
+
+	* [r191] src/new_cert_window.c, src/new_cert_window.h:
+	  Finishing implementation of dependences between certificate uses
+	  and certificate purposes
+
+2008-09-16 06:45  davefx
+
+	* [r190] src/ca_policy.c:
+	  Progress in uses-purposes dependencies. CA properties window
+	  finished. New cert window pending.
+
+2008-09-15 18:20  davefx
+
+	* [r189] src/ca_policy.c:
+	  Starting to implement dependences between certificate purposes
+	  and uses
+
+2008-09-15 17:50  davefx
+
+	* [r188] gui/gnomint.glade, src/Makefile.am, src/ca.c, src/ca.h,
+	  src/ca_file.c, src/ca_file.h, src/crl.c, src/crl.h:
+	  Fixing bug #2100270. Now it is possible to generate CRLs for all
+	  the CAs in the hierarchy
+
+2008-09-12 10:23  davefx
+
+	* [r187] src/Makefile.am:
+	  Uploading forgotten main.h
+
+2008-09-12 10:22  davefx
+
+	* [r186] src/main.h:
+	  Uploading forgotten main.h
+
+2008-09-11 17:31  davefx
+
+	* [r185] src/ca.c, src/ca.h, src/ca_creation.h, src/ca_file.c,
+	  src/ca_policy.c, src/ca_policy.h, src/certificate_properties.c,
+	  src/certificate_properties.h, src/csr_creation.h,
+	  src/csr_properties.c, src/csr_properties.h, src/main.c,
+	  src/new_ca_window.c, src/new_ca_window.h,
+	  src/new_cert_creation_process.c, src/new_cert_creation_process.h,
+	  src/new_cert_window.c, src/new_cert_window.h,
+	  src/new_req_window.c, src/new_req_window.h, src/pkey_manage.c,
+	  src/pkey_manage.h, src/preferences-gui.h,
+	  src/preferences-window.c, src/preferences-window.h:
+	  Updating src/, so now it compiles with the new default
+	  compilation options
+
+2008-09-11 16:24  davefx
+
+	* [r184] README, TODO, autogen.sh:
+	  Standarizing name of the project: it's gnoMint, not Gnomint
+
+2008-09-11 16:20  davefx
+
+	* [r183] src/ca.h, src/ca_creation.h, src/ca_file.c, src/ca_file.h,
+	  src/ca_policy.c, src/certificate_properties.c,
+	  src/csr_creation.h, src/csr_properties.c, src/new_ca_window.h,
+	  src/new_cert_creation_process.c, src/new_cert_window.c,
+	  src/new_req_window.c, src/new_req_window.h, src/pkey_manage.h,
+	  src/preferences-gui.c, src/preferences-gui.h,
+	  src/preferences-window.c, src/preferences-window.h,
+	  src/preferences.c, src/preferences.h, src/tls.h, src/uint160.h:
+	  Patch for improving standard compliance
+
+2008-09-11 06:33  davefx
+
+	* [r182] src/ca_file.c:
+	  Fixing problem with permissions of a just created file. Now
+	  created in 0600 mode. Fixing problem with certificates insertion
+	  into the database inserted in last commit
+
+2008-09-11 06:30  davefx
+
+	* [r181] src/ca_policy.c:
+	  Removing deprecated functions. Patch by Staněk Luboš
+
+2008-09-09 07:14  davefx
+
+	* [r180] certs/example-ca.6.gnomint, certs/example-ca.gnomint,
+	  src/ca.c, src/ca_file.c, src/ca_file.h:
+	  Fixing CRL problem: now, expired certificates appear only in the
+	  first CRL released after the expiration date, according to RFC
+	  5280 (page 13)
+
+2008-09-09 06:58  davefx
+
+	* [r178] m4/Makefile.am:
+	  Adding missing file in subversion repository
+
+2008-09-08 15:31  davefx
+
+	* [r176] ChangeLog, configure.in:
+	  Updating version to 0.5.3
+
 2008-09-08 14:41  davefx
 
 	* [r175] certs/example-ca.gnomint, src/ca.c, src/ca_file.c:
