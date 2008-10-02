@@ -641,9 +641,10 @@ gchar * pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn)
 	    pem_private_key->is_ciphered_with_db_pwd)
 		password = pkey_manage_ask_password();
 
-	res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);
-
-	g_free (password);
+	if (password) {
+		res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);		
+		g_free (password);
+	}
 
 	return res;
 }

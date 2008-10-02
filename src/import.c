@@ -397,7 +397,7 @@ gboolean import_crl (guchar *file_contents, gsize file_contents_size)
                 file_datum.data = (guchar *) cert_pem;
                 file_datum.size = strlen(cert_pem);
 
-                if (gnutls_x509_crt_import (issuer_crt, &file_datum, GNUTLS_X509_FMT_PEM) != 0) {
+                if (gnutls_x509_crt_import (issuer_crt, &file_datum, GNUTLS_X509_FMT_PEM) == GNUTLS_E_SUCCESS) {
 
                         if (gnutls_x509_crl_check_issuer (crl, issuer_crt)) {
                                 int number_of_certs;
