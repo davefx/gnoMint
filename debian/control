@@ -1,13 +1,13 @@
 Source: gnomint
 Section: unknown
 Priority: optional
-Maintainer: Joao Pinto <lamego@naconversa.com>
-Build-Depends: debhelper (>= 4.0.0), autotools-dev, libsqlite-dev
+Maintainer: David Marín Carreño <davefx@gmail.com>
+Build-Depends: debhelper (>= 4.0.0), autotools-dev, libsqlite3-dev, libgconf2-dev, libgtk2.0-dev, libgnomeui-dev, libglade2-dev, libgnutls-dev
 Standards-Version: 3.6.2
 
 Package: gnomint
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsqlite0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsqlite3-0, libglade2-0, libgtk2.0-0, libgconf2-4, libgnomeui-0, libgnutls13 
 Description: Certification Authority management tool
  x509 Certification Authority management tool for GTK/Gnome environments.
  .

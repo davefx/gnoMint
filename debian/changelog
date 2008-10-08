@@ -1,3 +1,9 @@
+gnomint (0.5.4-1) intrepid; urgency=low
+
+  * Upgrading to version 0.5.4
+
+ -- David Marín <davefx@gmail.com>  Wed, 8 Oct 2008 08:28:35 +0200
+
 gnomint (0.1.2-1) dapper; urgency=low
 
   * Upgrading to version 0.1.2
