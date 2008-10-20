@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint 0.4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-24 08:49+0200\n"
-"PO-Revision-Date: 2008-09-12 11:58+0000\n"
-"Last-Translator: David Marín <Unknown>\n"
+"POT-Creation-Date: 2008-09-24 08:52+0200\n"
+"PO-Revision-Date: 2008-10-14 10:10+0000\n"
+"Last-Translator: Michael Castielli <michael.castielli@gmail.com>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2008-09-24 06:40+0000\n"
+"X-Launchpad-Export-Date: 2008-10-20 17:04+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -118,9 +118,8 @@ msgid "<b>Validity</b>"
 msgstr "<b>Validité</b>"
 
 #: ../gui/gnomint.glade.h:16
-#, fuzzy
 msgid "<big><b>New Certificate Revocation List</b></big>"
-msgstr "<big>Propriétés du nouveau certificat</big>\n"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:17
 msgid "<big>CA Properties</big>\n"
@@ -213,8 +212,8 @@ msgstr ""
 msgid ""
 "<small><i>PKCS#3 files containing Diffie·Hellman parameters are used by some "
 "cryptographic \n"
-"applications for a secure interchange of their keys over insecure channels.</"
-"i></small>"
+"applications for a secure interchange of their keys over insecure "
+"channels.</i></small>"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:42
@@ -222,8 +221,8 @@ msgid ""
 "<small>The subject of the new certificate request can inherit information "
 "from one of the existing Certification Authorities. This is a must if the "
 "policy of the CA you are going to use is defined to force some fields of a "
-"certificate subject to be the same as the ones in the CA cert subject.</"
-"small>"
+"certificate subject to be the same as the ones in the CA cert "
+"subject.</small>"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:43
@@ -412,7 +411,8 @@ msgstr ""
 "Exporte le CSR de sorte qu'il puisse être importé par d'autre applications"
 
 #: ../gui/gnomint.glade.h:89
-msgid "Exports the certificate so it can be imported by any other application"
+msgid ""
+"Exports the certificate so it can be imported by any other application"
 msgstr ""
 "Exporte le certificat de sorte qu'il puisse être importé par d'autre "
 "applications"
@@ -576,14 +576,15 @@ msgstr "Protection par mot de passe"
 
 #: ../gui/gnomint.glade.h:130
 msgid "Password:"
-msgstr "Mot de passe:"
+msgstr "Mot de Passe:"
 
 #: ../gui/gnomint.glade.h:131
 msgid "Please, choose the file:"
 msgstr "Choisir le fichier:"
 
 #: ../gui/gnomint.glade.h:132
-msgid "Please, choose which part of the saved certificate you want to export:"
+msgid ""
+"Please, choose which part of the saved certificate you want to export:"
 msgstr "Choisir la partie du certificat à exporter:"
 
 #: ../gui/gnomint.glade.h:133
@@ -611,11 +612,8 @@ msgid "Please, enter password:"
 msgstr "Entrez le mot de passe:"
 
 #: ../gui/gnomint.glade.h:139
-#, fuzzy
 msgid "Please, enter the prime size, in bits:"
 msgstr ""
-"Entrez le nouveau \n"
-"mot de passe:"
 
 #: ../gui/gnomint.glade.h:140
 msgid ""
@@ -999,8 +997,8 @@ msgstr "Choisir la partie de CSR à exporter:"
 
 #: ../src/ca.c:1328
 msgid ""
-"<i>Export the Certificate Signing Request to a public file, in PEM format.</"
-"i>"
+"<i>Export the Certificate Signing Request to a public file, in PEM "
+"format.</i>"
 msgstr "<i>Exporter la CSR vers un fichier public, au format PEM.</i>"
 
 #: ../src/ca.c:1333
@@ -1079,9 +1077,8 @@ msgid "Save Diffie-Hellman parameters"
 msgstr ""
 
 #: ../src/ca.c:2057 ../src/ca.c:2065 ../src/ca.c:2073
-#, fuzzy
 msgid "There was an error while saving Diffie-Hellman parameters."
-msgstr "Erreur à l'export du certificat!"
+msgstr ""
 
 #: ../src/ca.c:2086
 msgid "Diffie-Hellman parameters saved successfully"
@@ -1132,9 +1129,8 @@ msgid ""
 msgstr ""
 
 #: ../src/ca_file.c:1035
-#, fuzzy
 msgid "Cannot find parent CA in database"
-msgstr "Création de la base de données du CA en cours..."
+msgstr ""
 
 #: ../src/certificate_properties.c:357 ../src/tls.c:1052
 msgid "Certificate signing"
@@ -1419,17 +1415,13 @@ msgstr ""
 "'%s'"
 
 #: ../src/import.c:198 ../src/import.c:274
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Couldn't import the certificate. \n"
 "The database returned this error: \n"
 "\n"
 "'%s'"
 msgstr ""
-"Erreur à l'import de CSR. \n"
-"La base de données a retourné l'erreur: \n"
-"\n"
-"'%s'"
 
 #: ../src/main.c:132
 msgid "- A graphical Certification Authority manager"
@@ -1508,7 +1500,12 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Ahmed https://launchpad.net/~ahmed-baizid\n"
-"  David Marín https://launchpad.net/~davefx"
+"  David Marín https://launchpad.net/~davefx\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Ahmed https://launchpad.net/~ahmed-baizid\n"
+"  David Marín https://launchpad.net/~davefx\n"
+"  Michael Castielli https://launchpad.net/~mickyx"
 
 #: ../src/new_cert_creation_process.c:79
 msgid "CA creation process finished"
@@ -1646,9 +1643,9 @@ msgid "Error when setting subject key identifier extension"
 msgstr "Erreur à l'établissement de l'extension SubjectKeyIdentifier!"
 
 #: ../src/tls.c:530 ../src/tls.c:757
-#, fuzzy, c-format
+#, c-format
 msgid "Error when setting authority key identifier extension"
-msgstr "Erreur à l'établissement de l'extension SubjectKeyIdentifier!"
+msgstr ""
 
 #: ../src/tls.c:540
 #, c-format
