@@ -1,0 +1,3 @@
+V	091021173053Z		01	unknown	/C=ES/ST=PrOvInCiA/L=CiUdAd/O=OrGaNiZaCiOn/OU=UnIdAdOrGaNiZaTiVa/CN=Test1/emailAddress=SuJeToUnO
+V	091021173142Z		02	unknown	/C=ES/ST=PrOvInCiA/L=CiUdAd/O=OrGaNiZaCiOn/OU=UnIdAdOrGaNiZaTiVa/CN=Test3
+R	091021173326Z	081021173357Z,unspecified	03	unknown	/C=ES/ST=PrOvInCiA/L=CiUdAd/O=OrGaNiZaCiOn/OU=UnIdAdOrGaNiZaTiVa/CN=Test2/emailAddress=SuJeToDoS

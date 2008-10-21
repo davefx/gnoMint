@@ -1,0 +1,151 @@
+[ ca ]
+default_ca	= server_ca		
+
+[ policy_client ]
+countryName             = optional
+stateOrProvinceName     = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ policy_server ]
+countryName             = optional
+stateOrProvinceName     = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ policy_ca ]
+countryName             = optional
+stateOrProvinceName     = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+default_bits		= 4096
+default_keyfile 	= privkey.pem
+distinguished_name	= req_distinguished_name
+attributes		= req_attributes
+x509_extensions	= v3_ca	
+string_mask = nombstr
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+countryName			= Country Name (2 letter code)
+countryName_default		= AU
+countryName_min			= 2
+countryName_max			= 2
+stateOrProvinceName		= State or Province Name (full name)
+stateOrProvinceName_default	= Some-State
+localityName			= Locality Name (eg, city)
+0.organizationName		= Organization Name (eg, company)
+0.organizationName_default	= Internet Widgits Pty Ltd
+organizationalUnitName		= Organizational Unit Name (eg, section)
+commonName			= Common Name (eg, YOUR name)
+commonName_max			= 64
+emailAddress			= Email Address
+emailAddress_max		= 40
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+[ req_attributes ]
+challengePassword		= A challenge password
+challengePassword_min		= 4
+challengePassword_max		= 20
+unstructuredName		= An optional company name
+
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints = critical,CA:true
+nsCertType = sslCA, emailCA
+issuerAltName = issuer:copy
+nsComment = "TinyCA Generated Certificate"
+subjectAltName = email:copy
+keyUsage = critical, keyCertSign, cRLSign
+
+[ crl_ext ]
+authorityKeyIdentifier = keyid:always,issuer:always
+
+[ server_ca ]
+dir = /home/davefx/.TinyCA/Example-CA
+certs = $dir/certs
+crl_dir = $dir/crl
+database = $dir/index.txt
+new_certs_dir = $dir/newcerts
+certificate = $dir/cacert.pem
+serial = $dir/serial
+crl = $dir/crl.pem
+private_key = $dir/cacert.key
+RANDFILE = $dir/.rand
+x509_extensions = server_cert
+default_days = 365
+default_crl_days = 30
+default_md = sha1
+preserve = no
+policy = policy_server
+unique_subject = yes
+
+[ client_ca ]
+dir = /home/davefx/.TinyCA/Example-CA
+certs = $dir/certs
+crl_dir = $dir/crl
+database = $dir/index.txt
+new_certs_dir = $dir/newcerts
+certificate = $dir/cacert.pem
+serial = $dir/serial
+crl = $dir/crl.pem
+private_key = $dir/cacert.key
+RANDFILE = $dir/.rand
+x509_extensions = client_cert
+default_days = 365
+default_crl_days = 30
+default_md = sha1
+preserve = no
+policy = policy_client
+unique_subject = yes
+
+[ ca_ca ]
+dir = /home/davefx/.TinyCA/Example-CA
+certs = $dir/certs
+crl_dir = $dir/crl
+database = $dir/index.txt
+new_certs_dir = $dir/newcerts
+certificate = $dir/cacert.pem
+serial = $dir/serial
+crl = $dir/crl.pem
+private_key = $dir/cacert.key
+RANDFILE = $dir/.rand
+x509_extensions = v3_ca
+default_days = 365
+default_crl_days = 30
+default_md = sha1
+preserve = no
+policy = policy_ca
+unique_subject = yes
+
+[ client_cert ]
+basicConstraints = CA:FALSE
+nsCertType = client, email, objsign
+nsComment = "TinyCA Generated Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+issuerAltName = issuer:copy
+subjectAltName = email:copy
+keyUsage = digitalSignature, keyEncipherment
+
+[ server_cert ]
+basicConstraints = CA:FALSE
+nsCertType = server
+nsComment = "TinyCA Generated Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+issuerAltName = issuer:copy
+subjectAltName = email:copy
+
