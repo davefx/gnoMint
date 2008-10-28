@@ -1568,7 +1568,7 @@ gchar * ca_file_import_privkey (const gchar *privkey_pem)
 
         sqlite3_free_table (table);
                         
-        return _("The given private key doesn't match any key-less certificate in the database.");
+        return _("The given file contains a valid private key. However, it has not been imported to the database because it doesn't match any key-less certificate in the database.");
 
 }
 

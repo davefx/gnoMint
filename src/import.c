@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include <glade/glade.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
@@ -29,18 +30,58 @@
 #include "ca_file.h"
 
 
-void __import_csr (gnutls_x509_crq_t *crq);
-void __import_cert (gnutls_x509_crt_t *cert);
+gchar * __import_ask_password (const gchar *crypted_part_description);
+gint __import_csr (gnutls_x509_crq_t *crq);
+gint __import_cert (gnutls_x509_crt_t *cert);
+
+gchar * __import_ask_password (const gchar *crypted_part_description)
+{
+	gchar *password;
+	GtkWidget * widget = NULL, * password_widget = NULL, *description_widget = NULL;
+	GladeXML * dialog_xml = NULL;
+	gchar     * xml_file = NULL;
+        gchar     * label = NULL;
+	gint response = 0;
+
+	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+	dialog_xml = glade_xml_new (xml_file, "import_password_dialog", NULL);
+	g_free (xml_file);
+	glade_xml_signal_autoconnect (dialog_xml); 	
+	
+	password_widget = glade_xml_get_widget (dialog_xml, "import_password_entry");
+	description_widget = glade_xml_get_widget (dialog_xml, "import_crypted_part_description");
+
+        label = g_strdup_printf ("<small><i>%s</i></small>", crypted_part_description);
+        gtk_label_set_markup (GTK_LABEL(description_widget), (const gchar *) label);
+        g_free (label);
+
+        gtk_widget_grab_focus (password_widget);
+        widget = glade_xml_get_widget (dialog_xml, "import_password_dialog");
+        response = gtk_dialog_run(GTK_DIALOG(widget)); 
+	
+        if (!response) {
+                gtk_widget_destroy (widget);
+                g_object_unref (G_OBJECT(dialog_xml));
+                return NULL;
+        } else {
+                password = g_strdup ((gchar *) gtk_entry_get_text (GTK_ENTRY(password_widget)));
+        }
+
+	widget = glade_xml_get_widget (dialog_xml, "import_password_dialog");
+	gtk_widget_destroy (widget);
+	g_object_unref (G_OBJECT(dialog_xml));
+
+	return password;
+}
 
 
-
-void __import_csr (gnutls_x509_crq_t *crq)
+gint __import_csr (gnutls_x509_crq_t *crq)
 {
 	CaCreationData * creation_data = g_new0(CaCreationData, 1);
 	gchar * pem_csr=NULL;
 	size_t size;
 	gchar * error_msg;
-
+        gint result = -1;
 	gchar *aux = NULL;
 	
 	size = 0;
@@ -70,11 +111,13 @@ void __import_csr (gnutls_x509_crq_t *crq)
 						  error_msg);
 		ca_error_dialog (message);
 		g_free (message);
-	}
-
+	} else {
+                result = 1;
+        }
+        return result;
 }
 
-void __import_cert (gnutls_x509_crt_t *cert)
+gint __import_cert (gnutls_x509_crt_t *cert)
 {
 	CertCreationData * creation_data = g_new0(CertCreationData, 1);
 	guchar *serial_str = NULL;
@@ -85,6 +128,7 @@ void __import_cert (gnutls_x509_crt_t *cert)
 	gboolean is_ca;
 	guint is_critical;
 	gchar *aux = NULL;
+        gint result = -1;
         
 	// For inserting the cert into the database we must get:
 	// - if the certificate is a CA certificate
@@ -139,17 +183,20 @@ void __import_cert (gnutls_x509_crt_t *cert)
 						  error_msg);
 		ca_error_dialog (message);
 		g_free (message);
-	}	
+	} else {
+                result = 1;
+        }
+
+        return result;
 }
 
 
 
-gboolean import_csr (guchar *file_contents, gsize file_contents_size) 
+gint import_csr (guchar *file_contents, gsize file_contents_size) 
 {	
-	gboolean successful_import = FALSE;
 	gnutls_x509_crq_t crq;
 	gnutls_datum_t file_datum;
-
+        gint result = 0;
 
         file_datum.data = file_contents;
         file_datum.size = file_contents_size;
@@ -157,29 +204,28 @@ gboolean import_csr (guchar *file_contents, gsize file_contents_size)
 	// Trying to import a Certificate Signing Request 
 
 	if (gnutls_x509_crq_init (&crq) < 0)
-		return FALSE;
+		return result;
 
 	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_PEM) == 0 ||
 	    gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
 
-		__import_csr (&crq);
-		successful_import = TRUE;		
+		result = __import_csr (&crq);
 	}
 
 	gnutls_x509_crq_deinit (crq);
 	
-	return successful_import;
+	return result;
 
 }
 
 
-gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
+gint import_certlist (guchar *file_contents, gsize file_contents_size)
 {
- 	gboolean successful_import = FALSE;
 	gnutls_x509_crt_t cert;
 	gnutls_x509_crt_t *certs = NULL;
 	gnutls_datum_t file_datum;
         guint num_certs = 0;
+        gint result = 0;
 
 	file_datum.size = file_contents_size;
 	file_datum.data = file_contents;
@@ -198,46 +244,45 @@ gboolean import_certlist (guchar *file_contents, gsize file_contents_size)
                 // order, as it's usual having a list of certificates conforming a
                 // certification path, with the root CA certificate as the last 
                 // certificate
-
+                result = -1;
                 for (i = num_certs - 1; i>=0; i--) {
-			__import_cert (&certs[i]);
+			if (__import_cert (&certs[i]) > 0)
+                                result = 1;
                 }
-                successful_import = TRUE;
 
                 g_free (certs);
                         
-                return successful_import;
+                return result;
 	}
 
 	// Trying to import a single certificate in DER format
         
         if (gnutls_x509_crt_init (&cert) < 0)
-                return FALSE;
+                return 0;
 
 	if (gnutls_x509_crt_import (cert, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
-		__import_cert (&cert);
-                
-                successful_import = TRUE;
-	}
+                result = __import_cert (&cert);
+        }
 
 	gnutls_x509_crt_deinit (cert);
 
-	return successful_import;
+	return result;
 }
 
-gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
+gint import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 {
-	gboolean successful_import = FALSE;
+        gint result = 0;
 	gnutls_x509_privkey_t privkey;
 	gnutls_datum_t file_datum;
-
+        gchar *result_import;
+        
         file_datum.data = file_contents;
         file_datum.size = file_contents_size;
 
 	// Trying to import a Private Key in PEM format
 
 	if (gnutls_x509_privkey_init (&privkey) < 0)
-		return FALSE;
+		return 0;
 
 	// Trying to import a Private Key in DER format
 
@@ -245,6 +290,7 @@ gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 	    gnutls_x509_privkey_import (privkey, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
 		gchar * pem_privkey=NULL;
 		size_t size;
+                result = -1;
 
 		size = 0;
 		gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size)  ; 
@@ -254,20 +300,24 @@ gboolean import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 			
 		}
 
-		ca_file_import_privkey (pem_privkey);
+                result_import = ca_file_import_privkey (pem_privkey);
+		if (result_import) {
+                        ca_error_dialog (result_import);
+                } else {
+                        result = 1;
+                }
 		g_free (pem_privkey);
 
-		successful_import = TRUE;
 	}
 
 	gnutls_x509_privkey_deinit (privkey);
 	
-	return successful_import;
+	return result;
 }
 
-gboolean import_crl (guchar *file_contents, gsize file_contents_size)
+gint import_crl (guchar *file_contents, gsize file_contents_size)
 {
-	gboolean successful_import = FALSE;
+        gint result = 0;
 	gnutls_x509_crl_t crl;
 	gnutls_x509_crt_t issuer_crt;
 	gnutls_datum_t file_datum;
@@ -283,16 +333,17 @@ gboolean import_crl (guchar *file_contents, gsize file_contents_size)
 	// Trying to import a Certificate Revocation List in PEM format
 
 	if (gnutls_x509_crl_init (&crl) < 0)
-		return FALSE;
+		return 0;
 
 	if (gnutls_x509_crl_import (crl, &file_datum, GNUTLS_X509_FMT_PEM) != 0 && 
             gnutls_x509_crl_import (crl, &file_datum, GNUTLS_X509_FMT_DER) != 0) {
                 // The given file is not a DER-coded CRL, neither a PEM-coded CRL
 
                 gnutls_x509_crl_deinit (crl);
-                return FALSE;
+                return 0;
         }
                 
+        result = -1;
         size = 0;
         gnutls_x509_crl_get_issuer_dn (crl, issuer_dn, &size)  ; 
         if (size) {
@@ -310,7 +361,7 @@ gboolean import_crl (guchar *file_contents, gsize file_contents_size)
                         gnutls_x509_crl_deinit(crl);
                         g_free (issuer_dn);
                         g_free (cert_pem);
-                        return FALSE;
+                        return result;
                 }
 
                 file_datum.data = (guchar *) cert_pem;
@@ -346,6 +397,7 @@ gboolean import_crl (guchar *file_contents, gsize file_contents_size)
                                                 if (ca_file_get_id_from_serial_issuer_id (&serial, issuer_id, &cert_id)) {
                                                         // If found, we revoke it with the correct date
                                                         ca_file_revoke_crt_with_date (cert_id, revocation);
+                                                        result = 1;
                                                 }
                                         }
                                 }
@@ -356,16 +408,75 @@ gboolean import_crl (guchar *file_contents, gsize file_contents_size)
                 gnutls_x509_crt_deinit (issuer_crt);
         }        
                 		
-        successful_import = TRUE;                        
 	gnutls_x509_crl_deinit (crl);
 	
-	return successful_import;
+	return result;
 }
 
-gboolean import_pkcs7 (guchar *file_contents, gsize file_contents_size)
+/* PKCS#7 importing was removed in libgnutls 2.6.0 */
+
+/* gint import_pkcs7 (guchar *file_contents, gsize file_contents_size) */
+/* { */
+/* 	gboolean successful_import = FALSE; */
+/* 	gnutls_pkcs7_t pkcs7; */
+/* 	gnutls_datum_t file_datum; */
+
+/*         file_datum.data = file_contents; */
+/*         file_datum.size = file_contents_size; */
+
+/* 	// Trying to import a Private Key in PEM format */
+
+/* 	if (gnutls_pkcs7_init (&pkcs7) < 0) */
+/* 		return FALSE; */
+
+/* 	// Trying to import a Private Key in DER format */
+
+/* 	if (gnutls_pkcs7_import (pkcs7, &file_datum, GNUTLS_X509_FMT_PEM) == 0 || */
+/* 	    gnutls_pkcs7_import (pkcs7, &file_datum, GNUTLS_X509_FMT_DER) == 0) { */
+/* 		int i; */
+/* 		int certs_no = gnutls_pkcs7_get_crt_count (pkcs7); */
+/* 		int crl_no = gnutls_pkcs7_get_crl_count (pkcs7); */
+
+/* 		for (i=0; i < certs_no; i++) { */
+/* 			guchar *raw_cert = NULL; */
+/* 			gsize raw_cert_size = 0; */
+
+/* 			gnutls_pkcs7_get_crt_raw (pkcs7, i, raw_cert, &raw_cert_size); */
+
+/* 			raw_cert = g_new0(guchar, raw_cert_size); */
+/* 			gnutls_pkcs7_get_crt_raw (pkcs7, i, raw_cert, &raw_cert_size); */
+
+/* 			import_certlist (raw_cert, raw_cert_size); */
+
+/* 			g_free (raw_cert); */
+/* 		} */
+
+/* 		for (i=0; i < crl_no; i++) { */
+/* 			guchar *raw_crl = NULL; */
+/* 			gsize raw_crl_size = 0; */
+			
+/* 			gnutls_pkcs7_get_crl_raw (pkcs7, i, raw_crl, &raw_crl_size); */
+
+/* 			raw_crl = g_new0(guchar, raw_crl_size); */
+/* 			gnutls_pkcs7_get_crl_raw (pkcs7, i, raw_crl, &raw_crl_size); */
+
+/* 			import_crl (raw_crl, raw_crl_size); */
+
+/* 			g_free (raw_crl); */
+/* 		} */
+
+/* 		successful_import = TRUE; */
+/* 	} */
+
+/* 	gnutls_pkcs7_deinit (pkcs7); */
+	
+/* 	return successful_import; */
+/* } */
+
+gint import_pkcs8 (guchar *file_contents, gsize file_contents_size)
 {
-	gboolean successful_import = FALSE;
-	gnutls_pkcs7_t pkcs7;
+	gint result = 0;
+	gnutls_x509_privkey_t privkey;
 	gnutls_datum_t file_datum;
 
         file_datum.data = file_contents;
@@ -373,54 +484,133 @@ gboolean import_pkcs7 (guchar *file_contents, gsize file_contents_size)
 
 	// Trying to import a Private Key in PEM format
 
-	if (gnutls_pkcs7_init (&pkcs7) < 0)
-		return FALSE;
+	if (gnutls_x509_privkey_init (&privkey) < 0)
+		return 0;
 
 	// Trying to import a Private Key in DER format
 
-	if (gnutls_pkcs7_import (pkcs7, &file_datum, GNUTLS_X509_FMT_PEM) == 0 ||
-	    gnutls_pkcs7_import (pkcs7, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
-		int i;
-		int certs_no = gnutls_pkcs7_get_crt_count (pkcs7);
-		int crl_no = gnutls_pkcs7_get_crl_count (pkcs7);
+	if (gnutls_x509_privkey_import_pkcs8 (privkey, &file_datum, GNUTLS_X509_FMT_PEM, NULL, GNUTLS_PKCS_PLAIN) == 0 ||
+	    gnutls_x509_privkey_import_pkcs8 (privkey, &file_datum, GNUTLS_X509_FMT_DER, NULL, GNUTLS_PKCS_PLAIN) == 0) {
+                result = -1;
+		gchar * pem_privkey=NULL;
+                gchar * error_msg = NULL;
+		size_t size;
 
-		for (i=0; i < certs_no; i++) {
-			guchar *raw_cert = NULL;
-			gsize raw_cert_size = 0;
-
-			gnutls_pkcs7_get_crt_raw (pkcs7, i, raw_cert, &raw_cert_size);
-
-			raw_cert = g_new0(guchar, raw_cert_size);
-			gnutls_pkcs7_get_crt_raw (pkcs7, i, raw_cert, &raw_cert_size);
-
-			import_certlist (raw_cert, raw_cert_size);
-
-			g_free (raw_cert);
-		}
-
-		for (i=0; i < crl_no; i++) {
-			guchar *raw_crl = NULL;
-			gsize raw_crl_size = 0;
+		size = 0;
+		gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size)  ; 
+		if (size) {
+			pem_privkey = g_new0(gchar, size);
+			gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size);
 			
-			gnutls_pkcs7_get_crl_raw (pkcs7, i, raw_crl, &raw_crl_size);
-
-			raw_crl = g_new0(guchar, raw_crl_size);
-			gnutls_pkcs7_get_crl_raw (pkcs7, i, raw_crl, &raw_crl_size);
-
-			import_crl (raw_crl, raw_crl_size);
-
-			g_free (raw_crl);
 		}
 
-		successful_import = TRUE;
-	}
+                error_msg = ca_file_import_privkey (pem_privkey);
+		if (error_msg) {
+                        ca_error_dialog (error_msg);
+                } else {
+                        result = 1;
+                }
 
-	gnutls_pkcs7_deinit (pkcs7);
+		g_free (pem_privkey);
+
+	} else {
+                // Now we check if the given file is a PEM codified encrypted private key: while trying to import,
+                // the password won't be correct.
+                
+                gint result_decryption = gnutls_x509_privkey_import_pkcs8 (privkey, &file_datum, GNUTLS_X509_FMT_PEM, NULL, 0);
+
+                while (result_decryption==GNUTLS_E_DECRYPTION_FAILED) {
+
+                        // We mark a successful import, as it is a PKCS#8 cyphered file: it must not be probed with other formats.
+                        result = -1;
+
+                        // We launch a window for asking the password.
+                        gchar * password = __import_ask_password (_("PKCS#8 crypted private key"));
+
+                        if (! password) {
+                                gnutls_x509_privkey_deinit (privkey);
+                                return result;
+                        }
+                        
+                        result_decryption = gnutls_x509_privkey_import_pkcs8 (privkey, &file_datum, GNUTLS_X509_FMT_PEM, password, 0);
+                        g_free (password);
+
+                        if (result_decryption == GNUTLS_E_DECRYPTION_FAILED) {
+                                ca_error_dialog (_("The given password doesn't match the one used for crypting this part"));
+                        }
+                }
+
+                if (result_decryption == GNUTLS_E_SUCCESS) {
+                        gchar * pem_privkey=NULL;
+                        size_t size;
+                        gchar * error_msg = NULL;
+
+                        result = -1;
+                        
+                        size = 0;
+                        gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size)  ; 
+                        if (size) {
+                                pem_privkey = g_new0(gchar, size);
+                                gnutls_x509_privkey_export (privkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size);
+                                
+                        }
+                        
+                        error_msg = ca_file_import_privkey (pem_privkey);
+                        if (error_msg) {
+                                ca_error_dialog (error_msg);
+                        } else {
+                                result = 1;
+                        }
+                        g_free (pem_privkey);
+                }
+
+                // Importing DER-codified encrypted private keys is not supported, as they cannot be probed without
+                // a password.
+        }
+
+	gnutls_x509_privkey_deinit (privkey);
 	
-	return successful_import;
+	return result;
 }
 
-gboolean import_pkcs12 (guchar *file_contents, gsize file_contents_size)
+gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
 {
-        return FALSE;
+        gint result = 0;
+	gnutls_pkcs12_t pkcs12;
+	gnutls_datum_t file_datum;
+
+        file_datum.data = file_contents;
+        file_datum.size = file_contents_size;
+
+	// Trying to import a Private Key in PEM format
+
+	if (gnutls_pkcs12_init (&pkcs12) < 0)
+		return result;
+
+        // Trying to import a PKCS#12 in PEM or DER format 
+	if (gnutls_pkcs12_import (pkcs12, &file_datum, GNUTLS_X509_FMT_PEM, 0) == 0 ||
+	    gnutls_pkcs12_import (pkcs12, &file_datum, GNUTLS_X509_FMT_DER, 0) == 0) {                
+                guint n_bag = 0;
+                gnutls_pkcs12_bag_t pkcs12_bag;
+                result = -1;
+
+                // Now, we walk through all the bags in the PKCS12 structure
+
+                if (gnutls_pkcs12_bag_init (&pkcs12_bag)) {
+                        gnutls_pkcs12_deinit (pkcs12);
+                        return result;
+                }
+                
+                while (gnutls_pkcs12_get_bag (pkcs12, n_bag, pkcs12_bag)) {
+                                
+                        // TO DO
+
+                }
+
+
+	}
+
+	gnutls_pkcs12_deinit (pkcs12);
+	
+	return result;
 }

@@ -1594,19 +1594,24 @@ gboolean ca_import (gchar *filename)
 
 	// Private key without password
         if (! successful_import)
-                successful_import = import_pkey_wo_passwd (file_contents, file_contents_size);
+                successful_import = import_pkey_wo_passwd (file_contents, file_contents_size);        
 
 	// Certificate revocation list
         if (! successful_import)
                 successful_import = import_crl (file_contents, file_contents_size);
 	
-	// PKCS7 structure
-        if (! successful_import)
-                successful_import = import_pkcs7 (file_contents, file_contents_size);
+        /* PKCS7 importing was removed in libgnutls 2.6.0 */
+	/* // PKCS7 structure */
+        /* if (! successful_import) */
+        /*         successful_import = import_pkcs7 (file_contents, file_contents_size); */
 
 	// PKCS12 structure
         if (! successful_import)
                 successful_import = import_pkcs12 (file_contents, file_contents_size);
+
+        // PKCS8 privkey structure
+        if (! successful_import)
+                successful_import = import_pkcs8 (file_contents, file_contents_size);
 
         g_free (file_contents);
 

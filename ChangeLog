@@ -1,3 +1,31 @@
+2008-10-08 08:43  davefx
+
+	* [r220] debian/changelog, debian/conffiles.ex, debian/control,
+	  debian/copyright, debian/cron.d.ex, debian/emacsen-install.ex,
+	  debian/emacsen-remove.ex, debian/emacsen-startup.ex,
+	  debian/gnomint.doc-base.EX, debian/init.d.ex, debian/manpage.1,
+	  debian/manpage.1.ex, debian/manpage.sgml.ex,
+	  debian/manpage.xml.ex, debian/menu.ex, debian/postinst.ex,
+	  debian/postrm.ex, debian/preinst.ex, debian/prerm.ex,
+	  debian/rules, debian/watch.ex:
+	  Updating files for building Debian packages
+
+2008-10-02 18:06  davefx
+
+	* [r219] src/import.c:
+	  Implemented PKCS7 importing. Cannot test, as I haven't found yet
+	  any PKCS7 file in the internet
+
+2008-10-02 17:12  davefx
+
+	* [r218] src/import.c, src/pkey_manage.c:
+	  Fixing bug that made CRL importing not work.
+
+2008-10-01 18:17  davefx
+
+	* [r216] ChangeLog, configure.in, m4/intltool.m4:
+	  Updating to version 0.5.4
+
 2008-10-01 18:04  davefx
 
 	* [r215] po, po/es.po, po/gnoMint.pot, src/ca_creation.c,
