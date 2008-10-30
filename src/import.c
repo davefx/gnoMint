@@ -590,22 +590,115 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
         // Trying to import a PKCS#12 in PEM or DER format 
 	if (gnutls_pkcs12_import (pkcs12, &file_datum, GNUTLS_X509_FMT_PEM, 0) == 0 ||
 	    gnutls_pkcs12_import (pkcs12, &file_datum, GNUTLS_X509_FMT_DER, 0) == 0) {                
-                guint n_bag = 0;
-                gnutls_pkcs12_bag_t pkcs12_bag;
+                guint n_bags = 0;
+                gnutls_pkcs12_bag_t *pkcs12_aux_bag = NULL;
+                GArray *pkcs_bag_array = g_array_new (FALSE, TRUE, sizeof(gnutls_pkcs12_bag_t));
+                gint get_bag_status;
+                gchar *password = NULL;
+                guint i;
+
                 result = -1;
 
                 // Now, we walk through all the bags in the PKCS12 structure
+                // inserting them into an array for walking through them afterwards
+                do {
+                        pkcs12_aux_bag = g_new0 (gnutls_pkcs12_bag_t, 1);
+                        gnutls_pkcs12_bag_init (pkcs12_aux_bag);
+                        
+                        get_bag_status = gnutls_pkcs12_get_bag (pkcs12, n_bags, *pkcs12_aux_bag);
+                        
+                        if (get_bag_status == GNUTLS_E_SUCCESS) {
+                                g_array_append_val (pkcs_bag_array, pkcs12_aux_bag);
+                                n_bags ++;
+                        } else {
+                                gnutls_pkcs12_bag_deinit (*pkcs12_aux_bag);
+                                g_free (pkcs12_aux_bag);
+                        }
 
-                if (gnutls_pkcs12_bag_init (&pkcs12_bag)) {
+                } while (get_bag_status == GNUTLS_E_SUCCESS);
+
+                if (n_bags == 0) {
+                        // Couldn't get any bag.
+                        // Exiting with error
                         gnutls_pkcs12_deinit (pkcs12);
                         return result;
                 }
-                
-                while (gnutls_pkcs12_get_bag (pkcs12, n_bag, pkcs12_bag)) {
-                                
-                        // TO DO
 
+
+                // Now, we first uncrypt all crypted bags
+                for (i=0; i<n_bags; i++) {
+                        if (gnutls_pkcs12_bag_get_type (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i), 0) == GNUTLS_BAG_ENCRYPTED) {
+                                gboolean pkcs12_bag_decrypted = FALSE;
+                                if (! password) 
+                                        password = __import_ask_password (_("Encrypted PKCS#12 bag"));
+
+                                if (! password) {
+                                        // The user cancelled the operation
+                                        for (i=0; i<n_bags; i++) {
+                                                gnutls_pkcs12_bag_deinit (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                                                g_free (g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                                                gnutls_pkcs12_deinit (pkcs12);
+                                                g_array_free (pkcs_bag_array, TRUE);
+                                                return result;
+                                        }
+                                } 
+                                
+                                pkcs12_bag_decrypted = ! (gnutls_pkcs12_bag_decrypt (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i),
+                                                                                     password));
+                                if (!pkcs12_bag_decrypted) {                                                
+                                        ca_error_dialog (_("The given password doesn't match with the password used for encrypting this part."));
+                                        gnutls_pkcs12_bag_deinit (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                                        g_free (g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                                        gnutls_pkcs12_deinit (pkcs12);
+                                        g_array_free (pkcs_bag_array, TRUE);
+                                        return result;
+                                }
+                        }
                 }
+
+                /* for (i=0; i<n_bags; i++) { */
+
+                /*         guint i; */
+                /*         guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (pkcs12_bag); */
+                /*         gchar *password = NULL; */
+                /*         gchar *friendly_name = NULL; */
+                        
+                /*         // First, we import all certificates. */
+                /*         for (i=0; i < num_elements_in_bag; i++) { */
+                /*                 if (gnutls_pkcs12_bag_get_type (pkcs12_bag, i) == GNUTLS_BAG_CERTIFICATE) { */
+                                        
+                /*                 } */
+                /*         } */
+                        // Then, we import all PKCS8 private keys.
+
+                        // Then we import the CRLs
+
+
+        /*                 for (i=0; i < num_elements_in_bag; i++) { */
+
+        /*                         switch (gnutls_pkcs12_bag_get_type (pkcs12_bag, i)) { */
+        /*                         case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY: */
+        /*                                 if (gnutls_pkcs12_bag_get_friendly_name (pkcs12_bag, i, &friendly_name) != GNUTLS_E_SUCCESS) */
+        /*                                         friendly_name = (_("PKCS#8 crypted private key")); */
+        /*                                 __import_ask_password (friendly_name); */
+
+        /*                                 break; */
+        /*                         case GNUTLS_BAG_PKCS8_KEY: */
+                                        
+        /*                                 break; */
+        /*                         case GNUTLS_BAG_CERTIFICATE: */
+                                        
+        /*                                 break; */
+        /*                         case GNUTLS_BAG_CRL: */
+
+        /*                                 break; */
+        /*                         case GNUTLS_BAG_EMPTY: */
+        /*                         case GNUTLS_BAG_UNKNOWN: */
+        /*                         default: */
+        /*                                 break; */
+        /*                         } */
+        /*                 } */
+        /*         } */
 
 
 	}
