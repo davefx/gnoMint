@@ -637,15 +637,19 @@ gchar * pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn)
  	gchar *res = NULL; 	
 	gchar *password = NULL;
 	
-	if (pem_private_key->is_in_db && 
-	    pem_private_key->is_ciphered_with_db_pwd)
-		password = pkey_manage_ask_password();
+	if (pem_private_key->is_in_db) {
+                if (pem_private_key->is_ciphered_with_db_pwd) {
+                        password = pkey_manage_ask_password();
+                        
+                        if (password) {
+                                res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);		
+                                g_free (password);
+                        }
 
-	if (password) {
-		res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);		
-		g_free (password);
-	}
-
+                } else {
+                        res = g_strdup (pem_private_key->pkey_data);
+                }
+        }
 	return res;
 }
 
