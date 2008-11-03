@@ -190,7 +190,81 @@ gint __import_cert (gnutls_x509_crt_t *cert)
         return result;
 }
 
+gint __import_crl (gnutls_x509_crl_t *crl)
+{
+        gint result = -1;
+	gnutls_x509_crt_t issuer_crt;
+        gsize size = 0;
+        gchar *issuer_dn = NULL;
+        gchar *cert_pem = NULL;
+        guint64 issuer_id;
+	gnutls_datum_t file_datum;
 
+
+        size = 0;
+        gnutls_x509_crl_get_issuer_dn (*crl, issuer_dn, &size)  ; 
+        if (size) {
+                issuer_dn = g_new0(gchar, size);
+                gnutls_x509_crl_get_issuer_dn (*crl, issuer_dn, &size);		
+        }
+
+        // First, we search the issuer in the database, using DN
+        if (ca_file_get_id_from_dn (CA_FILE_ELEMENT_TYPE_CERT, issuer_dn, &issuer_id)) {
+        
+                // We check if the supposed issuer is the actual issuer
+                cert_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, issuer_id);
+
+                if (gnutls_x509_crt_init (&issuer_crt) < 0) {
+                        g_free (issuer_dn);
+                        g_free (cert_pem);
+                        return result;
+                }
+
+                file_datum.data = (guchar *) cert_pem;
+                file_datum.size = strlen(cert_pem);
+
+                if (gnutls_x509_crt_import (issuer_crt, &file_datum, GNUTLS_X509_FMT_PEM) == GNUTLS_E_SUCCESS) {
+
+                        if (gnutls_x509_crl_check_issuer (*crl, issuer_crt)) {
+                                int number_of_certs;
+                                int i;
+
+                                // If it is, we recover all the certificates 
+                                number_of_certs = gnutls_x509_crl_get_crt_count(*crl);
+
+                                for (i=0; i<number_of_certs; i++) {
+                                        guchar *serialcrt = NULL;
+                                        UInt160 serial;
+                                        time_t revocation = 0;
+
+                                        // We look up each of the certificates in the crl
+
+                                        size = 0;
+                                        gnutls_x509_crl_get_crt_serial (*crl, i, serialcrt, &size, &revocation);
+                                        if (size) {
+                                                guint64 cert_id;
+
+                                                serialcrt = g_new0 (guchar, size);
+                                                gnutls_x509_crl_get_crt_serial (*crl, i, serialcrt, &size, &revocation);
+                                                uint160_read (&serial, serialcrt, size);
+                                                g_free (serialcrt);
+                                                serialcrt = NULL;
+
+                                                if (ca_file_get_id_from_serial_issuer_id (&serial, issuer_id, &cert_id)) {
+                                                        // If found, we revoke it with the correct date
+                                                        ca_file_revoke_crt_with_date (cert_id, revocation);
+                                                        result = 1;
+                                                }
+                                        }
+                                }
+
+                        }
+                }
+
+                gnutls_x509_crt_deinit (issuer_crt);
+        }        
+        return result;
+}
 
 gint import_csr (guchar *file_contents, gsize file_contents_size) 
 {	
@@ -319,13 +393,7 @@ gint import_crl (guchar *file_contents, gsize file_contents_size)
 {
         gint result = 0;
 	gnutls_x509_crl_t crl;
-	gnutls_x509_crt_t issuer_crt;
 	gnutls_datum_t file_datum;
-
-        gsize size = 0;
-        gchar *issuer_dn = NULL;
-        gchar *cert_pem = NULL;
-        guint64 issuer_id;
 
         file_datum.data = file_contents;
         file_datum.size = file_contents_size;
@@ -343,70 +411,7 @@ gint import_crl (guchar *file_contents, gsize file_contents_size)
                 return 0;
         }
                 
-        result = -1;
-        size = 0;
-        gnutls_x509_crl_get_issuer_dn (crl, issuer_dn, &size)  ; 
-        if (size) {
-                issuer_dn = g_new0(gchar, size);
-                gnutls_x509_crl_get_issuer_dn (crl, issuer_dn, &size);		
-        }
-
-        // First, we search the issuer in the database, using DN
-        if (ca_file_get_id_from_dn (CA_FILE_ELEMENT_TYPE_CERT, issuer_dn, &issuer_id)) {
-        
-                // We check if the supposed issuer is the actual issuer
-                cert_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, issuer_id);
-
-                if (gnutls_x509_crt_init (&issuer_crt) < 0) {
-                        gnutls_x509_crl_deinit(crl);
-                        g_free (issuer_dn);
-                        g_free (cert_pem);
-                        return result;
-                }
-
-                file_datum.data = (guchar *) cert_pem;
-                file_datum.size = strlen(cert_pem);
-
-                if (gnutls_x509_crt_import (issuer_crt, &file_datum, GNUTLS_X509_FMT_PEM) == GNUTLS_E_SUCCESS) {
-
-                        if (gnutls_x509_crl_check_issuer (crl, issuer_crt)) {
-                                int number_of_certs;
-                                int i;
-
-                                // If it is, we recover all the certificates 
-                                number_of_certs = gnutls_x509_crl_get_crt_count(crl);
-
-                                for (i=0; i<number_of_certs; i++) {
-                                        guchar *serialcrt = NULL;
-                                        UInt160 serial;
-                                        time_t revocation = 0;
-
-                                        // We look up each of the certificates in the crl
-
-                                        size = 0;
-                                        gnutls_x509_crl_get_crt_serial (crl, i, serialcrt, &size, &revocation);
-                                        if (size) {
-                                                guint64 cert_id;
-
-                                                serialcrt = g_new0 (guchar, size);
-                                                gnutls_x509_crl_get_crt_serial (crl, i, serialcrt, &size, &revocation);
-                                                uint160_read (&serial, serialcrt, size);
-                                                g_free (serialcrt);
-                                                serialcrt = NULL;
-
-                                                if (ca_file_get_id_from_serial_issuer_id (&serial, issuer_id, &cert_id)) {
-                                                        // If found, we revoke it with the correct date
-                                                        ca_file_revoke_crt_with_date (cert_id, revocation);
-                                                        result = 1;
-                                                }
-                                        }
-                                }
-
-                        }
-                }
-
-                gnutls_x509_crt_deinit (issuer_crt);
-        }        
+        result = __import_crl (&crl);
                 		
 	gnutls_x509_crl_deinit (crl);
 	
@@ -646,9 +651,12 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                                 pkcs12_bag_decrypted = ! (gnutls_pkcs12_bag_decrypt (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i),
                                                                                      password));
                                 if (!pkcs12_bag_decrypted) {                                                
+                                        gint j;
                                         ca_error_dialog (_("The given password doesn't match with the password used for encrypting this part."));
-                                        gnutls_pkcs12_bag_deinit (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
-                                        g_free (g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                                        for (j=0; j<n_bags; j++) {
+                                                gnutls_pkcs12_bag_deinit (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, j));
+                                                g_free (g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, j));
+                                        }
                                         gnutls_pkcs12_deinit (pkcs12);
                                         g_array_free (pkcs_bag_array, TRUE);
                                         return result;
@@ -656,51 +664,140 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                         }
                 }
 
-                /* for (i=0; i<n_bags; i++) { */
-
-                /*         guint i; */
-                /*         guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (pkcs12_bag); */
-                /*         gchar *password = NULL; */
-                /*         gchar *friendly_name = NULL; */
+                // After having all the parts unencrypted, we import all certificates first.
+                for (i=0; i<n_bags; i++) {
+                        gnutls_pkcs12_bag * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
+                        guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (*pkcs12_bag);
                         
-                /*         // First, we import all certificates. */
-                /*         for (i=0; i < num_elements_in_bag; i++) { */
-                /*                 if (gnutls_pkcs12_bag_get_type (pkcs12_bag, i) == GNUTLS_BAG_CERTIFICATE) { */
+                        for (i=0; i < num_elements_in_bag; i++) {
+                                gnutls_datum data;
+                                if (gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_CERTIFICATE) {
+                                        gnutls_x509_crt cert;
                                         
-                /*                 } */
-                /*         } */
-                        // Then, we import all PKCS8 private keys.
-
-                        // Then we import the CRLs
-
-
-        /*                 for (i=0; i < num_elements_in_bag; i++) { */
-
-        /*                         switch (gnutls_pkcs12_bag_get_type (pkcs12_bag, i)) { */
-        /*                         case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY: */
-        /*                                 if (gnutls_pkcs12_bag_get_friendly_name (pkcs12_bag, i, &friendly_name) != GNUTLS_E_SUCCESS) */
-        /*                                         friendly_name = (_("PKCS#8 crypted private key")); */
-        /*                                 __import_ask_password (friendly_name); */
-
-        /*                                 break; */
-        /*                         case GNUTLS_BAG_PKCS8_KEY: */
+                                        gnutls_x509_crt_init (&cert);
+                                        if (gnutls_pkcs12_bag_get_data(*pkcs12_bag, i, &data) < 0) {
+                                                gnutls_x509_crt_deinit (cert);
+                                                continue;
+                                        }
+                                        if (gnutls_x509_crt_import(cert, &data, GNUTLS_X509_FMT_DER) < 0) {
+                                                gnutls_x509_crt_deinit (cert);
+                                                continue;
+                                        }
+                                        __import_cert (& cert);
                                         
-        /*                                 break; */
-        /*                         case GNUTLS_BAG_CERTIFICATE: */
+                                        gnutls_x509_crt_deinit (cert);
+                                }
+                        }
+                }
+                
+                
+                // Then, we import all PKCS8 private keys.
+                for (i=0; i<n_bags; i++) {
+                        gnutls_pkcs12_bag * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
+                        guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (*pkcs12_bag);
+                        
+                        for (i=0; i < num_elements_in_bag; i++) {
+                                gnutls_datum data;
+                                if (gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_PKCS8_KEY ||
+                                    gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY) {
+                                        gnutls_x509_privkey pkey;
+                                        gint result_decryption;
                                         
-        /*                                 break; */
-        /*                         case GNUTLS_BAG_CRL: */
+                                        gnutls_x509_privkey_init (&pkey);
+                                        if (gnutls_pkcs12_bag_get_data(*pkcs12_bag, i, &data) < 0) {
+                                                gnutls_x509_privkey_deinit (pkey);
+                                                continue;
+                                        }
 
-        /*                                 break; */
-        /*                         case GNUTLS_BAG_EMPTY: */
-        /*                         case GNUTLS_BAG_UNKNOWN: */
-        /*                         default: */
-        /*                                 break; */
-        /*                         } */
-        /*                 } */
-        /*         } */
+                                        result_decryption = gnutls_x509_privkey_import_pkcs8(pkey, &data, GNUTLS_X509_FMT_DER, password, 0);
+                                        if (result_decryption < 0) {
+                                                while (result_decryption==GNUTLS_E_DECRYPTION_FAILED) {
+                                                        if (password)
+                                                                g_free (password);
 
+                                                        // We launch a window for asking the password.
+                                                        password = __import_ask_password (_("PKCS#8 crypted private key"));
+                                                        
+                                                        if (! password) {
+                                                                break;
+                                                        }
+                        
+                                                        result_decryption = gnutls_x509_privkey_import_pkcs8 (pkey, &data, GNUTLS_X509_FMT_DER, 
+                                                                                                              password, 0);
 
+                                                        if (result_decryption == GNUTLS_E_DECRYPTION_FAILED) {
+                                                                ca_error_dialog (_("The given password doesn't match the one used "
+                                                                                   "for crypting this part"));
+                                                        }
+                                                }
+                                                if (result_decryption < 0) {
+                                                        // The user pressed "Cancel" button, or 
+                                                        // the decryption has failed
+                                                        gnutls_x509_privkey_deinit (pkey);
+                                                        continue;
+                                                }
+                                        }
+                                        if (result_decryption == GNUTLS_E_SUCCESS) {
+                                                gchar * pem_privkey=NULL;
+                                                size_t size;
+                                                gchar * error_msg = NULL;
+                                                
+                                                result = -1;
+                                                
+                                                size = 0;
+                                                gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size)  ; 
+                                                if (size) {
+                                                        pem_privkey = g_new0(gchar, size);
+                                                        gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_PEM, pem_privkey, &size);
+                                                        
+                                                }
+                                                
+                                                error_msg = ca_file_import_privkey (pem_privkey);
+                                                if (error_msg) {
+                                                        ca_error_dialog (error_msg);
+                                                } else {
+                                                        result = 1;
+                                                }
+                                                g_free (pem_privkey);
+                                                gnutls_x509_privkey_deinit (pkey);
+                                        }
+                                }
+                        }
+                }       
+                // Then we import the CRLs
+
+                for (i=0; i<n_bags; i++) {
+                        gnutls_pkcs12_bag * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
+                        guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (*pkcs12_bag);
+                        
+                        for (i=0; i < num_elements_in_bag; i++) {
+                                gnutls_datum data;
+                                if (gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_CRL) {
+                                        gnutls_x509_crl crl;
+                                        
+                                        gnutls_x509_crl_init (&crl);
+                                        if (gnutls_pkcs12_bag_get_data(*pkcs12_bag, i, &data) < 0) {
+                                                gnutls_x509_crl_deinit (crl);
+                                                continue;
+                                        }
+                                        if (gnutls_x509_crl_import(crl, &data, GNUTLS_X509_FMT_DER) < 0) {
+                                                gnutls_x509_crl_deinit (crl);
+                                                continue;
+                                        }
+                                        __import_crl (& crl);
+                                        
+                                        gnutls_x509_crl_deinit (crl);
+                                }
+                        }
+                }
+
+                // Ok. Now we free all the bags
+                for (i=0; i<n_bags; i++) {
+                        gnutls_pkcs12_bag_deinit (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                        g_free (g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i));
+                }
+                g_array_free (pkcs_bag_array, TRUE);
+                
 	}
 
 	gnutls_pkcs12_deinit (pkcs12);
