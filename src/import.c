@@ -804,3 +804,89 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
 	
 	return result;
 }
+
+gboolean import_single_file (gchar *filename) 
+{	
+        gboolean successful_import = FALSE;
+	GError *error = NULL;
+	guchar *file_contents = NULL;
+        gsize   file_contents_size = 0;
+	
+	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
+
+	if (error) {
+		ca_error_dialog (_(error->message));
+		return FALSE;
+	}
+
+	file_contents_size = g_mapped_file_get_length (mapped_file);
+	file_contents = g_new0 (guchar, file_contents_size);
+	memcpy (file_contents, g_mapped_file_get_contents (mapped_file), file_contents_size);
+	
+	g_mapped_file_free (mapped_file);
+
+
+	// We start to check each type of file, in PEM and DER
+	// formats, for see if some of them matches with the actual file
+
+
+	// Certificate request
+        successful_import = import_csr (file_contents, file_contents_size);
+
+	// Certificate list (or single certificate)
+        if (! successful_import)
+                successful_import = import_certlist (file_contents, file_contents_size);
+
+	// Private key without password
+        if (! successful_import)
+                successful_import = import_pkey_wo_passwd (file_contents, file_contents_size);        
+
+	// Certificate revocation list
+        if (! successful_import)
+                successful_import = import_crl (file_contents, file_contents_size);
+	
+        /* PKCS7 importing was removed in libgnutls 2.6.0 */
+	/* // PKCS7 structure */
+        /* if (! successful_import) */
+        /*         successful_import = import_pkcs7 (file_contents, file_contents_size); */
+
+	// PKCS12 structure
+        if (! successful_import)
+                successful_import = import_pkcs12 (file_contents, file_contents_size);
+
+        // PKCS8 privkey structure
+        if (! successful_import)
+                successful_import = import_pkcs8 (file_contents, file_contents_size);
+
+        g_free (file_contents);
+
+	if (successful_import) {
+		ca_refresh_model();
+	} else {
+		ca_error_dialog (_("Couldn't find any supported format in the given file"));
+	}
+
+	return TRUE;
+
+}
+
+gchar * import_whole_dir (gchar *dirname)
+{
+        gchar *result;
+
+        guint CA_directory_type = 0;
+
+        // First, we try to probe if this is really a CA-containing directory
+        
+        // * Try to detect OpenSSL CA
+
+        // * Other formats... (?)
+
+        switch (CA_directory_type) {
+        case 0:
+                break;
+        }
+        
+
+        return result;
+}

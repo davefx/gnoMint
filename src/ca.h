@@ -47,7 +47,6 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data);
 gboolean ca_open (gchar *filename, gboolean create);
 guint64 ca_get_selected_row_id (void);
 gchar * ca_get_selected_row_pem (void);
-gboolean ca_import (gchar *filename);
 void ca_update_csr_view (gboolean new_value, gboolean refresh);
 gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
 void ca_update_revoked_view (gboolean new_value, gboolean refresh);

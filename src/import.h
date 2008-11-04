@@ -39,4 +39,7 @@ gint import_pkcs8 (guchar *file_contents, gsize file_contents_size);
 
 gint import_pkcs12 (guchar *file_contents, gsize file_contents_size);
 
+gboolean import_single_file (gchar *filename);
+gchar * import_whole_dir (gchar *dirname);
+
 #endif
