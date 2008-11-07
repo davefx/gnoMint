@@ -872,18 +872,180 @@ gboolean import_single_file (gchar *filename)
 
 gchar * import_whole_dir (gchar *dirname)
 {
-        gchar *result;
+        gchar *result = NULL;
+	gchar *filename = NULL;
 
         guint CA_directory_type = 0;
+	gboolean error = FALSE;
+	gchar *filecontents = NULL;
+	gchar *ca_password = NULL;
 
         // First, we try to probe if this is really a CA-containing directory
         
         // * Try to detect OpenSSL CA
+	{
+		filename = g_build_filename (dirname, "cacert.key", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+		filename = g_build_filename (dirname, "cacert.pem", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+		filename = g_build_filename (dirname, "serial", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+		filename = g_build_filename (dirname, "certs", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_DIR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+		filename = g_build_filename (dirname, "crl", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_DIR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+		filename = g_build_filename (dirname, "keys", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_DIR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+		filename = g_build_filename (dirname, "req", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_DIR)) {
+			error = TRUE;
+		}
+		g_free (filename);
+
+		if (! error) {
+			CA_directory_type = 1; //OpenSSL
+		}
+	}
 
         // * Other formats... (?)
 
         switch (CA_directory_type) {
+	case 1:
+		// First we import the public CA root certificate
+		filename = g_build_filename (dirname, "cacert.pem", NULL);
+		if (import_single_file (filename) != 1) {
+			g_free (filename);
+			result = _("There was a problem while importing the public CA root certificate");
+			break;
+		}
+		g_free (filename);
+
+		// Now we import the private CA root-certificate private key
+		// Usually, it is crypted in a OpenSSL proprietary format.
+		// Let's check it:
+		filename = g_build_filename (dirname, "cacert.key", NULL);
+		if (! g_file_get_contents (filename, &filecontents, NULL, NULL)) {
+			result = _("Couldn't open CA root private key file. Check permissions.");
+			g_free (filename);
+			break;
+		}
+		if (g_strrstr (filecontents, "Proc-Type") &&
+		    g_strrstr (filecontents, "DEK-Info")) {
+			// The file is codified with a proprietary OpenSSL format
+			// so we call openssl for decoding it			
+			gchar *keytype = NULL;
+			gchar *uncyphered_cakey = NULL;
+			gchar *error_message = NULL;
+			gchar *temp_pwd = NULL;
+			gint   exit_status = 0;
+			GError *gerror = NULL;
+			gchar *opensslargv[7];
+
+			if (g_strrstr (filecontents, "BEGIN RSA")) {
+				keytype = "rsa";
+			} 
+
+			if (g_strrstr (filecontents, "BEGIN DSA")) {
+				keytype = "dsa";
+			}
+
+			if (!keytype) {
+				result = _("Couldn't recognize the CA root private key file as a RSA or DSA private key.");
+				g_free (filecontents);
+				g_free (filename);
+
+			}
+
+			do {
+				
+				ca_password = __import_ask_password ("CA Root private key");
+				
+				if (ca_password == NULL) {
+					g_free (filename);
+					g_free (filecontents);
+					break;
+				}
+				
+				temp_pwd = g_strdup_printf ("pass:%s", ca_password);
+				opensslargv[0] = "openssl";
+				opensslargv[1] = keytype;
+				opensslargv[2] = "-in";
+				opensslargv[3] = filename;
+				opensslargv[4] = "-passin";
+				opensslargv[5] = temp_pwd;
+				opensslargv[6] = NULL;
+					
+				if (! g_spawn_sync (dirname, 
+						    opensslargv,
+						    NULL,
+						    G_SPAWN_SEARCH_PATH,
+						    NULL,
+						    NULL,
+						    &uncyphered_cakey,
+						    &error_message,
+						    &exit_status,
+						    &gerror)) {
+					// Problem while launching openssl...
+					g_free (filename);
+					g_free (filecontents);
+					g_free (temp_pwd);
+					
+					result = _("Problem while calling to openssl for decyphering private key");
+					break;					
+				}
+				
+				g_free (temp_pwd);
+
+				if (exit_status != 0) {
+					gchar *error_to_show = g_strdup_printf (_("OpenSSL has returned the following error "
+										  "while trying to decypher the private key:\n\n%s"),
+										error_message);
+					ca_error_dialog (error_to_show);
+					g_free (error_to_show);
+				}
+			} while (exit_status != 0);
+			
+			if (ca_password == NULL || gerror) {
+				break;
+			}
+			
+			g_free (filecontents);
+			if (error_message)
+				g_free (error_message);
+
+			filecontents = uncyphered_cakey;
+		} 
+		// Now, we import the uncyphered private key:
+
+		if (import_pkey_wo_passwd ((guchar *) filecontents, strlen(filecontents)) != 1) {
+			g_free (filename);
+			g_free (filecontents);
+			result = _("There was a problem while importing the private key corresponding to CA root certificate");
+			break;
+		}
+		g_free (filecontents);
+		
+		break;
         case 0:
+	default:
                 break;
         }
         
