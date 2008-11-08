@@ -115,10 +115,6 @@ if test x"$GCONFTOOL" = x; then
 fi
 AM_GCONF_SOURCE_2
 
-dnl
-if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall -Werror -g "
-fi
 
 dnl
 dnl Check if src should be build with the debug mode
@@ -137,6 +133,18 @@ AC_ARG_ENABLE(debug-signal,
 	AC_DEFINE(debug_signal), use_debug_sig="No")
 
 dnl
+
+dnl
+if test "x$GCC" = "xyes"; then
+	CFLAGS="-Wall -Werror"
+	if test "x$use_debug" = "xYes"; then
+   	   CFLAGS="$CFLAGS -g -O0"
+	fi
+fi
+
+
+
+
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
