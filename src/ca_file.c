@@ -1246,9 +1246,12 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 
         gchar **issuer_res = NULL;
         gchar **orphan_res = NULL;
+	gchar **existent_res = NULL;
         gchar *error = NULL;
         gchar *sql_subject_key_id = NULL;
         gchar *sql_issuer_key_id = NULL;
+        gchar *sql_subject_key_id_with_condition = NULL;
+        gchar *sql_issuer_key_id_with_condition = NULL;
         gchar *sql = NULL;
 
 	TlsCert *tlscert = tls_parse_cert_pem (pem_certificate);
@@ -1259,11 +1262,45 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
         sql_issuer_key_id = (tlscert->issuer_key_id ? 
                              g_strdup_printf ("'%s'",tlscert->issuer_key_id) :
                              g_strdup_printf ("NULL"));
+        sql_subject_key_id_with_condition = (tlscert->subject_key_id ? 
+                              g_strdup_printf ("= '%s'",tlscert->subject_key_id) :
+                              g_strdup_printf ("IS NULL"));
+        sql_issuer_key_id_with_condition = (tlscert->issuer_key_id ? 
+                             g_strdup_printf ("= '%s'",tlscert->issuer_key_id) :
+                             g_strdup_printf ("IS NULL"));
 
+	// Let's check if it is already in the database: we don't want to import 
+	// the same certificate several times.
+	existent_res = __ca_file_get_single_row ("SELECT count (id) FROM certificates WHERE "
+						 "dn='%q' AND parent_dn='%q' AND "
+						 "subject_key_id %s and issuer_key_id %s;",
+						 tlscert->dn, tlscert->i_dn,
+						 sql_subject_key_id_with_condition, sql_issuer_key_id_with_condition);
 
-	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
+	g_free (sql_subject_key_id_with_condition);
+	g_free (sql_issuer_key_id_with_condition);
+
+	if (! existent_res) {
+		g_free (sql_subject_key_id);
+		g_free (sql_issuer_key_id);
+		tls_cert_free (tlscert);
 		return error;
-        
+	}
+	if (atoi(existent_res[0]) != 0) {
+		g_free (sql_subject_key_id);
+		g_free (sql_issuer_key_id);
+		tls_cert_free (tlscert);
+		return _("This certificate already exists in the database: cannot insert it twice.");
+	}
+	
+
+	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+		g_free (sql_subject_key_id);
+		g_free (sql_issuer_key_id);
+		tls_cert_free (tlscert);
+		return error;
+        }
+
         // We first look up if the issuer is already in the database
         // * We first search using issuer_key_id (if the imported certificate has this field)
         if (tlscert->issuer_key_id) {
