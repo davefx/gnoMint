@@ -870,15 +870,142 @@ gboolean import_single_file (gchar *filename)
 
 }
 
+gint import_openssl_private_key (const gchar *filename, gchar **last_password)
+{
+	guint result = 0;
+	gchar *filecontents = NULL;
+
+	if (! g_file_get_contents (filename, &filecontents, NULL, NULL)) {
+		gchar *message = g_strdup_printf(_("Couldn't open %s file. Check permissions."), filename);
+		ca_error_dialog (message);
+		g_free (message);
+		return result;
+	}
+	if (g_strrstr (filecontents, "Proc-Type") &&
+	    g_strrstr (filecontents, "DEK-Info")) {
+		// The file is codified with a proprietary OpenSSL format
+		// so we call openssl for decoding it			
+		gchar *keytype = NULL;
+		gchar *uncyphered_cakey = NULL;
+		gchar *error_message = NULL;
+		gchar *temp_pwd = NULL;
+		gint   exit_status = 0;
+		GError *gerror = NULL;
+		gchar *opensslargv[7];
+		gboolean first_time = TRUE;
+
+		if (g_strrstr (filecontents, "BEGIN RSA")) {
+			keytype = "rsa";
+		} 
+
+		if (g_strrstr (filecontents, "BEGIN DSA")) {
+			keytype = "dsa";
+		}
+
+		if (!keytype) {
+			gchar * message = g_strdup_printf(_("Couldn't recognize the file %s as a RSA or DSA private key."), filename);
+			ca_error_dialog (message);
+			g_free (message);
+			g_free (filecontents);
+			return result;
+		}
+
+		do {
+			gchar *description;
+			gchar *dirname = NULL;
+
+			if (! first_time ||  ! *last_password) {
+				// We ask for a password only if there is no current password
+				// or if the current password has already failed.
+
+				description = g_strdup_printf (_("Private key %s"), filename);
+				*last_password = __import_ask_password (description);
+				g_free (description);
+				
+				if (*last_password == NULL) {
+					g_free (filecontents);
+					break;
+				}
+			}
+
+			temp_pwd = g_strdup_printf ("pass:%s", *last_password);
+			opensslargv[0] = "openssl";
+			opensslargv[1] = keytype;
+			opensslargv[2] = "-in";
+			opensslargv[3] = (gchar *) filename;
+			opensslargv[4] = "-passin";
+			opensslargv[5] = temp_pwd;
+			opensslargv[6] = NULL;
+					
+			dirname = g_path_get_dirname (filename);
+
+			if (! g_spawn_sync (dirname, 
+					    opensslargv,
+					    NULL,
+					    G_SPAWN_SEARCH_PATH,
+					    NULL,
+					    NULL,
+					    &uncyphered_cakey,
+					    &error_message,
+					    &exit_status,
+					    &gerror)) {
+				// Problem while launching openssl...
+				g_free (filecontents);
+				g_free (temp_pwd);
+				g_free (dirname);
+				ca_error_dialog (_("Problem while calling to openssl for decyphering private key."));
+				break;					
+			}
+				
+			g_free (dirname);
+			g_free (temp_pwd);
+
+			if (exit_status != 0) {
+				gchar *error_to_show = g_strdup_printf (_("OpenSSL has returned the following error "
+									  "while trying to decypher the private key:\n\n%s"),
+									error_message);
+				ca_error_dialog (error_to_show);
+				g_free (error_to_show);
+				first_time = FALSE;
+			}
+		} while (exit_status != 0);
+			
+		if (* last_password == NULL || gerror) {
+			return result;
+		}
+			
+		g_free (filecontents);
+		if (error_message)
+			g_free (error_message);
+
+		filecontents = uncyphered_cakey;
+	} 
+	// Now, we import the uncyphered private key:
+
+	result = import_pkey_wo_passwd ((guchar *) filecontents, strlen(filecontents));
+
+	if (result == 1)
+		ca_refresh_model();
+
+	g_free (filecontents);
+
+	return result;
+}
+
 gchar * import_whole_dir (gchar *dirname)
 {
         gchar *result = NULL;
 	gchar *filename = NULL;
+	const gchar *int_filename = NULL;
 
         guint CA_directory_type = 0;
 	gboolean error = FALSE;
-	gchar *filecontents = NULL;
 	gchar *ca_password = NULL;
+	
+	GError *gerror = NULL;
+
+	GDir * dir = NULL;
+	GList * problematic_files = NULL, *cursor = NULL;
 
         // First, we try to probe if this is really a CA-containing directory
         
@@ -931,7 +1058,7 @@ gchar * import_whole_dir (gchar *dirname)
 	case 1:
 		// First we import the public CA root certificate
 		filename = g_build_filename (dirname, "cacert.pem", NULL);
-		if (import_single_file (filename) != 1) {
+		if (import_single_file (filename) == FALSE) {
 			g_free (filename);
 			result = _("There was a problem while importing the public CA root certificate");
 			break;
@@ -942,107 +1069,113 @@ gchar * import_whole_dir (gchar *dirname)
 		// Usually, it is crypted in a OpenSSL proprietary format.
 		// Let's check it:
 		filename = g_build_filename (dirname, "cacert.key", NULL);
-		if (! g_file_get_contents (filename, &filecontents, NULL, NULL)) {
-			result = _("Couldn't open CA root private key file. Check permissions.");
+		if (import_openssl_private_key (filename, &ca_password) == 0) {
 			g_free (filename);
-			break;
-		}
-		if (g_strrstr (filecontents, "Proc-Type") &&
-		    g_strrstr (filecontents, "DEK-Info")) {
-			// The file is codified with a proprietary OpenSSL format
-			// so we call openssl for decoding it			
-			gchar *keytype = NULL;
-			gchar *uncyphered_cakey = NULL;
-			gchar *error_message = NULL;
-			gchar *temp_pwd = NULL;
-			gint   exit_status = 0;
-			GError *gerror = NULL;
-			gchar *opensslargv[7];
-
-			if (g_strrstr (filecontents, "BEGIN RSA")) {
-				keytype = "rsa";
-			} 
-
-			if (g_strrstr (filecontents, "BEGIN DSA")) {
-				keytype = "dsa";
-			}
-
-			if (!keytype) {
-				result = _("Couldn't recognize the CA root private key file as a RSA or DSA private key.");
-				g_free (filecontents);
-				g_free (filename);
-
-			}
-
-			do {
-				
-				ca_password = __import_ask_password ("CA Root private key");
-				
-				if (ca_password == NULL) {
-					g_free (filename);
-					g_free (filecontents);
-					break;
-				}
-				
-				temp_pwd = g_strdup_printf ("pass:%s", ca_password);
-				opensslargv[0] = "openssl";
-				opensslargv[1] = keytype;
-				opensslargv[2] = "-in";
-				opensslargv[3] = filename;
-				opensslargv[4] = "-passin";
-				opensslargv[5] = temp_pwd;
-				opensslargv[6] = NULL;
-					
-				if (! g_spawn_sync (dirname, 
-						    opensslargv,
-						    NULL,
-						    G_SPAWN_SEARCH_PATH,
-						    NULL,
-						    NULL,
-						    &uncyphered_cakey,
-						    &error_message,
-						    &exit_status,
-						    &gerror)) {
-					// Problem while launching openssl...
-					g_free (filename);
-					g_free (filecontents);
-					g_free (temp_pwd);
-					
-					result = _("Problem while calling to openssl for decyphering private key");
-					break;					
-				}
-				
-				g_free (temp_pwd);
-
-				if (exit_status != 0) {
-					gchar *error_to_show = g_strdup_printf (_("OpenSSL has returned the following error "
-										  "while trying to decypher the private key:\n\n%s"),
-										error_message);
-					ca_error_dialog (error_to_show);
-					g_free (error_to_show);
-				}
-			} while (exit_status != 0);
-			
-			if (ca_password == NULL || gerror) {
-				break;
-			}
-			
-			g_free (filecontents);
-			if (error_message)
-				g_free (error_message);
-
-			filecontents = uncyphered_cakey;
-		} 
-		// Now, we import the uncyphered private key:
-
-		if (import_pkey_wo_passwd ((guchar *) filecontents, strlen(filecontents)) != 1) {
-			g_free (filename);
-			g_free (filecontents);
 			result = _("There was a problem while importing the private key corresponding to CA root certificate");
 			break;
 		}
-		g_free (filecontents);
+		g_free (filename);
+
+		// Now we import all the certificates emitted by the CA
+		filename = g_build_filename (dirname, "certs", NULL);
+		dir = g_dir_open (filename, 0, &gerror);
+		if (! dir) {
+			g_free (filename);
+			result = _("There was a problem while opening the directory certs/.");
+			break;
+		}
+		g_free (filename);
+		while ((int_filename = g_dir_read_name (dir))) {
+			
+			if (g_strrstr (int_filename, ".pem")) {
+				filename = g_build_filename (dirname, "certs", int_filename, NULL);
+				if (import_single_file ((gchar *) filename) == 0) {
+					problematic_files = g_list_append (problematic_files, g_strdup(filename));
+				}
+				g_free (filename);
+			}
+		}
+		g_dir_close (dir);
+
+
+		// Now we import all the CSRs of the CA
+		filename = g_build_filename (dirname, "req", NULL);
+		dir = g_dir_open (filename, 0, &gerror);
+		if (! dir) {
+			g_free (filename);
+			result = _("There was a problem while opening the directory certs/.");
+			break;
+		}
+		g_free (filename);
+		while ((int_filename = g_dir_read_name (dir))) {
+			
+			if (g_strrstr (int_filename, ".pem")) {
+				filename = g_build_filename (dirname, "req", int_filename, NULL);
+				if (import_single_file ((gchar *) filename) == 0) {
+					problematic_files = g_list_append (problematic_files, g_strdup(filename));					
+				}
+				g_free (filename);
+			}
+		}
+		g_dir_close (dir);
+
+		// Now we import all the CRLs of the CA
+		filename = g_build_filename (dirname, "crl", NULL);
+		dir = g_dir_open (filename, 0, &gerror);
+		if (! dir) {
+			g_free (filename);
+			result = _("There was a problem while opening the directory certs/.");
+			break;
+		}
+		g_free (filename);
+		while ((int_filename = g_dir_read_name (dir))) {
+			
+			if (g_strrstr (int_filename, ".pem")) {
+				filename = g_build_filename (dirname, "crl", int_filename, NULL);
+				if (import_single_file ((gchar *) filename) == 0) {
+					problematic_files = g_list_append (problematic_files, g_strdup(filename));					
+				}
+				g_free (filename);
+			}
+		}
+		g_dir_close (dir);
 		
+		// Now we import all the private keys of the CA
+		filename = g_build_filename (dirname, "keys", NULL);
+		dir = g_dir_open (filename, 0, &gerror);
+		if (! dir) {
+			g_free (filename);
+			result = _("There was a problem while opening the directory certs/.");
+			break;
+		}
+		g_free (filename);
+		while ((int_filename = g_dir_read_name (dir))) {
+			
+			if (g_strrstr (int_filename, ".pem")) {
+				filename = g_build_filename (dirname, "keys", int_filename, NULL);
+				if (import_openssl_private_key ((gchar *) filename, &ca_password) == 0) {
+					problematic_files = g_list_append (problematic_files, g_strdup(filename));					
+				}
+				g_free (filename);
+			}
+		}
+		g_dir_close (dir);
+
+		// Now we import the last serial number
+		// TO DO
+
+
+		// We must show the problematic files.
+		// TO DO
+		
+		cursor = g_list_first (problematic_files);
+		while (cursor) {
+			g_free (cursor->data);
+			cursor->data = NULL;
+			cursor = cursor->next;
+		}
+		g_list_free (problematic_files);
+
 		break;
         case 0:
 	default:
