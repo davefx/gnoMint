@@ -17,13 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <libintl.h>
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include <glib/gi18n.h>
 #include "uint160.h"
 #include "tls.h"
 

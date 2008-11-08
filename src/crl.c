@@ -31,8 +31,7 @@
 #include "tls.h"
 #include "ca_policy.h"
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
+#include <glib/gi18n.h>
 
 GladeXML *crl_window_xml = NULL;
 GtkTreeStore * crl_ca_list_model = NULL;

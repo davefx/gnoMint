@@ -25,9 +25,7 @@
 #include "ca.h"
 #include "preferences-gui.h"
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-
+#include <glib/gi18n.h>
 
 
 static GConfClient * preferences_client;

@@ -24,8 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
+#include <glib/gi18n.h>
+
 
 #include "ca_creation.h"
 #include "csr_creation.h"

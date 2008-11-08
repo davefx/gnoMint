@@ -34,9 +34,7 @@
 #include "preferences-gui.h"
 #include "new_cert_window.h"
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-#define D_(x) dgettext ("iso_3166", x)
+#include <glib/gi18n.h>
 
 GladeXML * new_cert_window_xml = NULL;
 

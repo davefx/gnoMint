@@ -32,10 +32,7 @@
 #include "ca.h"
 #include "pkey_manage.h"
 
-#include <libintl.h>
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-
+#include <glib/gi18n.h>
 
 #define PKEY_MANAGE_ENCRYPTED_PKCS8_HEADER "-----BEGIN ENCRYPTED PRIVATE KEY-----"
 #define PKEY_MANAGE_UNCRYPTED_PKCS8_HEADER "-----BEGIN PRIVATE KEY-----"

@@ -34,9 +34,7 @@
 #include "ca_file.h"
 #include "pkey_manage.h"
 
-#include <libintl.h>
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
+#include <glib/gi18n.h>
 
 extern gchar * gnomint_current_opened_file;
 

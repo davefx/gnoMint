@@ -28,9 +28,8 @@
 #include "tls.h"
 #include "ca_policy.h"
 
+#include <glib/gi18n.h>
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
 
 extern GladeXML * certificate_properties_window_xml;
 

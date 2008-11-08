@@ -27,11 +27,7 @@
 #include "tls.h"
 #include "csr_properties.h"
 
-
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-
-
+#include <glib/gi18n.h>
 
 
 GladeXML * csr_properties_window_xml = NULL;

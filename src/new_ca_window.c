@@ -33,8 +33,7 @@
 #include "ca.h"
 #include "pkey_manage.h"
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
+#include <glib/gi18n.h>
 #define D_(x) dgettext ("iso_3166", x)
 
 typedef struct {

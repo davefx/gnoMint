@@ -34,9 +34,7 @@
 #include "pkey_manage.h"
 #include "new_req_window.h"
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-#define D_(x) dgettext ("iso_3166", x)
+#include <glib/gi18n.h>
 
 typedef struct {
 	char * name;

@@ -25,10 +25,7 @@
 #include <stdio.h>
 #include <gnutls/gnutls.h>
 
-#include <libintl.h>
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
-
+#include <glib/gi18n.h>
 
 gint ca_creation_is_launched = -1;
 

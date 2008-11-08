@@ -27,8 +27,7 @@
 #include "preferences-gui.h"
 #include "preferences-window.h"
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
+#include <glib/gi18n.h>
 
 GladeXML *preferences_window_xml = NULL;
 

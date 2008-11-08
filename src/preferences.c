@@ -20,8 +20,7 @@
 #include <libintl.h>
 #include <gconf/gconf-engine.h>
 
-#define _(x) gettext(x)
-#define N_(x) (x) gettext_noop(x)
+#include <glib/gi18n.h>
 
 #include "preferences.h"
 
