@@ -1577,3 +1577,52 @@ gchar * tls_get_public_key_id (const gchar *certificate_pem)
         
 
 }
+
+#ifdef GNUTLS_2_7_2_OR_BETTER
+
+gchar * tls_get_csr_public_key_id (const gchar *csr_pem)
+{
+	gnutls_datum_t pem_datum;
+        gnutls_x509_crq_t crq;
+
+	gchar * key_id = NULL;
+        gsize key_id_len;
+        guchar *uaux = NULL;
+        
+        guint i;
+
+	if (gnutls_x509_crq_init (&crq) < 0) {
+		return FALSE;
+	}
+
+        pem_datum.data = (unsigned char *) csr_pem;
+        pem_datum.size = strlen(csr_pem);
+
+	if (gnutls_x509_crq_import (crq, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+                gnutls_x509_crq_deinit (crq);
+		return FALSE;
+	}
+
+	uaux = NULL;
+	key_id_len = 0;
+	gnutls_x509_crq_get_key_id (crq, 0, uaux, &key_id_len);
+	uaux = g_new0(guchar, key_id_len);
+	if (gnutls_x509_crq_get_key_id (crq, 0, uaux, &key_id_len)) {
+		g_free (uaux);
+		gnutls_x509_crq_deinit (crq);
+		return NULL;
+	}
+	key_id = g_new0(gchar, key_id_len*3);
+	for (i=0; i<key_id_len; i++) {
+		snprintf (&key_id[i*3], 3, "%02X", uaux[i]);
+		if (i != key_id_len - 1)
+			key_id[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+
+        return key_id;
+        
+
+}
+
+#endif

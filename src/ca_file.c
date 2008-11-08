@@ -1602,8 +1602,59 @@ gchar * ca_file_import_privkey (const gchar *privkey_pem)
         }       
 
         sqlite3_free_table (table);
+
+#ifdef GNUTLS_2_7_2_OR_BETTER
+
+        // I get all csr's in database that have not their private key in
+        // the database, and it is not locatable.
+        if (sqlite3_get_table (ca_db,
+                               "SELECT id, pem FROM cert_requests WHERE "
+                               "private_key_in_db=0;",
+                               &table, &rows, &cols, &error)) {
+                return error;
+        }
+        
+        for (i=1; i<=rows; i++) {
+                gchar *public_key_id = NULL;
+                
+                // Foreach of them, we get their key-id from the public-key
+                public_key_id = tls_get_csr_public_key_id (table[(i*cols) + 1]);
+                
+                // If both key-ids match, we cipher (it we must) the private key,
+                // and insert it into the database.
+                if (! strcmp (pkey_key_id, public_key_id)) {
+                        TlsCsr *certreq = tls_parse_csr_pem (table[(i*cols) + 1]);
+                        gchar *crypted_pkey_pem = pkey_manage_crypt (privkey_pem, certreq->dn);
                         
+                        sql = sqlite3_mprintf ("UPDATE cert_requests SET private_key_in_db=1, private_key='%q' "
+                                               "WHERE id=%s", crypted_pkey_pem, table[i*cols]);
+                        if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                                tls_csr_free (certreq);
+                                g_free (crypted_pkey_pem);
+                                g_free (public_key_id);
+                                sqlite3_free_table (table);
+                                return error;
+                        }
+                        
+                        tls_csr_free (certreq);
+                        g_free (crypted_pkey_pem);
+                        g_free (public_key_id);
+                        sqlite3_free_table (table);
+                        return NULL;
+                }
+                
+                g_free (public_key_id);
+        }       
+
+        sqlite3_free_table (table);
+
+                        
+        return _("The given file contains a valid private key. However, it has not been imported to the database because it doesn't match any key-less certificate or certificate request in the database.");
+
+#else
         return _("The given file contains a valid private key. However, it has not been imported to the database because it doesn't match any key-less certificate in the database.");
+
+#endif
 
 }
 

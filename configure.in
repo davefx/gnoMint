@@ -55,6 +55,7 @@ AC_PROG_INTLTOOL([0.23])
 
 # required versions
 GNUTLS_REQUIRED=2.0
+GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION=2.7.2
 SQLITE_REQUIRED=3.0
 GLIB_REQUIRED=2.6.0
 GCONF_REQUIRED=2.0
@@ -63,10 +64,6 @@ LIBGNOMEUI_REQUIRED=2.0
 LIBGLADE_REQUIRED=2.5.0
 ISO_CODES_REQUIRED=0.35
 
-# check for gnutls
-AM_PATH_LIBGNUTLS([$GNUTLS_REQUIRED])
-AC_SUBST(LIBGNUTLS_CFLAGS)
-AC_SUBST(LIBGNUTLS_LIBS)
 
 # check for sqlite
 PKG_CHECK_MODULES(SQLITE, sqlite3 >= $SQLITE_REQUIRED)
@@ -79,10 +76,23 @@ PKG_CHECK_MODULES(GNOMINT,
 	gtk+-2.0 >= $GTK_REQUIRED \
 	gdk-pixbuf-2.0 \
 	libgnomeui-2.0 >= $LIBGNOMEUI_REQUIRED \
-	libglade-2.0 >= $LIBGLADE_REQUIRED
+	libglade-2.0 >= $LIBGLADE_REQUIRED \
+	gnutls >= $GNUTLS_REQUIRED \
 )
 AC_SUBST(GNOMINT_CFLAGS)
 AC_SUBST(GNOMINT_LIBS)
+
+dnl Check gnutls version
+dnl (if >= 2.7.2 it enables some extra characteristics and functionalities)
+AC_MSG_CHECKING([whether gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION])
+PKG_CHECK_EXISTS([gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION],
+		 [have_advanced_gnutls=yes],[have_advanced_gnutls=no])
+if test "x$have_advanced_gnutls" = "xyes"; then
+   	AC_DEFINE_UNQUOTED(GNUTLS_2_7_2_OR_BETTER, "yes")
+	AC_MSG_RESULT([yes])
+else
+	AC_MSG_RESULT([no])
+fi
 
 dnl Check iso-codes
 dnl (just a chek for packagers, it is required for l10n at runtime)
