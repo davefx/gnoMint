@@ -109,6 +109,7 @@ VERSION 0.5.4 (Oct. 1, 2008)
 * Import pre-existing OpenSSL CAs.
 
 
+* While importing a private key, if a password is needed, ask for it using a appropiate description
 - Generate default policies and options for imported CA certificates 
 - Import last OpenSSL CA serial.
 

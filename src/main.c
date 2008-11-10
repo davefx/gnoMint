@@ -535,7 +535,7 @@ void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
                         return;
                 }		
                 
-                if (! import_single_file (filename)) {
+                if (! import_single_file (filename, NULL)) {
                         dialog = gtk_message_dialog_new (GTK_WINDOW(main_window_widget),
                                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                                          GTK_MESSAGE_ERROR,
