@@ -198,5 +198,5 @@ gchar * csr_creation_database_save (CaCreationData * creation_data,
 {
 	return ca_file_insert_csr (creation_data, 
 				   private_key,
-				   certificate_sign_request);
+				   certificate_sign_request, NULL);
 }

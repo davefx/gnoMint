@@ -27,8 +27,8 @@
 //                            1 if the file is correctly recognized and imported
 //                           <0 if the file is recognized, but it is not imported
 
-gint import_csr (guchar *file_contents, gsize file_contents_size, gchar **csr_dn);
-gint import_certlist (guchar *file_contents, gsize file_contents_size, gchar **cert_dn);
+gint import_csr (guchar *file_contents, gsize file_contents_size, gchar **csr_dn, guint64 *id);
+gint import_certlist (guchar *file_contents, gsize file_contents_size, gchar **cert_dn, guint64 *id);
 gint import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size);
 gint import_crl (guchar *file_contents, gsize file_contents_size);
 
@@ -40,7 +40,7 @@ gint import_pkcs8 (guchar *file_contents, gsize file_contents_size);
 gint import_pkcs12 (guchar *file_contents, gsize file_contents_size);
 
 gint import_openssl_private_key (const gchar *filename, gchar **last_password, gchar *file_description);
-gboolean import_single_file (gchar *filename, gchar **dn);
+gboolean import_single_file (gchar *filename, gchar **dn, guint64 *id);
 gchar * import_whole_dir (gchar *dirname);
 
 #endif

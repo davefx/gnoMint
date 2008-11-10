@@ -1234,7 +1234,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data, 
                                       gboolean is_ca,
                                       const UInt160 serial,
-                                      const gchar *pem_certificate)
+                                      const gchar *pem_certificate,
+                                      guint64 *id)
 {
 	guint64 cert_id;
 	guint64 parent_id;
@@ -1370,10 +1371,14 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
         sqlite3_free (sql);
 
         cert_id = sqlite3_last_insert_rowid(ca_db);
+        if (id)
+                *id = cert_id;
 
         if (is_ca) {
                 gint rows, cols;
                 gint i;
+                gsize size;
+                UInt160 new_serial;
 
                 // Now we look all "orphan" certificates, for seeing if the just inserted certificate is their issuer
                 // so we only look up if their issuer_key_id is the same as the just-inserted-cert subject_key_id, or if
@@ -1419,6 +1424,51 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
                         }
                         
                 }
+
+                // * Now, we initialize minimally the just imported CA
+                size = 0;
+                uint160_assign (&new_serial, 0);
+                uint160_write_escaped (&new_serial, NULL, &size);
+                serialstr = g_new0(gchar, size+1);
+                uint160_write_escaped (&new_serial, serialstr, &size);                
+		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
+				       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
+				       cert_id, serialstr);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+			fprintf (stderr, "%s\n", sql);
+			sqlite3_free (sql);
+			return error;
+		}
+		sqlite3_free (sql);
+                g_free (serialstr);
+
+                sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
+                                       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_must_check_serial_dups', 1);", cert_id);
+                if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+			fprintf (stderr, "%s\n", sql);
+			sqlite3_free (sql);
+			return error;
+                }
+		sqlite3_free (sql);
+
+
+		if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) || 
+		    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)||
+		    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)||
+		    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1) ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1) ||
+		    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1)) {
+			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+			sqlite3_free (sql);
+			return g_strdup ("Error while establishing policies.");
+		}
+                
+
         }
 
         tls_cert_free (tlscert);
@@ -1432,7 +1482,8 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 
 gchar * ca_file_insert_csr (CaCreationData *creation_data, 
 			    gchar *pem_csr_private_key,
-			    gchar *pem_csr)
+			    gchar *pem_csr,
+                            guint64 *id)
 {
 	gchar *sql = NULL;
 	gchar *error = NULL;
@@ -1470,6 +1521,9 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 		return error;
 	}
 	sqlite3_free (sql);
+
+        if (id)
+                *id = sqlite3_last_insert_rowid(ca_db);
 	
 	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;

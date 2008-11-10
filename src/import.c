@@ -31,8 +31,8 @@
 
 
 gchar * __import_ask_password (const gchar *crypted_part_description);
-gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn);
-gint __import_cert (gnutls_x509_crt_t *cert, gchar ** cert_dn);
+gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id);
+gint __import_cert (gnutls_x509_crt_t *cert, gchar ** cert_dn, guint64 *id);
 
 gchar * __import_ask_password (const gchar *crypted_part_description)
 {
@@ -75,7 +75,7 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 }
 
 
-gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn)
+gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id)
 {
 	CaCreationData * creation_data = g_new0(CaCreationData, 1);
 	gchar * pem_csr=NULL;
@@ -115,7 +115,7 @@ gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn)
 		
 	}
 	
-	error_msg = ca_file_insert_csr (creation_data, NULL, pem_csr);
+	error_msg = ca_file_insert_csr (creation_data, NULL, pem_csr, id);
 	
 	
 	if (error_msg) {
@@ -130,7 +130,7 @@ gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn)
         return result;
 }
 
-gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn)
+gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
 {
 	CertCreationData * creation_data = g_new0(CertCreationData, 1);
 	guchar *serial_str = NULL;
@@ -197,7 +197,7 @@ gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn)
 		aux = NULL;
 	}
 	
-	error_msg = ca_file_insert_imported_cert (creation_data, is_ca, serial, pem_cert);
+	error_msg = ca_file_insert_imported_cert (creation_data, is_ca, serial, pem_cert, id);
         
 	if (pem_cert)
 		g_free (pem_cert);
@@ -292,7 +292,7 @@ gint __import_crl (gnutls_x509_crl_t *crl)
         return result;
 }
 
-gint import_csr (guchar *file_contents, gsize file_contents_size, gchar **csr_dn) 
+gint import_csr (guchar *file_contents, gsize file_contents_size, gchar **csr_dn, guint64 *id) 
 {	
 	gnutls_x509_crq_t crq;
 	gnutls_datum_t file_datum;
@@ -309,7 +309,7 @@ gint import_csr (guchar *file_contents, gsize file_contents_size, gchar **csr_dn
 	if (gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_PEM) == 0 ||
 	    gnutls_x509_crq_import (crq, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
 
-		result = __import_csr (&crq, csr_dn);
+		result = __import_csr (&crq, csr_dn, id);
 	}
 
 	gnutls_x509_crq_deinit (crq);
@@ -319,7 +319,7 @@ gint import_csr (guchar *file_contents, gsize file_contents_size, gchar **csr_dn
 }
 
 
-gint import_certlist (guchar *file_contents, gsize file_contents_size, gchar **cert_dn)
+gint import_certlist (guchar *file_contents, gsize file_contents_size, gchar **cert_dn, guint64 *id)
 {
 	gnutls_x509_crt_t cert;
 	gnutls_x509_crt_t *certs = NULL;
@@ -350,7 +350,7 @@ gint import_certlist (guchar *file_contents, gsize file_contents_size, gchar **c
                                 g_free (*cert_dn);
                                 *cert_dn = NULL;
                         }
-			if (__import_cert (&certs[i], cert_dn) > 0)
+			if (__import_cert (&certs[i], cert_dn, id) > 0)
                                 result = 1;
                 }
 
@@ -365,7 +365,7 @@ gint import_certlist (guchar *file_contents, gsize file_contents_size, gchar **c
                 return 0;
 
 	if (gnutls_x509_crt_import (cert, &file_datum, GNUTLS_X509_FMT_DER) == 0) {
-                result = __import_cert (&cert, cert_dn);
+                result = __import_cert (&cert, cert_dn, id);
         }
 
 	gnutls_x509_crt_deinit (cert);
@@ -713,7 +713,7 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                                                 gnutls_x509_crt_deinit (cert);
                                                 continue;
                                         }
-                                        __import_cert (& cert, NULL);
+                                        __import_cert (& cert, NULL, NULL);
                                         
                                         gnutls_x509_crt_deinit (cert);
                                 }
@@ -835,7 +835,7 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
 	return result;
 }
 
-gboolean import_single_file (gchar *filename, gchar **dn) 
+gboolean import_single_file (gchar *filename, gchar **dn, guint64 *id) 
 {	
         gboolean successful_import = FALSE;
 	GError *error = NULL;
@@ -861,11 +861,11 @@ gboolean import_single_file (gchar *filename, gchar **dn)
 
 
 	// Certificate request
-        successful_import = import_csr (file_contents, file_contents_size, dn);
+        successful_import = import_csr (file_contents, file_contents_size, dn, id);
 
 	// Certificate list (or single certificate)
         if (! successful_import)
-                successful_import = import_certlist (file_contents, file_contents_size, dn);
+                successful_import = import_certlist (file_contents, file_contents_size, dn, id);
 
 	// Private key without password
         if (! successful_import)
@@ -1041,6 +1041,7 @@ gchar * import_whole_dir (gchar *dirname)
 	GList * problematic_files = NULL, *cursor = NULL;
 
         GHashTable *descriptions = NULL;
+        guint64 ca_root_id;
 
         // First, we try to probe if this is really a CA-containing directory
         
@@ -1091,12 +1092,12 @@ gchar * import_whole_dir (gchar *dirname)
 
         switch (CA_directory_type) {
 	case 1:
-
+                
                 descriptions = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
 		// First we import the public CA root certificate
 		filename = g_build_filename (dirname, "cacert.pem", NULL);
-		if (import_single_file (filename, NULL) == FALSE) {
+		if (import_single_file (filename, NULL, &ca_root_id) == FALSE) {
 			g_free (filename);
 			result = _("There was a problem while importing the public CA root certificate");
 			break;
@@ -1128,7 +1129,7 @@ gchar * import_whole_dir (gchar *dirname)
 			if (g_strrstr (int_filename, ".pem")) {
                                 gchar *description = NULL;
 				filename = g_build_filename (dirname, "certs", int_filename, NULL);
-				if (import_single_file ((gchar *) filename, &description) == 0) {
+				if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
 					problematic_files = g_list_append (problematic_files, g_strdup(filename));
 				} else {
                                         if (description && ! g_hash_table_lookup (descriptions, int_filename))
@@ -1154,7 +1155,7 @@ gchar * import_whole_dir (gchar *dirname)
 			if (g_strrstr (int_filename, ".pem")) {
                                 gchar *description = NULL;
 				filename = g_build_filename (dirname, "req", int_filename, NULL);
-				if (import_single_file ((gchar *) filename, &description) == 0) {
+				if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
 					problematic_files = g_list_append (problematic_files, g_strdup(filename));
 				} else {
                                         if (description && ! g_hash_table_lookup (descriptions, int_filename))
@@ -1178,7 +1179,7 @@ gchar * import_whole_dir (gchar *dirname)
 			
 			if (g_strrstr (int_filename, ".pem")) {
 				filename = g_build_filename (dirname, "crl", int_filename, NULL);
-				if (import_single_file ((gchar *) filename, NULL) == 0) {
+				if (import_single_file ((gchar *) filename, NULL, NULL) == 0) {
 					problematic_files = g_list_append (problematic_files, g_strdup(filename));					
 				}
 				g_free (filename);

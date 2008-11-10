@@ -54,11 +54,13 @@ gchar * ca_file_insert_cert (CertCreationData * creation_data,
 gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
                                       gboolean is_ca,
                                       const UInt160 serial,
-                                      const gchar *pem_certificate);
+                                      const gchar *pem_certificate,
+                                      guint64 *id);
 
 gchar * ca_file_insert_csr (CaCreationData * creation_data,
 			    gchar *pem_private_key,
-			    gchar *pem_csr);
+			    gchar *pem_csr,
+                            guint64 *id);
 gchar * ca_file_remove_csr (guint64 id);
 gchar * ca_file_revoke_crt (guint64 id);
 gchar * ca_file_revoke_crt_with_date (guint64 id, time_t date);
