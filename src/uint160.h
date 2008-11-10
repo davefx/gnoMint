@@ -33,6 +33,7 @@ UInt160 * uint160_new(void);
 void uint160_assign (UInt160 *var, guint64 new_value);
 void uint160_add (UInt160 *var, guint64 new_value);
 void uint160_inc (UInt160 *var);
+void uint160_dec (UInt160 *var);
 void uint160_shift (UInt160 *var, guint positions);
 
 gboolean uint160_write (const UInt160 *var, guchar *buffer, gsize * max_size);

@@ -961,6 +961,33 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 	return;
 }
 
+gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id)
+{
+        gsize size;
+        gchar *serialstr = NULL;
+        gchar *sql = NULL;
+        gchar *error = NULL;
+
+        size = 0;
+        uint160_dec (serial);
+        uint160_write_escaped (serial, NULL, &size);
+        serialstr = g_new0(gchar, size+1);
+        uint160_write_escaped (serial, serialstr, &size);                
+        sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
+                               "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
+                               ca_id, serialstr);
+        if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                fprintf (stderr, "%s\n", sql);
+                sqlite3_free (sql);
+                return FALSE;
+        }
+        sqlite3_free (sql);
+        g_free (serialstr);
+
+        return TRUE;
+}
+
+
 gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data, 
                                        gchar *pem_ca_private_key,
                                        gchar *pem_ca_certificate)

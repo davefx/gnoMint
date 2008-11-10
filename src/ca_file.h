@@ -40,6 +40,7 @@ void ca_file_close (void);
 gboolean ca_file_save_as (gchar *new_file_name);
 
 void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id);
+gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id);
 
 gchar * ca_file_insert_self_signed_ca (CaCreationData * creation_data, 
                                        gchar *pem_ca_private_key,

@@ -78,6 +78,22 @@ void uint160_inc (UInt160 *var)
         return;
 }
 
+void uint160_dec (UInt160 *var)
+{
+        guint64 value0_backup = var->value0;
+        guint64 value1_backup = var->value1;
+
+
+        var->value0 --;
+        if (var->value0 > value0_backup) {
+                var->value1 --;
+                if (var->value1 > value1_backup)
+                        var->value2--;
+        }
+
+        return;
+}
+
 
 void uint160_shift (UInt160 *var, guint positions)
 {
