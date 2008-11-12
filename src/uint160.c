@@ -51,6 +51,92 @@ void uint160_assign (UInt160 *var, guint64 new_value)
         return;
 }
 
+
+gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value_hex)
+{
+        guint i;
+        gchar c;
+        gchar * stripped_value = g_strstrip (new_value_hex);
+
+        fprintf (stderr, "Antes de asignar Uint160=%s: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",
+		 stripped_value, var->value2, var->value1, var->value0);
+	
+	memset (var, 0, sizeof(UInt160));
+
+        for (i=0; i < strlen(stripped_value); i++) {
+
+                c = g_ascii_tolower(stripped_value[i]);
+
+                // Check if the character is valid
+
+                if (!((c >= '0' && c <= '9') ||
+                      (c >= 'a' && c <= 'f'))) {
+                        memset (var, 0, sizeof(UInt160));
+                        fprintf (stderr, "Error al asignar valor %s Uint160: caracter «%c» encontrado.\n",
+                                 stripped_value, c);
+                        return FALSE;
+                }
+                
+                uint160_shift (var, 4);
+
+                switch(c) {
+                case '0': 
+                        break;
+                case '1': 
+                        uint160_add (var, 1); 
+                        break;
+                case '2': 
+                        uint160_add (var, 2); 
+                        break;
+                case '3': 
+                        uint160_add (var, 3); 
+                        break;
+                case '4': 
+                        uint160_add (var, 4); 
+                        break;
+                case '5': 
+                        uint160_add (var, 5); 
+                        break;
+                case '6': 
+                        uint160_add (var, 6); 
+                        break;
+                case '7': 
+                        uint160_add (var, 7); 
+                        break;
+                case '8': 
+                        uint160_add (var, 8); 
+                        break;
+                case '9': 
+                        uint160_add (var, 9); 
+                        break;
+                case 'a': 
+                        uint160_add (var, 10); 
+                        break;
+                case 'b': 
+                        uint160_add (var, 11); 
+                        break;
+                case 'c': 
+                        uint160_add (var, 12); 
+                        break;
+                case 'd': 
+                        uint160_add (var, 13); 
+                        break;
+                case 'e': 
+                        uint160_add (var, 14); 
+                        break;
+                case 'f': 
+                        uint160_add (var, 15); 
+                        break;
+                }
+
+        }
+
+
+        fprintf (stderr, "Asignado valor %s Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",
+		 stripped_value, var->value2, var->value1, var->value0);
+        return TRUE;
+}
+
 void uint160_add (UInt160 *var, guint64 new_value)
 {
         guint64 value0_backup = var->value0;

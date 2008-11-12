@@ -1043,6 +1043,10 @@ gchar * import_whole_dir (gchar *dirname)
         GHashTable *descriptions = NULL;
         guint64 ca_root_id;
 
+        gchar *filecontents = NULL;
+
+        UInt160 next_serial;
+
         // First, we try to probe if this is really a CA-containing directory
         
         // * Try to detect OpenSSL CA
@@ -1217,8 +1221,22 @@ gchar * import_whole_dir (gchar *dirname)
                 
 
 		// Now we import the last serial number
-		// TO DO
+		filename = g_build_filename (dirname, "serial", NULL);
+                if (! g_file_get_contents (filename, &filecontents, NULL, NULL)) {
+                        gchar *message = g_strdup_printf(_("Couldn't open %s file. Check permissions."), filename);
+                        ca_error_dialog (message);
+                        g_free (message);
+                        return result;
+                }
+		g_free (filename);		
 
+                if (! uint160_assign_hexstr (&next_serial, filecontents))
+                        uint160_assign (&next_serial, 1);
+
+                g_free (filecontents);
+                
+                ca_file_set_next_serial (&next_serial, ca_root_id);
+                
 
 		// We must show the problematic files.
 		// TO DO

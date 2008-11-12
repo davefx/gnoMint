@@ -973,11 +973,9 @@ gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id)
         uint160_write_escaped (serial, NULL, &size);
         serialstr = g_new0(gchar, size+1);
         uint160_write_escaped (serial, serialstr, &size);                
-        sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
-                               "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
-                               ca_id, serialstr);
+        sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE ca_id=%"G_GUINT64_FORMAT";", serialstr, ca_id);
         if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
-                fprintf (stderr, "%s\n", sql);
+                fprintf (stderr, "%s: %s\n", error, sql);
                 sqlite3_free (sql);
                 return FALSE;
         }
