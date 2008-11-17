@@ -41,7 +41,7 @@ extern gchar * gnomint_current_opened_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 10
+#define CURRENT_GNOMINT_DB_VERSION 11
 
 void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv);
 void __ca_file_zeropad (sqlite3_context *context, int argc, sqlite3_value **argv);
@@ -831,6 +831,58 @@ gchar * __ca_file_check_and_update_version ()
 
 
         case 10:
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+			return error;
+		}
+                {
+			gchar **data_table;
+			gint rows, cols;
+			gint i;
+                        UInt160 serial;
+                        gchar *aux = NULL;
+                        gsize size = 0;
+
+			if (sqlite3_get_table (ca_db, 
+                                               "SELECT value, ca_id FROM ca_properties WHERE name='ca_root_last_assigned_serial'",
+					       &data_table,
+					       &rows,
+					       &cols,
+					       &error)) {
+				return error;
+			}
+			for (i = 1; i <= rows; i++) {
+                                size = 0;
+                                aux = NULL;
+
+                                uint160_read_escaped_old_format (&serial, data_table[(i*2)], strlen (data_table[i*2]));
+                                uint160_write_escaped (&serial, NULL, &size);
+                                aux = g_new0(gchar, size+1);
+                                uint160_write_escaped (&serial, aux, &size);
+                                sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"
+                                                       G_GUINT64_FORMAT";", aux, atoll(data_table[(i*2)+1]));
+                                if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                                        return error;
+                                }
+                                sqlite3_free (sql);
+                                g_free (aux);
+                                
+			}
+
+			sqlite3_free_table (data_table);
+
+                }
+
+		sql = sqlite3_mprintf ("UPDATE ca_properties SET value=%d WHERE name='ca_db_version';", 11);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+			return error;
+		}
+		sqlite3_free (sql);
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return error;
+
+
+        case 11:
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -973,7 +1025,7 @@ gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id)
         uint160_write_escaped (serial, NULL, &size);
         serialstr = g_new0(gchar, size+1);
         uint160_write_escaped (serial, serialstr, &size);                
-        sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE ca_id=%"G_GUINT64_FORMAT";", serialstr, ca_id);
+        sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", serialstr, ca_id);
         if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
                 fprintf (stderr, "%s: %s\n", error, sql);
                 sqlite3_free (sql);

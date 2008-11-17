@@ -42,6 +42,7 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize size);
 
 gboolean uint160_write_escaped (const UInt160 *var, gchar *buffer, gsize * max_size);
 gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize size);
+gboolean uint160_read_escaped_old_format (UInt160 *var, gchar *buffer, gsize size);
 
 
 

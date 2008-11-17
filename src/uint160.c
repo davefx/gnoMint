@@ -58,8 +58,8 @@ gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value_hex)
         gchar c;
         gchar * stripped_value = g_strstrip (new_value_hex);
 
-        fprintf (stderr, "Antes de asignar Uint160=%s: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",
-		 stripped_value, var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Antes de asignar Uint160=%s: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n", */
+	/* 	 stripped_value, var->value2, var->value1, var->value0); */
 	
 	memset (var, 0, sizeof(UInt160));
 
@@ -132,8 +132,8 @@ gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value_hex)
         }
 
 
-        fprintf (stderr, "Asignado valor %s Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",
-		 stripped_value, var->value2, var->value1, var->value0);
+        /* fprintf (stderr, "Asignado valor %s Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n", */
+	/* 	 stripped_value, var->value2, var->value1, var->value0); */
         return TRUE;
 }
 
@@ -237,36 +237,79 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
 
 gboolean uint160_write_escaped (const UInt160 *var, gchar *buffer, gsize * max_size)
 {
-        int i;
-        guchar *current = (guchar *) var;
-        int oversize = 0;
+        gsize size = 0;
+        guint32 value = 0;
+        gsize pos = 0;
 
-        for (i=0; i<sizeof(UInt160); i++) {
-                if (current[i] < 32)
-                        oversize++;
-        }
-        
-        if (*max_size < sizeof(UInt160) + oversize) {
-                *max_size = sizeof(UInt160) + oversize;
+        if (var->value2 > 0)
+                size = 16 + 16 + 8 + 1;
+        else if (var->value1 > 0)
+                size = 16 + 16 + 1;
+        else
+                size = 16 + 1;
+
+        if (size > *max_size) {
+                *max_size = size;
                 return FALSE;
         }
 
-        oversize = 0;
-        for (i=0; i<sizeof(UInt160); i++) {
-                if (current[i] < 32) {
-                        buffer[i+oversize] = 0x20;
-                        oversize++;
-                        buffer[i+oversize] = 0x20 + current[i];
-                } else {
-                        buffer[i+oversize] = current[i];
-                }
+        memset (buffer, 0, size);
+
+        if (var->value2 > 0) {
+                value = var->value2;
+                sprintf (&buffer[pos], "%08" G_GINT32_MODIFIER "x", value);
+                pos = pos + 8;
         }
+
+        if (var->value2 > 0 || var->value1 > 0) {
+                value = (var->value1 / G_GUINT64_CONSTANT(0x100000000));
+                sprintf (&buffer[pos], "%08" G_GINT32_MODIFIER "x", value);
+                pos = pos + 8;
+
+                value = (var->value1 % G_GUINT64_CONSTANT(0x100000000));
+                sprintf (&buffer[pos], "%08" G_GINT32_MODIFIER "x", value);
+                pos = pos + 8;
+        }
+
+        value = (var->value0 / G_GUINT64_CONSTANT(0x100000000));
+        sprintf (&buffer[pos], "%08" G_GINT32_MODIFIER "x", value);
+        pos = pos + 8;
+        
+        value = (var->value0 % G_GUINT64_CONSTANT(0x100000000));
+        sprintf (&buffer[pos], "%08" G_GINT32_MODIFIER "x", value);
+        pos = pos + 8;
 
         return TRUE;
         
 }
 
 gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize buffer_size)
+{
+        gchar aux[2];
+        guint i;
+        guint num;
+        gboolean res = TRUE;
+
+        memset (var, 0, sizeof (UInt160));
+        memset (aux, 0, 2);
+        
+        for (i=0; i<buffer_size; i++) {
+                aux[1] = buffer[i];
+                if (sscanf (aux, "%x", &num)) {
+                        uint160_shift (var, 4);
+                        uint160_add (var, num);
+                } else {
+                        memset (var, 0, sizeof (UInt160));
+                        res = FALSE;
+                        break;
+                }
+        }
+
+        return res;
+}
+
+
+gboolean uint160_read_escaped_old_format (UInt160 *var, gchar *buffer, gsize buffer_size)
 {
         gint i;
         guint num_chars;
