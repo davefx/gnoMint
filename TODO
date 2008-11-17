@@ -113,9 +113,7 @@ VERSION 0.5.4 (Oct. 1, 2008)
 * Generate default policies and options for imported CA certificates 
 * Import last OpenSSL CA serial.
 
-- Check what happens while visualizing a Cert whose serial is
-  00:ff:ff:ff:ff. The number 1099511627520 is shown, while it should show only
-  4294967295
+* Bug fixes
 
 VERSION 0.6.0 (---. --, ----)
 

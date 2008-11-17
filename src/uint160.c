@@ -218,7 +218,7 @@ gboolean uint160_write (const UInt160 *var, guchar *buffer, gsize * max_size)
 
 gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
 {
-        gint i;
+        gint start, i;
         guchar c;
         
 	memset (var, 0, sizeof(UInt160));
@@ -227,7 +227,12 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
         var->value1=0;
         var->value2=0;
 
-        for (i=buffer_size - 1; i >= 0; i--) {
+        start = 0;
+
+        if (start < buffer_size && buffer[start] == 0)
+                start++;
+
+        for (i=start; i < buffer_size; i++) {
                 c = buffer[i];
                 uint160_shift (var, 8);
                 uint160_add (var, c);
