@@ -433,7 +433,7 @@ void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data)
                 g_free (filename);
         }
 
-        if (utf8_filename || ! ca_open (utf8_filename, FALSE)) {
+        if (! utf8_filename || ! ca_open (utf8_filename, FALSE)) {
 		dialog = gtk_message_dialog_new (NULL,
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
 						 GTK_MESSAGE_ERROR,
