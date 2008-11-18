@@ -1254,6 +1254,7 @@ gchar * import_whole_dir (gchar *dirname)
 		break;
         case 0:
 	default:
+                result = _("Files in the directory don't belong to any supported CA format.");
                 break;
         }
         
