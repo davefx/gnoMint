@@ -1,3 +1,183 @@
+2008-11-18 17:57  davefx
+
+	* [r247] src/uint160.c:
+	  Fixed buffer overrun while reading in uint160_read_escaped
+
+2008-11-18 17:34  davefx
+
+	* [r246] certs/example-ca.7.gnomint, certs/example-ca.gnomint:
+	  Upgrading example database
+
+2008-11-18 07:42  davefx
+
+	* [r245] configure.in, po/cs.po, po/de.po, po/es.po, po/fr.po,
+	  po/gnoMint.pot, po/it.po, po/sv.po:
+	  Updating translations. Added new German translation.
+
+2008-11-17 19:42  davefx
+
+	* [r244] TODO, src/uint160.c:
+	  Fixed problem while showing serial from certificates
+
+2008-11-17 19:10  davefx
+
+	* [r243] src/main.c:
+	  Fixing error while loading from recent-file menu
+
+2008-11-17 19:08  davefx
+
+	* [r242] src/ca_file.c, src/uint160.c, src/uint160.h:
+	  Fixing potential future problem: a architecture-depending value
+	  was been saved in the database. Now this value is saved correctly
+	  serialized.
+
+2008-11-12 19:27  davefx
+
+	* [r241] TODO, src/ca_file.c, src/import.c, src/uint160.c,
+	  src/uint160.h:
+	  Adding next serial import from OpenSSL
+
+2008-11-10 19:40  davefx
+
+	* [r240] src/ca_file.c, src/ca_file.h, src/uint160.c,
+	  src/uint160.h:
+	  Adding new function ca_file_set_next_serial (needed while
+	  importing OpenSSL CA)
+
+2008-11-10 19:22  davefx
+
+	* [r239] src/ca_file.c, src/ca_file.h, src/csr_creation.c,
+	  src/import.c, src/import.h, src/main.c:
+	  Now, a minimal CA configuration is inserted while importing a CA
+	  certificate. The just-inserted cert-id or csr-id is returned
+	  while importing a cert or csr
+
+2008-11-10 18:40  davefx
+
+	* [r238] TODO, src/import.c, src/import.h, src/main.c:
+	  While importing a private key, if a password is needed, ask for
+	  it using a appropiate description
+
+2008-11-09 10:25  davefx
+
+	* [r237] TODO:
+	  Uploading a new TODO file with release and develop planning
+
+2008-11-08 23:36  davefx
+
+	* [r236] configure.in, src/ca_file.c, src/tls.c, src/tls.h:
+	  Adding new functionality for importing private keys for CSRs
+	  (depends on currently missing functionality of gnutls: patch sent
+	  to upstream)
+
+2008-11-08 14:32  davefx
+
+	* [r235] src/ca_creation.c, src/ca_file.c, src/ca_policy.c,
+	  src/certificate_properties.c, src/crl.c, src/csr_creation.c,
+	  src/csr_properties.c, src/new_ca_window.c,
+	  src/new_cert_creation_process.c, src/new_cert_window.c,
+	  src/new_req_window.c, src/pkey_manage.c, src/preferences-gui.c,
+	  src/preferences-window.c, src/preferences.c, src/tls.c:
+	  Removing all definitions of gettext macros. Using the definition
+	  in <glib/gi18n.h>
+
+2008-11-08 09:36  davefx
+
+	* [r234] src/import.c:
+	  OpenSSL CA importing almost complete. Now fully functional, only
+	  lacks a few checks, last serial and CSR private key importing
+
+2008-11-08 09:35  davefx
+
+	* [r233] src/ca_file.c:
+	  Avoiding multiple import of the same certificate
+
+2008-11-08 09:05  davefx
+
+	* [r232] configure.in:
+	  Adding -O0 -g when --enable-debug is supplied
+
+2008-11-07 18:46  davefx
+
+	* [r231] src/import.c:
+	  Advancing in OpenSSL CA importing: CA cert and private key
+	  (latter not working yet)
+
+2008-11-07 18:45  davefx
+
+	* [r230] po/es.po, po/gnoMint.pot:
+	  Updating translations
+
+2008-11-04 19:24  davefx
+
+	* [r229] gui/gnomint.glade, src/ca.c, src/ca.h, src/import.c,
+	  src/import.h, src/main.c:
+	  Starting slow progress to version 0.6.0. Distinction made between
+	  importing single files and CA directories
+
+2008-11-03 19:15  davefx
+
+	* [r228] src/import.c:
+	  Finished importing of PKCS#12 structures
+
+2008-10-30 19:11  davefx
+
+	* [r227] src/import.c:
+	  Advancing in PKCS#12 import
+
+2008-10-30 19:10  davefx
+
+	* [r226] src/pkey_manage.c:
+	  Fixing problem while export PKCS#12 files from an password-less
+	  database
+
+2008-10-28 19:07  davefx
+
+	* [r225] ChangeLog, gui/gnomint.glade, src/ca.c, src/ca_file.c,
+	  src/import.c, src/import.h:
+	  Finished PKCS#8 importing
+
+2008-10-24 06:25  davefx
+
+	* [r224] certs/test-gnutls.c:
+	  Adding gnutls test for getting errors
+
+2008-10-21 17:48  davefx
+
+	* [r223] certs/openssl-example, certs/openssl-example/cacert.key,
+	  certs/openssl-example/cacert.pem, certs/openssl-example/certs,
+	  certs/openssl-example/certs/VGVzdDE6U3VKZVRvVW5POlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
+	  certs/openssl-example/certs/VGVzdDI6U3VKZVRvRG9TOlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
+	  certs/openssl-example/certs/VGVzdDM6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
+	  certs/openssl-example/crl, certs/openssl-example/crl/crl.pem,
+	  certs/openssl-example/index.txt,
+	  certs/openssl-example/index.txt.attr, certs/openssl-example/keys,
+	  certs/openssl-example/keys/VGVzdDE6U3VKZVRvVW5POlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
+	  certs/openssl-example/keys/VGVzdDI6U3VKZVRvRG9TOlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
+	  certs/openssl-example/keys/VGVzdDM6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
+	  certs/openssl-example/keys/VGVzdDQ6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
+	  certs/openssl-example/newcerts,
+	  certs/openssl-example/newcerts/01.pem,
+	  certs/openssl-example/newcerts/02.pem,
+	  certs/openssl-example/newcerts/03.pem,
+	  certs/openssl-example/openssl.cnf, certs/openssl-example/req,
+	  certs/openssl-example/req/VGVzdDE6U3VKZVRvVW5POlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
+	  certs/openssl-example/req/VGVzdDI6U3VKZVRvRG9TOlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
+	  certs/openssl-example/req/VGVzdDM6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
+	  certs/openssl-example/req/VGVzdDQ6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
+	  certs/openssl-example/serial:
+	  Adding an example of an openssl-built certification authority
+
+2008-10-20 17:11  davefx
+
+	* [r222] configure.in:
+	  Added Italian translation
+
+2008-10-20 17:11  davefx
+
+	* [r221] po/fr.po, po/it.po, po/sv.po:
+	  Updating changes from Launchpad
+
 2008-10-08 08:43  davefx
 
 	* [r220] debian/changelog, debian/conffiles.ex, debian/control,

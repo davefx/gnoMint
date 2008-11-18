@@ -1,6 +1,6 @@
 AC_PREREQ(2.52)
 
-AC_INIT(gnoMint, [0.5.4], [<davefx@gmail.com>], gnomint)
+AC_INIT(gnoMint, [0.6.0], [<davefx@gmail.com>], gnomint)
 
 PACKAGE_COPYRIGHT="(c) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
@@ -84,7 +84,7 @@ AC_SUBST(GNOMINT_LIBS)
 
 dnl Check gnutls version
 dnl (if >= GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION it enables some extra characteristics and functionalities)
-AC_MSG_CHECKING([whether gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION])
+AC_MSG_CHECKING([whether gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION (for advanced features)])
 PKG_CHECK_EXISTS([gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION],
 		 [have_advanced_gnutls=yes],[have_advanced_gnutls=no])
 if test "x$have_advanced_gnutls" = "xyes"; then
