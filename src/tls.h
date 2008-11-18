@@ -123,6 +123,9 @@ gboolean tls_cert_check_issuer (const gchar *cert_pem, const gchar *ca_pem);
 
 gchar * tls_get_private_key_id (const gchar *privkey_pem);
 gchar * tls_get_public_key_id (const gchar *certificate_pem);
+
+#ifdef ADVANCED_GNUTLS
 gchar * tls_get_csr_public_key_id (const gchar *csr_pem);
+#endif
 
 #endif

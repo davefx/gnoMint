@@ -1578,7 +1578,7 @@ gchar * tls_get_public_key_id (const gchar *certificate_pem)
 
 }
 
-#ifdef GNUTLS_2_7_2_OR_BETTER
+#ifdef ADVANCED_GNUTLS
 
 gchar * tls_get_csr_public_key_id (const gchar *csr_pem)
 {

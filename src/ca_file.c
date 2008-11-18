@@ -1734,7 +1734,7 @@ gchar * ca_file_import_privkey (const gchar *privkey_pem)
 
         sqlite3_free_table (table);
 
-#ifdef GNUTLS_2_7_2_OR_BETTER
+#ifdef ADVANCED_GNUTLS
 
         // I get all csr's in database that have not their private key in
         // the database, and it is not locatable.
