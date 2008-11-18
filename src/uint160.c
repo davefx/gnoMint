@@ -295,12 +295,15 @@ gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize buffer_size)
         guint num;
         gboolean res = TRUE;
 
+        /* fprintf (stderr, "Uint160_read_escaped <%s>\n", buffer); */
+
         memset (var, 0, sizeof (UInt160));
         memset (aux, 0, 2);
         
         for (i=0; i<buffer_size; i++) {
-                aux[1] = buffer[i];
+                aux[0] = buffer[i];
                 if (sscanf (aux, "%x", &num)) {
+                        /* fprintf (stderr, "pos: %d. Char: %s. Val: %d\n", i, aux, num); */
                         uint160_shift (var, 4);
                         uint160_add (var, num);
                 } else {
@@ -310,6 +313,9 @@ gboolean uint160_read_escaped (UInt160 *var, gchar *buffer, gsize buffer_size)
                 }
         }
 
+        /* fprintf (stderr, "Uint160_read_escaped <%s> = : %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n",   */
+        /*          buffer, var->value2, var->value1, var->value0); */
+        
         return res;
 }
 
