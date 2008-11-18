@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-07 17:29+0100\n"
+"POT-Creation-Date: 2008-11-18 08:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,8 +229,8 @@ msgstr ""
 msgid "Add _Certificate Request"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:50 ../src/certificate_properties.c:1131
-#: ../src/tls.c:1085
+#: ../gui/gnomint.glade.h:50 ../src/certificate_properties.c:1130
+#: ../src/tls.c:1082
 msgid "Any purpose"
 msgstr ""
 
@@ -270,8 +270,8 @@ msgstr ""
 msgid "CAOU"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:61 ../src/certificate_properties.c:359
-#: ../src/tls.c:1059
+#: ../gui/gnomint.glade.h:61 ../src/certificate_properties.c:358
+#: ../src/tls.c:1056
 msgid "CRL signing"
 msgstr ""
 
@@ -305,7 +305,7 @@ msgstr ""
 msgid "Certificate properties"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:70 ../src/tls.c:1042
+#: ../gui/gnomint.glade.h:70 ../src/tls.c:1039
 msgid "Certification Authority"
 msgstr ""
 
@@ -329,8 +329,8 @@ msgstr ""
 msgid "City: "
 msgstr ""
 
-#: ../gui/gnomint.glade.h:76 ../src/certificate_properties.c:1127
-#: ../src/tls.c:1077
+#: ../gui/gnomint.glade.h:76 ../src/certificate_properties.c:1126
+#: ../src/tls.c:1074
 msgid "Code signing"
 msgstr ""
 
@@ -354,8 +354,8 @@ msgstr ""
 msgid "DSA"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:82 ../src/certificate_properties.c:353
-#: ../src/tls.c:1053
+#: ../gui/gnomint.glade.h:82 ../src/certificate_properties.c:352
+#: ../src/tls.c:1050
 msgid "Data encipherment"
 msgstr ""
 
@@ -363,8 +363,8 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:84 ../src/certificate_properties.c:347
-#: ../src/tls.c:1047
+#: ../gui/gnomint.glade.h:84 ../src/certificate_properties.c:346
+#: ../src/tls.c:1044
 msgid "Digital signature"
 msgstr ""
 
@@ -376,8 +376,8 @@ msgstr ""
 msgid "E_xport"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:87 ../src/certificate_properties.c:1128
-#: ../src/tls.c:1079
+#: ../gui/gnomint.glade.h:87 ../src/certificate_properties.c:1127
+#: ../src/tls.c:1076
 msgid "Email protection"
 msgstr ""
 
@@ -468,13 +468,13 @@ msgid ""
 "Inherit fields according to selected Certification Authority and its policy."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:114 ../src/certificate_properties.c:355
-#: ../src/tls.c:1055
+#: ../gui/gnomint.glade.h:114 ../src/certificate_properties.c:354
+#: ../src/tls.c:1052
 msgid "Key agreement"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:115 ../src/certificate_properties.c:351
-#: ../src/tls.c:1051
+#: ../gui/gnomint.glade.h:115 ../src/certificate_properties.c:350
+#: ../src/tls.c:1048
 msgid "Key encipherment"
 msgstr ""
 
@@ -505,13 +505,13 @@ msgid ""
 "Common Name (CN):"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:123 ../src/certificate_properties.c:349
-#: ../src/tls.c:1049
+#: ../gui/gnomint.glade.h:123 ../src/certificate_properties.c:348
+#: ../src/tls.c:1046
 msgid "Non repudiation"
 msgstr ""
 
-#: ../gui/gnomint.glade.h:124 ../src/certificate_properties.c:1130
-#: ../src/tls.c:1083
+#: ../gui/gnomint.glade.h:124 ../src/certificate_properties.c:1129
+#: ../src/tls.c:1080
 msgid "OCSP signing"
 msgstr ""
 
@@ -714,8 +714,8 @@ msgid ""
 "Please insert the database password."
 msgstr ""
 
-#: ../gui/gnomint.glade.h:179 ../src/certificate_properties.c:1129
-#: ../src/tls.c:1081
+#: ../gui/gnomint.glade.h:179 ../src/certificate_properties.c:1128
+#: ../src/tls.c:1078
 msgid "Time stamping"
 msgstr ""
 
@@ -845,13 +845,13 @@ msgstr ""
 msgid "<b>Certificate Signing Requests</b>"
 msgstr ""
 
-#: ../src/ca.c:290 ../src/certificate_properties.c:179
-#: ../src/certificate_properties.c:184
+#: ../src/ca.c:290 ../src/certificate_properties.c:178
+#: ../src/certificate_properties.c:183
 msgid "%m/%d/%Y %R GMT"
 msgstr ""
 
-#: ../src/ca.c:434 ../src/certificate_properties.c:532 ../src/crl.c:172
-#: ../src/new_cert_window.c:188 ../src/new_req_window.c:193
+#: ../src/ca.c:434 ../src/certificate_properties.c:531 ../src/crl.c:171
+#: ../src/new_cert_window.c:186 ../src/new_req_window.c:191
 msgid "Subject"
 msgstr ""
 
@@ -1054,331 +1054,343 @@ msgstr ""
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr ""
 
-#: ../src/ca_creation.c:56 ../src/csr_creation.c:58
+#: ../src/ca_creation.c:53 ../src/csr_creation.c:55
 msgid "Generating new RSA key pair"
 msgstr ""
 
-#: ../src/ca_creation.c:65 ../src/ca_creation.c:89 ../src/csr_creation.c:67
-#: ../src/csr_creation.c:90
+#: ../src/ca_creation.c:62 ../src/ca_creation.c:86 ../src/csr_creation.c:64
+#: ../src/csr_creation.c:87
 msgid "Key generation failed"
 msgstr ""
 
-#: ../src/ca_creation.c:79 ../src/csr_creation.c:80
+#: ../src/ca_creation.c:76 ../src/csr_creation.c:77
 msgid "Generating new DSA key pair"
 msgstr ""
 
-#: ../src/ca_creation.c:104
+#: ../src/ca_creation.c:101
 msgid "Generating self-signed CA-Root cert"
 msgstr ""
 
-#: ../src/ca_creation.c:112
+#: ../src/ca_creation.c:109
 msgid "Certificate generation failed"
 msgstr ""
 
-#: ../src/ca_creation.c:124
+#: ../src/ca_creation.c:121
 msgid "Creating CA database"
 msgstr ""
 
-#: ../src/ca_creation.c:133
+#: ../src/ca_creation.c:130
 msgid "CA database creation failed"
 msgstr ""
 
-#: ../src/ca_creation.c:147
+#: ../src/ca_creation.c:144
 msgid "CA generated successfully"
 msgstr ""
 
-#: ../src/ca_file.c:196
+#: ../src/ca_file.c:194
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr ""
 
-#: ../src/ca_file.c:308
+#: ../src/ca_file.c:306
 msgid ""
 "The selected database has been created with a newer version of gnoMint than "
 "the currently installed."
 msgstr ""
 
-#: ../src/ca_file.c:1105
+#: ../src/ca_file.c:1180
 msgid "Cannot find parent CA in database"
 msgstr ""
 
-#: ../src/ca_file.c:1571
+#: ../src/ca_file.c:1369
+msgid ""
+"This certificate already exists in the database: cannot insert it twice."
+msgstr ""
+
+#: ../src/ca_file.c:1783
+msgid ""
+"The given file contains a valid private key. However, it has not been "
+"imported to the database because it doesn't match any key-less certificate "
+"or certificate request in the database."
+msgstr ""
+
+#: ../src/ca_file.c:1786
 msgid ""
 "The given file contains a valid private key. However, it has not been "
 "imported to the database because it doesn't match any key-less certificate "
 "in the database."
 msgstr ""
 
-#: ../src/certificate_properties.c:357 ../src/tls.c:1057
+#: ../src/certificate_properties.c:356 ../src/tls.c:1054
 msgid "Certificate signing"
 msgstr ""
 
-#: ../src/certificate_properties.c:361
+#: ../src/certificate_properties.c:360
 msgid "Key encipherment only"
 msgstr ""
 
-#: ../src/certificate_properties.c:363
+#: ../src/certificate_properties.c:362
 msgid "Key decipherment only"
 msgstr ""
 
-#: ../src/certificate_properties.c:377
+#: ../src/certificate_properties.c:376
 msgid "Version"
 msgstr ""
 
-#: ../src/certificate_properties.c:412
+#: ../src/certificate_properties.c:411
 msgid "Serial Number"
 msgstr ""
 
-#: ../src/certificate_properties.c:428 ../src/certificate_properties.c:1061
+#: ../src/certificate_properties.c:427 ../src/certificate_properties.c:1060
 msgid "Signature"
 msgstr ""
 
-#: ../src/certificate_properties.c:431 ../src/certificate_properties.c:559
-#: ../src/certificate_properties.c:562 ../src/certificate_properties.c:1028
+#: ../src/certificate_properties.c:430 ../src/certificate_properties.c:558
+#: ../src/certificate_properties.c:561 ../src/certificate_properties.c:1027
 msgid "Algorithm"
 msgstr ""
 
-#: ../src/certificate_properties.c:434 ../src/certificate_properties.c:567
-#: ../src/certificate_properties.c:595 ../src/certificate_properties.c:623
-#: ../src/certificate_properties.c:1031
+#: ../src/certificate_properties.c:433 ../src/certificate_properties.c:566
+#: ../src/certificate_properties.c:594 ../src/certificate_properties.c:622
+#: ../src/certificate_properties.c:1030
 msgid "Parameters"
 msgstr ""
 
-#: ../src/certificate_properties.c:434 ../src/certificate_properties.c:567
-#: ../src/certificate_properties.c:623 ../src/certificate_properties.c:625
-#: ../src/certificate_properties.c:636 ../src/certificate_properties.c:645
-#: ../src/certificate_properties.c:1032
+#: ../src/certificate_properties.c:433 ../src/certificate_properties.c:566
+#: ../src/certificate_properties.c:622 ../src/certificate_properties.c:624
+#: ../src/certificate_properties.c:635 ../src/certificate_properties.c:644
+#: ../src/certificate_properties.c:1031
 msgid "(unknown)"
 msgstr ""
 
-#: ../src/certificate_properties.c:466
+#: ../src/certificate_properties.c:465
 msgid "Issuer"
 msgstr ""
 
-#: ../src/certificate_properties.c:494
+#: ../src/certificate_properties.c:493
 msgid "Validity"
 msgstr ""
 
-#: ../src/certificate_properties.c:497
+#: ../src/certificate_properties.c:496
 msgid "Not Before"
 msgstr ""
 
-#: ../src/certificate_properties.c:500
+#: ../src/certificate_properties.c:499
 msgid "Not After"
 msgstr ""
 
-#: ../src/certificate_properties.c:556
+#: ../src/certificate_properties.c:555
 msgid "Subject Public Key Info"
 msgstr ""
 
-#: ../src/certificate_properties.c:569
+#: ../src/certificate_properties.c:568
 msgid "RSA PublicKey"
 msgstr ""
 
-#: ../src/certificate_properties.c:579
+#: ../src/certificate_properties.c:578
 msgid "Modulus"
 msgstr ""
 
-#: ../src/certificate_properties.c:585
+#: ../src/certificate_properties.c:584
 msgid "Public Exponent"
 msgstr ""
 
-#: ../src/certificate_properties.c:618
+#: ../src/certificate_properties.c:617
 msgid "DSA PublicKey"
 msgstr ""
 
-#: ../src/certificate_properties.c:625
+#: ../src/certificate_properties.c:624
 msgid "Subject Public Key"
 msgstr ""
 
-#: ../src/certificate_properties.c:636
+#: ../src/certificate_properties.c:635
 msgid "Issuer Unique ID"
 msgstr ""
 
-#: ../src/certificate_properties.c:645
+#: ../src/certificate_properties.c:644
 msgid "Subject Unique ID"
 msgstr ""
 
-#: ../src/certificate_properties.c:667 ../src/certificate_properties.c:690
-#: ../src/certificate_properties.c:759 ../src/certificate_properties.c:863
-#: ../src/certificate_properties.c:891 ../src/certificate_properties.c:931
-#: ../src/certificate_properties.c:988 ../src/certificate_properties.c:1113
+#: ../src/certificate_properties.c:666 ../src/certificate_properties.c:689
+#: ../src/certificate_properties.c:758 ../src/certificate_properties.c:862
+#: ../src/certificate_properties.c:890 ../src/certificate_properties.c:930
+#: ../src/certificate_properties.c:987 ../src/certificate_properties.c:1112
 msgid "Value"
 msgstr ""
 
-#: ../src/certificate_properties.c:729 ../src/certificate_properties.c:833
+#: ../src/certificate_properties.c:728 ../src/certificate_properties.c:832
 msgid "DNS Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:734 ../src/certificate_properties.c:838
+#: ../src/certificate_properties.c:733 ../src/certificate_properties.c:837
 msgid "RFC822 Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:739 ../src/certificate_properties.c:843
+#: ../src/certificate_properties.c:738 ../src/certificate_properties.c:842
 msgid "URI"
 msgstr ""
 
-#: ../src/certificate_properties.c:745
+#: ../src/certificate_properties.c:744
 msgid "IP"
 msgstr ""
 
-#: ../src/certificate_properties.c:752 ../src/certificate_properties.c:856
+#: ../src/certificate_properties.c:751 ../src/certificate_properties.c:855
 msgid "Directory Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:786 ../src/certificate_properties.c:971
+#: ../src/certificate_properties.c:785 ../src/certificate_properties.c:970
 msgid "TRUE"
 msgstr ""
 
-#: ../src/certificate_properties.c:786 ../src/certificate_properties.c:971
+#: ../src/certificate_properties.c:785 ../src/certificate_properties.c:970
 msgid "FALSE"
 msgstr ""
 
-#: ../src/certificate_properties.c:791
+#: ../src/certificate_properties.c:790
 msgid "CA"
 msgstr ""
 
-#: ../src/certificate_properties.c:795
+#: ../src/certificate_properties.c:794
 msgid "Path Length Constraint"
 msgstr ""
 
-#: ../src/certificate_properties.c:849
+#: ../src/certificate_properties.c:848
 msgid "IP Address"
 msgstr ""
 
-#: ../src/certificate_properties.c:964
+#: ../src/certificate_properties.c:963
 msgid "Extensions"
 msgstr ""
 
-#: ../src/certificate_properties.c:973
+#: ../src/certificate_properties.c:972
 msgid "Critical"
 msgstr ""
 
-#: ../src/certificate_properties.c:1001
+#: ../src/certificate_properties.c:1000
 msgid "Certificate"
 msgstr ""
 
-#: ../src/certificate_properties.c:1026
+#: ../src/certificate_properties.c:1025
 msgid "Signature Algorithm"
 msgstr ""
 
-#: ../src/certificate_properties.c:1109
+#: ../src/certificate_properties.c:1108
 msgid "Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:1125 ../src/tls.c:1073
+#: ../src/certificate_properties.c:1124 ../src/tls.c:1070
 msgid "TLS WWW Server"
 msgstr ""
 
-#: ../src/certificate_properties.c:1126
+#: ../src/certificate_properties.c:1125
 msgid "TLS WWW Client"
 msgstr ""
 
-#: ../src/certificate_properties.c:1132
+#: ../src/certificate_properties.c:1131
 msgid "Subject Directory Attributes"
 msgstr ""
 
-#: ../src/certificate_properties.c:1133
+#: ../src/certificate_properties.c:1132
 msgid "Subject Key Identifier"
 msgstr ""
 
-#: ../src/certificate_properties.c:1134
+#: ../src/certificate_properties.c:1133
 msgid "Key Usage"
 msgstr ""
 
-#: ../src/certificate_properties.c:1135
+#: ../src/certificate_properties.c:1134
 msgid "Private Key Usage Period"
 msgstr ""
 
-#: ../src/certificate_properties.c:1136
+#: ../src/certificate_properties.c:1135
 msgid "Subject Alternative Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:1137
+#: ../src/certificate_properties.c:1136
 msgid "Basic Constraints"
 msgstr ""
 
-#: ../src/certificate_properties.c:1138
+#: ../src/certificate_properties.c:1137
 msgid "Name Constraints"
 msgstr ""
 
-#: ../src/certificate_properties.c:1139
+#: ../src/certificate_properties.c:1138
 msgid "CRL Distribution Points"
 msgstr ""
 
-#: ../src/certificate_properties.c:1140
+#: ../src/certificate_properties.c:1139
 msgid "Certificate Policies"
 msgstr ""
 
-#: ../src/certificate_properties.c:1141
+#: ../src/certificate_properties.c:1140
 msgid "Policy Mappings"
 msgstr ""
 
-#: ../src/certificate_properties.c:1142
+#: ../src/certificate_properties.c:1141
 msgid "Authority Key Identifier"
 msgstr ""
 
-#: ../src/certificate_properties.c:1143
+#: ../src/certificate_properties.c:1142
 msgid "Policy Constraints"
 msgstr ""
 
-#: ../src/certificate_properties.c:1144
+#: ../src/certificate_properties.c:1143
 msgid "Extended Key Usage"
 msgstr ""
 
-#: ../src/certificate_properties.c:1145
+#: ../src/certificate_properties.c:1144
 msgid "Delta CRL Distribution Point"
 msgstr ""
 
-#: ../src/certificate_properties.c:1146
+#: ../src/certificate_properties.c:1145
 msgid "Inhibit Any-Policy"
 msgstr ""
 
-#: ../src/crl.c:259
+#: ../src/crl.c:258
 msgid "Export Certificate Revocation List"
 msgstr ""
 
-#: ../src/crl.c:279 ../src/crl.c:356
+#: ../src/crl.c:278 ../src/crl.c:355
 msgid "There was an error while exporting CRL."
 msgstr ""
 
-#: ../src/crl.c:291
+#: ../src/crl.c:290
 msgid "There was an error while getting revoked certificates."
 msgstr ""
 
-#: ../src/crl.c:305 ../src/crl.c:325
+#: ../src/crl.c:304 ../src/crl.c:324
 msgid "There was an error while generating CRL."
 msgstr ""
 
-#: ../src/crl.c:334
+#: ../src/crl.c:333
 msgid "There was an error while writing CRL."
 msgstr ""
 
-#: ../src/crl.c:369
+#: ../src/crl.c:368
 msgid "CRL generated successfully"
 msgstr ""
 
-#: ../src/csr_creation.c:104
+#: ../src/csr_creation.c:101
 msgid "Generating CSR"
 msgstr ""
 
-#: ../src/csr_creation.c:113
+#: ../src/csr_creation.c:110
 msgid "CSR generation failed"
 msgstr ""
 
-#: ../src/csr_creation.c:124
+#: ../src/csr_creation.c:121
 msgid "Saving CSR in database"
 msgstr ""
 
-#: ../src/csr_creation.c:142
+#: ../src/csr_creation.c:139
 msgid "CSR couldn't be saved"
 msgstr ""
 
-#: ../src/csr_creation.c:153
+#: ../src/csr_creation.c:150
 msgid "CSR generated successfully"
 msgstr ""
 
-#: ../src/import.c:109
+#: ../src/import.c:122
 #, c-format
 msgid ""
 "Couldn't import the certificate request. \n"
@@ -1387,7 +1399,7 @@ msgid ""
 "'%s'"
 msgstr ""
 
-#: ../src/import.c:181
+#: ../src/import.c:207
 #, c-format
 msgid ""
 "Couldn't import the certificate. \n"
@@ -1397,26 +1409,82 @@ msgid ""
 msgstr ""
 
 #. We launch a window for asking the password.
-#: ../src/import.c:533 ../src/import.c:719
+#: ../src/import.c:563 ../src/import.c:749
 msgid "PKCS#8 crypted private key"
 msgstr ""
 
-#: ../src/import.c:544 ../src/import.c:729
+#: ../src/import.c:574 ../src/import.c:759
 msgid "The given password doesn't match the one used for crypting this part"
 msgstr ""
 
-#: ../src/import.c:638
+#: ../src/import.c:668
 msgid "Encrypted PKCS#12 bag"
 msgstr ""
 
-#: ../src/import.c:655
+#: ../src/import.c:685
 msgid ""
 "The given password doesn't match with the password used for encrypting this "
 "part."
 msgstr ""
 
-#: ../src/import.c:866
+#: ../src/import.c:896
 msgid "Couldn't find any supported format in the given file"
+msgstr ""
+
+#: ../src/import.c:909 ../src/import.c:1226
+#, c-format
+msgid "Couldn't open %s file. Check permissions."
+msgstr ""
+
+#: ../src/import.c:936
+#, c-format
+msgid "Couldn't recognize the file %s as a RSA or DSA private key."
+msgstr ""
+
+#: ../src/import.c:952
+#, c-format
+msgid "Private key for %s"
+msgstr ""
+
+#: ../src/import.c:954
+#, c-format
+msgid "Private key %s"
+msgstr ""
+
+#: ../src/import.c:989
+msgid "Problem while calling to openssl for decyphering private key."
+msgstr ""
+
+#: ../src/import.c:997
+#, c-format
+msgid ""
+"OpenSSL has returned the following error while trying to decypher the "
+"private key:\n"
+"\n"
+"%s"
+msgstr ""
+
+#: ../src/import.c:1106
+msgid "There was a problem while importing the public CA root certificate"
+msgstr ""
+
+#: ../src/import.c:1115
+msgid "CA Root certificate"
+msgstr ""
+
+#: ../src/import.c:1117
+msgid ""
+"There was a problem while importing the private key corresponding to CA root "
+"certificate"
+msgstr ""
+
+#: ../src/import.c:1127 ../src/import.c:1153 ../src/import.c:1178
+#: ../src/import.c:1199
+msgid "There was a problem while opening the directory certs/."
+msgstr ""
+
+#: ../src/import.c:1257
+msgid "Files in the directory don't belong to any supported CA format."
 msgstr ""
 
 #: ../src/main.c:131
@@ -1510,37 +1578,37 @@ msgstr ""
 msgid "Creating Certificate Signing Request"
 msgstr ""
 
-#: ../src/new_cert_window.c:335
+#: ../src/new_cert_window.c:333
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
 "the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert_window.c:341
+#: ../src/new_cert_window.c:339
 msgid ""
 "The policy of this CA obligue the state/province field of the certificates "
 "to be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert_window.c:347
+#: ../src/new_cert_window.c:345
 msgid ""
 "The policy of this CA obligue the locality/city field of the certificates to "
 "be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert_window.c:353
+#: ../src/new_cert_window.c:351
 msgid ""
 "The policy of this CA obligue the organization field of the certificates to "
 "be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert_window.c:359
+#: ../src/new_cert_window.c:357
 msgid ""
 "The policy of this CA obligue the organizational unit field of the "
 "certificates to be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/pkey_manage.c:73
+#: ../src/pkey_manage.c:70
 #, c-format
 msgid ""
 "The file that holds private key for certificate '%s' is password-protected.\n"
@@ -1549,139 +1617,139 @@ msgid ""
 msgstr ""
 
 #. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:154
+#: ../src/pkey_manage.c:151
 msgid ""
 "The designated file contains a private key, but it is not the private key "
 "corresponding to the certificate."
 msgstr ""
 
 #. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:158
+#: ../src/pkey_manage.c:155
 msgid "The designated file didn't contain any recognized private key."
 msgstr ""
 
 #. The file cannot be opened
-#: ../src/pkey_manage.c:163
+#: ../src/pkey_manage.c:160
 msgid "The designated file couldn't be opened."
 msgstr ""
 
 #. The file doesn't exist
-#: ../src/pkey_manage.c:168
+#: ../src/pkey_manage.c:165
 msgid "File designated in database doesn't exist."
 msgstr ""
 
-#: ../src/pkey_manage.c:584
+#: ../src/pkey_manage.c:581
 msgid "The given password doesn't match the one used in the database"
 msgstr ""
 
-#: ../src/tls.c:46 ../src/tls.c:80
+#: ../src/tls.c:43 ../src/tls.c:77
 #, c-format
 msgid "Error initializing private key structure."
 msgstr ""
 
-#: ../src/tls.c:52 ../src/tls.c:86
+#: ../src/tls.c:49 ../src/tls.c:83
 #, c-format
 msgid "Error creating private key: %d"
 msgstr ""
 
-#: ../src/tls.c:64 ../src/tls.c:98 ../src/tls.c:556 ../src/tls.c:858
+#: ../src/tls.c:61 ../src/tls.c:95 ../src/tls.c:553 ../src/tls.c:855
 #, c-format
 msgid "Error exporting private key to PEM structure."
 msgstr ""
 
-#: ../src/tls.c:438
+#: ../src/tls.c:435
 #, c-format
 msgid "Error when initializing certificate structure"
 msgstr ""
 
-#: ../src/tls.c:444 ../src/tls.c:692
+#: ../src/tls.c:441 ../src/tls.c:689
 #, c-format
 msgid "Error when setting certificate version"
 msgstr ""
 
-#: ../src/tls.c:454 ../src/tls.c:705
+#: ../src/tls.c:451 ../src/tls.c:702
 #, c-format
 msgid "Error when setting certificate serial number"
 msgstr ""
 
-#: ../src/tls.c:463 ../src/tls.c:714
+#: ../src/tls.c:460 ../src/tls.c:711
 #, c-format
 msgid "Error when setting activation time"
 msgstr ""
 
-#: ../src/tls.c:468 ../src/tls.c:722
+#: ../src/tls.c:465 ../src/tls.c:719
 #, c-format
 msgid "Error when setting expiration time"
 msgstr ""
 
-#: ../src/tls.c:514 ../src/tls.c:771
+#: ../src/tls.c:511 ../src/tls.c:768
 #, c-format
 msgid "Error when setting basicConstraint extension"
 msgstr ""
 
-#: ../src/tls.c:519 ../src/tls.c:813
+#: ../src/tls.c:516 ../src/tls.c:810
 #, c-format
 msgid "Error when setting keyUsage extension"
 msgstr ""
 
-#: ../src/tls.c:530 ../src/tls.c:787
+#: ../src/tls.c:527 ../src/tls.c:784
 #, c-format
 msgid "Error when setting subject key identifier extension"
 msgstr ""
 
-#: ../src/tls.c:534 ../src/tls.c:761
+#: ../src/tls.c:531 ../src/tls.c:758
 #, c-format
 msgid "Error when setting authority key identifier extension"
 msgstr ""
 
-#: ../src/tls.c:544
+#: ../src/tls.c:541
 #, c-format
 msgid "Error when signing self-signed certificate"
 msgstr ""
 
-#: ../src/tls.c:574
+#: ../src/tls.c:571
 #, c-format
 msgid "Error when initializing csr structure"
 msgstr ""
 
-#: ../src/tls.c:578
+#: ../src/tls.c:575
 #, c-format
 msgid "Error when setting csr version"
 msgstr ""
 
-#: ../src/tls.c:611
+#: ../src/tls.c:608
 #, c-format
 msgid "Error when signing self-signed csr"
 msgstr ""
 
-#: ../src/tls.c:622
+#: ../src/tls.c:619
 #, c-format
 msgid "Error exporting CSR to PEM structure."
 msgstr ""
 
-#: ../src/tls.c:676
+#: ../src/tls.c:673
 #, c-format
 msgid "Error when initializing crt structure"
 msgstr ""
 
-#: ../src/tls.c:684
+#: ../src/tls.c:681
 #, c-format
 msgid "Error when copying data from CSR to certificate structure"
 msgstr ""
 
-#: ../src/tls.c:843
+#: ../src/tls.c:840
 #, c-format
 msgid "Error when signing certificate"
 msgstr ""
 
-#: ../src/tls.c:1061
+#: ../src/tls.c:1058
 msgid "Key encipher only"
 msgstr ""
 
-#: ../src/tls.c:1063
+#: ../src/tls.c:1060
 msgid "Key decipher only"
 msgstr ""
 
-#: ../src/tls.c:1075
+#: ../src/tls.c:1072
 msgid "TLS WWW Client."
 msgstr ""

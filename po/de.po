@@ -1,4 +1,4 @@
-# Italian translation for gnomint
+# German translation for gnomint
 # Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
 # This file is distributed under the same license as the gnomint package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-11-18 08:40+0100\n"
-"PO-Revision-Date: 2008-11-07 18:47+0000\n"
+"PO-Revision-Date: 2008-11-18 07:31+0000\n"
 "Last-Translator: David Marín <Unknown>\n"
-"Language-Team: Italian <it@li.org>\n"
+"Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,43 +19,39 @@ msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:1
 msgid "Automatic exporting of certificates for gnome-keyring"
-msgstr "Esportazione automatica di certificati per gnome-keyring"
+msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:2
 msgid "Certificate requests visibility"
-msgstr "Visibilità de le richieste dei certificati"
+msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:3
 msgid "Revoked certificates visibility"
-msgstr "Visibilità de i certificati revocati"
+msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:4
 msgid ""
 "The (width,length) size gnoMint should take when started. This cannot be "
 "smaller than (320,200)."
 msgstr ""
-"La dimensione (width,length) gnoMint dovrebbe avere all'avvio. Non può "
-"essere minore a (320,200)."
 
 #: ../gconf/gnomint.schemas.in.h:5
 msgid "Whether the certificate requests should be visible."
-msgstr "Se le richieste dei certificati devono essere visibili."
+msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:6
 msgid ""
 "Whether the created or imported certificates are automatically exported to "
 "gnome-keyring certificate-store."
 msgstr ""
-"Se i certificati creati o importati sono automaticamente esportate a gnome-"
-"keyring certificate-store."
 
 #: ../gconf/gnomint.schemas.in.h:7
 msgid "Whether the revoked certificates should be visible."
-msgstr "Se i certificati revocati dovrebbero essere visibili."
+msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:8
 msgid "Window size"
-msgstr "Dimensione della finestra"
+msgstr "Fenstergröße"
 
 #: ../gui/gnomint.glade.h:1
 msgid " "
@@ -63,55 +59,53 @@ msgstr " "
 
 #: ../gui/gnomint.glade.h:2
 msgid "<b>CSR subject</b>"
-msgstr "<b>CSR subject</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:3
 msgid "<b>Certificate fields</b>"
-msgstr "<b>Campi dei dertificati</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:4
 msgid "<b>Certificate hierarchy</b>"
-msgstr "<b>Gerarchia dei certificati</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:5
 msgid "<b>Certificate purposes</b>"
-msgstr "<b>Proposito dei certificati</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:6
 msgid "<b>Certificate subject</b>"
-msgstr "<b>Oggetto dei certificati</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:7
 msgid "<b>Certificate uses</b>"
-msgstr "<b>Uso dei certificati</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:8
 msgid "<b>Emmited by</b>"
-msgstr "<b>Emesso da</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:9
 msgid "<b>Fingerprints</b>"
-msgstr "<b>Impronte digitali</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:10
 msgid "<b>Inherited fields from CA subject</b>"
-msgstr "<b>Campi hereditati dal sogetto CA</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:11
 msgid "<b>Purposes of new generated certificates</b>"
-msgstr "<b>Proposito dei nuovi certificati generati</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:12
 msgid ""
 "<b>This Certificate Signing Request has its corresponding private key saved "
 "in the internal database.</b>"
 msgstr ""
-"<b>Questa Richiesta di Firma di Certificato ha la corrispondente chiave "
-"privata salvata nel database interno.</b>"
 
 #: ../gui/gnomint.glade.h:13
 msgid "<b>This certificate has been verified for the following uses:</b>"
-msgstr "<b>Questo certificato è stato verificato per gli usi seguenti:</b>"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:14
 msgid "<b>Uses of new generated certificates</b>"
@@ -119,7 +113,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:15
 msgid "<b>Validity</b>"
-msgstr "<b>Validità</b>"
+msgstr "<b>Gültigkeit</b>"
 
 #: ../gui/gnomint.glade.h:16
 msgid "<big><b>New Certificate Revocation List</b></big>"
@@ -230,16 +224,16 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:48
 msgid "Activated on"
-msgstr "Attivato il"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:49
 msgid "Add _Certificate Request"
-msgstr "Agiunggere Richiesta di _Certificato"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:50 ../src/certificate_properties.c:1130
 #: ../src/tls.c:1082
 msgid "Any purpose"
-msgstr "Qualunque proposito"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:51
 msgid ""
@@ -288,23 +282,21 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:63
 msgid "CertExpirationDate"
-msgstr "CertExpirationDate"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:64
 msgid "CertSN"
-msgstr "CertSN"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:65
 msgid ""
 "Certificate \n"
 "Common Name (CN):"
 msgstr ""
-"Certificato \n"
-"Nome Comune (CN):"
 
 #: ../gui/gnomint.glade.h:67
 msgid "Certificate DN"
-msgstr "Certificato DN"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:68
 msgid "Certificate _Signing Requests"
@@ -312,19 +304,19 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:69
 msgid "Certificate properties"
-msgstr "Propietà dei Certificati"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:70 ../src/tls.c:1039
 msgid "Certification Authority"
-msgstr "Autorità di Certificazione"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:71
 msgid "Change database pass_word"
-msgstr "Cambiare la pass_word del database"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:72
 msgid "Choose CA for signing the CSR"
-msgstr "Scegliere CA per firmare il CSR"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:73
 msgid "Choose private key file. gnoMint"
@@ -332,32 +324,32 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:74
 msgid "City"
-msgstr "Località"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:75
 msgid "City: "
-msgstr "Città: "
+msgstr ""
 
 #: ../gui/gnomint.glade.h:76 ../src/certificate_properties.c:1126
 #: ../src/tls.c:1074
 msgid "Code signing"
-msgstr "Firmando Codice"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:77
 msgid "Common Name (CN)"
-msgstr "Nome comune (CN)"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:78
 msgid "Country"
-msgstr "Stato"
+msgstr "Land"
 
 #: ../gui/gnomint.glade.h:79
 msgid "Country:"
-msgstr "Stato:"
+msgstr "Land:"
 
 #: ../gui/gnomint.glade.h:80
 msgid "Creating CA Root Certificate"
-msgstr "Creando Certificato CA di Root"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:81
 msgid "DSA"
@@ -370,7 +362,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:83
 msgid "Details"
-msgstr "Dettagli"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:84 ../src/certificate_properties.c:346
 #: ../src/tls.c:1044
@@ -418,11 +410,11 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:95
 msgid "Extrac_t private key"
-msgstr "Es_trarre chiave privata"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:96
 msgid "Extract the saved private key to an external file or device"
-msgstr "Estrarre la chiave privata salvata ad un file esterno o periferico"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:97
 msgid ""
@@ -442,19 +434,19 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:105
 msgid "General"
-msgstr "Generale"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:106
 msgid "General Preferences - gnoMint"
-msgstr "Preferenze Generali - gnoMint"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:107
 msgid "Generate D_H parameters..."
-msgstr "Generare parametri D_H ..."
+msgstr ""
 
 #: ../gui/gnomint.glade.h:108
 msgid "Generate _CRL"
-msgstr "Generare _CRL"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:109
 msgid "Generate the current Certificate Revocation List"
@@ -480,7 +472,7 @@ msgstr ""
 #: ../gui/gnomint.glade.h:114 ../src/certificate_properties.c:354
 #: ../src/tls.c:1052
 msgid "Key agreement"
-msgstr "Accordo di chiavi"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:115 ../src/certificate_properties.c:350
 #: ../src/tls.c:1048
@@ -489,17 +481,16 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:116
 msgid "MD5 fingerprint"
-msgstr "Impronta digitale MD5"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:117
 msgid "MD5FINGERPRINT"
-msgstr "MD5FINGERPRINT"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:118
 msgid ""
 "Maximum number of months before expiration of the new generated certificates:"
 msgstr ""
-"Massimo numero di mesi prima della scadenzza dei nuovi certificati generati:"
 
 #: ../gui/gnomint.glade.h:119
 msgid "Months before certificate expiration:"
@@ -507,15 +498,13 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:120
 msgid "Months before root certificate expiration:"
-msgstr "Mesi prima della scadenzza dei certificati di root:"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:121
 msgid ""
 "New certificate \n"
 "Common Name (CN):"
 msgstr ""
-"Nuovo certificato \n"
-"Nome Comune (CN):"
 
 #: ../gui/gnomint.glade.h:123 ../src/certificate_properties.c:348
 #: ../src/tls.c:1046
@@ -525,7 +514,7 @@ msgstr ""
 #: ../gui/gnomint.glade.h:124 ../src/certificate_properties.c:1129
 #: ../src/tls.c:1080
 msgid "OCSP signing"
-msgstr "Firma OCSP"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:125
 msgid "Only the private key (crypted)."
@@ -545,11 +534,11 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:129
 msgid "Organization"
-msgstr "Organizzazione"
+msgstr "Organisation"
 
 #: ../gui/gnomint.glade.h:130
 msgid "Organization (O)"
-msgstr "Organizzazione (O)"
+msgstr "Organisation (O)"
 
 #: ../gui/gnomint.glade.h:131
 msgid "Organization Unit:"
@@ -557,19 +546,19 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:132
 msgid "Organization:"
-msgstr "Organizzazione:"
+msgstr "Organisation:"
 
 #: ../gui/gnomint.glade.h:133
 msgid "Organizational Unit (OU)"
-msgstr "Unità organizzativa (OU)"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:134
 msgid "Organizational unit"
-msgstr "Unità organizzativa"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:135
 msgid "Password (confirm):"
-msgstr "Confermare la password"
+msgstr "Kennwort (bestätigen):"
 
 #: ../gui/gnomint.glade.h:136
 msgid "Password protect"
@@ -577,7 +566,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:137
 msgid "Password:"
-msgstr "Password:"
+msgstr "Passwort:"
 
 #: ../gui/gnomint.glade.h:138
 msgid "Please, choose the file:"
@@ -671,7 +660,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:163
 msgid "Serial number"
-msgstr "Numero di serie"
+msgstr "Seriennummer"
 
 #: ../gui/gnomint.glade.h:164
 msgid "Shows the CSR properties window"
@@ -755,19 +744,19 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:184
 msgid "_Certificates"
-msgstr ""
+msgstr "_Zertifikate"
 
 #: ../gui/gnomint.glade.h:185
 msgid "_Edit"
-msgstr ""
+msgstr "B_earbeiten"
 
 #: ../gui/gnomint.glade.h:186
 msgid "_Help"
-msgstr ""
+msgstr "_Hilfe"
 
 #: ../gui/gnomint.glade.h:187
 msgid "_Import"
-msgstr ""
+msgstr "_Importieren"
 
 #: ../gui/gnomint.glade.h:188
 msgid "_New certificate database"
@@ -775,7 +764,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:189
 msgid "_No"
-msgstr ""
+msgstr "_Nein"
 
 #: ../gui/gnomint.glade.h:190
 msgid "_Open certificate database"
@@ -795,7 +784,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:194
 msgid "_Sign"
-msgstr ""
+msgstr "_Signieren"
 
 #: ../gui/gnomint.glade.h:195
 msgid "_View"
@@ -803,7 +792,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:196
 msgid "_Yes"
-msgstr ""
+msgstr "_Ja"
 
 #: ../gui/gnomint.glade.h:197
 msgid "gtk-add"
@@ -1005,7 +994,7 @@ msgstr ""
 
 #: ../src/ca.c:1392
 msgid "Unexpected error"
-msgstr ""
+msgstr "Unerwarteter Fehler"
 
 #: ../src/ca.c:1424
 msgid "To do. Feature not implemented yet."
@@ -1035,7 +1024,7 @@ msgstr ""
 
 #: ../src/ca.c:1805
 msgid "Password changed successfully"
-msgstr ""
+msgstr "Das Kennwort wurde erfolgreich geändert"
 
 #: ../src/ca.c:1815
 msgid ""
@@ -1147,11 +1136,11 @@ msgstr ""
 
 #: ../src/certificate_properties.c:376
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 #: ../src/certificate_properties.c:411
 msgid "Serial Number"
-msgstr ""
+msgstr "Seriennummer"
 
 #: ../src/certificate_properties.c:427 ../src/certificate_properties.c:1060
 msgid "Signature"
@@ -1160,7 +1149,7 @@ msgstr ""
 #: ../src/certificate_properties.c:430 ../src/certificate_properties.c:558
 #: ../src/certificate_properties.c:561 ../src/certificate_properties.c:1027
 msgid "Algorithm"
-msgstr ""
+msgstr "Algorithmus"
 
 #: ../src/certificate_properties.c:433 ../src/certificate_properties.c:566
 #: ../src/certificate_properties.c:594 ../src/certificate_properties.c:622
@@ -1173,7 +1162,7 @@ msgstr ""
 #: ../src/certificate_properties.c:635 ../src/certificate_properties.c:644
 #: ../src/certificate_properties.c:1031
 msgid "(unknown)"
-msgstr ""
+msgstr "(unbekannt)"
 
 #: ../src/certificate_properties.c:465
 msgid "Issuer"
@@ -1181,7 +1170,7 @@ msgstr ""
 
 #: ../src/certificate_properties.c:493
 msgid "Validity"
-msgstr ""
+msgstr "Gültigkeit"
 
 #: ../src/certificate_properties.c:496
 msgid "Not Before"
@@ -1240,11 +1229,11 @@ msgstr ""
 
 #: ../src/certificate_properties.c:738 ../src/certificate_properties.c:842
 msgid "URI"
-msgstr ""
+msgstr "URI"
 
 #: ../src/certificate_properties.c:744
 msgid "IP"
-msgstr ""
+msgstr "IP"
 
 #: ../src/certificate_properties.c:751 ../src/certificate_properties.c:855
 msgid "Directory Name"
@@ -1252,11 +1241,11 @@ msgstr ""
 
 #: ../src/certificate_properties.c:785 ../src/certificate_properties.c:970
 msgid "TRUE"
-msgstr ""
+msgstr "WAHR"
 
 #: ../src/certificate_properties.c:785 ../src/certificate_properties.c:970
 msgid "FALSE"
-msgstr ""
+msgstr "FALSCH"
 
 #: ../src/certificate_properties.c:790
 msgid "CA"
@@ -1268,7 +1257,7 @@ msgstr ""
 
 #: ../src/certificate_properties.c:848
 msgid "IP Address"
-msgstr ""
+msgstr "IP Adresse"
 
 #: ../src/certificate_properties.c:963
 msgid "Extensions"
@@ -1276,11 +1265,11 @@ msgstr ""
 
 #: ../src/certificate_properties.c:972
 msgid "Critical"
-msgstr ""
+msgstr "Kritisch"
 
 #: ../src/certificate_properties.c:1000
 msgid "Certificate"
-msgstr ""
+msgstr "Zertifikat"
 
 #: ../src/certificate_properties.c:1025
 msgid "Signature Algorithm"
@@ -1288,7 +1277,7 @@ msgstr ""
 
 #: ../src/certificate_properties.c:1108
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: ../src/certificate_properties.c:1124 ../src/tls.c:1070
 msgid "TLS WWW Server"
@@ -1483,7 +1472,7 @@ msgstr ""
 #: ../src/import.c:1115
 #, fuzzy
 msgid "CA Root certificate"
-msgstr "Creando Certificato CA di Root"
+msgstr "Zertifikat"
 
 #: ../src/import.c:1117
 msgid ""
@@ -1576,11 +1565,7 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  David Marín https://launchpad.net/~davefx\n"
-"  Michael Castielli https://launchpad.net/~mickyx\n"
-"\n"
-"Launchpad Contributions:\n"
-"  David Marín https://launchpad.net/~davefx\n"
-"  Michael Castielli https://launchpad.net/~castielli"
+"  Gregor Goldbach https://launchpad.net/~glauschwuffel"
 
 #: ../src/new_cert_creation_process.c:81
 msgid "CA creation process finished"
