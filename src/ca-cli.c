@@ -23,6 +23,9 @@
 #include <glib/gi18n.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
 
 #include "ca_file.h"
 
@@ -60,4 +63,56 @@ gboolean ca_open (gchar *filename, gboolean create)
                 fprintf (stderr, _(" Error.\n"));
 
 	return result;
+}
+
+typedef int  (* CaCommandCallback) (int argc, char **argv);
+
+typedef struct _CaCommand {
+        const gchar *command;
+        guint mandatory_params;
+        guint optional_params;
+        const gchar *shorthelp;
+        const gchar *longhelp;
+        CaCommandCallback callback;
+} CaCommand;
+
+
+void ca_command_line()
+{
+        const gchar *prompt = "gnoMint > ";
+        gchar *line = NULL;
+
+        printf (_("\n\n%s version %s\n%s\n\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_COPYRIGHT); 
+        printf (_("This program comes with ABSOLUTELY NO WARRANTY;\nfor details type 'warranty'.\n"));
+        printf (_("This is free software, and you are welcome to redistribute it \n"));
+        printf (_("under certain conditions; type 'distribution' for details.\n\n"));
+
+        while (TRUE) {
+                
+                // Wait until read a command
+                line = readline (prompt);
+                
+                // Check for EOF
+                if (line == NULL) {
+                        printf ("\n\n");
+                        return;
+                }
+                
+                // Check for empty commands
+                if (strlen (line) != 0) {
+
+                        add_history (line);
+
+                        // Parse line
+
+                        // If the given command is defined
+
+                        // Call it
+                
+                }
+
+                free (line);
+
+        } 
+        
 }

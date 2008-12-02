@@ -82,6 +82,32 @@ PKG_CHECK_MODULES(GNOMINT,
 AC_SUBST(GNOMINT_CFLAGS)
 AC_SUBST(GNOMINT_LIBS)
 
+#######################
+# Check for readline.
+########################
+AC_CHECK_HEADER(readline/readline.h, readline_found=true, [AC_MSG_ERROR([libreadline is needed for compiling gnoMint.])] )
+old_LIBS=$LIBS
+LIBS="-lreadline"
+
+AC_TRY_LINK(,,[	READLINE_LIBS="-lreadline" ],[ 
+                LIBS="$LIBS -ltermcap" 
+		AC_TRY_LINK(,,[ READLINE_LIBS="-lreadline -ltermcap" ],[
+			AC_MSG_ERROR([Cannot figure out how to link with the readline library; see config.log for more information])
+		])
+])
+
+LIBS=$old_LIBS
+
+AC_SUBST(READLINE_LIBS)
+
+PKG_CHECK_MODULES(GNOMINTCLI, 
+	glib-2.0 >= $GLIB_REQUIRED \
+	gconf-2.0 >= $GCONF_REQUIRED \
+	gnutls >= $GNUTLS_REQUIRED \
+)
+AC_SUBST(GNOMINTCLI_CFLAGS)
+AC_SUBST(GNOMINTCLI_LIBS)
+
 dnl Check gnutls version
 dnl (if >= GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION it enables some extra characteristics and functionalities)
 AC_MSG_CHECKING([whether gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION (for advanced features)])

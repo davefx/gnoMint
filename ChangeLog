@@ -1,3 +1,19 @@
+2008-11-18 18:23  davefx
+
+	* [r250] ChangeLog, configure.in, m4/intltool.m4:
+	  Upgrading to version 0.6.0
+
+2008-11-18 18:22  davefx
+
+	* [r249] src/ca_file.c, src/tls.c, src/tls.h:
+	  Changing define for advanced gnutls (post 2.7.3) features
+
+2008-11-18 18:20  davefx
+
+	* [r248] src/import.c:
+	  Added message for failure after trying to import unsupported
+	  directory
+
 2008-11-18 17:57  davefx
 
 	* [r247] src/uint160.c:

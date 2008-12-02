@@ -69,6 +69,7 @@ gnomint_cli_LDADD = \
 	$(GNOMINTCLI_LIBS) \
 	$(LIBGNUTLS_LIBS) \
 	$(SQLITE_LIBS) \
+	$(READLINE_LIBS) \
 	$(LTLIBINTL)
 
 

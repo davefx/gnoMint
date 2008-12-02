@@ -69,5 +69,7 @@ int main (int argc, char **argv)
                 ca_open (defaultfile, TRUE);
         }
 
+        ca_command_line ();
+
 	return 0;
 }

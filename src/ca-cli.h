@@ -31,6 +31,8 @@ gchar * ca_dialog_get_password (gchar *info_message,
 void ca_todo_callback (void);
 gboolean ca_open (gchar *filename, gboolean create);
 
+void ca_command_line ();
+
 /* void ca_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data); */
 /* void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data); */
 /* void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data); */

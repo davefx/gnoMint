@@ -1,0 +1,68 @@
+Recognized commands
+===================
+
+* newdb <filename>
+       Close current file and create a new database with given
+       filename
+* opendb <filename>
+       Close current file and open the file with given filename
+* savedbas <filename>
+       Save the current file with a different filename
+* listcert [--see-revoked]
+       List the certificates in database. With option --see-revoked,
+       lists also the revoked ones.
+* listcsr
+       List the CSRs in database.
+* addcsr
+       Start a new CSR creation process.
+* addca
+       Start a new self-signed CA creation process.
+* extractcertpkey <id> [<filename>]
+       Extract the private key of the certificate with the given
+       internal id and saves it into the given file.
+* extractcsrpkey <id> [<filename>]
+       Extract the private key of the CSR with the given
+       internal id and saves it into the given file.
+* revoke <id>
+       Revoke the certificate with the given internal ID.
+* sign <id> [<ca-id>]
+       Sign the CSR with the given internal ID.
+* delete <id>
+       Delete the CSR with the given internal ID.
+* crlgen <ca-id> [<filename>]
+       Generate a new CRL for the given CA.
+* dhgen <filename>
+       Generate a new DH-parameter set, saving it into the file
+       <filename>.
+* changepassword
+       Change password for the current database.
+* importfile <filename>
+       Import the given file.
+* importdir <dirname>
+       Import the given directory, as a OpenSSL-CA directory.
+* showcert <id>
+       Show certificate properties
+* showcsr <id>
+       Show CSR properties
+* showpolicy <ca-id>
+       Show CA policy
+* setpolicy <ca-id> <policy-id> <value>
+       Change CA policy
+* showpreferences
+       Show program preferences
+* setpreference <preference-id> <value>
+       Set program preference
+* about
+       Show about message
+* warranty
+       Show warranty information
+* distribution
+       Show distribution information
+* version
+       Show version message
+* help
+       Show help message
+* quit
+* exit
+* bye
+       Close database and exit program.
