@@ -30,6 +30,18 @@
 #include "ca_file.h"
 
 
+typedef int  (* CaCommandCallback) (int argc, char **argv);
+
+typedef struct _CaCommand {
+        const gchar *command;
+        guint mandatory_params;
+        guint optional_params;
+        gchar *sintax;
+        gchar *help;
+        CaCommandCallback callback;
+} CaCommand;
+
+
 void ca_error_dialog (gchar *message) {
         fprintf (stderr, "%s\n", message);
 }
@@ -65,22 +77,25 @@ gboolean ca_open (gchar *filename, gboolean create)
 	return result;
 }
 
-typedef int  (* CaCommandCallback) (int argc, char **argv);
+int __ca_newdb (int argc, char **argv)
+{
+	return 0;
+}
 
-typedef struct _CaCommand {
-        const gchar *command;
-        guint mandatory_params;
-        guint optional_params;
-        const gchar *shorthelp;
-        const gchar *longhelp;
-        CaCommandCallback callback;
-} CaCommand;
-
+void __ca_add_commands (GHashTable *table)
+{
+	g_hash_table_insert (table, "newdb", 
+			     &((CaCommand) {"newdb", 1, 1, _("newdb <filename>"), _("Close current file and create a new database with given filename"), __ca_newdb}));
+}
 
 void ca_command_line()
 {
         const gchar *prompt = "gnoMint > ";
         gchar *line = NULL;
+
+	GHashTable *command_table = g_hash_table_new (g_str_hash, g_str_equal);
+
+	__ca_add_commands (command_table);
 
         printf (_("\n\n%s version %s\n%s\n\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_COPYRIGHT); 
         printf (_("This program comes with ABSOLUTELY NO WARRANTY;\nfor details type 'warranty'.\n"));

@@ -8,6 +8,8 @@ Recognized commands
        Close current file and open the file with given filename
 * savedbas <filename>
        Save the current file with a different filename
+* status
+       Get current status (opened file, # of certificates, etc...)
 * listcert [--see-revoked]
        List the certificates in database. With option --see-revoked,
        lists also the revoked ones.
