@@ -20,6 +20,12 @@
 #ifndef _CA_H_
 #define _CA_H_
 
+#ifdef GNOMINTCLI
+
+#include "ca-cli.h"
+
+#else
+
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
@@ -61,5 +67,6 @@ gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data
 gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data);
 void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data);
 
+#endif
 
 #endif

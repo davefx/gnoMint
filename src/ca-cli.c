@@ -17,37 +17,47 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <libintl.h>
-#include <gconf/gconf-client.h>
 
+#include <glib.h>
+#include <glib-object.h>
 #include <glib/gi18n.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-#include "preferences.h"
+#include "ca_file.h"
 
 
-static GConfEngine * preferences_engine;
+void ca_error_dialog (gchar *message) {
+        fprintf (stderr, "%s\n", message);
+}
 
-void preferences_init (int argc, char **argv)
+gchar * ca_dialog_get_password (gchar *info_message, 
+                                gchar *password_message, gchar *confirm_message, 
+                                gchar *distinct_error_message, guint minimum_length)
 {
-        gconf_init (argc, argv, NULL);
-        preferences_engine = gconf_engine_get_default ();
+        gchar * password = NULL;
+
+	return password;
 }
 
 
-gboolean preferences_get_gnome_keyring_export ()
+void ca_todo_callback ()
 {
-        return gconf_engine_get_bool (preferences_engine, "/apps/gnomint/gnome_keyring_export", NULL);
-}
-
-void preferences_set_gnome_keyring_export (gboolean new_value)
-{
-        gconf_engine_set_bool (preferences_engine, "/apps/gnomint/gnome_keyring_export", new_value, NULL);
+	ca_error_dialog (_("To do. Feature not implemented yet."));
 }
 
 
-void preferences_deinit ()
+gboolean ca_open (gchar *filename, gboolean create) 
 {
-        gconf_engine_unref (preferences_engine);
-        preferences_engine = NULL;
-}
+        gboolean result;
 
+        fprintf (stderr, _("Opening database %s..."), filename);
+        result = ca_file_open (filename, create); 
+        
+        if (result)
+                fprintf (stderr, _(" OK.\n"));
+        else
+                fprintf (stderr, _(" Error.\n"));
+
+	return result;
+}

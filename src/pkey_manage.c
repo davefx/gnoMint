@@ -17,10 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef GNOMINTCLI
 #include <glade/glade.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+#endif
+
 #include <glib.h>
 #include <gcrypt.h>
 #include <stdio.h>
@@ -45,6 +48,9 @@ guchar *__pkey_manage_create_key(const gchar *password);
 gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password);
 gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password);
 
+#ifndef GNOMINTCLI
+// CALLBACKS
+gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data);
 
 gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 {
@@ -104,6 +110,15 @@ gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpoi
 
 	return FALSE;
 }
+
+#else
+gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
+{
+        /* FIXME */
+        return NULL;
+}
+
+#endif
 
 gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 {
@@ -167,6 +182,8 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 		}
 		
 		if (! pem_pkey && ! cancel) {
+
+                        #ifndef GNOMINTCLI
 			// Show file open dialog
 			
 			GtkWidget * widget = NULL, * filepath_widget = NULL, *remember_filepath_widget = NULL;
@@ -205,6 +222,11 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 			widget = glade_xml_get_widget (dialog_xml, "get_pkey_dialog");
 			gtk_widget_destroy (widget);
 			g_object_unref (G_OBJECT(dialog_xml));
+
+                        #else
+                        cancel = TRUE;
+                        #endif
+
 		}
 	} while (! pem_pkey && ! cancel);
 
@@ -530,7 +552,7 @@ void pkey_manage_crypt_auto (CaCreationData *creation_data,
 	return;
 }
 
-
+#ifndef GNOMINTCLI
 gchar * pkey_manage_ask_password ()
 {
 	gchar *password;
@@ -597,6 +619,13 @@ gchar * pkey_manage_ask_password ()
 
 	return password;
 }
+#else
+gchar * pkey_manage_ask_password ()
+{
+        /* FIXME */
+        return NULL;
+}
+#endif
 
 gchar * pkey_manage_crypt (const gchar *pem_private_key, const gchar *dn)
 {

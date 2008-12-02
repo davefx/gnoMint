@@ -1,8 +1,8 @@
-bin_PROGRAMS = gnomint #testuint160
+bin_PROGRAMS = gnomint gnomint-cli
 
 bin_SCRIPTS = gnomint-upgrade-db
 
-INCLUDES = \
+gnomint_CFLAGS = \
 	-I$(top_srcdir) \
 	-I$(top_builddir) \
 	$(GNOMINT_CFLAGS) \
@@ -33,8 +33,6 @@ gnomint_SOURCES = \
 	uint160.c \
 	import.c
 
-# testuint160_LDADD = \
-# 	$(GNOMINT_LIBS)
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS) \
@@ -45,9 +43,35 @@ gnomint_LDADD = \
 gnomint_LDFLAGS = \
 	-export-dynamic
 
-# testuint160_SOURCES = \
-# 	uint160.c \
-# 	testuint160.c
+
+
+gnomint_cli_CFLAGS = \
+	-I$(top_srcdir) \
+	-I$(top_builddir) \
+	$(GNOMINTCLI_CFLAGS) \
+	$(LIBGNUTLS_CFLAGS) \
+	$(SQLITE_CFLAGS) \
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
+	-DCOMPILATION_DATE=`date +%s` \
+	-DHAVE_CONFIG_H -DGNOMINTCLI
+
+gnomint_cli_SOURCES = \
+	gnomint-cli.c \
+	ca-cli.c \
+	ca_file.c \
+	preferences.c \
+	pkey_manage.c \
+	tls.c \
+	uint160.c 
+
+
+gnomint_cli_LDADD = \
+	$(GNOMINTCLI_LIBS) \
+	$(LIBGNUTLS_LIBS) \
+	$(SQLITE_LIBS) \
+	$(LTLIBINTL)
+
+
 
 EXTRA_DIST = \
 	gnomint-upgrade-db \
@@ -70,5 +94,6 @@ EXTRA_DIST = \
 	preferences-window.h \
 	crl.h \
 	uint160.h \
-	import.h
+	import.h \
+	ca-cli.h
 
