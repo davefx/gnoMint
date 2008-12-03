@@ -391,7 +391,7 @@ void ca_command_line()
                                 gchar **aux2[g_strv_length(aux)];
                                 for (i=0; i < g_strv_length(aux); i++) {
                                         if (i % 2 == 0) {
-                                                aux2[i] = g_strsplit (line, " ", -1);
+                                                aux2[i] = g_strsplit (aux[i], " ", -1);
                                                 
                                                 for (j = 0; j < (g_strv_length(aux2[i]) - 1); j++) {
                                                         if (aux2[i][j] && aux2[i][j][strlen(aux2[i][j]) - 1] == '\\') {
@@ -402,13 +402,15 @@ void ca_command_line()
                                                                         aux2[i][k] = aux2[i][k+1];
                                                                 }
                                                         }
-                                                        if (aux2[i][j] && strlen(aux2[i][j]))
-                                                                argc++;
 
-                                                }
-                                                
-                                        } 
-
+                                                }                                                
+                                        } else {
+                                                aux2[i] = &(aux[i]);
+                                        }
+                                        for (j=0; j < g_strv_length(aux2[i]); j++) {
+                                                if (aux2[i] && aux2[i][j] && strlen(aux2[i][j]))
+                                                        argc++;
+                                        }
                                 }
                         }
                         g_strfreev (aux);
