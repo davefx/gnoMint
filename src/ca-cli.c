@@ -79,8 +79,192 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 int __ca_newdb (int argc, char **argv)
 {
+	//FIXME
 	return 0;
 }
+
+int __ca_opendb (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_savedbas (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_status (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_listcert (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_listcsr (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_addcsr (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_addca (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_extractcertpkey (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+
+int __ca_extractcsrpkey (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_revoke (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_sign (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_delete (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_crlgen (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_dhgen (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_changepassword (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_importfile (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_importdir (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_showcert (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_showcsr (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_showpolicy (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_setpolicy (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_showpreferences (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_setpreference (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_about (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_warranty  (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_warranty  (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_distribution  (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_version  (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_help  (int argc, char **argv)
+{
+	//FIXME
+	return 0;
+}
+
+int __ca_exit (int argc, char **argv)
+{
+        //FIXME
+        return 0;
+}
+
+
 
 void __ca_add_commands (GHashTable *table)
 {
