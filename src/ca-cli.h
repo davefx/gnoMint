@@ -23,6 +23,17 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 
+typedef int  (* CaCommandCallback) (int argc, char **argv);
+
+typedef struct _CaCommand {
+        const gchar *command;
+        guint mandatory_params;
+        guint optional_params;
+        gchar *syntax;
+        gchar *help;
+        CaCommandCallback callback;
+} CaCommand;
+
 
 void ca_error_dialog (gchar *message);
 gchar * ca_dialog_get_password (gchar *info_message, 

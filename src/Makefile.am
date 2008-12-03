@@ -58,6 +58,7 @@ gnomint_cli_CFLAGS = \
 gnomint_cli_SOURCES = \
 	gnomint-cli.c \
 	ca-cli.c \
+	ca-callbacks.c \
 	ca_file.c \
 	preferences.c \
 	pkey_manage.c \
@@ -96,5 +97,5 @@ EXTRA_DIST = \
 	crl.h \
 	uint160.h \
 	import.h \
-	ca-cli.h
-
+	ca-cli.h \
+	ca-callbacks.h

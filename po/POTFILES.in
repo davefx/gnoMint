@@ -6,6 +6,8 @@ gui/gnomint.glade
 gui/gnomint.desktop.in
 mime/gnomint.xml.in
 src/ca.c
+src/ca-cli.c
+src/ca-callbacks.c
 src/ca_creation.c
 src/ca_file.c
 src/ca_policy.c
@@ -13,6 +15,7 @@ src/certificate_properties.c
 src/crl.c
 src/csr_creation.c
 src/csr_properties.c
+src/gnomint-cli.c
 src/import.c
 src/main.c
 src/new_ca_window.c

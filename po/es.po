@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-18 08:10+0100\n"
-"PO-Revision-Date: 2008-11-18 08:14+0100\n"
+"POT-Creation-Date: 2008-12-04 00:31+0100\n"
+"PO-Revision-Date: 2008-12-04 00:33+0100\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1103,7 +1103,7 @@ msgstr ""
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: ../src/ca.c:1424
+#: ../src/ca.c:1424 ../src/ca-cli.c:106
 msgid "To do. Feature not implemented yet."
 msgstr "Por hacer. Funcionalidad aún no implementada."
 
@@ -1170,6 +1170,297 @@ msgstr "Ocurrió un error al guardar los parámetros Diffie-Hellman."
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr "Parámetros Diffie-Hellman guardados correctamente"
 
+#: ../src/ca-cli.c:45
+msgid "newdb <filename>"
+msgstr "newdb <nombre de fichero>"
+
+#: ../src/ca-cli.c:45
+msgid "Close current file and create a new database with given filename"
+msgstr "Cierra el fichero actual y crea una nueva base de datos con el nombre de fichero indicado"
+
+#. 0
+#: ../src/ca-cli.c:46
+msgid "opendb <filename>"
+msgstr "opendb <nombre de fichero>"
+
+#: ../src/ca-cli.c:46
+msgid "Close current file and open the file with given filename"
+msgstr "Cierra el fichero actual y abre el fichero con el nombre indicado"
+
+#. 1
+#: ../src/ca-cli.c:47
+msgid "savedbas <filename>"
+msgstr "savedbas <nombre de fichero>"
+
+#: ../src/ca-cli.c:47
+msgid "Save the current file with a different filename"
+msgstr "Guarda el fichero actual con un nombre de fichero distinto"
+
+#. 2
+#: ../src/ca-cli.c:48
+msgid "Get current status (opened file, no. of certificates, etc...)"
+msgstr "Obtiene el estado actual (fichero abierto, nº de certificados, etc...)"
+
+#. 3
+#: ../src/ca-cli.c:49
+msgid ""
+"List the certificates in database. With option --see-revoked, lists also the "
+"revoked ones"
+msgstr "Lista los certificados de la base de datos. Con la opción --see-revoked, lista también los certificados revocados."
+
+#. 4
+#: ../src/ca-cli.c:51
+#, fuzzy
+msgid "List the CSRs in database"
+msgstr "Guardando solicitud de certificación en base de datos"
+
+#. 5
+#: ../src/ca-cli.c:52
+#, fuzzy
+msgid "Start a new CSR creation process"
+msgstr "Proceso de creación de solicitud finalizado"
+
+#. 6
+#: ../src/ca-cli.c:53
+msgid "Start a new self-signed CA creation process"
+msgstr ""
+
+#. 7
+#: ../src/ca-cli.c:54
+msgid "extractcertpkey <cert-id> <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:54
+msgid ""
+"Extract the private key of the certificate with the given internal id and "
+"saves it into the given file"
+msgstr ""
+
+#. 8
+#: ../src/ca-cli.c:57
+msgid "extractcsrpkey <csr-id> <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:57
+msgid ""
+"Extract the private key of the CSR with the given internal id and saves it "
+"into the given file"
+msgstr ""
+
+#. 9
+#: ../src/ca-cli.c:60
+msgid "revoke <cert-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:60
+msgid "Revoke the certificate with the given internal ID"
+msgstr ""
+
+#. 10
+#: ../src/ca-cli.c:61
+msgid "sign <csr-id> <ca-cert-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:61
+msgid "Generate a certificate signing the given CSR with the given CA"
+msgstr ""
+
+#. 11
+#: ../src/ca-cli.c:62
+msgid "delete <csr-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:62
+msgid "Delete the given CSR from the database"
+msgstr ""
+
+#. 12
+#: ../src/ca-cli.c:63
+msgid "dhgen <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:63
+msgid "Generate a new DH-parameter set, saving it into the file <filename>"
+msgstr ""
+
+#. 13
+#: ../src/ca-cli.c:64
+#, fuzzy
+msgid "Change password for the current database"
+msgstr ""
+"La contraseña que ha introducido no coincide con la contraseña de la base de "
+"datos."
+
+#. 14
+#: ../src/ca-cli.c:65
+#, fuzzy
+msgid "importfile <filename>"
+msgstr "Importar un único fichero."
+
+#: ../src/ca-cli.c:65
+msgid "Import the file with the given name <filename>"
+msgstr ""
+
+#. 15
+#: ../src/ca-cli.c:66
+msgid "importdir <dirname>"
+msgstr ""
+
+#: ../src/ca-cli.c:66
+msgid "Import the given directory, as a OpenSSL-CA directory"
+msgstr ""
+
+#. 16
+#: ../src/ca-cli.c:67
+msgid "showcert <cert-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:67
+#, fuzzy
+msgid "Show properties of the given certificate"
+msgstr "Error al firmar certificado"
+
+#. 17
+#: ../src/ca-cli.c:68
+msgid "showcsr <csr-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:68
+msgid "Show properties of the given CSR"
+msgstr ""
+
+#. 18
+#: ../src/ca-cli.c:69
+msgid "showpolicy <ca-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:69
+#, fuzzy
+msgid "Show CA policy"
+msgstr "Política de la AC"
+
+#. 19
+#: ../src/ca-cli.c:70
+msgid "setpolicy <ca-id> <policy-id> <value>"
+msgstr ""
+
+#: ../src/ca-cli.c:70
+msgid "Change the given CA policy"
+msgstr ""
+
+#. 20
+#: ../src/ca-cli.c:71
+msgid "Show program preferences"
+msgstr ""
+
+#. 21
+#: ../src/ca-cli.c:72
+msgid "setpreference <preference-id> <value>"
+msgstr ""
+
+#: ../src/ca-cli.c:72
+msgid "Set the given program preference"
+msgstr ""
+
+#. 22
+#: ../src/ca-cli.c:73
+msgid "Show about message"
+msgstr ""
+
+#. 23
+#: ../src/ca-cli.c:74
+msgid "Show warranty information"
+msgstr ""
+
+#. 24
+#: ../src/ca-cli.c:75
+#, fuzzy
+msgid "Show distribution information"
+msgstr "Puntos de distribución de CRLs"
+
+#. 25
+#: ../src/ca-cli.c:76
+msgid "Show version information"
+msgstr ""
+
+#. 26
+#: ../src/ca-cli.c:77
+msgid "Show (this) help message"
+msgstr ""
+
+#. 27
+#. 28
+#. 29
+#: ../src/ca-cli.c:78 ../src/ca-cli.c:79 ../src/ca-cli.c:80
+msgid "Close database and exit program"
+msgstr ""
+
+#: ../src/ca-cli.c:114
+#, fuzzy, c-format
+msgid "Opening database %s..."
+msgstr "Abrir base de datos de AC"
+
+#: ../src/ca-cli.c:118
+#, c-format
+msgid " OK.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:120
+#, c-format
+msgid " Error.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:147
+#, c-format
+msgid ""
+"\n"
+"\n"
+"%s version %s\n"
+"%s\n"
+"\n"
+msgstr ""
+
+#: ../src/ca-cli.c:148
+#, c-format
+msgid ""
+"This program comes with ABSOLUTELY NO WARRANTY;\n"
+"for details type 'warranty'.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:149
+#, c-format
+msgid "This is free software, and you are welcome to redistribute it \n"
+msgstr ""
+
+#: ../src/ca-cli.c:150
+#, c-format
+msgid ""
+"under certain conditions; type 'distribution' for details.\n"
+"\n"
+msgstr ""
+
+#. Unpaired quotes
+#: ../src/ca-cli.c:192
+#, fuzzy, c-format
+msgid "Unpaired quotes\n"
+msgstr "Estados Unidos"
+
+#: ../src/ca-cli.c:270
+#, c-format
+msgid ""
+"Invalid command. Try 'help' for getting a list of recognized commands.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:274
+#, c-format
+msgid "Incorrect number of parameters.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:275
+#, c-format
+msgid "Syntax: %s\n"
+msgstr ""
+
 #: ../src/ca_creation.c:53 ../src/csr_creation.c:55
 msgid "Generating new RSA key pair"
 msgstr "Generando nuevo par de claves RSA"
@@ -1223,7 +1514,9 @@ msgstr "No se pudo encontrar la AC padre en la base de datos"
 #: ../src/ca_file.c:1369
 msgid ""
 "This certificate already exists in the database: cannot insert it twice."
-msgstr "Este certificado ya existe en la base de datos: no se puede insertar de nuevo."
+msgstr ""
+"Este certificado ya existe en la base de datos: no se puede insertar de "
+"nuevo."
 
 #: ../src/ca_file.c:1783
 msgid ""
@@ -1514,6 +1807,16 @@ msgstr "La solicitud no se pudo guardar"
 msgid "CSR generated successfully"
 msgstr "Solicitud de certificación generada con éxito"
 
+#: ../src/gnomint-cli.c:55
+#, fuzzy
+msgid "- A Certification Authority manager"
+msgstr "- Un gestor gráfico de Autoridades de Certificación"
+
+#: ../src/gnomint-cli.c:58 ../src/main.c:134
+#, c-format
+msgid "Failed to initialize: %s\n"
+msgstr "Fallo al inicializar: %s\n"
+
 #: ../src/import.c:122
 #, c-format
 msgid ""
@@ -1598,7 +1901,8 @@ msgid ""
 "private key:\n"
 "\n"
 "%s"
-msgstr "OpenSSL ha devuelto el siguiente error tras intentar descifrar la clave "
+msgstr ""
+"OpenSSL ha devuelto el siguiente error tras intentar descifrar la clave "
 "privada:\n"
 "\n"
 "%s"
@@ -1615,7 +1919,8 @@ msgstr "Certificado raíz de la AC"
 msgid ""
 "There was a problem while importing the private key corresponding to CA root "
 "certificate"
-msgstr "Hubo un problema al importar la clave privada correspondiente al certificado "
+msgstr ""
+"Hubo un problema al importar la clave privada correspondiente al certificado "
 "raíz de la AC."
 
 #: ../src/import.c:1127 ../src/import.c:1153 ../src/import.c:1178
@@ -1625,17 +1930,13 @@ msgstr "Ocurrió un error al abrir el directorio certs/."
 
 #: ../src/import.c:1257
 msgid "Files in the directory don't belong to any supported CA format."
-msgstr "Los ficheros existentes en el directorio no pertenecen a ningún formato "
+msgstr ""
+"Los ficheros existentes en el directorio no pertenecen a ningún formato "
 "soportado de Autoridad de Certificación."
 
 #: ../src/main.c:131
 msgid "- A graphical Certification Authority manager"
 msgstr "- Un gestor gráfico de Autoridades de Certificación"
-
-#: ../src/main.c:134
-#, c-format
-msgid "Failed to initialize: %s\n"
-msgstr "Fallo al inicializar: %s\n"
 
 #: ../src/main.c:253
 msgid "Create new CA database"
@@ -1776,7 +2077,7 @@ msgstr ""
 "La política de esta AC obliga a que los campos \"unidad organizativa\" de "
 "los certificados expedidos seanigual al del certificado de la AC."
 
-#: ../src/pkey_manage.c:70
+#: ../src/pkey_manage.c:76
 #, c-format
 msgid ""
 "The file that holds private key for certificate '%s' is password-protected.\n"
@@ -1788,7 +2089,7 @@ msgstr ""
 "fichero."
 
 #. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:151
+#: ../src/pkey_manage.c:166
 msgid ""
 "The designated file contains a private key, but it is not the private key "
 "corresponding to the certificate."
@@ -1797,21 +2098,21 @@ msgstr ""
 "corresponde con el certificado."
 
 #. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:155
+#: ../src/pkey_manage.c:170
 msgid "The designated file didn't contain any recognized private key."
 msgstr "El fichero indicado no contiene ninguna clave privada reconocible."
 
 #. The file cannot be opened
-#: ../src/pkey_manage.c:160
+#: ../src/pkey_manage.c:175
 msgid "The designated file couldn't be opened."
 msgstr "No se pudo abrir el fichero indicado."
 
 #. The file doesn't exist
-#: ../src/pkey_manage.c:165
+#: ../src/pkey_manage.c:180
 msgid "File designated in database doesn't exist."
 msgstr "El fichero indicado en la base de datos no existe."
 
-#: ../src/pkey_manage.c:581
+#: ../src/pkey_manage.c:603
 msgid "The given password doesn't match the one used in the database"
 msgstr ""
 "La contraseña que ha introducido no coincide con la contraseña de la base de "
@@ -2651,9 +2952,6 @@ msgstr "Cliente TLS WWW"
 
 #~ msgid "United Kingdom"
 #~ msgstr "Reino Unido"
-
-#~ msgid "United States"
-#~ msgstr "Estados Unidos"
 
 #~ msgid "United States Minor Outlying Islands"
 #~ msgstr "Estados Unidos, Islas menores exteriores de"

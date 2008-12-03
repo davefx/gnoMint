@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-18 08:40+0100\n"
+"POT-Creation-Date: 2008-12-04 00:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -995,7 +995,7 @@ msgstr ""
 msgid "Unexpected error"
 msgstr ""
 
-#: ../src/ca.c:1424
+#: ../src/ca.c:1424 ../src/ca-cli.c:106
 msgid "To do. Feature not implemented yet."
 msgstr ""
 
@@ -1052,6 +1052,288 @@ msgstr ""
 
 #: ../src/ca.c:2028
 msgid "Diffie-Hellman parameters saved successfully"
+msgstr ""
+
+#: ../src/ca-cli.c:45
+msgid "newdb <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:45
+msgid "Close current file and create a new database with given filename"
+msgstr ""
+
+#. 0
+#: ../src/ca-cli.c:46
+msgid "opendb <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:46
+msgid "Close current file and open the file with given filename"
+msgstr ""
+
+#. 1
+#: ../src/ca-cli.c:47
+msgid "savedbas <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:47
+msgid "Save the current file with a different filename"
+msgstr ""
+
+#. 2
+#: ../src/ca-cli.c:48
+msgid "Get current status (opened file, no. of certificates, etc...)"
+msgstr ""
+
+#. 3
+#: ../src/ca-cli.c:49
+msgid ""
+"List the certificates in database. With option --see-revoked, lists also the "
+"revoked ones"
+msgstr ""
+
+#. 4
+#: ../src/ca-cli.c:51
+msgid "List the CSRs in database"
+msgstr ""
+
+#. 5
+#: ../src/ca-cli.c:52
+msgid "Start a new CSR creation process"
+msgstr ""
+
+#. 6
+#: ../src/ca-cli.c:53
+msgid "Start a new self-signed CA creation process"
+msgstr ""
+
+#. 7
+#: ../src/ca-cli.c:54
+msgid "extractcertpkey <cert-id> <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:54
+msgid ""
+"Extract the private key of the certificate with the given internal id and "
+"saves it into the given file"
+msgstr ""
+
+#. 8
+#: ../src/ca-cli.c:57
+msgid "extractcsrpkey <csr-id> <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:57
+msgid ""
+"Extract the private key of the CSR with the given internal id and saves it "
+"into the given file"
+msgstr ""
+
+#. 9
+#: ../src/ca-cli.c:60
+msgid "revoke <cert-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:60
+msgid "Revoke the certificate with the given internal ID"
+msgstr ""
+
+#. 10
+#: ../src/ca-cli.c:61
+msgid "sign <csr-id> <ca-cert-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:61
+msgid "Generate a certificate signing the given CSR with the given CA"
+msgstr ""
+
+#. 11
+#: ../src/ca-cli.c:62
+msgid "delete <csr-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:62
+msgid "Delete the given CSR from the database"
+msgstr ""
+
+#. 12
+#: ../src/ca-cli.c:63
+msgid "dhgen <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:63
+msgid "Generate a new DH-parameter set, saving it into the file <filename>"
+msgstr ""
+
+#. 13
+#: ../src/ca-cli.c:64
+msgid "Change password for the current database"
+msgstr ""
+
+#. 14
+#: ../src/ca-cli.c:65
+msgid "importfile <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:65
+msgid "Import the file with the given name <filename>"
+msgstr ""
+
+#. 15
+#: ../src/ca-cli.c:66
+msgid "importdir <dirname>"
+msgstr ""
+
+#: ../src/ca-cli.c:66
+msgid "Import the given directory, as a OpenSSL-CA directory"
+msgstr ""
+
+#. 16
+#: ../src/ca-cli.c:67
+msgid "showcert <cert-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:67
+msgid "Show properties of the given certificate"
+msgstr ""
+
+#. 17
+#: ../src/ca-cli.c:68
+msgid "showcsr <csr-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:68
+msgid "Show properties of the given CSR"
+msgstr ""
+
+#. 18
+#: ../src/ca-cli.c:69
+msgid "showpolicy <ca-id>"
+msgstr ""
+
+#: ../src/ca-cli.c:69
+msgid "Show CA policy"
+msgstr ""
+
+#. 19
+#: ../src/ca-cli.c:70
+msgid "setpolicy <ca-id> <policy-id> <value>"
+msgstr ""
+
+#: ../src/ca-cli.c:70
+msgid "Change the given CA policy"
+msgstr ""
+
+#. 20
+#: ../src/ca-cli.c:71
+msgid "Show program preferences"
+msgstr ""
+
+#. 21
+#: ../src/ca-cli.c:72
+msgid "setpreference <preference-id> <value>"
+msgstr ""
+
+#: ../src/ca-cli.c:72
+msgid "Set the given program preference"
+msgstr ""
+
+#. 22
+#: ../src/ca-cli.c:73
+msgid "Show about message"
+msgstr ""
+
+#. 23
+#: ../src/ca-cli.c:74
+msgid "Show warranty information"
+msgstr ""
+
+#. 24
+#: ../src/ca-cli.c:75
+msgid "Show distribution information"
+msgstr ""
+
+#. 25
+#: ../src/ca-cli.c:76
+msgid "Show version information"
+msgstr ""
+
+#. 26
+#: ../src/ca-cli.c:77
+msgid "Show (this) help message"
+msgstr ""
+
+#. 27
+#. 28
+#. 29
+#: ../src/ca-cli.c:78 ../src/ca-cli.c:79 ../src/ca-cli.c:80
+msgid "Close database and exit program"
+msgstr ""
+
+#: ../src/ca-cli.c:114
+#, c-format
+msgid "Opening database %s..."
+msgstr ""
+
+#: ../src/ca-cli.c:118
+#, c-format
+msgid " OK.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:120
+#, c-format
+msgid " Error.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:147
+#, c-format
+msgid ""
+"\n"
+"\n"
+"%s version %s\n"
+"%s\n"
+"\n"
+msgstr ""
+
+#: ../src/ca-cli.c:148
+#, c-format
+msgid ""
+"This program comes with ABSOLUTELY NO WARRANTY;\n"
+"for details type 'warranty'.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:149
+#, c-format
+msgid "This is free software, and you are welcome to redistribute it \n"
+msgstr ""
+
+#: ../src/ca-cli.c:150
+#, c-format
+msgid ""
+"under certain conditions; type 'distribution' for details.\n"
+"\n"
+msgstr ""
+
+#. Unpaired quotes
+#: ../src/ca-cli.c:192
+#, c-format
+msgid "Unpaired quotes\n"
+msgstr ""
+
+#: ../src/ca-cli.c:270
+#, c-format
+msgid ""
+"Invalid command. Try 'help' for getting a list of recognized commands.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:274
+#, c-format
+msgid "Incorrect number of parameters.\n"
+msgstr ""
+
+#: ../src/ca-cli.c:275
+#, c-format
+msgid "Syntax: %s\n"
 msgstr ""
 
 #: ../src/ca_creation.c:53 ../src/csr_creation.c:55
@@ -1390,6 +1672,15 @@ msgstr ""
 msgid "CSR generated successfully"
 msgstr ""
 
+#: ../src/gnomint-cli.c:55
+msgid "- A Certification Authority manager"
+msgstr ""
+
+#: ../src/gnomint-cli.c:58 ../src/main.c:134
+#, c-format
+msgid "Failed to initialize: %s\n"
+msgstr ""
+
 #: ../src/import.c:122
 #, c-format
 msgid ""
@@ -1489,11 +1780,6 @@ msgstr ""
 
 #: ../src/main.c:131
 msgid "- A graphical Certification Authority manager"
-msgstr ""
-
-#: ../src/main.c:134
-#, c-format
-msgid "Failed to initialize: %s\n"
 msgstr ""
 
 #: ../src/main.c:253
@@ -1608,7 +1894,7 @@ msgid ""
 "certificates to be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/pkey_manage.c:70
+#: ../src/pkey_manage.c:76
 #, c-format
 msgid ""
 "The file that holds private key for certificate '%s' is password-protected.\n"
@@ -1617,28 +1903,28 @@ msgid ""
 msgstr ""
 
 #. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:151
+#: ../src/pkey_manage.c:166
 msgid ""
 "The designated file contains a private key, but it is not the private key "
 "corresponding to the certificate."
 msgstr ""
 
 #. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:155
+#: ../src/pkey_manage.c:170
 msgid "The designated file didn't contain any recognized private key."
 msgstr ""
 
 #. The file cannot be opened
-#: ../src/pkey_manage.c:160
+#: ../src/pkey_manage.c:175
 msgid "The designated file couldn't be opened."
 msgstr ""
 
 #. The file doesn't exist
-#: ../src/pkey_manage.c:165
+#: ../src/pkey_manage.c:180
 msgid "File designated in database doesn't exist."
 msgstr ""
 
-#: ../src/pkey_manage.c:581
+#: ../src/pkey_manage.c:603
 msgid "The given password doesn't match the one used in the database"
 msgstr ""
 
