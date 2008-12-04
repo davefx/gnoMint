@@ -19,13 +19,12 @@
 
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <glib-object.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-
-#define _(x) (x)
 
 #include "ca-cli.h"
 #include "ca_file.h"
@@ -33,48 +32,46 @@
 
 
 CaCommand ca_commands[] = {
-	{"newdb", 1, 1, _("newdb <filename>"), _("Close current file and create a new database with given filename"), ca_callback_newdb}, // 0
-	{"opendb", 1, 1, _("opendb <filename>"), _("Close current file and open the file with given filename"), ca_callback_opendb}, // 1
-	{"savedbas", 1, 1, _("savedbas <filename>"), _("Save the current file with a different filename"), ca_callback_savedbas}, // 2
-	{"status", 0, 0, "status", _("Get current status (opened file, no. of certificates, etc...)"), ca_callback_status}, // 3
-	{"listcert", 0, 1, "listcert [--see-revoked]", _("List the certificates in database. With option --see-revoked, "
+	{"newdb", 1, 1, N_("newdb <filename>"), N_("Close current file and create a new database with given filename"), ca_callback_newdb}, // 0
+	{"opendb", 1, 1, N_("opendb <filename>"), N_("Close current file and open the file with given filename"), ca_callback_opendb}, // 1
+	{"savedbas", 1, 1, N_("savedbas <filename>"), N_("Save the current file with a different filename"), ca_callback_savedbas}, // 2
+	{"status", 0, 0, "status", N_("Get current status (opened file, no. of certificates, etc...)"), ca_callback_status}, // 3
+	{"listcert", 0, 1, "listcert [--see-revoked]", N_("List the certificates in database. With option --see-revoked, "
 							 "lists also the revoked ones"), ca_callback_listcert}, // 4
-	{"listcsr", 0, 0, "listcsr", _("List the CSRs in database"), ca_callback_listcsr}, // 5
-	{"addcsr", 0, 0, "addcsr", _("Start a new CSR creation process"), ca_callback_addcsr}, // 6
-	{"addca", 0, 0, "addca", _("Start a new self-signed CA creation process"), ca_callback_addca}, //7
-	{"extractcertpkey", 2, 2, _("extractcertpkey <cert-id> <filename>"), _("Extract the private key of the certificate with the given " 
+	{"listcsr", 0, 0, "listcsr", N_("List the CSRs in database"), ca_callback_listcsr}, // 5
+	{"addcsr", 0, 0, "addcsr", N_("Start a new CSR creation process"), ca_callback_addcsr}, // 6
+	{"addca", 0, 0, "addca", N_("Start a new self-signed CA creation process"), ca_callback_addca}, //7
+	{"extractcertpkey", 2, 2, N_("extractcertpkey <cert-id> <filename>"), N_("Extract the private key of the certificate with the given " 
 									       "internal id and saves it into the given file"),  
 	 ca_callback_extractcertpkey}, // 8
-	{"extractcsrpkey", 2, 2, _("extractcsrpkey <csr-id> <filename>"), _("Extract the private key of the CSR with the given " 
+	{"extractcsrpkey", 2, 2, N_("extractcsrpkey <csr-id> <filename>"), N_("Extract the private key of the CSR with the given " 
 									    "internal id and saves it into the given file"), 
 	 ca_callback_extractcsrpkey}, // 9
-	{"revoke", 1, 1, _("revoke <cert-id>"), _("Revoke the certificate with the given internal ID"), ca_callback_revoke}, // 10
-	{"sign", 2, 2, _("sign <csr-id> <ca-cert-id>"), _("Generate a certificate signing the given CSR with the given CA"), ca_callback_sign}, // 11
-	{"delete", 1, 1, _("delete <csr-id>"), _("Delete the given CSR from the database"), ca_callback_delete}, // 12
-	{"dhgen", 1, 1, _("dhgen <filename>"), _("Generate a new DH-parameter set, saving it into the file <filename>"), ca_callback_dhgen}, // 13
-	{"changepassword", 0, 0, "changepassword", _("Change password for the current database"), ca_callback_changepassword}, // 14
-	{"importfile", 1, 1, _("importfile <filename>"), _("Import the file with the given name <filename>"), ca_callback_importfile}, // 15
-	{"importdir", 1, 1, _("importdir <dirname>"), _("Import the given directory, as a OpenSSL-CA directory"), ca_callback_importdir}, // 16
-	{"showcert", 1, 1, _("showcert <cert-id>"), _("Show properties of the given certificate"), ca_callback_showcert}, // 17 
-	{"showcsr", 1, 1, _("showcsr <csr-id>"), _("Show properties of the given CSR"), ca_callback_showcsr}, // 18
-	{"showpolicy", 1, 1, _("showpolicy <ca-id>"), _("Show CA policy"), ca_callback_showpolicy}, // 19
-	{"setpolicy", 3, 3, _("setpolicy <ca-id> <policy-id> <value>"), _("Change the given CA policy"), ca_callback_setpolicy}, // 20
-	{"showpreferences", 0, 0, "showpreferences", _("Show program preferences"), ca_callback_showpreferences}, // 21
-	{"setpreference", 2, 2, _("setpreference <preference-id> <value>"), _("Set the given program preference"), ca_callback_setpreference}, // 22
-	{"about", 0, 0, "about", _("Show about message"), ca_callback_about}, // 23
-	{"warranty", 0, 0, "warranty", _("Show warranty information"), ca_callback_warranty}, // 24
-	{"distribution", 0, 0, "distribution", _("Show distribution information"), ca_callback_distribution}, // 25
-	{"version", 0, 0, "version", _("Show version information"), ca_callback_version}, // 26
-	{"help", 0, 0, "help", _("Show (this) help message"),  ca_callback_help}, // 27
-	{"quit", 0, 0, "quit", _("Close database and exit program"), ca_callback_exit}, // 28
-	{"exit", 0, 0, "exit", _("Close database and exit program"), ca_callback_exit}, // 29
-	{"bye", 0, 0, "bye", _("Close database and exit program"), ca_callback_exit} // 30
+	{"revoke", 1, 1, N_("revoke <cert-id>"), N_("Revoke the certificate with the given internal ID"), ca_callback_revoke}, // 10
+	{"sign", 2, 2, N_("sign <csr-id> <ca-cert-id>"), N_("Generate a certificate signing the given CSR with the given CA"), ca_callback_sign}, // 11
+	{"delete", 1, 1, N_("delete <csr-id>"), N_("Delete the given CSR from the database"), ca_callback_delete}, // 12
+	{"dhgen", 1, 1, N_("dhgen <filename>"), N_("Generate a new DH-parameter set, saving it into the file <filename>"), ca_callback_dhgen}, // 13
+	{"changepassword", 0, 0, "changepassword", N_("Change password for the current database"), ca_callback_changepassword}, // 14
+	{"importfile", 1, 1, N_("importfile <filename>"), N_("Import the file with the given name <filename>"), ca_callback_importfile}, // 15
+	{"importdir", 1, 1, N_("importdir <dirname>"), N_("Import the given directory, as a OpenSSL-CA directory"), ca_callback_importdir}, // 16
+	{"showcert", 1, 1, N_("showcert <cert-id>"), N_("Show properties of the given certificate"), ca_callback_showcert}, // 17 
+	{"showcsr", 1, 1, N_("showcsr <csr-id>"), N_("Show properties of the given CSR"), ca_callback_showcsr}, // 18
+	{"showpolicy", 1, 1, N_("showpolicy <ca-id>"), N_("Show CA policy"), ca_callback_showpolicy}, // 19
+	{"setpolicy", 3, 3, N_("setpolicy <ca-id> <policy-id> <value>"), N_("Change the given CA policy"), ca_callback_setpolicy}, // 20
+	{"showpreferences", 0, 0, "showpreferences", N_("Show program preferences"), ca_callback_showpreferences}, // 21
+	{"setpreference", 2, 2, N_("setpreference <preference-id> <value>"), N_("Set the given program preference"), ca_callback_setpreference}, // 22
+	{"about", 0, 0, "about", N_("Show about message"), ca_callback_about}, // 23
+	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_callback_warranty}, // 24
+	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_callback_distribution}, // 25
+	{"version", 0, 0, "version", N_("Show version information"), ca_callback_version}, // 26
+	{"help", 0, 0, "help", N_("Show (this) help message"),  ca_callback_help}, // 27
+	{"quit", 0, 0, "quit", N_("Close database and exit program"), ca_callback_exit}, // 28
+	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_callback_exit}, // 29
+	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_callback_exit} // 30
 };
 #define CA_COMMAND_NUMBER 31
 
 
-#undef _
-#include <glib/gi18n.h>
 
 
 GHashTable *ca_command_table = NULL;
@@ -137,8 +134,7 @@ void ca_command_line()
 
         printf (_("\n\n%s version %s\n%s\n\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_COPYRIGHT); 
         printf (_("This program comes with ABSOLUTELY NO WARRANTY;\nfor details type 'warranty'.\n"));
-        printf (_("This is free software, and you are welcome to redistribute it \n"));
-        printf (_("under certain conditions; type 'distribution' for details.\n\n"));
+        printf (_("This is free software, and you are welcome to redistribute it\nunder certain conditions; type 'distribution' for details.\n\n"));
 
         while (TRUE) {
                 
