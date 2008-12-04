@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-04 00:31+0100\n"
-"PO-Revision-Date: 2008-12-04 00:33+0100\n"
+"POT-Creation-Date: 2008-12-04 19:50+0100\n"
+"PO-Revision-Date: 2008-12-04 20:11+0100\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1103,7 +1103,7 @@ msgstr ""
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: ../src/ca.c:1424 ../src/ca-cli.c:106
+#: ../src/ca.c:1424 ../src/ca-cli.c:94
 msgid "To do. Feature not implemented yet."
 msgstr "Por hacer. Funcionalidad aún no implementada."
 
@@ -1170,247 +1170,246 @@ msgstr "Ocurrió un error al guardar los parámetros Diffie-Hellman."
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr "Parámetros Diffie-Hellman guardados correctamente"
 
-#: ../src/ca-cli.c:45
+#: ../src/ca-cli.c:35
 msgid "newdb <filename>"
 msgstr "newdb <nombre de fichero>"
 
-#: ../src/ca-cli.c:45
+#: ../src/ca-cli.c:35
 msgid "Close current file and create a new database with given filename"
-msgstr "Cierra el fichero actual y crea una nueva base de datos con el nombre de fichero indicado"
+msgstr ""
+"Cierra el fichero actual y crea una nueva base de datos con el nombre de "
+"fichero indicado"
 
 #. 0
-#: ../src/ca-cli.c:46
+#: ../src/ca-cli.c:36
 msgid "opendb <filename>"
 msgstr "opendb <nombre de fichero>"
 
-#: ../src/ca-cli.c:46
+#: ../src/ca-cli.c:36
 msgid "Close current file and open the file with given filename"
 msgstr "Cierra el fichero actual y abre el fichero con el nombre indicado"
 
 #. 1
-#: ../src/ca-cli.c:47
+#: ../src/ca-cli.c:37
 msgid "savedbas <filename>"
 msgstr "savedbas <nombre de fichero>"
 
-#: ../src/ca-cli.c:47
+#: ../src/ca-cli.c:37
 msgid "Save the current file with a different filename"
 msgstr "Guarda el fichero actual con un nombre de fichero distinto"
 
 #. 2
-#: ../src/ca-cli.c:48
+#: ../src/ca-cli.c:38
 msgid "Get current status (opened file, no. of certificates, etc...)"
 msgstr "Obtiene el estado actual (fichero abierto, nº de certificados, etc...)"
 
 #. 3
-#: ../src/ca-cli.c:49
+#: ../src/ca-cli.c:39
 msgid ""
 "List the certificates in database. With option --see-revoked, lists also the "
 "revoked ones"
-msgstr "Lista los certificados de la base de datos. Con la opción --see-revoked, lista también los certificados revocados."
+msgstr ""
+"Lista los certificados de la base de datos. Con la opción --see-revoked, "
+"lista también los certificados revocados."
 
 #. 4
-#: ../src/ca-cli.c:51
-#, fuzzy
+#: ../src/ca-cli.c:41
 msgid "List the CSRs in database"
-msgstr "Guardando solicitud de certificación en base de datos"
+msgstr "Lista las solicitudes de certificación existentes en la base de datos"
 
 #. 5
-#: ../src/ca-cli.c:52
-#, fuzzy
+#: ../src/ca-cli.c:42
 msgid "Start a new CSR creation process"
-msgstr "Proceso de creación de solicitud finalizado"
+msgstr "Comienza un nuevo proceso de creación de solicitud de certificación"
 
 #. 6
-#: ../src/ca-cli.c:53
+#: ../src/ca-cli.c:43
 msgid "Start a new self-signed CA creation process"
-msgstr ""
+msgstr "Iniciar un nuevo proceso de creación de Autoridad de Certificación auto-firmada"
 
 #. 7
-#: ../src/ca-cli.c:54
+#: ../src/ca-cli.c:44
 msgid "extractcertpkey <cert-id> <filename>"
-msgstr ""
+msgstr "extractcertpkey·<id. de certificado>·<nombre de fichero>"
 
-#: ../src/ca-cli.c:54
+#: ../src/ca-cli.c:44
 msgid ""
 "Extract the private key of the certificate with the given internal id and "
 "saves it into the given file"
 msgstr ""
+"Extraer clae privada del certificado con el identificador proporcionado y"
+"almacenarla en el fichero indicado"
 
 #. 8
-#: ../src/ca-cli.c:57
+#: ../src/ca-cli.c:47
 msgid "extractcsrpkey <csr-id> <filename>"
-msgstr ""
+msgstr "extractcsrpkey·<id. de csr>·<nombre de fichero>"
 
-#: ../src/ca-cli.c:57
+#: ../src/ca-cli.c:47
 msgid ""
 "Extract the private key of the CSR with the given internal id and saves it "
 "into the given file"
 msgstr ""
+"Extraer clave privada del CSR con identificador indicado y almacenarla"
+"en el fichero proporcionado"
 
 #. 9
-#: ../src/ca-cli.c:60
+#: ../src/ca-cli.c:50
 msgid "revoke <cert-id>"
-msgstr ""
+msgstr "revoke <id de certificado>"
 
-#: ../src/ca-cli.c:60
+#: ../src/ca-cli.c:50
 msgid "Revoke the certificate with the given internal ID"
-msgstr ""
+msgstr "Revocar el certificado con identificador proporcionado"
 
 #. 10
-#: ../src/ca-cli.c:61
+#: ../src/ca-cli.c:51
 msgid "sign <csr-id> <ca-cert-id>"
-msgstr ""
+msgstr "sign <csr-id> <ca-cert-id>"
 
-#: ../src/ca-cli.c:61
+#: ../src/ca-cli.c:51
 msgid "Generate a certificate signing the given CSR with the given CA"
-msgstr ""
+msgstr "Generar certificado firmando el CSR indicado con la AC proporcionada"
 
 #. 11
-#: ../src/ca-cli.c:62
+#: ../src/ca-cli.c:52
 msgid "delete <csr-id>"
-msgstr ""
+msgstr "delete <id. de csr>"
 
-#: ../src/ca-cli.c:62
+#: ../src/ca-cli.c:52
 msgid "Delete the given CSR from the database"
-msgstr ""
+msgstr "Borrar solicitud de certificación indicada de la base de datos"
 
 #. 12
-#: ../src/ca-cli.c:63
+#: ../src/ca-cli.c:53
 msgid "dhgen <filename>"
-msgstr ""
+msgstr "dhgen <nombre de fichero>"
 
-#: ../src/ca-cli.c:63
+#: ../src/ca-cli.c:53
 msgid "Generate a new DH-parameter set, saving it into the file <filename>"
-msgstr ""
+msgstr "Generar un nuevo conjunto de parámetros DH, almacenándolo en el fichero <nombre de fichero>"
 
 #. 13
-#: ../src/ca-cli.c:64
-#, fuzzy
+#: ../src/ca-cli.c:54
 msgid "Change password for the current database"
-msgstr ""
-"La contraseña que ha introducido no coincide con la contraseña de la base de "
-"datos."
+msgstr "Cambiar contraseña de la base de datos actual"
 
 #. 14
-#: ../src/ca-cli.c:65
-#, fuzzy
+#: ../src/ca-cli.c:55
 msgid "importfile <filename>"
-msgstr "Importar un único fichero."
+msgstr "importfile <nombre de fichero>"
 
-#: ../src/ca-cli.c:65
+#: ../src/ca-cli.c:55
 msgid "Import the file with the given name <filename>"
-msgstr ""
+msgstr "Importar fichero con el nombre indicado"
 
 #. 15
-#: ../src/ca-cli.c:66
+#: ../src/ca-cli.c:56
 msgid "importdir <dirname>"
-msgstr ""
+msgstr "importdir <nombre de directorio>"
 
-#: ../src/ca-cli.c:66
+#: ../src/ca-cli.c:56
 msgid "Import the given directory, as a OpenSSL-CA directory"
-msgstr ""
+msgstr "Importar el directorio proporcionado, interpretándolo como el directorio de una AC realizada con OpenSSL"
 
 #. 16
-#: ../src/ca-cli.c:67
+#: ../src/ca-cli.c:57
 msgid "showcert <cert-id>"
-msgstr ""
+msgstr "showcert <id de certificado>"
 
-#: ../src/ca-cli.c:67
-#, fuzzy
+#: ../src/ca-cli.c:57
 msgid "Show properties of the given certificate"
-msgstr "Error al firmar certificado"
+msgstr "Mostrar propiedades del certificado indicado"
 
 #. 17
-#: ../src/ca-cli.c:68
+#: ../src/ca-cli.c:58
 msgid "showcsr <csr-id>"
-msgstr ""
+msgstr "showcsr <id de solicitud de certificación>"
 
-#: ../src/ca-cli.c:68
+#: ../src/ca-cli.c:58
 msgid "Show properties of the given CSR"
-msgstr ""
+msgstr "Mostrar propiedades del CSR proporcionado"
 
 #. 18
-#: ../src/ca-cli.c:69
+#: ../src/ca-cli.c:59
 msgid "showpolicy <ca-id>"
-msgstr ""
+msgstr "showpolicy <id de certificado de AC> "
 
-#: ../src/ca-cli.c:69
-#, fuzzy
+#: ../src/ca-cli.c:59
 msgid "Show CA policy"
-msgstr "Política de la AC"
+msgstr "Mostrar política de la AC"
 
 #. 19
-#: ../src/ca-cli.c:70
+#: ../src/ca-cli.c:60
 msgid "setpolicy <ca-id> <policy-id> <value>"
-msgstr ""
+msgstr "setpolicy <id de certificado de AC> <id de política> <valor>"
 
-#: ../src/ca-cli.c:70
+#: ../src/ca-cli.c:60
 msgid "Change the given CA policy"
-msgstr ""
+msgstr "Cambiar política indicada de la AC"
 
 #. 20
-#: ../src/ca-cli.c:71
+#: ../src/ca-cli.c:61
 msgid "Show program preferences"
-msgstr ""
+msgstr "Mostrar preferencias de programa"
 
 #. 21
-#: ../src/ca-cli.c:72
+#: ../src/ca-cli.c:62
 msgid "setpreference <preference-id> <value>"
-msgstr ""
+msgstr "setpreference <id de preferencia> <valor>"
 
-#: ../src/ca-cli.c:72
+#: ../src/ca-cli.c:62
 msgid "Set the given program preference"
-msgstr ""
+msgstr "Establece la preferencia de programa indicada"
 
 #. 22
-#: ../src/ca-cli.c:73
+#: ../src/ca-cli.c:63
 msgid "Show about message"
-msgstr ""
+msgstr "Mostrar mensaje de \"Acerca de...\""
 
 #. 23
-#: ../src/ca-cli.c:74
+#: ../src/ca-cli.c:64
 msgid "Show warranty information"
-msgstr ""
+msgstr "Mostrar información de garantía"
 
 #. 24
-#: ../src/ca-cli.c:75
-#, fuzzy
+#: ../src/ca-cli.c:65
 msgid "Show distribution information"
-msgstr "Puntos de distribución de CRLs"
+msgstr "Mostrar información sobre la distribución del programa"
 
 #. 25
-#: ../src/ca-cli.c:76
+#: ../src/ca-cli.c:66
 msgid "Show version information"
-msgstr ""
+msgstr "Mostrar información de versión"
 
 #. 26
-#: ../src/ca-cli.c:77
+#: ../src/ca-cli.c:67
 msgid "Show (this) help message"
-msgstr ""
+msgstr "Mostrar (este) mensaje de ayuda"
 
 #. 27
 #. 28
 #. 29
-#: ../src/ca-cli.c:78 ../src/ca-cli.c:79 ../src/ca-cli.c:80
+#: ../src/ca-cli.c:68 ../src/ca-cli.c:69 ../src/ca-cli.c:70
 msgid "Close database and exit program"
-msgstr ""
+msgstr "Cerrar base de datos y salir de programa"
 
-#: ../src/ca-cli.c:114
-#, fuzzy, c-format
+#: ../src/ca-cli.c:102
+#, c-format
 msgid "Opening database %s..."
-msgstr "Abrir base de datos de AC"
+msgstr "Abriendo base de datos %s..."
 
-#: ../src/ca-cli.c:118
+#: ../src/ca-cli.c:106
 #, c-format
 msgid " OK.\n"
-msgstr ""
+msgstr "Correcto.\n"
 
-#: ../src/ca-cli.c:120
+#: ../src/ca-cli.c:108
 #, c-format
 msgid " Error.\n"
-msgstr ""
+msgstr "Error.\n"
 
-#: ../src/ca-cli.c:147
+#: ../src/ca-cli.c:135
 #, c-format
 msgid ""
 "\n"
@@ -1419,47 +1418,170 @@ msgid ""
 "%s\n"
 "\n"
 msgstr ""
+"\n"
+"\n"
+"%s versión %s\n"
+"%s\n"
+"\n"
 
-#: ../src/ca-cli.c:148
+#: ../src/ca-cli.c:136
 #, c-format
 msgid ""
 "This program comes with ABSOLUTELY NO WARRANTY;\n"
 "for details type 'warranty'.\n"
-msgstr ""
+msgstr "Este programa se proporciona SIN GARANTÍAS DE NINGÚN TIPO; para más\n"
+"detalles, teclee 'warranty'.\n"
 
-#: ../src/ca-cli.c:149
-#, c-format
-msgid "This is free software, and you are welcome to redistribute it \n"
-msgstr ""
-
-#: ../src/ca-cli.c:150
+#: ../src/ca-cli.c:137
 #, c-format
 msgid ""
+"This is free software, and you are welcome to redistribute it\n"
 "under certain conditions; type 'distribution' for details.\n"
 "\n"
-msgstr ""
+msgstr "Este programa es software libre; se le anima a distribuirlo bajo ciertas\n"
+"condiciones; teclee 'distribution' para más detalles.\n"
+"\n"
 
 #. Unpaired quotes
-#: ../src/ca-cli.c:192
-#, fuzzy, c-format
+#: ../src/ca-cli.c:179
+#, c-format
 msgid "Unpaired quotes\n"
-msgstr "Estados Unidos"
+msgstr "Error: número impar de comillas\n"
 
-#: ../src/ca-cli.c:270
+#: ../src/ca-cli.c:257
 #, c-format
 msgid ""
 "Invalid command. Try 'help' for getting a list of recognized commands.\n"
-msgstr ""
+msgstr "Orden no válida. Teclee 'help' para conseguir una lista de órdenes\n"
+"reconocidas.\n"
 
-#: ../src/ca-cli.c:274
+#: ../src/ca-cli.c:261
 #, c-format
 msgid "Incorrect number of parameters.\n"
-msgstr ""
+msgstr "Número incorrecto de parámetros.\n"
+""
 
-#: ../src/ca-cli.c:275
+#: ../src/ca-cli.c:262
 #, c-format
 msgid "Syntax: %s\n"
+msgstr "Sintaxis: %s\n"
+
+#: ../src/ca-callbacks.c:178
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+msgstr "%s versión %s\n"
+"%s\n"
+
+#: ../src/ca-callbacks.c:179
+#, c-format
+msgid ""
+"\n"
+"Authors:\n"
+"%s\n"
+"\n"
 msgstr ""
+"\n"
+"Autores:\n"
+"%s\n"
+"\n"
+
+#: ../src/ca-callbacks.c:180 ../src/ca-callbacks.c:181 ../src/main.c:648
+msgid "translator-credits"
+msgstr "David Marín Carreño <davefx@gmail.com>"
+
+#: ../src/ca-callbacks.c:181
+#, c-format
+msgid ""
+"Translators:\n"
+"%s\n"
+msgstr ""
+"Traductores:\n"
+"%s\n"
+
+#: ../src/ca-callbacks.c:188
+msgid ""
+"THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
+"APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
+"HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n"
+"OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\n"
+"THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n"
+"PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\n"
+"IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\n"
+"ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n"
+"\n"
+"For more information about warranty, see section 15 onwards of the GNU\n"
+"General Public License. You should have received a copy of the GNU General\n"
+"Public License along with this program. If not, see\n"
+"<http://www.gnu.org/licenses/>.\n"
+"\n"
+msgstr "NO HAY GARANTÍA PARA ESTE PROGRAMA, HASTA EL EXTREMO PERMITIDO POR LA\n"
+"LEY APLICABLE.  A NO SER QUE SE INDIQUE LO CONTRARIO, LOS PROPIETARIOS DEL\n"
+"COPYRIGHT, U OTRAS TERCERAS PARTES PROPORCIONAN EL PROGRAMA \"TAL CUAL\", \n"
+"SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O IMPLÍCITAS, INCLUYÉNDOSE, PERO NO\n"
+"LIMITÁNDOSE A LAS GARANTÍAS IMPLÍCITAS DE COMERCIABILIDAD O AJUSTE A UN\n"
+"PROPÓSITO PARTICULAR. TODO RIESGO DERIVADO DE LA CALIDAD O PRESTACIONES\n"
+"DEL PROGRAMA CORRE DE SU PARTE.  SI EL PROGRAMA FUERA DEFECTUOSO, USTED\n"
+"DEBERÁ ASUMIR LOS COSTES DE CUALQUIER OPERACIÓN DE SOPORTE TÉCNICO,\n"
+"REPARACIÓN O CORRECCIÓN.\n"
+"\n"
+"Para más información sobre la garantía, véanse las secciones 15 y siguientes\n"
+"de la Licencia Pública General GNU. Debería haber recibido una copia de la\n"
+"Licencia Pública General de GNU junto con este programa. Si no es así, veáse\n"
+"<http://www.gnu.org/licenses/>.\n"
+"\n"
+
+#: ../src/ca-callbacks.c:206
+msgid ""
+"This program is free software: you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 3 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
+"\n"
+msgstr ""
+"Este programa es software libre; puede distribuirlo y/o modificarlo \n"
+"según los términos de la Licencia Pública General GNU (GNU GPL), \n"
+"según fue publicada por la Free Software Foundation; en la versión 3\n"
+"de la Licencia, o (a su elección) cualquier versión posterior. \n"
+"\n"
+"Este programa se distribuye con la esperanza de que sea útil, \n"
+"pero SIN GARANTÍA DE NINGÚN TIPO; sin ninguna garantía implícita\n"
+"de estar APTO PARA LA COMERCIALIZACIÓN o de IDONEIDAD PARA ALGÚN\n"
+"FIN DETERMINADO. Para más detalles, vea la Licencia Pública General\n"
+"GNU. \n"
+"\n"
+"Debería haber recibido una copia de la Licencia Pública General GNU junto\n"
+"con este programa; si no es así, visite <http://www.gnu.org/licenses/>.\n"
+"\n"
+
+#: ../src/ca-callbacks.c:221
+#, c-format
+msgid "%s version %s\n"
+msgstr "%s versión %s\n"
+
+#: ../src/ca-callbacks.c:230
+#, c-format
+msgid "Available commands:\n"
+msgstr "Órdenes disponibles:\n"
+
+#: ../src/ca-callbacks.c:231
+#, c-format
+msgid "===================\n"
+msgstr "====================\n"
+
+#: ../src/ca-callbacks.c:241
+#, c-format
+msgid "Exiting gnomint-cli...\n"
+msgstr "Saliendo de gnomint-cli...\n"
 
 #: ../src/ca_creation.c:53 ../src/csr_creation.c:55
 msgid "Generating new RSA key pair"
@@ -1808,9 +1930,8 @@ msgid "CSR generated successfully"
 msgstr "Solicitud de certificación generada con éxito"
 
 #: ../src/gnomint-cli.c:55
-#, fuzzy
 msgid "- A Certification Authority manager"
-msgstr "- Un gestor gráfico de Autoridades de Certificación"
+msgstr "-Un gestor de Autoridades de Certificación"
 
 #: ../src/gnomint-cli.c:58 ../src/main.c:134
 #, c-format
@@ -2016,10 +2137,6 @@ msgstr ""
 "Debería haber recibido una copia de la Licencia Pública General GNU junto "
 "con este programa; si no es así, escriba a la Free Software Foundation, "
 "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
-
-#: ../src/main.c:648
-msgid "translator-credits"
-msgstr "David Marín Carreño <davefx@gmail.com>"
 
 #: ../src/new_cert_creation_process.c:81
 msgid "CA creation process finished"
