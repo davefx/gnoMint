@@ -24,26 +24,80 @@
 #include <glib/gi18n.h>
 
 #include "ca-cli.h"
+#include "ca_file.h"
 
 extern CaCommand ca_commands[];
 #define CA_COMMAND_NUMBER 31
 
 int ca_callback_newdb (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+        gchar *filename = argv[1];
+        gchar *error = NULL;
+
+        if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
+                /* The file already exists. We ask the user about overwriting it */
+                
+                // FIXME
+
+                /* If he wants to overwrite it, we first rename it to "filename~", after deleting "filename~" if it already exists */
+
+                gchar *backup_filename = g_strdup_printf ("%s~", filename);
+                if (g_file_test (backup_filename, G_FILE_TEST_EXISTS)) {
+                        g_remove (backup_filename);
+                }
+                
+                g_rename (filename, backup_filename);
+                
+                g_free (backup_filename);
+        }
+
+        error = ca_file_create (filename);
+        if (error) {
+                fprintf (stderr, "%s\n", error);
+                return 1;
+        }
+
+	if (! ca_open (filename, FALSE)) {
+                fprintf (stderr, _("Problem when opening new '%s' CA database\n"), filename);
+                return 1;
+        }
 	return 0;
 }
 
 int ca_callback_opendb (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gchar *filename = argv[1];
+
+	if (! ca_open (filename, FALSE)) {
+                fprintf (stderr, _("Problem when opening '%s' CA database\n"), filename);
+	} 
+
 	return 0;
 }
 
 int ca_callback_savedbas (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
-	return 0;
+        gchar *filename = argv[1];
+        
+        if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
+                /* The file already exists. We ask the user about overwriting it */
+                
+                // FIXME
+
+                /* If he wants to overwrite it, we first rename it to "filename~", after deleting "filename~" if it already exists */
+
+                gchar *backup_filename = g_strdup_printf ("%s~", filename);
+                if (g_file_test (backup_filename, G_FILE_TEST_EXISTS)) {
+                        g_remove (backup_filename);
+                }
+                
+                g_rename (filename, backup_filename);
+                
+                g_free (backup_filename);
+        }
+
+        return ca_file_save_as (filename);
+
 }
 
 int ca_callback_status (int argc, char **argv)

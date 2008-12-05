@@ -262,7 +262,7 @@ void ca_command_line()
 						fprintf (stderr, _("Syntax: %s\n"), _(command_entry->syntax));
 					} else {
 						// Call it
-						command_entry->callback (0, NULL);
+						command_entry->callback (argc, argv);
 					}
                                 }
                         }                
