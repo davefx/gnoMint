@@ -17,10 +17,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef GNOMINTCLI
+
 #include <glade/glade.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <libintl.h>
+
+#else
+
+#include <glib.h>
+
+#endif
+
+#include <glib/gi18n.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ca_file.h> 
@@ -28,8 +37,7 @@
 #include "tls.h"
 #include "ca_policy.h"
 
-#include <glib/gi18n.h>
-
+#ifndef GNOMINTCLI
 
 extern GladeXML * certificate_properties_window_xml;
 
@@ -170,7 +178,7 @@ void ca_policy_populate (guint64 ca_id)
         g_hash_table_destroy (policy_table);
 }
 
-
+#endif
 
 guint ca_policy_get (guint64 ca_id, gchar *property_name)
 {
@@ -184,6 +192,7 @@ void ca_policy_set (guint64 ca_id, gchar *property_name, guint value)
 
 }
 
+#ifndef GNOMINTCLI
 
 void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata)
 {
@@ -529,5 +538,5 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 
 }
 
-
+#endif
 

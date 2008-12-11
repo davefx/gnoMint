@@ -977,6 +977,34 @@ gboolean ca_file_save_as (gchar *new_file_name)
 
 }
 
+gint ca_file_get_number_of_certs ()
+{
+	gint result;
+	gchar **aux;
+
+	aux = __ca_file_get_single_row ("SELECT COUNT(*) FROM certificates");
+	result = atoi (aux[0]);
+	g_strfreev (aux);
+
+	return result;
+
+}
+
+gint ca_file_get_number_of_csrs ()
+{
+	gint result;
+	gchar **aux;
+
+	aux = __ca_file_get_single_row ("SELECT COUNT(*) FROM cert_requests");
+	result = atoi (aux[0]);
+	g_strfreev (aux);
+
+	return result;
+
+
+}
+
+
 
 void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 {
@@ -2280,8 +2308,8 @@ gboolean ca_file_foreach_crt (CaFileCallbackFunc func, gboolean view_revoked, gp
 				       "FROM certificates ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u)) ",
                                        num_chars, num_chars);
 	} else {
-                sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, "
-                                       "pem, dn, parent_dn, parent_route "
+                sql = sqlite3_mprintf ("SELECT id, is_ca, serial, subject, activation, expiration, revocation, private_key_in_db, pem, "
+                                       " dn, parent_dn, parent_route "
 				       "FROM certificates WHERE revocation IS NULL "
                                        "ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u))",
                                        num_chars, num_chars);
@@ -2442,7 +2470,7 @@ gboolean ca_file_set_pkey_field_for_id (CaFileElementType type, const gchar *new
        
 
 	sqlite3_exec (ca_db, sql, NULL, NULL, &error);	
-	g_free (sql);
+	sqlite3_free (sql);
 
 	return (! error);
 }
@@ -2462,7 +2490,7 @@ gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gc
 	}
        
 	sqlite3_exec (ca_db, sql, NULL, NULL, &error);	
-	g_free (sql);
+	sqlite3_free (sql);
 
 	if (error)
 		fprintf (stderr, "%s", error);

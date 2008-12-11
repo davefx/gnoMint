@@ -40,7 +40,11 @@ gchar * ca_dialog_get_password (gchar *info_message,
                                 gchar *password_message, gchar *confirm_message, 
                                 gchar *distinct_error_message, guint minimum_length);
 void ca_todo_callback (void);
+gboolean ca_ask_for_confirmation (gchar *message, gchar *prompt, gboolean default_answer);
+gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default_value);
+
 gboolean ca_open (gchar *filename, gboolean create);
+
 
 void ca_command_line ();
 

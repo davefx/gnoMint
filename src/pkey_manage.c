@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "tls.h"
 #include "ca_file.h"
@@ -114,8 +115,22 @@ gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpoi
 #else
 gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 {
-        /* FIXME */
-        return NULL;
+	gchar *password;
+	gchar *aux = NULL;
+
+
+	printf (_("The file that holds private key for certificate\n'%s' is password-protected.\n\n"), cert_dn);
+
+	aux = getpass ("Please, insert the password corresponding to this file:");
+	
+	if (!aux || aux[0] == '\0') {
+		return NULL;
+	} else {
+		password = g_strdup (aux);
+		memset (aux, 0, strlen(aux));
+	}
+	
+	return password;
 }
 
 #endif
@@ -149,6 +164,9 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 					pem_pkey = tls_load_pkcs8_private_key (file_contents, password, cert->key_id, &tls_error);
 					
 					if (tls_error == TLS_INVALID_PASSWORD) {
+						if (password)
+							ca_error_dialog (_("The given password doesn't match with the one used while crypting the file."));
+
 						// We ask for a password
 						password = __pkey_manage_ask_external_file_password (cert->dn);
 						
@@ -163,21 +181,21 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 				if (! pem_pkey) {
 					if (tls_error == TLS_NON_MATCHING_PRIVATE_KEY) {
 						// The file could be opened, but it didn't contain any recognized private key
-						ca_error_dialog (_("The designated file contains a private key, but it "
+						ca_error_dialog (_("The file designated in database contains a private key, but it "
 								   "is not the private key corresponding to the certificate."));
 					} else {
 						// The file could be opened, but it didn't contain any recognized private key
-						ca_error_dialog (_("The designated file didn't contain any recognized private key."));
+						ca_error_dialog (_("The file designated in database doesn't contain any recognized private key."));
 					}
 				}
 			} else {
 				// The file cannot be opened
-				ca_error_dialog (_("The designated file couldn't be opened."));
+				ca_error_dialog (_("The file designated in database couldn't be opened."));
 				
 			}
 		} else {
 			// The file doesn't exist
-			ca_error_dialog (_("File designated in database doesn't exist."));
+			ca_error_dialog (_("The file designated in database doesn't exist."));
 			
 		}
 		
@@ -232,7 +250,8 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 
 	tls_cert_free (cert);
 	g_free (file_contents);					
-	g_error_free (error);
+	if (error)
+		g_error_free (error);
 
 	if (cancel) {
 		g_free (file_name);
@@ -555,7 +574,7 @@ void pkey_manage_crypt_auto (CaCreationData *creation_data,
 #ifndef GNOMINTCLI
 gchar * pkey_manage_ask_password ()
 {
-	gchar *password;
+	gchar *password = NULL;
 	gboolean is_key_ok;
 	gboolean remember = 0;
 	GtkWidget * widget = NULL, * password_widget = NULL, *remember_password_widget = NULL;
@@ -584,6 +603,12 @@ gchar * pkey_manage_ask_password ()
 
 	while (! is_key_ok) {
 		gtk_widget_grab_focus (password_widget);
+
+		if (password) {
+			g_free (password);
+			password = NULL;
+		}
+			
 
 		widget = glade_xml_get_widget (dialog_xml, "get_db_password_dialog");
 		response = gtk_dialog_run(GTK_DIALOG(widget)); 
@@ -622,8 +647,42 @@ gchar * pkey_manage_ask_password ()
 #else
 gchar * pkey_manage_ask_password ()
 {
-        /* FIXME */
-        return NULL;
+	gchar *password = NULL;
+	gchar *pass;
+	gboolean is_key_ok;
+
+	if (! ca_file_is_password_protected())
+		return NULL;
+
+	is_key_ok = FALSE;
+
+	while (! is_key_ok) {
+
+		if (password) {
+			g_free (password);
+			password = NULL;
+		}
+
+		printf (_("This action requires using one or more private keys saved in the database.\n"));
+		pass = getpass (_("Please insert the database password:"));
+	
+		if (! pass || pass[0] == '\0') {
+			return NULL;
+		} else {
+			password = g_strdup (pass);
+			memset (pass, 0, strlen(pass));
+		}
+
+		is_key_ok = ca_file_check_password (password);
+		
+		if (! is_key_ok) {
+			ca_error_dialog (_("The given password doesn't match the one used in the database"));
+		}
+
+	}
+
+
+	return password;      
 }
 #endif
 
@@ -675,7 +734,9 @@ gchar * pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn)
                 } else {
                         res = g_strdup (pem_private_key->pkey_data);
                 }
-        }
+        } else {
+		res = g_strdup (pem_private_key->pkey_data);
+	}
 	return res;
 }
 

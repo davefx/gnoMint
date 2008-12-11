@@ -41,21 +41,6 @@
 #include "preferences-gui.h"
 #include "import.h"
 
-extern GladeXML * main_window_xml;
-extern GladeXML * cert_popup_menu_xml;
-extern GladeXML * csr_popup_menu_xml;
-
-static GtkTreeStore * ca_model = NULL;
-static gboolean cert_title_inserted = FALSE;
-static GtkTreeIter * cert_parent_iter = NULL;
-static GtkTreeIter * last_parent_iter = NULL;
-static GtkTreeIter * last_cert_iter = NULL;
-static gboolean csr_title_inserted=FALSE;
-static GtkTreeIter * csr_parent_iter = NULL;
-
-static gboolean view_csr = TRUE;
-static gboolean view_rcrt = TRUE;
-
 enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_IS_CA=1,
       CA_MODEL_COLUMN_SERIAL=2,
@@ -80,6 +65,25 @@ enum {CSR_MODEL_COLUMN_ID=0,
       CSR_MODEL_COLUMN_PARENT_ID=4,
       CSR_MODEL_COLUMN_NUMBER=5}
         CsrModelColumns;
+
+
+
+
+extern GladeXML * main_window_xml;
+extern GladeXML * cert_popup_menu_xml;
+extern GladeXML * csr_popup_menu_xml;
+
+static GtkTreeStore * ca_model = NULL;
+static gboolean cert_title_inserted = FALSE;
+static GtkTreeIter * cert_parent_iter = NULL;
+static GtkTreeIter * last_parent_iter = NULL;
+static GtkTreeIter * last_cert_iter = NULL;
+static gboolean csr_title_inserted=FALSE;
+static GtkTreeIter * csr_parent_iter = NULL;
+
+static gboolean view_csr = TRUE;
+static gboolean view_rcrt = TRUE;
+
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
 int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames);
@@ -136,7 +140,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 		cert_title_inserted = TRUE;
 	}
 
-	if (! last_cert_iter || (! strcmp (argv[CA_MODEL_COLUMN_DN], argv[CA_MODEL_COLUMN_PARENT_DN]))) {
+	if (! last_cert_iter || (! strcmp (argv[CA_FILE_CERT_COLUMN_DN], argv[CA_FILE_CERT_COLUMN_PARENT_DN]))) {
 		if (last_parent_iter)
 			gtk_tree_iter_free (last_parent_iter);
 		last_parent_iter = NULL;
@@ -150,7 +154,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
                 g_assert (string_value);
 		
 
-		if (! strcmp (argv[CA_MODEL_COLUMN_PARENT_DN], string_value)) {
+		if (! strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_DN], string_value)) {
 			// Last node is parent of the current node
 			if (last_parent_iter)
 				gtk_tree_iter_free (last_parent_iter);
@@ -160,8 +164,8 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 			// current certificate.
 			
 			while (last_parent_iter && 
-                               g_value_get_string(last_parent_dn_value) && argv[CA_MODEL_COLUMN_PARENT_DN] &&
-			       strcmp (argv[CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
+                               g_value_get_string(last_parent_dn_value) && argv[CA_FILE_CERT_COLUMN_PARENT_DN] &&
+			       strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
 				
 				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
 					// Last ca iter is a top_level
@@ -186,39 +190,39 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	
 	gtk_tree_store_append (new_model, &iter, (last_parent_iter ? last_parent_iter: cert_parent_iter));
 
-        if (! argv[CA_MODEL_COLUMN_REVOCATION])        
+        if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])        
                 gtk_tree_store_set (new_model, &iter,
-                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_MODEL_COLUMN_ID]),
-                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-                                    CA_MODEL_COLUMN_SERIAL, argv[CA_MODEL_COLUMN_SERIAL],
-                                    CA_MODEL_COLUMN_SUBJECT, argv[CA_MODEL_COLUMN_SUBJECT],
-                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
-                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
+                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CERT_COLUMN_ID]),
+                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_FILE_CERT_COLUMN_IS_CA]),
+                                    CA_MODEL_COLUMN_SERIAL, argv[CA_FILE_CERT_COLUMN_SERIAL],
+                                    CA_MODEL_COLUMN_SUBJECT, argv[CA_FILE_CERT_COLUMN_SUBJECT],
+                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_FILE_CERT_COLUMN_ACTIVATION]),
+                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_FILE_CERT_COLUMN_EXPIRATION]),
                                     CA_MODEL_COLUMN_REVOCATION, 0,
-                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-                                    CA_MODEL_COLUMN_PEM, argv[CA_MODEL_COLUMN_PEM],
-				    CA_MODEL_COLUMN_DN, argv[CA_MODEL_COLUMN_DN],
-				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_MODEL_COLUMN_PARENT_DN],
-				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_MODEL_COLUMN_PARENT_ROUTE],
+                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_FILE_CERT_COLUMN_PRIVATE_KEY_IN_DB]),
+                                    CA_MODEL_COLUMN_PEM, argv[CA_FILE_CERT_COLUMN_PEM],
+				    CA_MODEL_COLUMN_DN, argv[CA_FILE_CERT_COLUMN_DN],
+				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_FILE_CERT_COLUMN_PARENT_DN],
+				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],
                                     CA_MODEL_COLUMN_ITEM_TYPE, 0,
                                     -1);
         else {
                 gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>", 
-                                                                   argv[CA_MODEL_COLUMN_SUBJECT]);
+                                                                   argv[CA_FILE_CERT_COLUMN_SUBJECT]);
 
                 gtk_tree_store_set (new_model, &iter,
-                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_MODEL_COLUMN_ID]),
-                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_MODEL_COLUMN_IS_CA]),
-                                    CA_MODEL_COLUMN_SERIAL, argv[CA_MODEL_COLUMN_SERIAL],
+                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CERT_COLUMN_ID]),
+                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_FILE_CERT_COLUMN_IS_CA]),
+                                    CA_MODEL_COLUMN_SERIAL, argv[CA_FILE_CERT_COLUMN_SERIAL],
                                     CA_MODEL_COLUMN_SUBJECT, revoked_subject,
-                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_MODEL_COLUMN_ACTIVATION]),
-                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_MODEL_COLUMN_EXPIRATION]),
-                                    CA_MODEL_COLUMN_REVOCATION, atoi(argv[CA_MODEL_COLUMN_REVOCATION]),
-                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-                                    CA_MODEL_COLUMN_PEM, argv[CA_MODEL_COLUMN_PEM],
-				    CA_MODEL_COLUMN_DN, argv[CA_MODEL_COLUMN_DN],
-				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_MODEL_COLUMN_PARENT_DN],
-				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_MODEL_COLUMN_PARENT_ROUTE],
+                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_FILE_CERT_COLUMN_ACTIVATION]),
+                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_FILE_CERT_COLUMN_EXPIRATION]),
+                                    CA_MODEL_COLUMN_REVOCATION, atoi(argv[CA_FILE_CERT_COLUMN_REVOCATION]),
+                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_FILE_CERT_COLUMN_PRIVATE_KEY_IN_DB]),
+                                    CA_MODEL_COLUMN_PEM, argv[CA_FILE_CERT_COLUMN_PEM],
+				    CA_MODEL_COLUMN_DN, argv[CA_FILE_CERT_COLUMN_DN],
+				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_FILE_CERT_COLUMN_PARENT_DN],
+				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],
                                     CA_MODEL_COLUMN_ITEM_TYPE, 0,
                                     -1);
 
@@ -256,11 +260,11 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 	gtk_tree_store_append (new_model, &iter, csr_parent_iter);
 
         gtk_tree_store_set (new_model, &iter,
-                            CA_MODEL_COLUMN_ID, atoll(argv[CSR_MODEL_COLUMN_ID]),
-                            CA_MODEL_COLUMN_SUBJECT, argv[CSR_MODEL_COLUMN_SUBJECT],
-                            CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CSR_MODEL_COLUMN_PRIVATE_KEY_IN_DB]),
-                            CA_MODEL_COLUMN_PEM, argv[CSR_MODEL_COLUMN_PEM],
-                            CA_MODEL_COLUMN_PARENT_ID, argv[CSR_MODEL_COLUMN_PARENT_ID],
+                            CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CSR_COLUMN_ID]),
+                            CA_MODEL_COLUMN_SUBJECT, argv[CA_FILE_CSR_COLUMN_SUBJECT],
+                            CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_FILE_CSR_COLUMN_PRIVATE_KEY_IN_DB]),
+                            CA_MODEL_COLUMN_PEM, argv[CA_FILE_CSR_COLUMN_PEM],
+                            CA_MODEL_COLUMN_PARENT_ID, argv[CA_FILE_CSR_COLUMN_PARENT_ID],
                             CA_MODEL_COLUMN_ITEM_TYPE, 1,
                             -1);
 	return 0;

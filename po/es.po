@@ -1230,7 +1230,7 @@ msgstr "Iniciar un nuevo proceso de creación de Autoridad de Certificación aut
 #. 7
 #: ../src/ca-cli.c:44
 msgid "extractcertpkey <cert-id> <filename>"
-msgstr "extractcertpkey·<id. de certificado>·<nombre de fichero>"
+msgstr "extractcertpkey <id. de certificado> <nombre de fichero>"
 
 #: ../src/ca-cli.c:44
 msgid ""
@@ -1243,7 +1243,7 @@ msgstr ""
 #. 8
 #: ../src/ca-cli.c:47
 msgid "extractcsrpkey <csr-id> <filename>"
-msgstr "extractcsrpkey·<id. de csr>·<nombre de fichero>"
+msgstr "extractcsrpkey <id. de csr> <nombre de fichero>"
 
 #: ../src/ca-cli.c:47
 msgid ""
@@ -1519,9 +1519,9 @@ msgid ""
 msgstr "NO HAY GARANTÍA PARA ESTE PROGRAMA, HASTA EL EXTREMO PERMITIDO POR LA\n"
 "LEY APLICABLE.  A NO SER QUE SE INDIQUE LO CONTRARIO, LOS PROPIETARIOS DEL\n"
 "COPYRIGHT, U OTRAS TERCERAS PARTES PROPORCIONAN EL PROGRAMA \"TAL CUAL\", \n"
-"SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O IMPLÍCITAS, INCLUYÉNDOSE, PERO NO\n"
-"LIMITÁNDOSE A LAS GARANTÍAS IMPLÍCITAS DE COMERCIABILIDAD O AJUSTE A UN\n"
-"PROPÓSITO PARTICULAR. TODO RIESGO DERIVADO DE LA CALIDAD O PRESTACIONES\n"
+"SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O IMPLÍCITAS. ESTO INCLUYE PERO NO\n"
+"SE LIMITA A LAS GARANTÍAS IMPLÍCITAS DE COMERCIABILIDAD O IDONEIDAD PARA UN\n"
+"FIN DETERMINADO. TODO RIESGO DERIVADO DE LA CALIDAD O PRESTACIONES\n"
 "DEL PROGRAMA CORRE DE SU PARTE.  SI EL PROGRAMA FUERA DEFECTUOSO, USTED\n"
 "DEBERÁ ASUMIR LOS COSTES DE CUALQUIER OPERACIÓN DE SOPORTE TÉCNICO,\n"
 "REPARACIÓN O CORRECCIÓN.\n"

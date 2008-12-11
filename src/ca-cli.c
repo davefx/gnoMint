@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <unistd.h>
 
 #include "ca-cli.h"
 #include "ca_file.h"
@@ -77,15 +78,49 @@ CaCommand ca_commands[] = {
 GHashTable *ca_command_table = NULL;
 
 void ca_error_dialog (gchar *message) {
-        fprintf (stderr, "%s\n", message);
+        fprintf (stderr, "\nError: %s\n\n", message);
 }
 
 gchar * ca_dialog_get_password (gchar *info_message, 
                                 gchar *password_message, gchar *confirm_message, 
                                 gchar *distinct_error_message, guint minimum_length)
 {
+	gchar * res = NULL;
         gchar * password = NULL;
-	return password;
+	gchar * password2 = NULL;
+
+	printf ("%s\n\n", info_message);
+
+	do {
+		if (res) {
+			g_free (res);
+			res = NULL;
+		}
+
+		password = getpass(password_message);
+
+		if (! password || password[0]=='\0')
+			return NULL;
+
+		res = g_strdup (password);
+		if (strlen (res) < minimum_length) {
+			fprintf (stderr, _("\nThe password must have, at least, %d characters\n"), minimum_length); 
+			continue;
+		}
+		memset (password, 0, strlen (res));
+
+		password2 = getpass(confirm_message);
+
+		if (strcmp (res, password2)) {
+			fprintf (stderr, "\n%s\n", distinct_error_message);
+			memset (password, 0, strlen (password2));		
+		}
+
+	} while (strlen (res) < minimum_length || strcmp (res, password2) );
+
+	memset (password, 0, strlen (password2));		
+
+	return res;
 }
 
 
@@ -93,6 +128,91 @@ void ca_todo_callback ()
 {
 	ca_error_dialog (_("To do. Feature not implemented yet."));
 }
+
+gboolean ca_ask_for_confirmation (gchar *message, gchar *prompt, gboolean default_answer)
+{
+	gchar *line;
+
+	const gchar *positive_answers = Q_("List of affirmative answers, separated with #|Yes#yes#Y#y");
+	const gchar *negative_answers = Q_("List of negative answers, separated with #|No#no#N#n");
+	
+	gchar **aux;
+	gint i;
+
+	if (message)
+		printf ("%s\n", message);
+
+	while (TRUE) {
+
+		line = readline (prompt);
+		
+		if (line == NULL)
+			return default_answer;
+		
+		aux = g_strsplit (positive_answers, "#", -1);
+		i = 0;
+
+		while (aux[i]) {
+			if (!strcmp (line, aux[i])) {
+				free (line);
+				g_strfreev (aux);
+				return TRUE;
+			}
+			i++;
+		}
+		g_strfreev (aux);
+
+		aux = g_strsplit (negative_answers, "#", -1);
+		i = 0;
+
+		while (aux[i]) {
+			if (!strcmp (line, aux[i])) {
+				free (line);
+				g_strfreev (aux);
+				return FALSE;
+			}
+			i++;
+		}
+		g_strfreev (aux);
+
+	} 
+		
+	
+}
+
+
+gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default_value)
+{
+	gchar *line;
+	gchar *prompt = NULL;
+
+	if (! message)
+		message = "";
+
+	g_assert (minimum <= default_value);
+	g_assert (maximum >= default_value);
+
+	if (maximum == default_value)
+		prompt = g_strdup_printf ("%s (%d - [%d]): ", message, minimum, maximum);
+	else if (minimum == default_value)
+		prompt = g_strdup_printf ("%s ([%d] - %d): ", message, minimum, maximum);
+	else 
+		prompt = g_strdup_printf ("%s (%d - [%d] - %d): ", message, minimum, default_value, maximum);
+
+	while (TRUE) {
+		line = readline (prompt);
+		
+		if (line == NULL)
+			return default_value;
+		
+		if (atoi (line) <= maximum && atoi(line) >= minimum) {
+			return (atoi (line));
+		}
+	} 	
+
+	
+}
+
 
 
 gboolean ca_open (gchar *filename, gboolean create) 
@@ -267,8 +387,10 @@ void ca_command_line()
                                 }
                         }                
 
-                        if (argv)
-                                g_strfreev (argv);
+                        if (argv) {
+				for (i=0; i < argc; i++)
+					g_free (argv[i]);
+			}
 
                 }
 

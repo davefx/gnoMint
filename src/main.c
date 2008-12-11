@@ -37,10 +37,10 @@
 
 #define GNOMINT_MIME_TYPE "application/x-gnomint"
 
-gchar * PACKAGE_AUTHORS[] = {
-	"David Marín Carreño <davefx@gmail.com>",
-	NULL
-};
+/* gchar * PACKAGE_AUTHORS[] = { */
+/* 	"David Marín Carreño <davefx@gmail.com>", */
+/* 	NULL */
+/* }; */
 
 GladeXML * main_window_xml = NULL;
 GladeXML * csr_popup_menu_xml = NULL;
