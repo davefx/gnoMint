@@ -51,7 +51,7 @@ CaCommand ca_commands[] = {
 	{"revoke", 1, 1, N_("revoke <cert-id>"), N_("Revoke the certificate with the given internal ID"), ca_callback_revoke}, // 10
 	{"sign", 2, 2, N_("sign <csr-id> <ca-cert-id>"), N_("Generate a certificate signing the given CSR with the given CA"), ca_callback_sign}, // 11
 	{"delete", 1, 1, N_("delete <csr-id>"), N_("Delete the given CSR from the database"), ca_callback_delete}, // 12
-	{"dhgen", 1, 1, N_("dhgen <filename>"), N_("Generate a new DH-parameter set, saving it into the file <filename>"), ca_callback_dhgen}, // 13
+	{"dhgen", 2, 2, N_("dhgen <prime-bitlength> <filename>"), N_("Generate a new DH-parameter set, saving it into the file <filename>"), ca_callback_dhgen}, // 13
 	{"changepassword", 0, 0, "changepassword", N_("Change password for the current database"), ca_callback_changepassword}, // 14
 	{"importfile", 1, 1, N_("importfile <filename>"), N_("Import the file with the given name <filename>"), ca_callback_importfile}, // 15
 	{"importdir", 1, 1, N_("importdir <dirname>"), N_("Import the given directory, as a OpenSSL-CA directory"), ca_callback_importdir}, // 16
@@ -149,6 +149,10 @@ gboolean ca_ask_for_confirmation (gchar *message, gchar *prompt, gboolean defaul
 		if (line == NULL)
 			return default_answer;
 		
+		if (strlen (line) == 0)
+			return default_answer;
+		
+
 		aux = g_strsplit (positive_answers, "#", -1);
 		i = 0;
 
@@ -211,6 +215,24 @@ gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default
 	} 	
 
 	
+}
+
+gchar * ca_ask_for_password (gchar *message)
+{
+	gchar *password;
+	gchar *aux = NULL;
+
+
+	aux = getpass (message);
+	
+	if (!aux || aux[0] == '\0') {
+		return NULL;
+	} else {
+		password = g_strdup (aux);
+		memset (aux, 0, strlen(aux));
+	}
+	
+	return password;
 }
 
 

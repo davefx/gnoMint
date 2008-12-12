@@ -20,6 +20,7 @@
 #ifndef _NEW_REQ_WINDOW_H_
 #define _NEW_REQ_WINDOW_H_
 
+#ifndef GNOMINTCLI
 
 void new_req_window_display (void);
 void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data);
@@ -39,7 +40,7 @@ void on_new_req_cancel_clicked (GtkButton *widget,
 void on_new_req_commit_clicked (GtkButton *widg,
                                 gpointer user_data);
 
-
+#endif
 
 
 #endif

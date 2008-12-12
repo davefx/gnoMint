@@ -20,17 +20,11 @@
 #ifndef _CA_H_
 #define _CA_H_
 
-#ifdef GNOMINTCLI
-
-#include "ca-cli.h"
-
-#else
-
 #include <glib.h>
 #include <glib/gstdio.h>
+
+#ifndef GNOMINTCLI
 #include <gtk/gtk.h>
-
-
 
 gboolean ca_refresh_model (void);
 gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
@@ -65,8 +59,15 @@ gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data);
 gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data);
 gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data);
-void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data);
+void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data);
+
+#else 
+
+#include "ca-cli.h"
 
 #endif
+
+gchar * ca_export_private_pkcs8 (guint64 id, gint type, gchar *filename);
+gchar * ca_generate_dh_param (guint bitlength_prime, gchar *filename);
 
 #endif

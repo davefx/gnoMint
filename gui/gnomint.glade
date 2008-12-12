@@ -173,7 +173,7 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Generate D_H parameters...</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_generate_dh_param"/>
+                        <signal name="activate" handler="ca_generate_dh_param_show"/>
                       </widget>
                     </child>
                     <child>

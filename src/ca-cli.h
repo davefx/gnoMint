@@ -42,6 +42,7 @@ gchar * ca_dialog_get_password (gchar *info_message,
 void ca_todo_callback (void);
 gboolean ca_ask_for_confirmation (gchar *message, gchar *prompt, gboolean default_answer);
 gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default_value);
+gchar * ca_ask_for_password (gchar *message);
 
 gboolean ca_open (gchar *filename, gboolean create);
 

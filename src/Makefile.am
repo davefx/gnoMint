@@ -57,10 +57,13 @@ gnomint_cli_CFLAGS = \
 
 gnomint_cli_SOURCES = \
 	gnomint-cli.c \
+	ca.c \
 	ca-cli.c \
 	ca-callbacks.c \
 	ca_file.c \
 	ca_policy.c \
+	crl.c \
+	new_cert_window.c \
 	preferences.c \
 	pkey_manage.c \
 	tls.c \

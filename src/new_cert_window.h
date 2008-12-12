@@ -20,6 +20,9 @@
 #ifndef _NEW_CERT_WINDOW_H_
 #define _NEW_CERT_WINDOW_H_
 
+#include "tls.h"
+
+#ifndef GNOMINTCLI
 void new_cert_window_display (const gchar * csr_pem, const gchar * csr_parent_id);
 void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointer userdata);
 void new_cert_tab_activate (int tab_number);
@@ -37,5 +40,9 @@ void on_new_cert_property_toggled (GtkWidget *toggle,
                                    gpointer user_data);
 void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data);
+#endif
+
+const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, CertCreationData *cert_creation_data);
+
 
 #endif

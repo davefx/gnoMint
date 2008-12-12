@@ -27,9 +27,11 @@
 #include "ca.h"
 #include "ca_file.h"
 #include "ca_policy.h"
+#include "new_cert_window.h"
 #include "pkey_manage.h"
 #include "preferences.h"
 #include "tls.h"
+#include "crl.h"
 
 extern CaCommand ca_commands[];
 #define CA_COMMAND_NUMBER 31
@@ -275,85 +277,17 @@ int ca_callback_extractcertpkey (int argc, char **argv)
 {
 	guint64 id_cert = atoll(argv[1]);
 	gchar *filename = argv[2];
+	gchar *error = NULL;
 
-	GIOChannel * file = NULL;
-	gchar * password = NULL;
-	GError * error = NULL;
-	gchar * dn = NULL;
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * privatekey = NULL;
-	gchar * pem = NULL;
+	error = ca_export_private_pkcs8 (id_cert, CA_FILE_ELEMENT_TYPE_CERT, filename);
 
-
-	file = g_io_channel_new_file (filename, "w", &error);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting private key."));
-		g_free (password);
+	if (! error) {
+		printf (_("Private key extracted successfully into file '%s'\n"), filename);
+	} else {
+		ca_error_dialog (error);
 		return 1;
-	} 
-	
-	crypted_pkey = pkey_manage_get_certificate_pkey (id_cert);
-	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id_cert);
-			
-	if (!crypted_pkey || !dn) {
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-		ca_error_dialog (_("There was an error while getting private key."));
-		return 2;
 	}
 
-	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
-	
-	pkey_manage_data_free (crypted_pkey);
-	g_free (dn);
-
-	if (! privatekey) {
-		ca_error_dialog (_("There was an error while uncrypting private key."));
-		return 3;
-	}
-	
-	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
-					     "so nobody else but authorized people can use it. This passphrase will be asked "
-					     "by any application that will make use of the private key."),
-					   _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
-					   _("The introduced passphrases are distinct."), 8);
-	if (! password) {
-		ca_error_dialog (_("Operation cancelled."));
-		g_free (privatekey);
-		return 4;
-	}
-
-	pem = tls_generate_pkcs8_encrypted_private_key (privatekey, password); 
-	g_free (password);
-	g_free (privatekey);
-	
-	if (!pem) {
-		ca_error_dialog (_("There was an error while password-protecting private key."));
-		return 5;
-	}
-	
-	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-	if (error) {
-		g_free (pem);
-		ca_error_dialog (_("There was an error while exporting private key."));
-		return 6;
-	} 
-	g_free (pem);
-	
-	
-	g_io_channel_shutdown (file, TRUE, &error);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting private key."));
-		g_io_channel_unref (file);
-		return 7;
-	} 
-	
-	g_io_channel_unref (file);
-	
-	printf (_("Private key extracted successfully into file '%s'\n"), filename);
-
-	ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CERT, filename, id_cert);
-	
 	return 0;
 }
 
@@ -362,85 +296,17 @@ int ca_callback_extractcsrpkey (int argc, char **argv)
 {
 	guint64 id_csr = atoll(argv[1]);
 	gchar *filename = argv[2];
+	gchar *error = NULL;
 
-	GIOChannel * file = NULL;
-	gchar * password = NULL;
-	GError * error = NULL;
-	gchar * dn = NULL;
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * privatekey = NULL;
-	gchar * pem = NULL;
+	error = ca_export_private_pkcs8 (id_csr, CA_FILE_ELEMENT_TYPE_CSR, filename);
 
-
-	file = g_io_channel_new_file (filename, "w", &error);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting private key."));
-		g_free (password);
+	if (! error) {
+		printf (_("Private key extracted successfully into file '%s'\n"), filename);
+	} else {
+		ca_error_dialog (error);
 		return 1;
-	} 
-	
-	crypted_pkey = pkey_manage_get_certificate_pkey (id_csr);
-	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id_csr);
-			
-	if (!crypted_pkey || !dn) {
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-		ca_error_dialog (_("There was an error while getting private key."));
-		return 2;
 	}
 
-	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
-	
-	pkey_manage_data_free (crypted_pkey);
-	g_free (dn);
-
-	if (! privatekey) {
-		ca_error_dialog (_("There was an error while uncrypting private key."));
-		return 3;
-	}
-	
-	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
-					     "so nobody else but authorized people can use it. This passphrase will be asked "
-					     "by any application that will make use of the private key."),
-					   _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
-					   _("The introduced passphrases are distinct."), 8);
-	if (! password) {
-		ca_error_dialog (_("Operation cancelled."));
-		g_free (privatekey);
-		return 4;
-	}
-
-	pem = tls_generate_pkcs8_encrypted_private_key (privatekey, password); 
-	g_free (password);
-	g_free (privatekey);
-	
-	if (!pem) {
-		ca_error_dialog (_("There was an error while password-protecting private key."));
-		return 5;
-	}
-	
-	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-	if (error) {
-		g_free (pem);
-		ca_error_dialog (_("There was an error while exporting private key."));
-		return 6;
-	} 
-	g_free (pem);
-	
-	
-	g_io_channel_shutdown (file, TRUE, &error);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting private key."));
-		g_io_channel_unref (file);
-		return 7;
-	} 
-	
-	g_io_channel_unref (file);
-	
-	printf (_("Private key extracted successfully into file '%s'\n"), filename);
-
-	ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CSR, filename, id_csr);
-	
 	return 0;
 }
 
@@ -567,20 +433,9 @@ void __ca_callback_show_uses_and_purposes (CertCreationData *cert_creation_data)
 int ca_callback_sign (int argc, char **argv)
 {
 	CertCreationData *cert_creation_data = NULL;
-	gchar *csr_pem = NULL;
 	
-	gchar *certificate;
-        gchar *error = NULL;
-
-	gchar *pem;
-	gchar *dn;
-	gchar *pkey_pem;
 	guint64 csr_id;
 	guint64 ca_id;
-	PkeyManageData *crypted_pkey;
-
-	time_t tmp;
-	struct tm * expiration_time;
 
 	csr_id = atoll(argv[1]);
 	ca_id = atoll(argv[2]);
@@ -596,21 +451,10 @@ int ca_callback_sign (int argc, char **argv)
 									      ca_policy_get (ca_id, "MONTHS_TO_EXPIRE"), 
 									      ca_policy_get (ca_id, "MONTHS_TO_EXPIRE"));
 	
-	if (cert_creation_data->key_months_before_expiration == -1) {
+	if (cert_creation_data->key_months_before_expiration == 0) {
 		g_free (cert_creation_data);
-		return 1;
+		printf (_("Operation cancelled.\n"));
 	}
-
-	tmp = time (NULL);	
-	cert_creation_data->activation = tmp;
-	
-	expiration_time = g_new (struct tm,1);
-	localtime_r (&tmp, expiration_time);      
-	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
-	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
-	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
-	cert_creation_data->expiration = mktime(expiration_time);
-	g_free (expiration_time);
 
 	printf (_("The certificate will be generated with the following uses and purposes:\n"));
 
@@ -725,82 +569,10 @@ int ca_callback_sign (int argc, char **argv)
 	
 	if (ca_ask_for_confirmation (_("All the mandatory data for the certificate generation has been gathered."), _("Do you want to proceed with the signing? [Yes]/No "), TRUE)) {
 
-		ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
-
-		csr_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, csr_id);
-		pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-		crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
-		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-					      
-		if (pem && crypted_pkey && dn) {
-			PkeyManageData *csr_pkey = NULL;
-
-			pkey_pem = pkey_manage_uncrypt (crypted_pkey, dn);
-
-			if (! pkey_pem) {
-				g_free (pem);
-				pkey_manage_data_free (crypted_pkey);
-				g_free (dn);
-				return 2;
-			}
-
-			error = tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
-			if (error)
-				ca_error_dialog (error);
-
-			g_free (pkey_pem);
-			if (! error) {
-		
-				csr_pkey = pkey_manage_get_csr_pkey (csr_id);
-                        
-				if (csr_pkey)
-					if (csr_pkey->is_in_db)
-						error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 1, csr_pkey->pkey_data, certificate);
-					else
-						error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, csr_pkey->external_file, certificate);			
-				else
-					error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, NULL, certificate);
-                        
-				if (!error)
-					ca_file_remove_csr (csr_id);
-				else 
-					ca_error_dialog (error);
-                        
-				pkey_manage_data_free (csr_pkey);
-			}
-		}
-		
-		if (!error && preferences_get_gnome_keyring_export()) {
-			TlsCert * cert = NULL;
-			gchar *filename = NULL;
-			gchar *directory = NULL;
-			gchar *aux = NULL;
-			cert = tls_parse_cert_pem (certificate);
-
-			// We must calculate the name of the file. 
-			// Basically, it will be the subject DN + issuer DN + sha1 fingerprint
-			// with substitution of non-valid filename characters
-
-			aux = g_strdup_printf ("%s_%s_%s.pem", cert->dn, cert->i_dn, cert->sha1);
-                
-			aux = g_strcanon (aux,
-					  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.",
-					  '_');
-                
-			directory = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", NULL);
-			filename = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", aux, NULL);
-
-			if (! g_mkdir_with_parents (directory, 0700)) {
-				g_file_set_contents (filename, certificate, strlen(certificate), NULL);
-			}
-
-		}
-
-		g_free (pem);
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-
-		if (! error)
+		const gchar * strerror = new_cert_window_sign_csr (csr_id, ca_id, cert_creation_data);
+		if (strerror)
+			ca_error_dialog ((gchar *) strerror);
+		else
 			printf (_("Certificate signed.\n"));
 
 	} else {
@@ -813,24 +585,174 @@ int ca_callback_sign (int argc, char **argv)
 
 int ca_callback_delete (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gchar *errmsg = NULL;
+	guint64 id = atoll (argv[1]);
+
+	ca_callback_showcsr (argc, argv);
+
+	if (ca_ask_for_confirmation (_("This Certificate Signing Request will be deleted."), _("This operation cannot be undone. Are you sure? Yes/[No] "),  FALSE)) {
+		errmsg = ca_file_remove_csr (id);
+		if (errmsg) {
+			ca_error_dialog (_(errmsg));
+			
+		} else {
+			printf (_("Certificate Signing Request deleted.\n"));
+		}
+
+	} else {
+		printf (_("Operation cancelled.\n"));
+	}
+
+
 	return 0;
 }
 
 int ca_callback_crlgen (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	guint64 id_ca = atoll(argv[1]);
+	gchar *filename = argv[2];
+	gchar *error = NULL;
+
+	error = crl_generate (id_ca, filename);
+
+	if (! error) {
+		printf (_("CRL generated successfully into file '%s'\n"), filename);
+	} else {
+		ca_error_dialog (error);
+		return 1;
+	}
+
 	return 0;
 }
 
 int ca_callback_dhgen (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gint primebitlength = atoi (argv[1]);
+	gchar *filename = argv[2];
+	
+	gchar *error = NULL;
+
+	if (primebitlength == 0 || primebitlength % 1024) {
+		ca_error_dialog (_("The bit-length of the prime number must be whole multiple of 1024"));
+		return 1;
+	}
+
+	error = ca_generate_dh_param (primebitlength, filename);
+
+	if (error)
+		ca_error_dialog (error);
+	else
+		printf (_("Diffie-Hellman parameters created and saved successfully in file '%s'\n"), filename);
 	return 0;
 }
 
 int ca_callback_changepassword (int argc, char **argv)
 {
+	gchar *current_pwd = NULL;
+	gchar *password = NULL;
+
+	// First, we check the current status
+
+	if (! ca_file_is_password_protected()) {
+		if (ca_ask_for_confirmation (_("Currently, the database is not password-protected."), _("Do you want to password protect it? [Yes]/No "),  TRUE)) {
+			password = ca_dialog_get_password (_("OK. You need to supply a password for protecting the private keys in the\n"
+							     "database, so nobody else but authorized people can use them. This password\n"
+							     "will be asked any time gnoMint will make use of any private key in database."),
+							   _("Insert password:"), _("Insert password (confirm):"), 
+							   _("The introduced passwords are distinct."), 0);
+			if (! password) {
+				printf (_("Operation cancelled.\n"));
+				return 1;
+			} 
+			
+			if (! ca_file_password_protect (password)) {
+				ca_error_dialog (_("Error while establishing database password. The operation was cancelled."));
+				g_free (password);
+				return 2;
+			} else {
+				printf (_("Password established successfully.\n"));
+				g_free (password);
+				return 0;
+			}
+			
+
+		} else {
+			printf (_("Nothing done.\n"));
+			return 0;
+		}
+	} else {
+		if (ca_ask_for_confirmation (_("Currently, the database IS password-protected."), _("Do you want to remove this password protection? Yes/[No] "),  FALSE)) {
+			do {
+				if (current_pwd)
+					g_free (current_pwd);
+				printf (_("For removing the password-protection, the current database password\nmust be supplied.\n"));
+				current_pwd = ca_ask_for_password (_("Please, insert the current database password (Empty to cancel): "));
+				if (! current_pwd) {
+					printf (_("Operation cancelled.\n"));
+					return 3;
+				}
+
+				if (! ca_file_check_password (current_pwd)) {
+					ca_error_dialog (_("The current password you have entered\ndoesn't match with the actual current database password."));
+				} 
+			} while (! ca_file_check_password(current_pwd));
+
+			if (! ca_file_password_unprotect (current_pwd)) {
+				ca_error_dialog (_("Error while removing database password. \n"
+						   "The operation was cancelled."));
+				g_free (current_pwd);
+				return 4;
+			} else {
+				printf (_("Password removed successfully.\n"));
+				g_free (current_pwd);
+				g_free (password);				
+				return 0;
+			}
+
+		} else {
+			do {
+				if (current_pwd)
+					g_free (current_pwd);
+				printf (_("You must supply the current database password before changing the password.\n"));
+				current_pwd = ca_ask_for_password (_("Please, insert the current database password (Empty to cancel): "));
+				if (! current_pwd) {
+					printf (_("Operation cancelled.\n"));
+					return 3;
+				}
+
+				if (! ca_file_check_password (current_pwd)) {
+					ca_error_dialog (_("The current password you have entered\ndoesn't match with the actual current database password."));
+				}
+			} while (! ca_file_check_password(current_pwd));
+
+			password = ca_dialog_get_password (_("OK. Now you must supply a new password for protecting the private keys in the\n"
+							     "database, so nobody else but authorized people can use them. This password\n"
+							     "will be asked any time gnoMint will make use of any private key in database."),
+							   _("Insert new password:"), _("Insert new password (confirm):"), 
+							   _("The introduced passwords are distinct."), 0);
+			if (! password) {
+				printf (_("Operation cancelled.\n"));
+				g_free (current_pwd);
+				return 4;
+			} 
+
+			if (! ca_file_password_change (current_pwd, password)) {
+				ca_error_dialog (_("Error while changing database password. \n"
+						   "The operation was cancelled."));
+				g_free (current_pwd);
+				g_free (password);
+				return 5;
+			} else {
+				printf (_("Password changed successfully.\n"));
+				g_free (current_pwd);
+				g_free (password);				
+				return 0;
+			}				
+
+		
+		}
+	}
+
 	fprintf (stderr, "//FIXME\n");
 	return 0;
 }

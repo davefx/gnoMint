@@ -17,12 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <glade/glade.h>
-#include <glib-object.h>
-#include <gtk/gtk.h>
-#include <libintl.h>
+#include <glib/gi18n.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef GNOMINTCLI
+#include <glib-object.h>
+#include <glade/glade.h>
+#include <gtk/gtk.h>
+#endif
 
 #include "crl.h"
 #include "ca_file.h"
@@ -31,8 +34,9 @@
 #include "tls.h"
 #include "ca_policy.h"
 
-#include <glib/gi18n.h>
+void __crl_gfree_gfunc (gpointer data, gpointer user_data);
 
+#ifndef GNOMINTCLI
 GladeXML *crl_window_xml = NULL;
 GtkTreeStore * crl_ca_list_model = NULL;
 
@@ -54,7 +58,6 @@ typedef struct {
 
 int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
 void __crl_populate_ca_treeview (GtkTreeView *treeview);
-void __crl_gfree_gfunc (gpointer data, gpointer user_data);
 
 
 
@@ -227,19 +230,9 @@ void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata)
 void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 {
 	GtkWidget *widget = NULL;
-	GIOChannel * file = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
-	GError * error = NULL;
-	gchar * pem = NULL;
-        GList * revoked_certs = NULL;
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * dn = NULL;
-	gchar * ca_pem = NULL;
-	gchar * private_key = NULL;
-        gint crl_version = 0;
 	guint64 ca_id = 0;
-        time_t timestamp;
         gchar * strerror = NULL;
 
 	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(crl_window_xml, "crl_ca_treeview"));
@@ -272,11 +265,49 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 	
+	strerror = crl_generate (ca_id, filename);
+	if (strerror) {
+		ca_error_dialog (strerror);
+	} else {
+		
+	}
+
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+						    GTK_DIALOG_DESTROY_WITH_PARENT,
+						    GTK_MESSAGE_INFO,
+						    GTK_BUTTONS_CLOSE,
+						    "%s",
+						    _("CRL generated successfully")));
+	gtk_dialog_run (GTK_DIALOG(dialog));
+	
+	gtk_widget_destroy (GTK_WIDGET(dialog));
+
+        dialog = GTK_DIALOG(glade_xml_get_widget (crl_window_xml, "new_crl_dialog"));
+        gtk_object_destroy(GTK_OBJECT(dialog));	
+			
+}
+
+#endif /*GNOMINTCLI*/
+
+gchar * crl_generate (guint64 ca_id, gchar *filename)
+{
+        time_t timestamp;
+        gint crl_version = 0;
+	gchar * dn = NULL;
+	gchar * ca_pem = NULL;
+	gchar * private_key = NULL;
+	PkeyManageData * crypted_pkey = NULL;
+	gchar * pem = NULL;
+        GList * revoked_certs = NULL;
+	GIOChannel * file = NULL;
+	GError * error = NULL;
+	gchar *strerror = NULL;
+
 	file = g_io_channel_new_file (filename, "w", &error);
 	g_free (filename);
 	if (error) {
-		ca_error_dialog (_("There was an error while exporting CRL."));
-		return;
+		return (_("There was an error while exporting CRL."));
 	}
 	
 	ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
@@ -287,8 +318,7 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
         revoked_certs = ca_file_get_revoked_certs (ca_id, &strerror);
 	
 	if (strerror) {
-		ca_error_dialog (_("There was an error while getting revoked certificates."));
-		return;
+		return (_("There was an error while getting revoked certificates."));
 	}
 
 
@@ -301,11 +331,10 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 			g_free (ca_pem);
 			pkey_manage_data_free (crypted_pkey);
 			g_free (dn);
-                        ca_error_dialog (_("There was an error while generating CRL."));
                         g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
                         g_list_free (revoked_certs);
                         ca_file_rollback_new_crl_transaction ();
-                        return;
+                        return (_("There was an error while generating CRL."));
                 }
 
                 pem = tls_generate_crl (revoked_certs,
@@ -321,20 +350,18 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 		g_free (dn);
 
                 if (!pem) {
-                        ca_error_dialog (_("There was an error while generating CRL."));
                         g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
                         g_list_free (revoked_certs);
                         ca_file_rollback_new_crl_transaction ();
-                        return;
+                        return (_("There was an error while generating CRL."));
                 }
                 g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 
                 if (error) {
-                        ca_error_dialog (_("There was an error while writing CRL."));
                         g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
                         g_list_free (revoked_certs);
                         ca_file_rollback_new_crl_transaction ();
-                        return;
+                        return (_("There was an error while writing CRL."));
                 }
                 g_free (pem);
 
@@ -342,7 +369,7 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
                         g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
                         g_list_free (revoked_certs);
                         ca_file_rollback_new_crl_transaction ();
-                        return;
+                        return (_("There was an error while exporting CRL."));
         }
         
         ca_file_commit_new_crl_transaction (ca_id, revoked_certs);
@@ -352,28 +379,13 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
-		ca_error_dialog (_("There was an error while exporting CRL."));
 		g_io_channel_unref (file);
-		return;
+		return (_("There was an error while exporting CRL."));
 	}
 	
 	g_io_channel_unref (file);
 	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_INFO,
-						    GTK_BUTTONS_CLOSE,
-						    "%s",
-						    _("CRL generated successfully")));
-	gtk_dialog_run (GTK_DIALOG(dialog));
-	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-
-        dialog = GTK_DIALOG(glade_xml_get_widget (crl_window_xml, "new_crl_dialog"));
-        gtk_object_destroy(GTK_OBJECT(dialog));	
-	
-	
+	return NULL;
 }
 
 void __crl_gfree_gfunc (gpointer data, gpointer user_data)

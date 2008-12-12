@@ -20,9 +20,13 @@
 #ifndef _CRL_WINDOW_H_
 #define _CRL_WINDOW_H_
 
+#ifndef GNOMINTCLI
 void crl_window_display (void);
 void crl_treeview_cursor_changed_cb (GtkTreeView *treeview, gpointer userdata);
 void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata);
 void crl_ok_clicked_cb (GtkButton *button, gpointer userdata);
+#endif
+
+gchar * crl_generate (guint64 ca_id, gchar *filename);
 
 #endif

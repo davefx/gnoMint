@@ -20,6 +20,8 @@
 #ifndef _NEW_CA_WINDOW_H_
 #define _NEW_CA_WINDOW_H_
 
+#ifndef GNOMINTCLI
+
 void new_ca_window_display (void);
 void new_ca_populate_country_combobox(GtkComboBox *country_combobox);
 void new_ca_tab_activate (int tab_number);
@@ -43,4 +45,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data);
 void populate_country_table(void);
 void new_ca_populate_country_combobox(GtkComboBox *country_combobox);
+
+#endif 
+
 #endif

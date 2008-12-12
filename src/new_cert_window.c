@@ -17,12 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef GNOMINTCLI
 #include <glade/glade.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <libintl.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
+#include <glib/gi18n.h>
 
 #include "ca_creation.h"
 #include "ca_policy.h"
@@ -34,13 +37,8 @@
 #include "preferences-gui.h"
 #include "new_cert_window.h"
 
-#include <glib/gi18n.h>
-
+#ifndef GNOMINTCLI
 GladeXML * new_cert_window_xml = NULL;
-
-
-// NEW CERTIFICATE WINDOW CALLBACKS
-
 GtkTreeStore * new_cert_ca_list_model = NULL;
 
 
@@ -695,21 +693,12 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	GtkTreeIter iter;
 
 	CertCreationData *cert_creation_data = NULL;
-	gchar *csr_pem = NULL;
-	
-	gchar *certificate;
-        gchar *error = NULL;
 
 	GtkWidget *widget = NULL;
 	gint active = -1;
-	gchar *pem;
-	gchar *dn;
-	gchar *pkey_pem;
 	guint64 ca_id;
-	PkeyManageData *crypted_pkey;
 
-	time_t tmp;
-	struct tm * expiration_time;
+	const gchar *strerror = NULL;
 
         gtk_tree_selection_get_selected (selection, &model, &iter);
         gtk_tree_model_get_value (model, &iter, NEW_CERT_CA_MODEL_COLUMN_ID, value);
@@ -720,17 +709,6 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton1");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	cert_creation_data->key_months_before_expiration = active;
-
-	tmp = time (NULL);	
-	cert_creation_data->activation = tmp;
-	
-	expiration_time = g_new (struct tm,1);
-	localtime_r (&tmp, expiration_time);      
-	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
-	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
-	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
-	cert_creation_data->expiration = mktime(expiration_time);
-	g_free (expiration_time);
 
 	widget = glade_xml_get_widget (new_cert_window_xml, "ca_check");
 	cert_creation_data->ca = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
@@ -762,10 +740,49 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	widget = glade_xml_get_widget (new_cert_window_xml, "any_purpose_check");
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
+	strerror = new_cert_window_sign_csr (ca_get_selected_row_id (), ca_id, cert_creation_data);
+
+	if (strerror) {
+		ca_error_dialog ((gchar *) strerror);
+	}
+
+	widget = GTK_WIDGET(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
+        gtk_object_destroy(GTK_OBJECT(widget));	
+
+	ca_refresh_model();
+
+}
+#endif
+
+const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, CertCreationData *cert_creation_data)
+{
+	gchar *csr_pem = NULL;
+	
+	gchar *certificate;
+        gchar *error = NULL;
+
+	gchar *pem;
+	gchar *dn;
+	gchar *pkey_pem;
+	PkeyManageData *crypted_pkey;
+
+	time_t tmp;
+	struct tm * expiration_time;
+
+	tmp = time (NULL);	
+	cert_creation_data->activation = tmp;
+	
+	expiration_time = g_new (struct tm,1);
+	localtime_r (&tmp, expiration_time);      
+	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
+	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
+	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
+	cert_creation_data->expiration = mktime(expiration_time);
+	g_free (expiration_time);
 
         ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
 
-	csr_pem = ca_get_selected_row_pem ();
+	csr_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, csr_id);
 	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
 	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
@@ -780,17 +797,15 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 			g_free (pem);
 			pkey_manage_data_free (crypted_pkey);
 			g_free (dn);
-			return;
+			return (_("Error while signing CSR."));
 		}
 
 		error = tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
-                if (error)
-                        ca_error_dialog (error);
 
 		g_free (pkey_pem);
                 if (! error) {
 		
-                        csr_pkey = pkey_manage_get_csr_pkey (ca_get_selected_row_id());
+                        csr_pkey = pkey_manage_get_csr_pkey (csr_id);
                         
                         if (csr_pkey)
                                 if (csr_pkey->is_in_db)
@@ -801,7 +816,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
                                 error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, NULL, certificate);
                         
                         if (!error)
-                                ca_file_remove_csr (ca_get_selected_row_id());
+                                ca_file_remove_csr (csr_id);
                         else 
                                 ca_error_dialog (error);
                         
@@ -840,9 +855,6 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	pkey_manage_data_free (crypted_pkey);
 	g_free (dn);
 
-	widget = GTK_WIDGET(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
-        gtk_object_destroy(GTK_OBJECT(widget));	
-
-	ca_refresh_model();
+	return error;
 }
 

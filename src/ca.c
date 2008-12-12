@@ -17,12 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef GNOMINTCLI
 
 #include <glade/glade.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <glib/gi18n.h>
+
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,6 +44,8 @@
 #include "pkey_manage.h"
 #include "preferences-gui.h"
 #include "import.h"
+
+#ifndef GNOMINTCLI
 
 enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_IS_CA=1,
@@ -940,19 +946,14 @@ void ca_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_da
 }
 
 
+
 gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 {
 	GtkWidget *widget = NULL;
-	GIOChannel * file = NULL;
 	gchar * filename = NULL;
-	gchar * password = NULL;
 	GtkDialog * dialog = NULL;
-	GError * error = NULL;
 	gint id;
-	gchar * dn = NULL;
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * privatekey = NULL;
-	gchar * pem = NULL;
+	gchar * strerror = NULL;
 
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
 	
@@ -974,94 +975,25 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 	
 	
-	file = g_io_channel_new_file (filename, "w", &error);
-	if (error) {
-		ca_error_dialog (_("There was an error while exporting private key."));
-		g_free (filename);
-		g_free (password);
-		return NULL;
-	} 
-	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	if (type == 1) {
-		crypted_pkey = pkey_manage_get_certificate_pkey (id);
-		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
-	} else {
-		crypted_pkey = pkey_manage_get_csr_pkey (id);
-		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
-	}
+	
+	strerror = ca_export_private_pkcs8 (id, type, filename);
+
+	if (! strerror) {
+	
+		dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+							    GTK_DIALOG_DESTROY_WITH_PARENT,
+							    GTK_MESSAGE_INFO,
+							    GTK_BUTTONS_CLOSE,
+							    "%s",
+							    _("Private key exported successfully")));
+		gtk_dialog_run (GTK_DIALOG(dialog));
 		
-	
-	if (!crypted_pkey || !dn) {
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-		g_free (filename);
-		ca_error_dialog (_("There was an error while getting private key."));
-		return NULL;
+		gtk_widget_destroy (GTK_WIDGET(dialog));
+	} else {
+		ca_error_dialog (strerror);
 	}
 
-	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
-	
-	pkey_manage_data_free (crypted_pkey);
-	g_free (dn);
-
-	if (! privatekey) {
-		g_free (filename);
-		return NULL;
-	}
-	
-	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
-					     "so nobody else but authorized people can use it. This passphrase will be asked "
-					     "by any application that will make use of the private key."),
-					   _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
-					   _("The introduced passphrases are distinct."), 8);
-	if (! password) {
-		g_free (filename);
-		g_free (privatekey);
-		return NULL;
-	}
-
-	pem = tls_generate_pkcs8_encrypted_private_key (privatekey, password); 
-	g_free (password);
-	g_free (privatekey);
-	
-	if (!pem) {
-		g_free (filename);
-		ca_error_dialog (_("There was an error while password-protecting private key."));
-		return NULL;
-	}
-	
-	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-	if (error) {
-		g_free (pem);
-		g_free (filename);
-		ca_error_dialog (_("There was an error while exporting private key."));
-		return NULL;
-	} 
-	g_free (pem);
-	
-	
-	g_io_channel_shutdown (file, TRUE, &error);
-	if (error) {
-		g_free (filename);
-		ca_error_dialog (_("There was an error while exporting private key."));
-		g_io_channel_unref (file);
-		return NULL;
-	} 
-	
-	g_io_channel_unref (file);
-	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_INFO,
-						    GTK_BUTTONS_CLOSE,
-						    "%s",
-						    _("Private key exported successfully")));
-	gtk_dialog_run (GTK_DIALOG(dialog));
-	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	
 	return filename;
 }
 
@@ -1954,17 +1886,16 @@ gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpoint
 }
 
 
-void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data)
+void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
 {
 	GtkWidget * widget = NULL;
 	GtkDialog * dialog = NULL, * dialog2 = NULL;
 	GladeXML * dialog_xml = NULL;
-	GIOChannel * file = NULL;
 	gchar     * xml_file = NULL;
-	gchar *filename, * pem = NULL;
-	GError * error = NULL;
+	gchar *filename;
 	gint response = 0;
 	guint dh_size;
+	gchar *strerror;
 
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	dialog_xml = glade_xml_new (xml_file, "dh_parameters_dialog", NULL);
@@ -1984,8 +1915,6 @@ void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data)
 	widget = glade_xml_get_widget (dialog_xml, "dh_prime_size_spinbutton");
 	dh_size = gtk_spin_button_get_value (GTK_SPIN_BUTTON(widget));
 
-	pem = tls_generate_dh_params (dh_size);
-
 	dialog2 = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Save Diffie-Hellman parameters"),
 							  GTK_WINDOW(widget),
 							  GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1995,44 +1924,29 @@ void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data)
 	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog2), TRUE);
 	
 	if (gtk_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
+
 		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog2));
-		file = g_io_channel_new_file (filename, "w", &error);
-		if (error) {
+
+		strerror = ca_generate_dh_param (dh_size, filename);
+
+		if (strerror) {
 			gtk_widget_destroy (GTK_WIDGET(dialog2));
 			gtk_widget_destroy (GTK_WIDGET(dialog));
-			ca_error_dialog (_("There was an error while saving Diffie-Hellman parameters."));
-			return;
-		} 
-
-                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-                if (error) {
-                        gtk_widget_destroy (GTK_WIDGET(dialog2));
+			ca_error_dialog (strerror);
+		} else {
+			gtk_widget_destroy (GTK_WIDGET(dialog2));
 			gtk_widget_destroy (GTK_WIDGET(dialog));
-			ca_error_dialog (_("There was an error while saving Diffie-Hellman parameters."));
-			return;
-                } 
-
-                g_io_channel_shutdown (file, TRUE, &error);
-                if (error) {
-                        gtk_widget_destroy (GTK_WIDGET(dialog2));
-			gtk_widget_destroy (GTK_WIDGET(dialog));
-			ca_error_dialog (_("There was an error while saving Diffie-Hellman parameters."));
-                        return;
-                } 
-
-                g_io_channel_unref (file);
-
-                gtk_widget_destroy (GTK_WIDGET(dialog2));
-                gtk_widget_destroy (GTK_WIDGET(dialog));
-		dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-							    GTK_DIALOG_DESTROY_WITH_PARENT,
-							    GTK_MESSAGE_INFO,
-							    GTK_BUTTONS_CLOSE,
-							    "%s",
-							    _("Diffie-Hellman parameters saved successfully")));
-                gtk_dialog_run (GTK_DIALOG(dialog));
+			dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+								    GTK_DIALOG_DESTROY_WITH_PARENT,
+								    GTK_MESSAGE_INFO,
+								    GTK_BUTTONS_CLOSE,
+								    "%s",
+								    _("Diffie-Hellman parameters saved successfully")));
+			gtk_dialog_run (GTK_DIALOG(dialog));
 			
-                gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_widget_destroy (GTK_WIDGET(dialog));
+		}
+
 
         }
 	
@@ -2040,3 +1954,107 @@ void ca_generate_dh_param (GtkWidget *menuitem, gpointer user_data)
 	return;
 }
 
+#endif
+
+gchar *ca_generate_dh_param (guint dh_size, gchar *filename)
+{
+	GIOChannel * file = NULL;
+	gchar *pem = NULL;
+	GError * error = NULL;
+
+	pem = tls_generate_dh_params (dh_size);
+
+	file = g_io_channel_new_file (filename, "w", &error);
+	if (error) {
+		return (_("There was an error while saving Diffie-Hellman parameters."));
+	} 
+
+	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+	if (error) {
+		return (_("There was an error while saving Diffie-Hellman parameters."));
+	} 
+
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		return (_("There was an error while saving Diffie-Hellman parameters."));
+	} 
+
+	g_io_channel_unref (file);
+
+	return NULL;
+}
+
+
+gchar * ca_export_private_pkcs8 (guint64 id, gint type, gchar *filename)
+{
+	GIOChannel * file = NULL;
+	gchar * password = NULL;
+	GError * error = NULL;
+	gchar * dn = NULL;
+	PkeyManageData * crypted_pkey = NULL;
+	gchar * privatekey = NULL;
+	gchar * pem = NULL;
+
+
+	file = g_io_channel_new_file (filename, "w", &error);
+	if (error) {
+		g_free (password);
+		return (_("There was an error while exporting private key."));
+	} 
+	
+	crypted_pkey = pkey_manage_get_certificate_pkey (id);
+	dn = ca_file_get_dn_from_id (type, id);
+			
+	if (!crypted_pkey || !dn) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (dn);
+		return (_("There was an error while getting private key."));
+	}
+
+	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
+	
+	pkey_manage_data_free (crypted_pkey);
+	g_free (dn);
+
+	if (! privatekey) {
+		return (_("There was an error while uncrypting private key."));
+	}
+	
+	password = ca_dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
+					     "so nobody else but authorized people can use it. This passphrase will be asked "
+					     "by any application that will make use of the private key."),
+					   _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
+					   _("The introduced passphrases are distinct."), 8);
+	if (! password) {
+		g_free (privatekey);
+		return (_("Operation cancelled."));
+	}
+
+	pem = tls_generate_pkcs8_encrypted_private_key (privatekey, password); 
+	g_free (password);
+	g_free (privatekey);
+	
+	if (!pem) {
+		return (_("There was an error while password-protecting private key."));
+	}
+	
+	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+	if (error) {
+		g_free (pem);
+		return (_("There was an error while exporting private key."));
+	} 
+	g_free (pem);
+	
+	
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		g_io_channel_unref (file);
+		return (_("There was an error while exporting private key."));
+	} 
+	
+	g_io_channel_unref (file);
+	
+	ca_file_mark_pkey_as_extracted_for_id (type, filename, id);
+
+	return NULL;
+}

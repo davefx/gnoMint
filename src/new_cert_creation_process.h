@@ -20,6 +20,7 @@
 #ifndef _NEW_CERT_CREATION_PROCESS_H_
 #define _NEW_CERT_CREATION_PROCESS_H_
 
+#ifndef GNOMINTCLI
 void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data);
 
 void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
@@ -33,6 +34,6 @@ void on_cancel_creation_process_clicked (GtkButton *button,
 void new_csr_creation_process_finish (void);
 gint new_csr_creation_pulse (gpointer data);
 void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
-
+#endif
 
 #endif
