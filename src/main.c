@@ -553,7 +553,7 @@ void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
                 gchar * result = NULL;
 
-                dialog = gtk_file_chooser_dialog_new (_("Select PEM file to import"),
+                dialog = gtk_file_chooser_dialog_new (_("Select directory to import"),
                                                       GTK_WINDOW(main_window_widget),
                                                       GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                                       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
