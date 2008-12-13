@@ -134,4 +134,10 @@ gboolean ca_file_password_unprotect(const gchar *old_password);
 gboolean ca_file_password_protect(const gchar *new_password);
 gboolean ca_file_password_change(const gchar *old_password, const gchar *new_password);
 
+
+gboolean ca_file_check_if_is_ca_id (guint64 ca_id);
+gboolean ca_file_check_if_is_cert_id (guint64 cert_id);
+gboolean ca_file_check_if_is_csr_id (guint64 csr_id);
+
+
 #endif

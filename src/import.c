@@ -17,10 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
+#ifndef GNOMINTCLI
 #include <glade/glade.h>
-#include <glib-object.h>
 #include <gtk/gtk.h>
+#endif
+
+#include <glib-object.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,6 +38,7 @@ gint __import_cert (gnutls_x509_crt_t *cert, gchar ** cert_dn, guint64 *id);
 
 gchar * __import_ask_password (const gchar *crypted_part_description)
 {
+#ifndef GNOMINTCLI
 	gchar *password;
 	GtkWidget * widget = NULL, * password_widget = NULL, *description_widget = NULL;
 	GladeXML * dialog_xml = NULL;
@@ -72,6 +75,21 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	g_object_unref (G_OBJECT(dialog_xml));
 
 	return password;
+#else
+	gchar *password = NULL;
+	gchar *prompt = NULL;
+
+	printf (_("The whole selected file, or some of its elements, seems to\n"
+		  "be cyphered using a password or passphrase. For importing\n"
+		  "the file into gnoMint database, you must provide an \n"
+		  "appropiate password.\n"));
+
+	prompt = g_strdup_printf (_("Please introduce password for `%s'"), crypted_part_description);
+	password = ca_ask_for_password (prompt);
+	g_free (prompt);
+	
+	return password;
+#endif
 }
 
 
@@ -1016,7 +1034,7 @@ gint import_openssl_private_key (const gchar *filename, gchar **last_password, g
 	// Now, we import the uncyphered private key:
 
 	result = import_pkey_wo_passwd ((guchar *) filecontents, strlen(filecontents));
-
+	
 	if (result == 1)
 		ca_refresh_model();
 

@@ -2550,3 +2550,57 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
 		
 }
 
+gboolean ca_file_check_if_is_ca_id (guint64 ca_id)
+{
+	gchar **aux;
+	gboolean res;
+
+	aux = __ca_file_get_single_row ("SELECT COUNT(*) FROM certificates WHERE is_ca=1 AND id=%"G_GUINT64_FORMAT" ;",
+					ca_id);
+
+	if (!aux) {
+		return FALSE;
+	}
+
+	res = (atoi(aux[0]) > 0);
+
+	g_strfreev (aux);
+	return res;
+}
+
+gboolean ca_file_check_if_is_cert_id (guint64 cert_id)
+{
+	gchar **aux;
+	gboolean res;
+
+	aux = __ca_file_get_single_row ("SELECT COUNT(*) FROM certificates WHERE id=%"G_GUINT64_FORMAT" ;",
+					cert_id);
+
+	if (!aux) {
+		return FALSE;
+	}
+
+	res = (atoi(aux[0]) > 0);
+
+	g_strfreev (aux);
+	return res;
+}
+
+gboolean ca_file_check_if_is_csr_id (guint64 csr_id)
+{
+	gchar **aux;
+	gboolean res;
+
+	aux = __ca_file_get_single_row ("SELECT COUNT(*) FROM cert_requests WHERE id=%"G_GUINT64_FORMAT" ;",
+					csr_id);
+
+	if (!aux) {
+		return FALSE;
+	}
+
+	res = (atoi(aux[0]) > 0);
+
+	g_strfreev (aux);
+	return res;
+
+}

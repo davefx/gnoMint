@@ -34,7 +34,7 @@ typedef struct _CaCommand {
         CaCommandCallback callback;
 } CaCommand;
 
-
+gboolean ca_refresh_model (void);
 void ca_error_dialog (gchar *message);
 gchar * ca_dialog_get_password (gchar *info_message, 
                                 gchar *password_message, gchar *confirm_message, 

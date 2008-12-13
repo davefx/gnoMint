@@ -72,6 +72,8 @@ typedef struct __TlsCsr {
 	gchar * st;
 	gchar * l;
 	gchar * dn;
+
+	gchar * key_id;
 } TlsCsr;
 
 void tls_init (void);

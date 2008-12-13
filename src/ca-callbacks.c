@@ -27,6 +27,7 @@
 #include "ca.h"
 #include "ca_file.h"
 #include "ca_policy.h"
+#include "import.h"
 #include "new_cert_window.h"
 #include "pkey_manage.h"
 #include "preferences.h"
@@ -246,13 +247,9 @@ int ca_callback_listcsr (int argc, char **argv)
 
 
 
-
-
-
-
-
 int ca_callback_addcsr (int argc, char **argv)
 {
+
 	fprintf (stderr, "//FIXME\n");
 	return 0;
 }
@@ -279,6 +276,11 @@ int ca_callback_extractcertpkey (int argc, char **argv)
 	gchar *filename = argv[2];
 	gchar *error = NULL;
 
+	if (! ca_file_check_if_is_cert_id (id_cert)) {
+		ca_error_dialog (_("The given certificate id. is not valid"));
+		return -1;
+	}
+
 	error = ca_export_private_pkcs8 (id_cert, CA_FILE_ELEMENT_TYPE_CERT, filename);
 
 	if (! error) {
@@ -298,6 +300,11 @@ int ca_callback_extractcsrpkey (int argc, char **argv)
 	gchar *filename = argv[2];
 	gchar *error = NULL;
 
+	if (! ca_file_check_if_is_csr_id (id_csr)) {
+		ca_error_dialog (_("The given CSR id. is not valid"));
+		return -1;
+	}
+
 	error = ca_export_private_pkcs8 (id_csr, CA_FILE_ELEMENT_TYPE_CSR, filename);
 
 	if (! error) {
@@ -316,6 +323,11 @@ int ca_callback_revoke (int argc, char **argv)
 {
 	gchar *errmsg = NULL;
 	guint64 id = atoll (argv[1]);
+
+	if (! ca_file_check_if_is_cert_id (id)) {
+		ca_error_dialog (_("The given certificate id. is not valid"));
+		return -1;
+	}
 
 	ca_callback_showcert (argc, argv);
 
@@ -439,6 +451,13 @@ int ca_callback_sign (int argc, char **argv)
 
 	csr_id = atoll(argv[1]);
 	ca_id = atoll(argv[2]);
+
+	if (! ca_file_check_if_is_csr_id (csr_id)) {
+		ca_error_dialog (_("The given CSR id. is not valid"));
+		return -1;
+	}
+
+
 	cert_creation_data = g_new0 (CertCreationData, 1);
 
 	printf (_("You are about to sign the following Certificate Signing Request:\n"));
@@ -588,6 +607,11 @@ int ca_callback_delete (int argc, char **argv)
 	gchar *errmsg = NULL;
 	guint64 id = atoll (argv[1]);
 
+	if (! ca_file_check_if_is_csr_id (id)) {
+		ca_error_dialog (_("The given CSR id. is not valid"));
+		return -1;
+	}
+
 	ca_callback_showcsr (argc, argv);
 
 	if (ca_ask_for_confirmation (_("This Certificate Signing Request will be deleted."), _("This operation cannot be undone. Are you sure? Yes/[No] "),  FALSE)) {
@@ -612,6 +636,11 @@ int ca_callback_crlgen (int argc, char **argv)
 	guint64 id_ca = atoll(argv[1]);
 	gchar *filename = argv[2];
 	gchar *error = NULL;
+
+	if (! ca_file_check_if_is_ca_id (id_ca)) {
+		ca_error_dialog (_("The given CA id. is not valid"));
+		return -1;
+	}
 
 	error = crl_generate (id_ca, filename);
 
@@ -753,55 +782,334 @@ int ca_callback_changepassword (int argc, char **argv)
 		}
 	}
 
-	fprintf (stderr, "//FIXME\n");
 	return 0;
 }
 
 int ca_callback_importfile (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gchar *filename = argv[1];
+
+	if (! import_single_file (filename, NULL, NULL)) {
+		ca_error_dialog (_("Problem when importing the given file."));
+		return 1;
+	} else {
+		printf (_("File imported successfully.\n"));
+	}
+
 	return 0;
 }
 
 int ca_callback_importdir (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gchar *filename = argv[1];
+	gchar *error = NULL;
+
+	error = import_whole_dir (filename);
+	if (error) {
+		ca_error_dialog (error);
+		return 1;
+	} else {
+		printf (_("Directory imported successfully.\n"));
+	}
+
+	
 	return 0;
 }
 
 int ca_callback_showcert (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	guint64 cert_id = atoll(argv[1]);
+	gchar * certificate_pem;
+	
+	TlsCert * cert = NULL;
+	struct tm tim;
+	gchar model_time_str[100];
+	gchar *aux;
+	UInt160 *serial_number;
+
+	gint i;
+
+	if (! ca_file_check_if_is_cert_id (cert_id)) {
+		ca_error_dialog (_("The given certificate id. is not valid"));
+		return -1;
+	}
+
+	certificate_pem = ca_file_get_public_pem_from_id(CA_FILE_ELEMENT_TYPE_CERT, cert_id);
+
+	cert = tls_parse_cert_pem (certificate_pem);
+	
+	printf (_("Certificate:\n"));
+
+	serial_number = &cert->serial_number;
+        aux = uint160_strdup_printf (&cert->serial_number);
+	printf (_("\tSerial number: %s\n"), aux);
+        g_free (aux);
+
+	printf (_("Subject:\n"));
+	printf (_("\tDistinguished Name: %s\n"), (cert->dn ? cert->dn : _("None.")));
+	printf (_("\tUnique ID: %s\n"), (cert->subject_key_id ? cert->subject_key_id : _("None.")));
+	
+	printf (_("Issuer:\n"));
+	printf (_("\tDistinguished Name: %s\n"), (cert->i_dn ? cert->i_dn : _("None.")));
+	printf (_("\tUnique ID: %s\n"), (cert->issuer_key_id ? cert->issuer_key_id : _("None.")));
+	
+	printf (_("Validity:\n"));
+	gmtime_r (&cert->activation_time, &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
+	printf (_("\tActivated on: %s\n"), model_time_str);
+
+	gmtime_r (&cert->expiration_time, &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
+	printf (_("\tExpires on: %s\n"), model_time_str);
+
+	printf (_("Fingerprints:\n"));
+	printf (_("\tSHA1 fingerprint: %s\n"), cert->sha1);
+	printf (_("\tMD5 fingerprint: %s\n"), cert->md5);
+
+	if (g_list_length (cert->uses)) {
+		printf (_("Certificate uses:\n"));
+		for (i = g_list_length(cert->uses) - 1; i >= 0; i--) {
+			printf ("\t%s\n", (gchar *) g_list_nth_data (cert->uses, i));
+		}
+	}
+
+	tls_cert_free (cert);
+
 	return 0;
 }
 
 int ca_callback_showcsr (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	guint64 csr_id = atoll(argv[1]);
+	gchar * csr_pem;
+	
+	TlsCsr * csr = NULL;
+
+	if (! ca_file_check_if_is_csr_id (csr_id)) {
+		ca_error_dialog (_("The given CSR id. is not valid"));
+		return -1;
+	}
+
+
+	csr_pem = ca_file_get_public_pem_from_id(CA_FILE_ELEMENT_TYPE_CSR, csr_id);
+
+	csr = tls_parse_csr_pem (csr_pem);
+	
+	printf (_("Certificate Signing Request:\n"));
+
+	printf (_("Subject:\n"));
+	printf (_("\tDistinguished Name: %s\n"), csr->dn);
+	#ifdef ADVANCED_GNUTLS
+	printf (_("\tUnique ID: %s\n"), csr->subject_key_id);
+	#endif
+
+	tls_csr_free (csr);
+
 	return 0;
 }
 
+typedef enum {
+	CA_CALLBACK_POLICY_C_INHERIT = 0,
+	CA_CALLBACK_POLICY_ST_INHERIT = 1,
+	CA_CALLBACK_POLICY_L_INHERIT = 2,
+	CA_CALLBACK_POLICY_O_INHERIT = 3,
+	CA_CALLBACK_POLICY_OU_INHERIT = 4,
+	CA_CALLBACK_POLICY_C_FORCE_SAME = 5,
+	CA_CALLBACK_POLICY_ST_FORCE_SAME = 6,
+	CA_CALLBACK_POLICY_L_FORCE_SAME = 7,
+	CA_CALLBACK_POLICY_O_FORCE_SAME = 8,
+	CA_CALLBACK_POLICY_OU_FORCE_SAME = 9,
+	CA_CALLBACK_POLICY_HOURS_BETWEEN_CRL_UPDATES = 10,
+	CA_CALLBACK_POLICY_MONTHS_TO_EXPIRE = 11,
+	CA_CALLBACK_POLICY_CA = 12,
+	CA_CALLBACK_POLICY_CRL_SIGN = 13,
+	CA_CALLBACK_POLICY_NON_REPUTATION = 14,
+	CA_CALLBACK_POLICY_DIGITAL_SIGNATURE = 15,
+	CA_CALLBACK_POLICY_KEY_ENCIPHERMENT = 16,
+	CA_CALLBACK_POLICY_KEY_AGREEMENT = 17,
+	CA_CALLBACK_POLICY_DATA_ENCIPHERMENT = 18,
+	CA_CALLBACK_POLICY_TLS_WEB_SERVER = 19,
+	CA_CALLBACK_POLICY_TLS_WEB_CLIENT = 20,
+	CA_CALLBACK_POLICY_TIME_STAMPING = 21,
+	CA_CALLBACK_POLICY_CODE_SIGNING = 22,
+	CA_CALLBACK_POLICY_EMAIL_PROTECTION = 23,
+	CA_CALLBACK_POLICY_OCSP_SIGNING = 24,
+	CA_CALLBACK_POLICY_ANY_PURPOSE = 25,
+	CA_CALLBACK_POLICY_NUMBER = 26
+} CaCallbackPolicy;
+
+static gchar *CaCallbackPolicyName[CA_CALLBACK_POLICY_NUMBER] = {
+	"C_INHERIT",
+	"ST_INHERIT",
+	"L_INHERIT",
+	"O_INHERIT",
+	"OU_INHERIT",
+	"C_FORCE_SAME",
+	"ST_FORCE_SAME",
+	"L_FORCE_SAME",
+	"O_FORCE_SAME",
+	"OU_FORCE_SAME",
+	"HOURS_BETWEEN_CRL_UPDATES",
+	"MONTHS_TO_EXPIRE",
+	"CA",
+	"CRL_SIGN",
+	"NON_REPUDIATION",
+	"DIGITAL_SIGNATURE",
+	"KEY_ENCIPHERMENT",
+	"KEY_AGREEMENT",
+	"DATA_ENCIPHERMENT",
+	"TLS_WEB_SERVER",
+	"TLS_WEB_CLIENT",
+	"TIME_STAMPING",
+	"CODE_SIGNING",
+	"EMAIL_PROTECTION",
+	"OCSP_SIGNING",
+	"ANY_PURPOSE"
+};
+
+static gchar *CaCallbackPolicyDescriptions[CA_CALLBACK_POLICY_NUMBER] = {
+	N_("Generated certs inherit Country from CA                           "),
+	N_("Generated certs inherit State from CA                             "),
+	N_("Generated certs inherit Locality from CA                          "),
+	N_("Generated certs inherit Organization from CA                      "),
+	N_("Generated certs inherit Organizational Unit from CA               "),
+	N_("Country in generated certs must be the same than in CA            "),
+	N_("State in generated certs must be the same than in CA              "),
+	N_("Locality in generated certs must be the same than in CA           "),
+	N_("Organization in generated certs must be the same than in CA       "),
+	N_("Organizational Unit in generated certs must be the same than in CA"),
+	N_("Maximum number of hours between CRL updates                       "),
+	N_("Maximum number of months before expiration of new certs           "),
+	N_("CA use enabled in generated certs                                 "),
+	N_("CRL Sign use enabled in generated certs                           "),
+	N_("Non reputation use enabled in generated certs                     "),
+	N_("Digital signature use enabled in generated certs                  "),
+	N_("Key encipherment use enabled in generated certs                   "),
+	N_("Key agreement use enabled in generated certs                      "),
+	N_("Data encipherment use enabled in generated certs                  "),
+	N_("TLS web server purpose enabled in generated certs                 "),
+	N_("TLS web client purpose enabled in generated certs                 "),
+	N_("Time stamping purpose enabled in generated certs                  "),
+	N_("Code signing server purpose enabled in generated certs            "),
+	N_("Email protection purpose enabled in generated certs               "),
+	N_("OCSP signing purpose enabled in generated certs                   "),
+	N_("Any purpose enabled in generated certs                            ")};
+                                                                                
+
 int ca_callback_showpolicy (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	guint64 ca_id = atoll(argv[1]);
+	gint i;
+
+
+	if (! ca_file_check_if_is_csr_id (ca_id)) {
+		ca_error_dialog (_("The given CA id. is not valid"));
+		return -1;
+	}
+	
+	printf (_("Showing policies of the following certificate:\n"));
+	ca_callback_showcert (argc, argv);
+	printf (_("\nPolicies:\n"));
+	
+	printf (_("Id.\tDescription\t\t\t\t\t\t\t\tValue\n"));
+	for (i = 0; i < CA_CALLBACK_POLICY_NUMBER; i++) {
+
+		printf ("%d\t%s\t%d\n", i, CaCallbackPolicyDescriptions[i], ca_file_policy_get(ca_id, CaCallbackPolicyName[i]));
+
+	}
+
+
 	return 0;
 }
 
 int ca_callback_setpolicy (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	guint64 ca_id = atoll(argv[1]);
+	gint policy_id = atoi (argv[2]);
+	gint value = atoi (argv[3]);
+	gchar *message = NULL;
+	gchar *description = NULL;
+	gint i;
+
+	if (! ca_file_check_if_is_csr_id (ca_id)) {
+		ca_error_dialog (_("The given CA id. is not valid"));
+		return -1;
+	}
+	
+	if (policy_id < 0 || policy_id >= CA_CALLBACK_POLICY_NUMBER) {
+		ca_error_dialog (_("The given policy id is not valid"));
+		return -2;
+	}
+
+	description = g_strdup (CaCallbackPolicyDescriptions[policy_id]);
+	for (i=strlen (description) - 1; i>=0; i--) {
+		if (description[i] != ' ') {
+			description[i+1] = '\0';
+			break;
+		}
+	}
+
+	message = g_strdup_printf (_("You are about to assign to the policy\n'%s' the new value '%d'."), description, value);
+	g_free (description);
+
+
+	if (ca_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
+		if (! ca_file_policy_set (ca_id, CaCallbackPolicyName[i], value)) {
+			g_free (message);
+			return -1;
+		} else
+			printf (_("Policy set correctly to '%d'.\n"), value);
+			
+		
+	} else {
+		printf (_("Operation cancelled.\n"));
+	}
+
+	g_free (message);
+
 	return 0;
 }
 
 int ca_callback_showpreferences (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	printf (_("gnoMint-cli current preferences:\n"));
+
+	printf (_("Id.\tName\t\t\tValue\n"));
+	printf (_("0\tGnome keyring support\t%d\n"), preferences_get_gnome_keyring_export());
+	
 	return 0;
 }
 
 int ca_callback_setpreference (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gint preference_id = atoi (argv[1]);
+	gint value = atoi (argv[2]);
+	gchar *message = NULL;
+
+	if (preference_id != 0) {
+		ca_error_dialog (_("The given preference id is not valid"));
+		return -1;
+	}
+
+	switch (preference_id) {
+	case 0:
+		message = g_strdup_printf (_("You are about to assign to the preference 'Gnome keyring support' the new value '%d'."), value);
+		break;
+	}
+
+	if (ca_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
+		switch (preference_id) {
+		case 0:
+			preferences_set_gnome_keyring_export (value);
+			break;
+		}
+
+	} else {
+		printf (_("Operation cancelled.\n"));
+	}
+	
+	g_free (message);
+	
 	return 0;
 }
 

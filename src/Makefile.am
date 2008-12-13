@@ -63,6 +63,7 @@ gnomint_cli_SOURCES = \
 	ca_file.c \
 	ca_policy.c \
 	crl.c \
+        import.c \
 	new_cert_window.c \
 	preferences.c \
 	pkey_manage.c \

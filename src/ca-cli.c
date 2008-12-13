@@ -40,7 +40,7 @@ CaCommand ca_commands[] = {
 	{"listcert", 0, 1, "listcert [--see-revoked]", N_("List the certificates in database. With option --see-revoked, "
 							 "lists also the revoked ones"), ca_callback_listcert}, // 4
 	{"listcsr", 0, 0, "listcsr", N_("List the CSRs in database"), ca_callback_listcsr}, // 5
-	{"addcsr", 0, 0, "addcsr", N_("Start a new CSR creation process"), ca_callback_addcsr}, // 6
+	{"addcsr", 0, 1, "addcsr [ca-id-for-inherit-fields]", N_("Start a new CSR creation process"), ca_callback_addcsr}, // 6
 	{"addca", 0, 0, "addca", N_("Start a new self-signed CA creation process"), ca_callback_addca}, //7
 	{"extractcertpkey", 2, 2, N_("extractcertpkey <cert-id> <filename>"), N_("Extract the private key of the certificate with the given " 
 									       "internal id and saves it into the given file"),  
@@ -76,6 +76,13 @@ CaCommand ca_commands[] = {
 
 
 GHashTable *ca_command_table = NULL;
+
+
+gboolean ca_refresh_model (void)
+{
+	return TRUE;
+}
+
 
 void ca_error_dialog (gchar *message) {
         fprintf (stderr, "\nError: %s\n\n", message);
