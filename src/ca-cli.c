@@ -186,6 +186,7 @@ gboolean ca_ask_for_confirmation (gchar *message, gchar *prompt, gboolean defaul
 		}
 		g_strfreev (aux);
 
+		free (line);
 	} 
 		
 	
@@ -196,6 +197,8 @@ gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default
 {
 	gchar *line;
 	gchar *prompt = NULL;
+	gint result;
+	gboolean keep_trying = TRUE;
 
 	if (! message)
 		message = "";
@@ -210,17 +213,24 @@ gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default
 	else 
 		prompt = g_strdup_printf ("%s (%d - [%d] - %d): ", message, minimum, default_value, maximum);
 
-	while (TRUE) {
+	while (keep_trying) {
 		line = readline (prompt);
 		
-		if (line == NULL)
-			return default_value;
-		
-		if (atoi (line) <= maximum && atoi(line) >= minimum) {
-			return (atoi (line));
+		if (line == NULL || strlen (line) == 0) {
+			result = default_value;
+			keep_trying = FALSE;		
 		}
+		if (atoi (line) <= maximum && atoi(line) >= minimum) {
+			result = (atoi (line));
+			keep_trying = FALSE;
+		}
+		
+		if (line)
+			free (line);
 	} 	
 
+	g_free (prompt);
+	return result;
 	
 }
 
@@ -242,6 +252,36 @@ gchar * ca_ask_for_password (gchar *message)
 	return password;
 }
 
+gchar * ca_ask_for_string (gchar *message, gchar *default_answer)
+{
+	gchar *prompt;
+	gchar *result = NULL;
+	char *line;
+
+	printf ("%s\n", message);
+	
+	if (default_answer) {
+		prompt = g_strdup_printf ("[%s] : ", default_answer);
+	} else {
+		prompt = g_strdup (": ");
+	}
+
+
+	line = readline (prompt);
+	
+	if (line == NULL || strlen(line) == 0) {
+		if (default_answer)
+			result = g_strdup(default_answer);
+		else
+			result = NULL;
+	} else {
+		result = g_strdup (line);
+	}
+
+	g_free (prompt);
+	return result;
+	
+}
 
 
 gboolean ca_open (gchar *filename, gboolean create) 

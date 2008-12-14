@@ -27,6 +27,7 @@
 #include "ca.h"
 #include "ca_file.h"
 #include "ca_policy.h"
+#include "csr_creation.h"
 #include "import.h"
 #include "new_cert_window.h"
 #include "pkey_manage.h"
@@ -38,6 +39,7 @@ extern CaCommand ca_commands[];
 #define CA_COMMAND_NUMBER 31
 
 extern gchar * gnomint_current_opened_file;
+extern gchar * csr_creation_message;
 
 
 int ca_callback_newdb (int argc, char **argv)
@@ -216,10 +218,10 @@ int __ca_callback_listcsr_aux (void *pArg, int argc, char **argv, char **columnN
 
 	printf (Q_("CsrList ParentID|%s\t"), (argv[CA_FILE_CSR_COLUMN_PARENT_ID] ? argv[CA_FILE_CSR_COLUMN_PARENT_ID] : Q_("CsrList ParentID|\t")));
 	
-	if (strlen(argv[CA_FILE_CSR_COLUMN_SUBJECT]) > 16)
-		argv[CA_FILE_CSR_COLUMN_SUBJECT][16] = '\0';
+	if (strlen(argv[CA_FILE_CSR_COLUMN_SUBJECT]) > 24)
+		argv[CA_FILE_CSR_COLUMN_SUBJECT][24] = '\0';
 
-	printf (Q_("CsrList Subject|%s\t"), argv[CA_FILE_CSR_COLUMN_SUBJECT]);
+	printf (Q_("CsrList Subject|%-24s\t"), argv[CA_FILE_CSR_COLUMN_SUBJECT]);
 
 	if (strlen (argv[CA_FILE_CSR_COLUMN_SUBJECT]) / 8 < 2)
 		printf (Q_("CsrList PadIfSubject<16|\t"));
@@ -249,8 +251,166 @@ int ca_callback_listcsr (int argc, char **argv)
 
 int ca_callback_addcsr (int argc, char **argv)
 {
+	gboolean with_ca_id = FALSE;
+	guint64 ca_id;
 
-	fprintf (stderr, "//FIXME\n");
+	gboolean c_force_same = FALSE;
+	gboolean st_force_same = FALSE;
+	gboolean l_force_same = FALSE;
+	gboolean o_force_same = FALSE;
+	gboolean ou_force_same = FALSE;
+
+	gboolean change_data = FALSE;
+
+	CaCreationData *csr_creation_data = NULL;
+
+	if (argc == 2) {
+		ca_id = atoll (argv[1]);
+		with_ca_id = TRUE;
+		if (! ca_file_check_if_is_ca_id (ca_id)) {
+			ca_error_dialog (_("The given CA id. is not valid"));
+			return -1;
+		}
+	}
+
+	csr_creation_data = g_new0 (CaCreationData, 1);
+
+	if (with_ca_id) {
+		TlsCert *tlscert = NULL;
+		gchar *pem = NULL;
+
+		pem = ca_file_get_public_pem_from_id (ca_id, CA_FILE_ELEMENT_TYPE_CERT);
+		g_assert (pem);
+
+                tlscert = tls_parse_cert_pem (pem);
+
+                if (ca_file_policy_get (ca_id, "C_INHERIT")) {
+                        c_force_same = ca_file_policy_get (ca_id, "C_FORCE_SAME");
+			csr_creation_data->country = g_strdup (tlscert->c);
+                } 
+		
+		if (ca_file_policy_get (ca_id, "ST_INHERIT")) {
+			st_force_same = ca_file_policy_get (ca_id, "ST_FORCE_SAME");
+			csr_creation_data->state = g_strdup (tlscert->st);
+		}
+
+		if (ca_file_policy_get (ca_id, "L_INHERIT")) {
+			l_force_same = ca_file_policy_get (ca_id, "L_FORCE_SAME");
+			csr_creation_data->city = g_strdup (tlscert->l);
+		}
+
+		if (ca_file_policy_get (ca_id, "O_INHERIT")) {
+			o_force_same = ca_file_policy_get (ca_id, "O_FORCE_SAME");
+			csr_creation_data->org = g_strdup (tlscert->o);
+		}
+
+		if (ca_file_policy_get (ca_id, "OU_INHERIT")) {
+			ou_force_same = ca_file_policy_get (ca_id, "OU_FORCE_SAME");
+			csr_creation_data->ou = g_strdup (tlscert->ou);
+		}
+                
+                tls_cert_free (tlscert);
+	}
+
+	// Enter default values
+	csr_creation_data->key_type = 0;
+	csr_creation_data->key_bitlength = 2048;
+
+	do {
+		gchar * aux;
+
+		printf (_("Please enter data corresponding to subject of the Certificate Signing Request:\n"));
+
+		aux = ca_ask_for_string (_("Enter country (C)"), csr_creation_data->country);
+		if (csr_creation_data->country)
+			g_free (csr_creation_data->country);
+		csr_creation_data->country = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter state or province (ST)"), csr_creation_data->state);
+		if (csr_creation_data->state)
+			g_free (csr_creation_data->state);
+		csr_creation_data->state = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter locality or city (L)"), csr_creation_data->city);
+		if (csr_creation_data->city)
+			g_free (csr_creation_data->city);
+		csr_creation_data->city = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter organization (O)"), csr_creation_data->org);
+		if (csr_creation_data->org)
+			g_free (csr_creation_data->org);
+		csr_creation_data->org = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter organizational unit (OU)"), csr_creation_data->ou);
+		if (csr_creation_data->ou)
+			g_free (csr_creation_data->ou);
+		csr_creation_data->ou = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter common name (CN)"), csr_creation_data->cn);
+		if (csr_creation_data->cn)
+			g_free (csr_creation_data->cn);
+		csr_creation_data->cn = aux;
+		aux = NULL;
+
+		do {
+			if (aux)
+				g_free (aux);
+
+			aux = ca_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (csr_creation_data->key_type ? "DSA" : "RSA"));
+		} while (g_ascii_strcasecmp (aux, "RSA") && g_ascii_strcasecmp (aux, "DSA"));
+
+		if (! g_ascii_strcasecmp (aux, "RSA")) {
+			csr_creation_data->key_type = 0;
+		} else if (! g_ascii_strcasecmp (aux, "DSA")) {
+			csr_creation_data->key_type = 1;
+		}
+		g_free (aux);
+		aux = NULL;
+		
+		do {
+			csr_creation_data->key_bitlength = ca_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+									      1024,10240,csr_creation_data->key_bitlength);
+		} while (csr_creation_data->key_bitlength % 1024);
+
+		printf (_("These are the provided CSR properties:\n"));
+
+		printf (_("Subject:\n"));
+		printf (_("\tDistinguished Name: "));
+		if (csr_creation_data->country)
+			printf ("C=%s/", csr_creation_data->country);
+		if (csr_creation_data->state)
+			printf ("ST=%s/", csr_creation_data->state);
+		if (csr_creation_data->city)
+			printf ("L=%s/", csr_creation_data->city);
+		if (csr_creation_data->org)
+			printf ("O=%s/", csr_creation_data->org);
+		if (csr_creation_data->ou)
+			printf ("OU=%s/", csr_creation_data->ou);
+		if (csr_creation_data->cn)
+			printf ("CN=%s", csr_creation_data->cn);
+		printf ("\n");
+		printf (_("Key pair\n"));
+		printf (_("\tType: %s\n"), (csr_creation_data->key_type ? "DSA" : "RSA"));
+		printf (_("\tKey bitlength: %d\n"), csr_creation_data->key_bitlength);
+
+		change_data = ca_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
+
+	} while (change_data);
+
+	if (ca_ask_for_confirmation (_("You are about to create a Certificate Signing Request with these properties."),
+				     _("Are you sure? [Yes]/No "), TRUE)) {
+		csr_creation_thread (csr_creation_data);
+		printf ("%s\n", csr_creation_message);
+		
+	} else {
+		printf (_("Operation cancelled.\n"));
+	}
+
 	return 0;
 }
 
@@ -496,87 +656,87 @@ int ca_callback_sign (int argc, char **argv)
 	printf (_("The new certificate will be created with the following uses and purposes:\n"));
 	__ca_callback_show_uses_and_purposes (cert_creation_data);
 	
-	while (ca_ask_for_confirmation (NULL, _("Do you want to change any property of the new certificate? Yes/[No]"), FALSE)) {
+	while (ca_ask_for_confirmation (NULL, _("Do you want to change any property of the new certificate? Yes/[No] "), FALSE)) {
 
 		if (ca_policy_get (ca_id, "CA")) {
-			cert_creation_data->ca = ca_ask_for_confirmation (NULL, _("* Enable Certification Authority use? [Yes]/No"), TRUE);
+			cert_creation_data->ca = ca_ask_for_confirmation (NULL, _("* Enable Certification Authority use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Certification Authority use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "CRL_SIGN")) {
-			cert_creation_data->crl_signing = ca_ask_for_confirmation (NULL, _("* Enable CRL Signing? [Yes]/No"), TRUE);
+			cert_creation_data->crl_signing = ca_ask_for_confirmation (NULL, _("* Enable CRL Signing? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* CRL signing use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "DIGITAL_SIGNATURE")) {
-			cert_creation_data->digital_signature = ca_ask_for_confirmation (NULL, _("* Enable Digital Signature use? [Yes]/No"), TRUE);
+			cert_creation_data->digital_signature = ca_ask_for_confirmation (NULL, _("* Enable Digital Signature use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Digital Signature use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "DATA_ENCIPHERMENT")) {
-			cert_creation_data->data_encipherment = ca_ask_for_confirmation (NULL, _("Enable Data Encipherment use? [Yes]/No"), TRUE);
+			cert_creation_data->data_encipherment = ca_ask_for_confirmation (NULL, _("Enable Data Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Data Encipherment use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "KEY_ENCIPHERMENT")) {
-			cert_creation_data->key_encipherment = ca_ask_for_confirmation (NULL, _("Enable Key Encipherment use? [Yes]/No"), TRUE);
+			cert_creation_data->key_encipherment = ca_ask_for_confirmation (NULL, _("Enable Key Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Encipherment use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "NON_REPUDIATION")) {
-			cert_creation_data->non_repudiation = ca_ask_for_confirmation (NULL, _("Enable Non Repudiation use? [Yes]/No"), TRUE);
+			cert_creation_data->non_repudiation = ca_ask_for_confirmation (NULL, _("Enable Non Repudiation use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Non Repudiation use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "KEY_AGREEMENT")) {
-			cert_creation_data->key_agreement = ca_ask_for_confirmation (NULL, _("Enable Key Agreement use? [Yes]/No"), TRUE);
+			cert_creation_data->key_agreement = ca_ask_for_confirmation (NULL, _("Enable Key Agreement use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Agreement use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "EMAIL_PROTECTION")) {
-			cert_creation_data->email_protection = ca_ask_for_confirmation (NULL, _("Enable Email Protection purpose? [Yes]/No"), TRUE);
+			cert_creation_data->email_protection = ca_ask_for_confirmation (NULL, _("Enable Email Protection purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Email Protection purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "CODE_SIGNING")) {
-			cert_creation_data->code_signing = ca_ask_for_confirmation (NULL, _("Enable Code Signing purpose? [Yes]/No"), TRUE);
+			cert_creation_data->code_signing = ca_ask_for_confirmation (NULL, _("Enable Code Signing purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Code Signing purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "TLS_WEB_CLIENT")) {
-			cert_creation_data->web_client = ca_ask_for_confirmation (NULL, _("Enable TLS Web Client purpose? [Yes]/No"), TRUE);
+			cert_creation_data->web_client = ca_ask_for_confirmation (NULL, _("Enable TLS Web Client purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Client purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "TLS_WEB_SERVER")) {
-			cert_creation_data->web_server = ca_ask_for_confirmation (NULL, _("Enable TLS Web Server purpose? [Yes]/No"), TRUE);
+			cert_creation_data->web_server = ca_ask_for_confirmation (NULL, _("Enable TLS Web Server purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Server purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "TIME_STAMPING")) {
-			cert_creation_data->time_stamping = ca_ask_for_confirmation (NULL, _("Enable Time Stamping purpose? [Yes]/No"), TRUE);
+			cert_creation_data->time_stamping = ca_ask_for_confirmation (NULL, _("Enable Time Stamping purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Time Stamping purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "OCSP_SIGNING")) {
-			cert_creation_data->ocsp_signing = ca_ask_for_confirmation (NULL, _("Enable OCSP Signing purpose? [Yes]/No"), TRUE);		} else {
+			cert_creation_data->ocsp_signing = ca_ask_for_confirmation (NULL, _("Enable OCSP Signing purpose? [Yes]/No "), TRUE);		} else {
 			printf (_("* OCSP Signing purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "ANY_PURPOSE")) {
-			cert_creation_data->any_purpose = ca_ask_for_confirmation (NULL, _("Enable any purpose? [Yes]/No"), TRUE);
+			cert_creation_data->any_purpose = ca_ask_for_confirmation (NULL, _("Enable any purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Any purpose disabled by policy\n"));
 		}
