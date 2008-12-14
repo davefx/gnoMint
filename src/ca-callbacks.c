@@ -39,6 +39,7 @@ extern CaCommand ca_commands[];
 #define CA_COMMAND_NUMBER 31
 
 extern gchar * gnomint_current_opened_file;
+extern gchar * ca_creation_message;
 extern gchar * csr_creation_message;
 
 
@@ -308,6 +309,8 @@ int ca_callback_addcsr (int argc, char **argv)
 			ou_force_same = ca_file_policy_get (ca_id, "OU_FORCE_SAME");
 			csr_creation_data->ou = g_strdup (tlscert->ou);
 		}
+
+		csr_creation_data->parent_ca_id_str = g_strdup_printf ("%"G_GUINT64_FORMAT, ca_id);
                 
                 tls_cert_free (tlscert);
 	}
@@ -419,7 +422,145 @@ int ca_callback_addcsr (int argc, char **argv)
 
 int ca_callback_addca (int argc, char **argv)
 {
-	fprintf (stderr, "//FIXME\n");
+	gboolean change_data = FALSE;
+
+	CaCreationData *ca_creation_data = NULL;
+
+	time_t tmp;
+	struct tm * expiration_time;
+	struct tm timer;
+	char model_time_str[100];
+
+	ca_creation_data = g_new0 (CaCreationData, 1);
+
+
+	// Enter default values
+
+	ca_creation_data->key_type = 0;
+	ca_creation_data->key_bitlength = 2048;
+
+	ca_creation_data->key_months_before_expiration = 240;
+
+
+	do {
+		gchar * aux;
+
+		printf (_("Please enter data corresponding to subject of the new Certification Authority:\n"));
+
+		aux = ca_ask_for_string (_("Enter country (C)"), ca_creation_data->country);
+		if (ca_creation_data->country)
+			g_free (ca_creation_data->country);
+		ca_creation_data->country = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter state or province (ST)"), ca_creation_data->state);
+		if (ca_creation_data->state)
+			g_free (ca_creation_data->state);
+		ca_creation_data->state = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter locality or city (L)"), ca_creation_data->city);
+		if (ca_creation_data->city)
+			g_free (ca_creation_data->city);
+		ca_creation_data->city = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter organization (O)"), ca_creation_data->org);
+		if (ca_creation_data->org)
+			g_free (ca_creation_data->org);
+		ca_creation_data->org = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter organizational unit (OU)"), ca_creation_data->ou);
+		if (ca_creation_data->ou)
+			g_free (ca_creation_data->ou);
+		ca_creation_data->ou = aux;
+		aux = NULL;
+
+		aux = ca_ask_for_string (_("Enter common name (CN)"), ca_creation_data->cn);
+		if (ca_creation_data->cn)
+			g_free (ca_creation_data->cn);
+		ca_creation_data->cn = aux;
+		aux = NULL;
+
+		do {
+			if (aux)
+				g_free (aux);
+
+			aux = ca_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (ca_creation_data->key_type ? "DSA" : "RSA"));
+		} while (g_ascii_strcasecmp (aux, "RSA") && g_ascii_strcasecmp (aux, "DSA"));
+		
+		if (! g_ascii_strcasecmp (aux, "RSA")) {
+			ca_creation_data->key_type = 0;
+		} else if (! g_ascii_strcasecmp (aux, "DSA")) {
+			ca_creation_data->key_type = 1;
+		}
+		g_free (aux);
+		aux = NULL;
+		
+		do {
+			ca_creation_data->key_bitlength = ca_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+									     1024,10240,ca_creation_data->key_bitlength);
+		} while (ca_creation_data->key_bitlength % 1024);
+
+
+		ca_creation_data->key_months_before_expiration = ca_ask_for_number (_("Introduce number of months before expiration of the new certification authority"),
+										    1, 600, 240);
+
+		tmp = time (NULL);	
+		ca_creation_data->activation = tmp;
+	
+		expiration_time = g_new (struct tm,1);
+		localtime_r (&tmp, expiration_time);      
+		expiration_time->tm_mon = expiration_time->tm_mon + ca_creation_data->key_months_before_expiration;
+		expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
+		expiration_time->tm_mon = expiration_time->tm_mon % 12;	
+		ca_creation_data->expiration = mktime(expiration_time);
+		g_free (expiration_time);
+
+		printf (_("These are the provided new CA properties:\n"));
+
+		printf (_("Subject:\n"));
+		printf (_("\tDistinguished Name: "));
+		if (ca_creation_data->country)
+			printf ("C=%s/", ca_creation_data->country);
+		if (ca_creation_data->state)
+			printf ("ST=%s/", ca_creation_data->state);
+		if (ca_creation_data->city)
+			printf ("L=%s/", ca_creation_data->city);
+		if (ca_creation_data->org)
+			printf ("O=%s/", ca_creation_data->org);
+		if (ca_creation_data->ou)
+			printf ("OU=%s/", ca_creation_data->ou);
+		if (ca_creation_data->cn)
+			printf ("CN=%s", ca_creation_data->cn);
+		printf ("\n");
+		printf (_("Key pair\n"));
+		printf (_("\tType: %s\n"), (ca_creation_data->key_type ? "DSA" : "RSA"));
+		printf (_("\tKey bitlength: %d\n"), ca_creation_data->key_bitlength);
+		printf (_("Validity\n"));
+		printf (_("Validity:\n"));
+		gmtime_r (&ca_creation_data->activation, &timer);
+		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);	
+		printf (_("\tActivated on: %s\n"), model_time_str);
+		
+		gmtime_r (&ca_creation_data->expiration, &timer);
+		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);	
+		printf (_("\tExpires on: %s\n"), model_time_str);
+
+		change_data = ca_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
+
+	} while (change_data);
+
+	if (ca_ask_for_confirmation (_("You are about to create a new Certification Authority with these properties."),
+				     _("Are you sure? [Yes]/No "), TRUE)) {
+		ca_creation_thread (ca_creation_data);
+		printf ("%s\n", ca_creation_message);
+		
+	} else {
+		printf (_("Operation cancelled.\n"));
+	}
+
 	return 0;
 }
 

@@ -60,6 +60,7 @@ gnomint_cli_SOURCES = \
 	ca.c \
 	ca-cli.c \
 	ca-callbacks.c \
+        ca_creation.c \
 	ca_file.c \
 	ca_policy.c \
 	crl.c \
