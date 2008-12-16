@@ -1,3 +1,111 @@
+2008-12-14 20:36  davefx
+
+	* [r269] src/Makefile.am, src/ca-callbacks.c:
+	  gnoMint-cli commands completed
+
+2008-12-14 10:04  davefx
+
+	* [r268] src/Makefile.am, src/ca-callbacks.c, src/ca-cli.c,
+	  src/ca-cli.h:
+	  Implemented gnomint-cli addcsr function. Only addca left\!
+
+2008-12-13 07:55  davefx
+
+	* [r267] src/Makefile.am, src/ca-callbacks.c, src/ca-cli.c,
+	  src/ca-cli.h, src/ca_file.c, src/ca_file.h, src/ca_policy.c,
+	  src/import.c, src/tls.c, src/tls.h:
+	  Completing gnomint command line interface. Missing only addca and
+	  addcsr
+
+2008-12-12 07:59  davefx
+
+	* [r266] src/main.c:
+	  Correcting string while importing whole directory.
+
+2008-12-12 00:01  davefx
+
+	* [r265] gui/gnomint.glade, po/es.po, po/gnoMint.pot,
+	  src/Makefile.am, src/ca-callbacks.c, src/ca-cli.c, src/ca-cli.h,
+	  src/ca.c, src/ca.h, src/crl.c, src/crl.h, src/new_ca_window.h,
+	  src/new_cert_creation_process.h, src/new_cert_window.c,
+	  src/new_cert_window.h, src/new_req_window.h:
+	  Adding delete, crlgen, dhgen, and changepassword
+
+2008-12-11 13:49  davefx
+
+	* [r264] po/es.po, src/Makefile.am, src/ca-callbacks.c,
+	  src/ca-cli.c, src/ca-cli.h, src/ca.c, src/ca_file.c,
+	  src/ca_file.h, src/ca_policy.c, src/main.c, src/pkey_manage.c:
+	  Implementing more features in Command-Line Interface
+
+2008-12-10 18:17  davefx
+
+	* [r263] configure.in:
+	  Upgrading GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION to 2.7.4
+
+2008-12-05 07:46  davefx
+
+	* [r262] src/ca-callbacks.c, src/ca-cli.c:
+	  Uploading support for basic file-operations in gnomint-cli
+
+2008-12-04 19:22  davefx
+
+	* [r261] po/es.po, po/gnoMint.pot:
+	  Uploading Spanish translation.
+
+2008-12-04 19:22  davefx
+
+	* [r260] configure.in, src/ca-callbacks.c, src/ca-cli.c,
+	  src/gnomint-cli.c:
+	  Completing textual informative commands
+
+2008-12-03 23:44  davefx
+
+	* [r259] po/POTFILES.in, po/es.po, po/gnoMint.pot, src/Makefile.am,
+	  src/ca-callbacks.c, src/ca-callbacks.h, src/ca-cli.c,
+	  src/ca-cli.h:
+	  Completing command-line parser. Help implemented.
+
+2008-12-03 19:49  davefx
+
+	* [r258] src/ca-cli.c:
+	  Improving the (buggy) parser a little bit
+
+2008-12-03 19:44  davefx
+
+	* [r257] src/ca-cli.c:
+	  Uploading initial (buggy) parser
+
+2008-12-03 07:27  davefx
+
+	* [r256] src/ca-cli.c:
+	  Completing callbacks
+
+2008-12-02 22:09  davefx
+
+	* [r255] doc/gnomint-cli.txt, m4/libtool.m4, m4/ltoptions.m4,
+	  m4/ltsugar.m4, m4/ltversion.m4, m4/lt~obsolete.m4, src/ca-cli.c:
+	  Adding callbacks
+
+2008-12-02 19:37  davefx
+
+	* [r254] ChangeLog, TODO, certs/example-ca-web-gnomint.gnomint,
+	  configure.in, doc/gnomint-cli.txt, src/Makefile.am, src/ca-cli.c,
+	  src/ca-cli.h, src/gnomint-cli.c:
+	  Added readline support
+
+2008-12-02 08:05  davefx
+
+	* [r253] src/Makefile.am, src/ca-cli.c, src/ca-cli.h, src/ca.h,
+	  src/gnomint-cli.c, src/pkey_manage.c, src/pkey_manage.h,
+	  src/preferences-gui.c, src/preferences.c:
+	  Starting command-line CA manager
+
+2008-11-19 18:29  davefx
+
+	* [r251] certs/example-ca-web-gnomint.gnomint:
+	  Adding a web tutorial example
+
 2008-11-18 18:23  davefx
 
 	* [r250] ChangeLog, configure.in, m4/intltool.m4:

@@ -634,17 +634,21 @@ void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	
 	GtkWidget *widget;
+	gchar *authors[2];
 	
 	widget = glade_xml_get_widget (main_window_xml, "main_window");
+
+	authors[0] = PACKAGE_AUTHORS;
+	authors[1] = NULL;
 	
 	gtk_show_about_dialog (GTK_WINDOW(widget), 
-			       "version", PACKAGE_VERSION,
+			       "version", PACKAGE_VERSION, 
 			       "copyright", PACKAGE_COPYRIGHT,
 			       "comments", _("gnoMint is a program for creating and managing Certification Authorities, and their certificates"),
 			       "license",  _("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. \n\nYou should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."),
 			       "wrap_license", TRUE,
 			       "website", PACKAGE_WEBSITE,
-			       "authors", PACKAGE_AUTHORS,
+			       "authors", authors, 
 			       "translator_credits", _("translator-credits"),
-			       NULL);
+			       NULL); 
 }
