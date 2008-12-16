@@ -1,3 +1,11 @@
+2008-12-16 06:45  davefx
+
+	* [r270] AUTHORS, ChangeLog, configure.in, po/es.po,
+	  po/gnoMint.pot, src/ca-cli.c, src/main.c:
+	  Getting ready for version 0.9.0. Spanish translation updated.
+	  Adding Ahmed Bazid and Staněk Luboš as authors. Changing method
+	  for showing AUTHORS (it was wrong).
+
 2008-12-14 20:36  davefx
 
 	* [r269] src/Makefile.am, src/ca-callbacks.c:
