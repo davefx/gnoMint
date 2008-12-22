@@ -1067,13 +1067,8 @@ gchar * import_whole_dir (gchar *dirname)
 
         // First, we try to probe if this is really a CA-containing directory
         
-        // * Try to detect OpenSSL CA
+        // * Try to detect OpenSSL CA.pl or TinyCA
 	{
-		filename = g_build_filename (dirname, "cacert.key", NULL);
-		if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
-			error = TRUE;
-		}
-		g_free (filename);
 		filename = g_build_filename (dirname, "cacert.pem", NULL);
 		if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
 			error = TRUE;
@@ -1094,19 +1089,25 @@ gchar * import_whole_dir (gchar *dirname)
 			error = TRUE;
 		}
 		g_free (filename);
-		filename = g_build_filename (dirname, "keys", NULL);
-		if (! g_file_test(filename, G_FILE_TEST_IS_DIR)) {
-			error = TRUE;
-		}
-		g_free (filename);
-		filename = g_build_filename (dirname, "req", NULL);
-		if (! g_file_test(filename, G_FILE_TEST_IS_DIR)) {
-			error = TRUE;
+		filename = g_build_filename (dirname, "cacert.key", NULL);
+		if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+			g_free (filename);
+			filename = g_build_filename (dirname, "private", "cakey.pem", NULL);
+			if (! g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+				error = TRUE;
+			} else {
+				if (! error) 
+					CA_directory_type = 2; // OpenSSL CA.pl
+			}
 		}
 		g_free (filename);
 
-		if (! error) {
-			CA_directory_type = 1; //OpenSSL
+		if (! error && ! CA_directory_type) {
+			CA_directory_type = 1; //TinyCA
+		} 
+		
+		if (error) {
+			CA_directory_type = 0;
 		}
 	}
 
@@ -1114,6 +1115,7 @@ gchar * import_whole_dir (gchar *dirname)
 
         switch (CA_directory_type) {
 	case 1:
+	case 2:
                 
                 descriptions = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
@@ -1129,7 +1131,12 @@ gchar * import_whole_dir (gchar *dirname)
 		// Now we import the private CA root-certificate private key
 		// Usually, it is crypted in a OpenSSL proprietary format.
 		// Let's check it:
-		filename = g_build_filename (dirname, "cacert.key", NULL);
+		if (CA_directory_type == 1 /* TinyCA */) {
+			filename = g_build_filename (dirname, "cacert.key", NULL);
+		} else {
+			/* CA_directory_type == 2  (OpenSSL's CA.pl) */
+			filename = g_build_filename (dirname, "private", "cakey.pem", NULL);
+		}
 		if (import_openssl_private_key (filename, &ca_password, _("CA Root certificate")) == 0) {
 			g_free (filename);
 			result = _("There was a problem while importing the private key corresponding to CA root certificate");
@@ -1143,57 +1150,83 @@ gchar * import_whole_dir (gchar *dirname)
 		if (! dir) {
 			g_free (filename);
 			result = _("There was a problem while opening the directory certs/.");
-			break;
+		} else {
+			g_free (filename);
+			while ((int_filename = g_dir_read_name (dir))) {
+				
+				if (g_strrstr (int_filename, ".pem")) {
+					gchar *description = NULL;
+					filename = g_build_filename (dirname, "certs", int_filename, NULL);
+					if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
+						problematic_files = g_list_append (problematic_files, g_strdup(filename));
+					} else {
+						if (description && ! g_hash_table_lookup (descriptions, int_filename))
+							g_hash_table_insert (descriptions, g_strdup(int_filename), description);
+					}
+					g_free (filename);
+				}
+			}
+			g_dir_close (dir);
 		}
-		g_free (filename);
-		while ((int_filename = g_dir_read_name (dir))) {
-			
-			if (g_strrstr (int_filename, ".pem")) {
-                                gchar *description = NULL;
-				filename = g_build_filename (dirname, "certs", int_filename, NULL);
-				if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
-					problematic_files = g_list_append (problematic_files, g_strdup(filename));
-				} else {
-                                        if (description && ! g_hash_table_lookup (descriptions, int_filename))
-                                                g_hash_table_insert (descriptions, g_strdup(int_filename), description);
-                                }
+		filename = g_build_filename (dirname, "newcerts", NULL);
+		if (g_file_test(filename, G_FILE_TEST_IS_DIR)) { 
+			dir = g_dir_open (filename, 0, &gerror);
+			if (! dir) {
 				g_free (filename);
+				result = _("There was a problem while opening the directory newcerts/.");
+			} else {
+				g_free (filename);
+				while ((int_filename = g_dir_read_name (dir))) {
+					
+					if (g_strrstr (int_filename, ".pem")) {
+						gchar *description = NULL;
+						filename = g_build_filename (dirname, "newcerts", int_filename, NULL);
+						if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
+							problematic_files = g_list_append (problematic_files, g_strdup(filename));
+						} else {
+							if (description && ! g_hash_table_lookup (descriptions, int_filename))
+								g_hash_table_insert (descriptions, g_strdup(int_filename), description);
+						}
+						g_free (filename);
+					}
+				}
+				g_dir_close (dir);
 			}
 		}
-		g_dir_close (dir);
-
 
 		// Now we import all the CSRs of the CA
 		filename = g_build_filename (dirname, "req", NULL);
-		dir = g_dir_open (filename, 0, &gerror);
-		if (! dir) {
-			g_free (filename);
-			result = _("There was a problem while opening the directory certs/.");
-			break;
-		}
-		g_free (filename);
-		while ((int_filename = g_dir_read_name (dir))) {
-			
-			if (g_strrstr (int_filename, ".pem")) {
-                                gchar *description = NULL;
-				filename = g_build_filename (dirname, "req", int_filename, NULL);
-				if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
-					problematic_files = g_list_append (problematic_files, g_strdup(filename));
-				} else {
-                                        if (description && ! g_hash_table_lookup (descriptions, int_filename))
-                                                g_hash_table_insert (descriptions, g_strdup(int_filename), description);
-                                }
+		if (g_file_test(filename, G_FILE_TEST_IS_DIR)) { 
+			dir = g_dir_open (filename, 0, &gerror);
+			if (! dir) {
 				g_free (filename);
+				result = _("There was a problem while opening the directory req.");
+				break;
 			}
+			g_free (filename);
+			while ((int_filename = g_dir_read_name (dir))) {
+				
+				if (g_strrstr (int_filename, ".pem")) {
+					gchar *description = NULL;
+					filename = g_build_filename (dirname, "req", int_filename, NULL);
+					if (import_single_file ((gchar *) filename, &description, NULL) == 0) {
+						problematic_files = g_list_append (problematic_files, g_strdup(filename));
+					} else {
+						if (description && ! g_hash_table_lookup (descriptions, int_filename))
+							g_hash_table_insert (descriptions, g_strdup(int_filename), description);
+					}
+					g_free (filename);
+				}
+			}
+			g_dir_close (dir);
 		}
-		g_dir_close (dir);
 
 		// Now we import all the CRLs of the CA
 		filename = g_build_filename (dirname, "crl", NULL);
 		dir = g_dir_open (filename, 0, &gerror);
 		if (! dir) {
 			g_free (filename);
-			result = _("There was a problem while opening the directory certs/.");
+			result = _("There was a problem while opening the directory crl/.");
 			break;
 		}
 		g_free (filename);
@@ -1211,32 +1244,33 @@ gchar * import_whole_dir (gchar *dirname)
 		
 		// Now we import all the private keys of the CA
 		filename = g_build_filename (dirname, "keys", NULL);
-		dir = g_dir_open (filename, 0, &gerror);
-		if (! dir) {
-			g_free (filename);
-			result = _("There was a problem while opening the directory certs/.");
-			break;
-		}
-		g_free (filename);
-		while ((int_filename = g_dir_read_name (dir))) {
-			
-			if (g_strrstr (int_filename, ".pem")) {
-                                gchar *description = NULL;
-
-				filename = g_build_filename (dirname, "keys", int_filename, NULL);
-
-                                description = g_hash_table_lookup (descriptions, int_filename);
-                                if (! description)
-                                        description = filename;
-
-				if (import_openssl_private_key (filename, &ca_password, description) == 0) {
-					problematic_files = g_list_append (problematic_files, g_strdup(filename));					
-				}
+		if (g_file_test(filename, G_FILE_TEST_IS_DIR)) { 
+			dir = g_dir_open (filename, 0, &gerror);
+			if (! dir) {
 				g_free (filename);
+				result = _("There was a problem while opening the directory keys/.");
+				break;
 			}
+			g_free (filename);
+			while ((int_filename = g_dir_read_name (dir))) {
+				
+				if (g_strrstr (int_filename, ".pem")) {
+					gchar *description = NULL;
+					
+					filename = g_build_filename (dirname, "keys", int_filename, NULL);
+					
+					description = g_hash_table_lookup (descriptions, int_filename);
+					if (! description)
+						description = filename;
+					
+					if (import_openssl_private_key (filename, &ca_password, description) == 0) {
+						problematic_files = g_list_append (problematic_files, g_strdup(filename));					
+					}
+					g_free (filename);
+				}
+			}
+			g_dir_close (dir);
 		}
-		g_dir_close (dir);
-                
 
 		// Now we import the last serial number
 		filename = g_build_filename (dirname, "serial", NULL);
