@@ -30,7 +30,7 @@
 #include "crl.h"
 #include "ca_file.h"
 #include "pkey_manage.h"
-#include "ca.h"
+#include "dialog.h"
 #include "tls.h"
 #include "ca_policy.h"
 
@@ -267,7 +267,7 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	
 	strerror = crl_generate (ca_id, filename);
 	if (strerror) {
-		ca_error_dialog (strerror);
+		dialog_error (strerror);
 	} else {
 		
 	}

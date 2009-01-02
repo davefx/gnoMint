@@ -32,6 +32,7 @@
 #include "new_cert_creation_process.h"
 #include "ca_file.h"
 #include "tls.h"
+#include "dialog.h"
 #include "ca.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
@@ -328,31 +329,31 @@ void on_new_cert_next2_clicked (GtkButton *button,
         if (ca_policy_get (ca_id, "C_FORCE_SAME") && 
             (tls_ca_cert->c != tls_csr->c) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->c == NULL || tls_csr->c == NULL || strcmp(tls_ca_cert->c, tls_csr->c))) {
-                ca_error_dialog (_("The policy of this CA obligue the country field of the certificates to be the same as the one in the CA cert."));
+                dialog_error (_("The policy of this CA obligue the country field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
         if (ca_policy_get (ca_id, "ST_FORCE_SAME") && 
             (tls_ca_cert->st != tls_csr->st) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->st == NULL || tls_csr->st == NULL || strcmp(tls_ca_cert->st, tls_csr->st))) {
-                ca_error_dialog (_("The policy of this CA obligue the state/province field of the certificates to be the same as the one in the CA cert."));
+                dialog_error (_("The policy of this CA obligue the state/province field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
         if (ca_policy_get (ca_id, "L_FORCE_SAME") && 
             (tls_ca_cert->l != tls_csr->l) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->l == NULL || tls_csr->st == NULL || strcmp(tls_ca_cert->l, tls_csr->l))) {
-                ca_error_dialog (_("The policy of this CA obligue the locality/city field of the certificates to be the same as the one in the CA cert."));
+                dialog_error (_("The policy of this CA obligue the locality/city field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
         if (ca_policy_get (ca_id, "O_FORCE_SAME") && 
             (tls_ca_cert->o != tls_csr->o) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->o == NULL || tls_csr->o == NULL || strcmp(tls_ca_cert->o, tls_csr->o))) {
-                ca_error_dialog (_("The policy of this CA obligue the organization field of the certificates to be the same as the one in the CA cert."));
+                dialog_error (_("The policy of this CA obligue the organization field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
         if (ca_policy_get (ca_id, "OU_FORCE_SAME") && 
             (tls_ca_cert->ou != tls_csr->ou) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->ou == NULL || tls_csr->ou == NULL || strcmp(tls_ca_cert->ou, tls_csr->ou))) {
-                ca_error_dialog (_("The policy of this CA obligue the organizational unit field of the certificates to be the same as the one in the CA cert."));
+                dialog_error (_("The policy of this CA obligue the organizational unit field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
         
@@ -743,7 +744,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	strerror = new_cert_window_sign_csr (ca_get_selected_row_id (), ca_id, cert_creation_data);
 
 	if (strerror) {
-		ca_error_dialog ((gchar *) strerror);
+		dialog_error ((gchar *) strerror);
 	}
 
 	widget = GTK_WIDGET(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
@@ -818,7 +819,7 @@ const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, CertCreati
                         if (!error)
                                 ca_file_remove_csr (csr_id);
                         else 
-                                ca_error_dialog (error);
+                                dialog_error (error);
                         
                         pkey_manage_data_free (csr_pkey);
 		}

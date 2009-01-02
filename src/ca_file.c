@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "ca.h"
+#include "dialog.h"
 #include "tls.h"
 #include "ca_file.h"
 #include "pkey_manage.h"
@@ -303,7 +303,7 @@ gchar * __ca_file_check_and_update_version ()
 	}
 
         if (db_version_in_file > CURRENT_GNOMINT_DB_VERSION) {
-                ca_error_dialog (_("The selected database has been created with a newer version of gnoMint than the currently installed."));
+                dialog_error (_("The selected database has been created with a newer version of gnoMint than the currently installed."));
                 return error;
         }
 
@@ -1705,7 +1705,7 @@ gchar * ca_file_revoke_crt_with_date (guint64 id, time_t date)
 }
 
 
-gchar * ca_file_import_privkey (const gchar *privkey_pem)
+gchar * ca_file_insert_imported_privkey (const gchar *privkey_pem)
 {
         gchar *pkey_key_id = NULL;
         gchar *sql = NULL;

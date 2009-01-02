@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -17,30 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_CLI_H_
-#define _CA_CLI_H_
+#ifndef _EXPORT_H_
+#define _EXPORT_H_
 
 #include <glib.h>
-#include <glib/gstdio.h>
+#include <glib/gi18n.h>
 
-typedef int  (* CaCommandCallback) (int argc, char **argv);
+gchar *export_dh_param (guint dh_size, gchar *filename);
 
-typedef struct _CaCommand {
-        const gchar *command;
-        guint mandatory_params;
-        guint optional_params;
-        gchar *syntax;
-        gchar *help;
-        CaCommandCallback callback;
-} CaCommand;
-
-gboolean ca_refresh_model (void);
-
-gboolean ca_open (gchar *filename, gboolean create);
-
-
-void ca_command_line ();
-
+gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename);
 
 
 #endif

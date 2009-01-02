@@ -33,14 +33,8 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 				    gpointer user_data);
 gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data);
-void ca_error_dialog (gchar *message);
-gchar * ca_dialog_get_password (gchar *info_message, 
-                                gchar *password_message, gchar *confirm_message, 
-                                gchar *distinct_error_message, guint minimum_length);
-void ca_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data);
 void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_todo_callback (void);
 void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data);
@@ -67,7 +61,5 @@ void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data);
 
 #endif
 
-gchar * ca_export_private_pkcs8 (guint64 id, gint type, gchar *filename);
-gchar * ca_generate_dh_param (guint bitlength_prime, gchar *filename);
 
 #endif

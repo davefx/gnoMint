@@ -18,6 +18,7 @@ gnomint_SOURCES = \
         new_req_window.c \
 	new_cert_window.c \
 	new_cert_creation_process.c \
+	dialog.c \
 	ca.c \
 	ca_creation.c \
 	tls.c \
@@ -31,7 +32,8 @@ gnomint_SOURCES = \
 	preferences-window.c \
 	crl.c \
 	uint160.c \
-	import.c
+	import.c \
+	export.c
 
 
 gnomint_LDADD = \
@@ -56,10 +58,11 @@ gnomint_cli_CFLAGS = \
 	-DHAVE_CONFIG_H -DGNOMINTCLI
 
 gnomint_cli_SOURCES = \
+	dialog.c \
 	gnomint-cli.c \
-	ca.c \
+	export.c \
 	ca-cli.c \
-	ca-callbacks.c \
+	ca-cli-callbacks.c \
         ca_creation.c \
 	ca_file.c \
 	ca_policy.c \
@@ -91,6 +94,8 @@ EXTRA_DIST = \
 	certificate_properties.h \
 	csr_creation.h \
 	csr_properties.h \
+	dialog.h \
+	export.h \
 	main.h \
 	new_cert_creation_process.h \
 	new_ca_window.h \
@@ -105,4 +110,4 @@ EXTRA_DIST = \
 	uint160.h \
 	import.h \
 	ca-cli.h \
-	ca-callbacks.h
+	ca-cli-callbacks.h

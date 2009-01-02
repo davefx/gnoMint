@@ -65,11 +65,11 @@ gchar * ca_file_insert_csr (CaCreationData * creation_data,
 			    gchar *pem_private_key,
 			    gchar *pem_csr,
                             guint64 *id);
+gchar * ca_file_insert_imported_privkey (const gchar *privkey_pem);
+
 gchar * ca_file_remove_csr (guint64 id);
 gchar * ca_file_revoke_crt (guint64 id);
 gchar * ca_file_revoke_crt_with_date (guint64 id, time_t date);
-
-gchar * ca_file_import_privkey (const gchar *privkey_pem);
 
 GList * ca_file_get_revoked_certs (guint64 ca_id, gchar **error);
 

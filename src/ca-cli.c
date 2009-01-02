@@ -30,46 +30,46 @@
 
 #include "ca-cli.h"
 #include "ca_file.h"
-#include "ca-callbacks.h"
+#include "ca-cli-callbacks.h"
 
 
 CaCommand ca_commands[] = {
-	{"newdb", 1, 1, N_("newdb <filename>"), N_("Close current file and create a new database with given filename"), ca_callback_newdb}, // 0
-	{"opendb", 1, 1, N_("opendb <filename>"), N_("Close current file and open the file with given filename"), ca_callback_opendb}, // 1
-	{"savedbas", 1, 1, N_("savedbas <filename>"), N_("Save the current file with a different filename"), ca_callback_savedbas}, // 2
-	{"status", 0, 0, "status", N_("Get current status (opened file, no. of certificates, etc...)"), ca_callback_status}, // 3
+	{"newdb", 1, 1, N_("newdb <filename>"), N_("Close current file and create a new database with given filename"), ca_cli_callback_newdb}, // 0
+	{"opendb", 1, 1, N_("opendb <filename>"), N_("Close current file and open the file with given filename"), ca_cli_callback_opendb}, // 1
+	{"savedbas", 1, 1, N_("savedbas <filename>"), N_("Save the current file with a different filename"), ca_cli_callback_savedbas}, // 2
+	{"status", 0, 0, "status", N_("Get current status (opened file, no. of certificates, etc...)"), ca_cli_callback_status}, // 3
 	{"listcert", 0, 1, "listcert [--see-revoked]", N_("List the certificates in database. With option --see-revoked, "
-							 "lists also the revoked ones"), ca_callback_listcert}, // 4
-	{"listcsr", 0, 0, "listcsr", N_("List the CSRs in database"), ca_callback_listcsr}, // 5
-	{"addcsr", 0, 1, N_("addcsr [ca-id-for-inherit-fields]"), N_("Start a new CSR creation process"), ca_callback_addcsr}, // 6
-	{"addca", 0, 0, "addca", N_("Start a new self-signed CA creation process"), ca_callback_addca}, //7
+							 "lists also the revoked ones"), ca_cli_callback_listcert}, // 4
+	{"listcsr", 0, 0, "listcsr", N_("List the CSRs in database"), ca_cli_callback_listcsr}, // 5
+	{"addcsr", 0, 1, N_("addcsr [ca-id-for-inherit-fields]"), N_("Start a new CSR creation process"), ca_cli_callback_addcsr}, // 6
+	{"addca", 0, 0, "addca", N_("Start a new self-signed CA creation process"), ca_cli_callback_addca}, //7
 	{"extractcertpkey", 2, 2, N_("extractcertpkey <cert-id> <filename>"), N_("Extract the private key of the certificate with the given " 
 									       "internal id and saves it into the given file"),  
-	 ca_callback_extractcertpkey}, // 8
+	 ca_cli_callback_extractcertpkey}, // 8
 	{"extractcsrpkey", 2, 2, N_("extractcsrpkey <csr-id> <filename>"), N_("Extract the private key of the CSR with the given " 
 									    "internal id and saves it into the given file"), 
-	 ca_callback_extractcsrpkey}, // 9
-	{"revoke", 1, 1, N_("revoke <cert-id>"), N_("Revoke the certificate with the given internal ID"), ca_callback_revoke}, // 10
-	{"sign", 2, 2, N_("sign <csr-id> <ca-cert-id>"), N_("Generate a certificate signing the given CSR with the given CA"), ca_callback_sign}, // 11
-	{"delete", 1, 1, N_("delete <csr-id>"), N_("Delete the given CSR from the database"), ca_callback_delete}, // 12
-	{"dhgen", 2, 2, N_("dhgen <prime-bitlength> <filename>"), N_("Generate a new DH-parameter set, saving it into the file <filename>"), ca_callback_dhgen}, // 13
-	{"changepassword", 0, 0, "changepassword", N_("Change password for the current database"), ca_callback_changepassword}, // 14
-	{"importfile", 1, 1, N_("importfile <filename>"), N_("Import the file with the given name <filename>"), ca_callback_importfile}, // 15
-	{"importdir", 1, 1, N_("importdir <dirname>"), N_("Import the given directory, as a OpenSSL-CA directory"), ca_callback_importdir}, // 16
-	{"showcert", 1, 1, N_("showcert <cert-id>"), N_("Show properties of the given certificate"), ca_callback_showcert}, // 17 
-	{"showcsr", 1, 1, N_("showcsr <csr-id>"), N_("Show properties of the given CSR"), ca_callback_showcsr}, // 18
-	{"showpolicy", 1, 1, N_("showpolicy <ca-id>"), N_("Show CA policy"), ca_callback_showpolicy}, // 19
-	{"setpolicy", 3, 3, N_("setpolicy <ca-id> <policy-id> <value>"), N_("Change the given CA policy"), ca_callback_setpolicy}, // 20
-	{"showpreferences", 0, 0, "showpreferences", N_("Show program preferences"), ca_callback_showpreferences}, // 21
-	{"setpreference", 2, 2, N_("setpreference <preference-id> <value>"), N_("Set the given program preference"), ca_callback_setpreference}, // 22
-	{"about", 0, 0, "about", N_("Show about message"), ca_callback_about}, // 23
-	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_callback_warranty}, // 24
-	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_callback_distribution}, // 25
-	{"version", 0, 0, "version", N_("Show version information"), ca_callback_version}, // 26
-	{"help", 0, 0, "help", N_("Show (this) help message"),  ca_callback_help}, // 27
-	{"quit", 0, 0, "quit", N_("Close database and exit program"), ca_callback_exit}, // 28
-	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_callback_exit}, // 29
-	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_callback_exit} // 30
+	 ca_cli_callback_extractcsrpkey}, // 9
+	{"revoke", 1, 1, N_("revoke <cert-id>"), N_("Revoke the certificate with the given internal ID"), ca_cli_callback_revoke}, // 10
+	{"sign", 2, 2, N_("sign <csr-id> <ca-cert-id>"), N_("Generate a certificate signing the given CSR with the given CA"), ca_cli_callback_sign}, // 11
+	{"delete", 1, 1, N_("delete <csr-id>"), N_("Delete the given CSR from the database"), ca_cli_callback_delete}, // 12
+	{"dhgen", 2, 2, N_("dhgen <prime-bitlength> <filename>"), N_("Generate a new DH-parameter set, saving it into the file <filename>"), ca_cli_callback_dhgen}, // 13
+	{"changepassword", 0, 0, "changepassword", N_("Change password for the current database"), ca_cli_callback_changepassword}, // 14
+	{"importfile", 1, 1, N_("importfile <filename>"), N_("Import the file with the given name <filename>"), ca_cli_callback_importfile}, // 15
+	{"importdir", 1, 1, N_("importdir <dirname>"), N_("Import the given directory, as a OpenSSL-CA directory"), ca_cli_callback_importdir}, // 16
+	{"showcert", 1, 1, N_("showcert <cert-id>"), N_("Show properties of the given certificate"), ca_cli_callback_showcert}, // 17 
+	{"showcsr", 1, 1, N_("showcsr <csr-id>"), N_("Show properties of the given CSR"), ca_cli_callback_showcsr}, // 18
+	{"showpolicy", 1, 1, N_("showpolicy <ca-id>"), N_("Show CA policy"), ca_cli_callback_showpolicy}, // 19
+	{"setpolicy", 3, 3, N_("setpolicy <ca-id> <policy-id> <value>"), N_("Change the given CA policy"), ca_cli_callback_setpolicy}, // 20
+	{"showpreferences", 0, 0, "showpreferences", N_("Show program preferences"), ca_cli_callback_showpreferences}, // 21
+	{"setpreference", 2, 2, N_("setpreference <preference-id> <value>"), N_("Set the given program preference"), ca_cli_callback_setpreference}, // 22
+	{"about", 0, 0, "about", N_("Show about message"), ca_cli_callback_about}, // 23
+	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_cli_callback_warranty}, // 24
+	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_cli_callback_distribution}, // 25
+	{"version", 0, 0, "version", N_("Show version information"), ca_cli_callback_version}, // 26
+	{"help", 0, 0, "help", N_("Show (this) help message"),  ca_cli_callback_help}, // 27
+	{"quit", 0, 0, "quit", N_("Close database and exit program"), ca_cli_callback_exit}, // 28
+	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_cli_callback_exit}, // 29
+	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_cli_callback_exit} // 30
 };
 #define CA_COMMAND_NUMBER 31
 
@@ -85,204 +85,6 @@ gboolean ca_refresh_model (void)
 }
 
 
-void ca_error_dialog (gchar *message) {
-        fprintf (stderr, "\nError: %s\n\n", message);
-}
-
-gchar * ca_dialog_get_password (gchar *info_message, 
-                                gchar *password_message, gchar *confirm_message, 
-                                gchar *distinct_error_message, guint minimum_length)
-{
-	gchar * res = NULL;
-        gchar * password = NULL;
-	gchar * password2 = NULL;
-
-	printf ("%s\n\n", info_message);
-
-	do {
-		if (res) {
-			g_free (res);
-			res = NULL;
-		}
-
-		password = getpass(password_message);
-
-		if (! password || password[0]=='\0')
-			return NULL;
-
-		res = g_strdup (password);
-		if (strlen (res) < minimum_length) {
-			fprintf (stderr, _("\nThe password must have, at least, %d characters\n"), minimum_length); 
-			continue;
-		}
-		memset (password, 0, strlen (res));
-
-		password2 = getpass(confirm_message);
-
-		if (strcmp (res, password2)) {
-			fprintf (stderr, "\n%s\n", distinct_error_message);
-			memset (password, 0, strlen (password2));		
-		}
-
-	} while (strlen (res) < minimum_length || strcmp (res, password2) );
-
-	memset (password, 0, strlen (password2));		
-
-	return res;
-}
-
-
-void ca_todo_callback ()
-{
-	ca_error_dialog (_("To do. Feature not implemented yet."));
-}
-
-gboolean ca_ask_for_confirmation (gchar *message, gchar *prompt, gboolean default_answer)
-{
-	gchar *line;
-
-	const gchar *positive_answers = Q_("List of affirmative answers, separated with #|Yes#yes#Y#y");
-	const gchar *negative_answers = Q_("List of negative answers, separated with #|No#no#N#n");
-	
-	gchar **aux;
-	gint i;
-
-	if (message)
-		printf ("%s\n", message);
-
-	while (TRUE) {
-
-		line = readline (prompt);
-		
-		if (line == NULL)
-			return default_answer;
-		
-		if (strlen (line) == 0)
-			return default_answer;
-		
-
-		aux = g_strsplit (positive_answers, "#", -1);
-		i = 0;
-
-		while (aux[i]) {
-			if (!strcmp (line, aux[i])) {
-				free (line);
-				g_strfreev (aux);
-				return TRUE;
-			}
-			i++;
-		}
-		g_strfreev (aux);
-
-		aux = g_strsplit (negative_answers, "#", -1);
-		i = 0;
-
-		while (aux[i]) {
-			if (!strcmp (line, aux[i])) {
-				free (line);
-				g_strfreev (aux);
-				return FALSE;
-			}
-			i++;
-		}
-		g_strfreev (aux);
-
-		free (line);
-	} 
-		
-	
-}
-
-
-gint ca_ask_for_number (gchar *message, gint minimum, gint maximum, gint default_value)
-{
-	gchar *line;
-	gchar *prompt = NULL;
-	gint result;
-	gboolean keep_trying = TRUE;
-
-	if (! message)
-		message = "";
-
-	g_assert (minimum <= default_value);
-	g_assert (maximum >= default_value);
-
-	if (maximum == default_value)
-		prompt = g_strdup_printf ("%s (%d - [%d]): ", message, minimum, maximum);
-	else if (minimum == default_value)
-		prompt = g_strdup_printf ("%s ([%d] - %d): ", message, minimum, maximum);
-	else 
-		prompt = g_strdup_printf ("%s (%d - [%d] - %d): ", message, minimum, default_value, maximum);
-
-	while (keep_trying) {
-		line = readline (prompt);
-		
-		if (line == NULL || strlen (line) == 0) {
-			result = default_value;
-			keep_trying = FALSE;		
-		}
-		if (atoi (line) <= maximum && atoi(line) >= minimum) {
-			result = (atoi (line));
-			keep_trying = FALSE;
-		}
-		
-		if (line)
-			free (line);
-	} 	
-
-	g_free (prompt);
-	return result;
-	
-}
-
-gchar * ca_ask_for_password (gchar *message)
-{
-	gchar *password;
-	gchar *aux = NULL;
-
-
-	aux = getpass (message);
-	
-	if (!aux || aux[0] == '\0') {
-		return NULL;
-	} else {
-		password = g_strdup (aux);
-		memset (aux, 0, strlen(aux));
-	}
-	
-	return password;
-}
-
-gchar * ca_ask_for_string (gchar *message, gchar *default_answer)
-{
-	gchar *prompt;
-	gchar *result = NULL;
-	char *line;
-
-	printf ("%s\n", message);
-	
-	if (default_answer) {
-		prompt = g_strdup_printf ("[%s] : ", default_answer);
-	} else {
-		prompt = g_strdup (": ");
-	}
-
-
-	line = readline (prompt);
-	
-	if (line == NULL || strlen(line) == 0) {
-		if (default_answer)
-			result = g_strdup(default_answer);
-		else
-			result = NULL;
-	} else {
-		result = g_strdup (line);
-	}
-
-	g_free (prompt);
-	return result;
-	
-}
 
 
 gboolean ca_open (gchar *filename, gboolean create) 

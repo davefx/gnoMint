@@ -24,11 +24,13 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 
-#include "ca-callbacks.h"
-#include "ca.h"
+#include "ca-cli-callbacks.h"
+#include "ca-cli.h"
+#include "dialog.h"
 #include "ca_file.h"
 #include "ca_policy.h"
 #include "csr_creation.h"
+#include "export.h"
 #include "import.h"
 #include "new_cert_window.h"
 #include "pkey_manage.h"
@@ -44,7 +46,7 @@ extern gchar * ca_creation_message;
 extern gchar * csr_creation_message;
 
 
-int ca_callback_newdb (int argc, char **argv)
+int ca_cli_callback_newdb (int argc, char **argv)
 {
         gchar *filename = argv[1];
         gchar *error = NULL;
@@ -52,7 +54,7 @@ int ca_callback_newdb (int argc, char **argv)
         if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
                 /* The file already exists. We ask the user about overwriting it */
                 
-                if (! ca_ask_for_confirmation (_("The file already exists, so it will be overwritten."), _("Are you sure? Yes/[No] "), FALSE)) 
+                if (! dialog_ask_for_confirmation (_("The file already exists, so it will be overwritten."), _("Are you sure? Yes/[No] "), FALSE)) 
 			return 1;
 
                 /* If he wants to overwrite it, we first rename it to "filename~", after deleting "filename~" if it already exists */
@@ -83,7 +85,7 @@ int ca_callback_newdb (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_opendb (int argc, char **argv)
+int ca_cli_callback_opendb (int argc, char **argv)
 {
 	gchar *filename = argv[1];
 
@@ -94,14 +96,14 @@ int ca_callback_opendb (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_savedbas (int argc, char **argv)
+int ca_cli_callback_savedbas (int argc, char **argv)
 {
         gchar *filename = argv[1];
         
         if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
                 /* The file already exists. We ask the user about overwriting it */
                 
-                if (! ca_ask_for_confirmation (_("The file already exists, so it will be overwritten."), _("Are you sure? Yes/[No] "), FALSE)) 
+                if (! dialog_ask_for_confirmation (_("The file already exists, so it will be overwritten."), _("Are you sure? Yes/[No] "), FALSE)) 
 			return 1;
 
                 /* If he wants to overwrite it, we first rename it to "filename~", after deleting "filename~" if it already exists */
@@ -120,7 +122,7 @@ int ca_callback_savedbas (int argc, char **argv)
 
 }
 
-int ca_callback_status (int argc, char **argv)
+int ca_cli_callback_status (int argc, char **argv)
 {
 	printf (_("Current opened file: %s\n"), gnomint_current_opened_file);
 	printf (_("Number of certificates in file: %d\n"), ca_file_get_number_of_certs());
@@ -129,7 +131,7 @@ int ca_callback_status (int argc, char **argv)
 	return 0;
 }
 
-int __ca_callback_listcert_aux (void *pArg, int argc, char **argv, char **columnNames)
+int __ca_cli_callback_listcert_aux (void *pArg, int argc, char **argv, char **columnNames)
 {
 	struct tm tmp;
 	time_t aux_date;
@@ -195,7 +197,7 @@ int __ca_callback_listcert_aux (void *pArg, int argc, char **argv, char **column
 }
 
 
-int ca_callback_listcert (int argc, char **argv)
+int ca_cli_callback_listcert (int argc, char **argv)
 {
 	gboolean see_revoked = FALSE;
 
@@ -210,11 +212,11 @@ int ca_callback_listcert (int argc, char **argv)
 	else
 		printf ("\n");
 
-	ca_file_foreach_crt (__ca_callback_listcert_aux, see_revoked, GINT_TO_POINTER(see_revoked));
+	ca_file_foreach_crt (__ca_cli_callback_listcert_aux, see_revoked, GINT_TO_POINTER(see_revoked));
 	return 0;
 }
 
-int __ca_callback_listcsr_aux (void *pArg, int argc, char **argv, char **columnNames)
+int __ca_cli_callback_listcsr_aux (void *pArg, int argc, char **argv, char **columnNames)
 {
 	printf (Q_("CsrList ID|%s\t"), argv[CA_FILE_CSR_COLUMN_ID]);
 
@@ -239,19 +241,19 @@ int __ca_callback_listcsr_aux (void *pArg, int argc, char **argv, char **columnN
 }
 
 
-int ca_callback_listcsr (int argc, char **argv)
+int ca_cli_callback_listcsr (int argc, char **argv)
 {
 	printf (_("Certificate Requests in Database:\n"));
 	printf (_("Id.\tParent Id.\tCSR Subject\t\tKey in DB?\n"));
 
-	ca_file_foreach_csr (__ca_callback_listcsr_aux, NULL);
+	ca_file_foreach_csr (__ca_cli_callback_listcsr_aux, NULL);
 	return 0;
 }
 
 
 
 
-int ca_callback_addcsr (int argc, char **argv)
+int ca_cli_callback_addcsr (int argc, char **argv)
 {
 	gboolean with_ca_id = FALSE;
 	guint64 ca_id;
@@ -270,7 +272,7 @@ int ca_callback_addcsr (int argc, char **argv)
 		ca_id = atoll (argv[1]);
 		with_ca_id = TRUE;
 		if (! ca_file_check_if_is_ca_id (ca_id)) {
-			ca_error_dialog (_("The given CA id. is not valid"));
+			dialog_error (_("The given CA id. is not valid"));
 			return -1;
 		}
 	}
@@ -325,37 +327,37 @@ int ca_callback_addcsr (int argc, char **argv)
 
 		printf (_("Please enter data corresponding to subject of the Certificate Signing Request:\n"));
 
-		aux = ca_ask_for_string (_("Enter country (C)"), csr_creation_data->country);
+		aux = dialog_ask_for_string (_("Enter country (C)"), csr_creation_data->country);
 		if (csr_creation_data->country)
 			g_free (csr_creation_data->country);
 		csr_creation_data->country = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter state or province (ST)"), csr_creation_data->state);
+		aux = dialog_ask_for_string (_("Enter state or province (ST)"), csr_creation_data->state);
 		if (csr_creation_data->state)
 			g_free (csr_creation_data->state);
 		csr_creation_data->state = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter locality or city (L)"), csr_creation_data->city);
+		aux = dialog_ask_for_string (_("Enter locality or city (L)"), csr_creation_data->city);
 		if (csr_creation_data->city)
 			g_free (csr_creation_data->city);
 		csr_creation_data->city = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter organization (O)"), csr_creation_data->org);
+		aux = dialog_ask_for_string (_("Enter organization (O)"), csr_creation_data->org);
 		if (csr_creation_data->org)
 			g_free (csr_creation_data->org);
 		csr_creation_data->org = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter organizational unit (OU)"), csr_creation_data->ou);
+		aux = dialog_ask_for_string (_("Enter organizational unit (OU)"), csr_creation_data->ou);
 		if (csr_creation_data->ou)
 			g_free (csr_creation_data->ou);
 		csr_creation_data->ou = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter common name (CN)"), csr_creation_data->cn);
+		aux = dialog_ask_for_string (_("Enter common name (CN)"), csr_creation_data->cn);
 		if (csr_creation_data->cn)
 			g_free (csr_creation_data->cn);
 		csr_creation_data->cn = aux;
@@ -365,7 +367,7 @@ int ca_callback_addcsr (int argc, char **argv)
 			if (aux)
 				g_free (aux);
 
-			aux = ca_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (csr_creation_data->key_type ? "DSA" : "RSA"));
+			aux = dialog_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (csr_creation_data->key_type ? "DSA" : "RSA"));
 		} while (g_ascii_strcasecmp (aux, "RSA") && g_ascii_strcasecmp (aux, "DSA"));
 
 		if (! g_ascii_strcasecmp (aux, "RSA")) {
@@ -377,7 +379,7 @@ int ca_callback_addcsr (int argc, char **argv)
 		aux = NULL;
 		
 		do {
-			csr_creation_data->key_bitlength = ca_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+			csr_creation_data->key_bitlength = dialog_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
 									      1024,10240,csr_creation_data->key_bitlength);
 		} while (csr_creation_data->key_bitlength % 1024);
 
@@ -402,11 +404,11 @@ int ca_callback_addcsr (int argc, char **argv)
 		printf (_("\tType: %s\n"), (csr_creation_data->key_type ? "DSA" : "RSA"));
 		printf (_("\tKey bitlength: %d\n"), csr_creation_data->key_bitlength);
 
-		change_data = ca_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
+		change_data = dialog_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
 
 	} while (change_data);
 
-	if (ca_ask_for_confirmation (_("You are about to create a Certificate Signing Request with these properties."),
+	if (dialog_ask_for_confirmation (_("You are about to create a Certificate Signing Request with these properties."),
 				     _("Are you sure? [Yes]/No "), TRUE)) {
 		csr_creation_thread (csr_creation_data);
 		printf ("%s\n", csr_creation_message);
@@ -421,7 +423,7 @@ int ca_callback_addcsr (int argc, char **argv)
 
 
 
-int ca_callback_addca (int argc, char **argv)
+int ca_cli_callback_addca (int argc, char **argv)
 {
 	gboolean change_data = FALSE;
 
@@ -448,37 +450,37 @@ int ca_callback_addca (int argc, char **argv)
 
 		printf (_("Please enter data corresponding to subject of the new Certification Authority:\n"));
 
-		aux = ca_ask_for_string (_("Enter country (C)"), ca_creation_data->country);
+		aux = dialog_ask_for_string (_("Enter country (C)"), ca_creation_data->country);
 		if (ca_creation_data->country)
 			g_free (ca_creation_data->country);
 		ca_creation_data->country = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter state or province (ST)"), ca_creation_data->state);
+		aux = dialog_ask_for_string (_("Enter state or province (ST)"), ca_creation_data->state);
 		if (ca_creation_data->state)
 			g_free (ca_creation_data->state);
 		ca_creation_data->state = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter locality or city (L)"), ca_creation_data->city);
+		aux = dialog_ask_for_string (_("Enter locality or city (L)"), ca_creation_data->city);
 		if (ca_creation_data->city)
 			g_free (ca_creation_data->city);
 		ca_creation_data->city = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter organization (O)"), ca_creation_data->org);
+		aux = dialog_ask_for_string (_("Enter organization (O)"), ca_creation_data->org);
 		if (ca_creation_data->org)
 			g_free (ca_creation_data->org);
 		ca_creation_data->org = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter organizational unit (OU)"), ca_creation_data->ou);
+		aux = dialog_ask_for_string (_("Enter organizational unit (OU)"), ca_creation_data->ou);
 		if (ca_creation_data->ou)
 			g_free (ca_creation_data->ou);
 		ca_creation_data->ou = aux;
 		aux = NULL;
 
-		aux = ca_ask_for_string (_("Enter common name (CN)"), ca_creation_data->cn);
+		aux = dialog_ask_for_string (_("Enter common name (CN)"), ca_creation_data->cn);
 		if (ca_creation_data->cn)
 			g_free (ca_creation_data->cn);
 		ca_creation_data->cn = aux;
@@ -488,7 +490,7 @@ int ca_callback_addca (int argc, char **argv)
 			if (aux)
 				g_free (aux);
 
-			aux = ca_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (ca_creation_data->key_type ? "DSA" : "RSA"));
+			aux = dialog_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (ca_creation_data->key_type ? "DSA" : "RSA"));
 		} while (g_ascii_strcasecmp (aux, "RSA") && g_ascii_strcasecmp (aux, "DSA"));
 		
 		if (! g_ascii_strcasecmp (aux, "RSA")) {
@@ -500,12 +502,12 @@ int ca_callback_addca (int argc, char **argv)
 		aux = NULL;
 		
 		do {
-			ca_creation_data->key_bitlength = ca_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+			ca_creation_data->key_bitlength = dialog_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
 									     1024,10240,ca_creation_data->key_bitlength);
 		} while (ca_creation_data->key_bitlength % 1024);
 
 
-		ca_creation_data->key_months_before_expiration = ca_ask_for_number (_("Introduce number of months before expiration of the new certification authority"),
+		ca_creation_data->key_months_before_expiration = dialog_ask_for_number (_("Introduce number of months before expiration of the new certification authority"),
 										    1, 600, 240);
 
 		tmp = time (NULL);	
@@ -549,11 +551,11 @@ int ca_callback_addca (int argc, char **argv)
 		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);	
 		printf (_("\tExpires on: %s\n"), model_time_str);
 
-		change_data = ca_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
+		change_data = dialog_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
 
 	} while (change_data);
 
-	if (ca_ask_for_confirmation (_("You are about to create a new Certification Authority with these properties."),
+	if (dialog_ask_for_confirmation (_("You are about to create a new Certification Authority with these properties."),
 				     _("Are you sure? [Yes]/No "), TRUE)) {
 		ca_creation_thread (ca_creation_data);
 		printf ("%s\n", ca_creation_message);
@@ -572,23 +574,23 @@ int ca_callback_addca (int argc, char **argv)
 
 
 
-int ca_callback_extractcertpkey (int argc, char **argv)
+int ca_cli_callback_extractcertpkey (int argc, char **argv)
 {
 	guint64 id_cert = atoll(argv[1]);
 	gchar *filename = argv[2];
 	gchar *error = NULL;
 
 	if (! ca_file_check_if_is_cert_id (id_cert)) {
-		ca_error_dialog (_("The given certificate id. is not valid"));
+		dialog_error (_("The given certificate id. is not valid"));
 		return -1;
 	}
 
-	error = ca_export_private_pkcs8 (id_cert, CA_FILE_ELEMENT_TYPE_CERT, filename);
+	error = export_private_pkcs8 (id_cert, CA_FILE_ELEMENT_TYPE_CERT, filename);
 
 	if (! error) {
 		printf (_("Private key extracted successfully into file '%s'\n"), filename);
 	} else {
-		ca_error_dialog (error);
+		dialog_error (error);
 		return 1;
 	}
 
@@ -596,23 +598,23 @@ int ca_callback_extractcertpkey (int argc, char **argv)
 }
 
 
-int ca_callback_extractcsrpkey (int argc, char **argv)
+int ca_cli_callback_extractcsrpkey (int argc, char **argv)
 {
 	guint64 id_csr = atoll(argv[1]);
 	gchar *filename = argv[2];
 	gchar *error = NULL;
 
 	if (! ca_file_check_if_is_csr_id (id_csr)) {
-		ca_error_dialog (_("The given CSR id. is not valid"));
+		dialog_error (_("The given CSR id. is not valid"));
 		return -1;
 	}
 
-	error = ca_export_private_pkcs8 (id_csr, CA_FILE_ELEMENT_TYPE_CSR, filename);
+	error = export_private_pkcs8 (id_csr, CA_FILE_ELEMENT_TYPE_CSR, filename);
 
 	if (! error) {
 		printf (_("Private key extracted successfully into file '%s'\n"), filename);
 	} else {
-		ca_error_dialog (error);
+		dialog_error (error);
 		return 1;
 	}
 
@@ -621,22 +623,22 @@ int ca_callback_extractcsrpkey (int argc, char **argv)
 
 
 
-int ca_callback_revoke (int argc, char **argv)
+int ca_cli_callback_revoke (int argc, char **argv)
 {
 	gchar *errmsg = NULL;
 	guint64 id = atoll (argv[1]);
 
 	if (! ca_file_check_if_is_cert_id (id)) {
-		ca_error_dialog (_("The given certificate id. is not valid"));
+		dialog_error (_("The given certificate id. is not valid"));
 		return -1;
 	}
 
-	ca_callback_showcert (argc, argv);
+	ca_cli_callback_showcert (argc, argv);
 
-	if (ca_ask_for_confirmation (_("This certificate will be revoked."), _("Are you sure? Yes/[No] "),  FALSE)) {
+	if (dialog_ask_for_confirmation (_("This certificate will be revoked."), _("Are you sure? Yes/[No] "),  FALSE)) {
 		errmsg = ca_file_revoke_crt (id);
 		if (errmsg) {
-			ca_error_dialog (_(errmsg));
+			dialog_error (_(errmsg));
 			
 		} else {
 			printf (_("Certificate revoked.\n"));
@@ -651,7 +653,7 @@ int ca_callback_revoke (int argc, char **argv)
 }
 
 
-void __ca_callback_show_uses_and_purposes (CertCreationData *cert_creation_data)
+void __ca_cli_callback_show_uses_and_purposes (CertCreationData *cert_creation_data)
 {
 	printf (_("Certificate uses:\n"));
 
@@ -744,7 +746,7 @@ void __ca_callback_show_uses_and_purposes (CertCreationData *cert_creation_data)
 }
 
 
-int ca_callback_sign (int argc, char **argv)
+int ca_cli_callback_sign (int argc, char **argv)
 {
 	CertCreationData *cert_creation_data = NULL;
 	
@@ -755,7 +757,7 @@ int ca_callback_sign (int argc, char **argv)
 	ca_id = atoll(argv[2]);
 
 	if (! ca_file_check_if_is_csr_id (csr_id)) {
-		ca_error_dialog (_("The given CSR id. is not valid"));
+		dialog_error (_("The given CSR id. is not valid"));
 		return -1;
 	}
 
@@ -763,11 +765,11 @@ int ca_callback_sign (int argc, char **argv)
 	cert_creation_data = g_new0 (CertCreationData, 1);
 
 	printf (_("You are about to sign the following Certificate Signing Request:\n"));
-	ca_callback_showcsr (argc, argv);
+	ca_cli_callback_showcsr (argc, argv);
 	printf (_("with the certificate corresponding to the next CA:\n"));
-	ca_callback_showcert (argc - 1, &argv[1]);
+	ca_cli_callback_showcert (argc - 1, &argv[1]);
 
-	cert_creation_data->key_months_before_expiration = ca_ask_for_number (_("Introduce number of months before expiration of the new certificate (0 to cancel)"),
+	cert_creation_data->key_months_before_expiration = dialog_ask_for_number (_("Introduce number of months before expiration of the new certificate (0 to cancel)"),
 									      0,
 									      ca_policy_get (ca_id, "MONTHS_TO_EXPIRE"), 
 									      ca_policy_get (ca_id, "MONTHS_TO_EXPIRE"));
@@ -796,103 +798,103 @@ int ca_callback_sign (int argc, char **argv)
 	cert_creation_data->any_purpose = ca_policy_get (ca_id, "ANY_PURPOSE");
 
 	printf (_("The new certificate will be created with the following uses and purposes:\n"));
-	__ca_callback_show_uses_and_purposes (cert_creation_data);
+	__ca_cli_callback_show_uses_and_purposes (cert_creation_data);
 	
-	while (ca_ask_for_confirmation (NULL, _("Do you want to change any property of the new certificate? Yes/[No] "), FALSE)) {
+	while (dialog_ask_for_confirmation (NULL, _("Do you want to change any property of the new certificate? Yes/[No] "), FALSE)) {
 
 		if (ca_policy_get (ca_id, "CA")) {
-			cert_creation_data->ca = ca_ask_for_confirmation (NULL, _("* Enable Certification Authority use? [Yes]/No "), TRUE);
+			cert_creation_data->ca = dialog_ask_for_confirmation (NULL, _("* Enable Certification Authority use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Certification Authority use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "CRL_SIGN")) {
-			cert_creation_data->crl_signing = ca_ask_for_confirmation (NULL, _("* Enable CRL Signing? [Yes]/No "), TRUE);
+			cert_creation_data->crl_signing = dialog_ask_for_confirmation (NULL, _("* Enable CRL Signing? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* CRL signing use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "DIGITAL_SIGNATURE")) {
-			cert_creation_data->digital_signature = ca_ask_for_confirmation (NULL, _("* Enable Digital Signature use? [Yes]/No "), TRUE);
+			cert_creation_data->digital_signature = dialog_ask_for_confirmation (NULL, _("* Enable Digital Signature use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Digital Signature use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "DATA_ENCIPHERMENT")) {
-			cert_creation_data->data_encipherment = ca_ask_for_confirmation (NULL, _("Enable Data Encipherment use? [Yes]/No "), TRUE);
+			cert_creation_data->data_encipherment = dialog_ask_for_confirmation (NULL, _("Enable Data Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Data Encipherment use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "KEY_ENCIPHERMENT")) {
-			cert_creation_data->key_encipherment = ca_ask_for_confirmation (NULL, _("Enable Key Encipherment use? [Yes]/No "), TRUE);
+			cert_creation_data->key_encipherment = dialog_ask_for_confirmation (NULL, _("Enable Key Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Encipherment use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "NON_REPUDIATION")) {
-			cert_creation_data->non_repudiation = ca_ask_for_confirmation (NULL, _("Enable Non Repudiation use? [Yes]/No "), TRUE);
+			cert_creation_data->non_repudiation = dialog_ask_for_confirmation (NULL, _("Enable Non Repudiation use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Non Repudiation use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "KEY_AGREEMENT")) {
-			cert_creation_data->key_agreement = ca_ask_for_confirmation (NULL, _("Enable Key Agreement use? [Yes]/No "), TRUE);
+			cert_creation_data->key_agreement = dialog_ask_for_confirmation (NULL, _("Enable Key Agreement use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Agreement use disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "EMAIL_PROTECTION")) {
-			cert_creation_data->email_protection = ca_ask_for_confirmation (NULL, _("Enable Email Protection purpose? [Yes]/No "), TRUE);
+			cert_creation_data->email_protection = dialog_ask_for_confirmation (NULL, _("Enable Email Protection purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Email Protection purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "CODE_SIGNING")) {
-			cert_creation_data->code_signing = ca_ask_for_confirmation (NULL, _("Enable Code Signing purpose? [Yes]/No "), TRUE);
+			cert_creation_data->code_signing = dialog_ask_for_confirmation (NULL, _("Enable Code Signing purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Code Signing purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "TLS_WEB_CLIENT")) {
-			cert_creation_data->web_client = ca_ask_for_confirmation (NULL, _("Enable TLS Web Client purpose? [Yes]/No "), TRUE);
+			cert_creation_data->web_client = dialog_ask_for_confirmation (NULL, _("Enable TLS Web Client purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Client purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "TLS_WEB_SERVER")) {
-			cert_creation_data->web_server = ca_ask_for_confirmation (NULL, _("Enable TLS Web Server purpose? [Yes]/No "), TRUE);
+			cert_creation_data->web_server = dialog_ask_for_confirmation (NULL, _("Enable TLS Web Server purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Server purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "TIME_STAMPING")) {
-			cert_creation_data->time_stamping = ca_ask_for_confirmation (NULL, _("Enable Time Stamping purpose? [Yes]/No "), TRUE);
+			cert_creation_data->time_stamping = dialog_ask_for_confirmation (NULL, _("Enable Time Stamping purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Time Stamping purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "OCSP_SIGNING")) {
-			cert_creation_data->ocsp_signing = ca_ask_for_confirmation (NULL, _("Enable OCSP Signing purpose? [Yes]/No "), TRUE);		} else {
+			cert_creation_data->ocsp_signing = dialog_ask_for_confirmation (NULL, _("Enable OCSP Signing purpose? [Yes]/No "), TRUE);		} else {
 			printf (_("* OCSP Signing purpose disabled by policy\n"));
 		}
 
 		if (ca_policy_get (ca_id, "ANY_PURPOSE")) {
-			cert_creation_data->any_purpose = ca_ask_for_confirmation (NULL, _("Enable any purpose? [Yes]/No "), TRUE);
+			cert_creation_data->any_purpose = dialog_ask_for_confirmation (NULL, _("Enable any purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Any purpose disabled by policy\n"));
 		}
 
 		printf (_("The new certificate will be created with the following uses and purposes:\n"));
-		__ca_callback_show_uses_and_purposes (cert_creation_data);
+		__ca_cli_callback_show_uses_and_purposes (cert_creation_data);
 	
 	}
 	
-	if (ca_ask_for_confirmation (_("All the mandatory data for the certificate generation has been gathered."), _("Do you want to proceed with the signing? [Yes]/No "), TRUE)) {
+	if (dialog_ask_for_confirmation (_("All the mandatory data for the certificate generation has been gathered."), _("Do you want to proceed with the signing? [Yes]/No "), TRUE)) {
 
 		const gchar * strerror = new_cert_window_sign_csr (csr_id, ca_id, cert_creation_data);
 		if (strerror)
-			ca_error_dialog ((gchar *) strerror);
+			dialog_error ((gchar *) strerror);
 		else
 			printf (_("Certificate signed.\n"));
 
@@ -904,22 +906,22 @@ int ca_callback_sign (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_delete (int argc, char **argv)
+int ca_cli_callback_delete (int argc, char **argv)
 {
 	gchar *errmsg = NULL;
 	guint64 id = atoll (argv[1]);
 
 	if (! ca_file_check_if_is_csr_id (id)) {
-		ca_error_dialog (_("The given CSR id. is not valid"));
+		dialog_error (_("The given CSR id. is not valid"));
 		return -1;
 	}
 
-	ca_callback_showcsr (argc, argv);
+	ca_cli_callback_showcsr (argc, argv);
 
-	if (ca_ask_for_confirmation (_("This Certificate Signing Request will be deleted."), _("This operation cannot be undone. Are you sure? Yes/[No] "),  FALSE)) {
+	if (dialog_ask_for_confirmation (_("This Certificate Signing Request will be deleted."), _("This operation cannot be undone. Are you sure? Yes/[No] "),  FALSE)) {
 		errmsg = ca_file_remove_csr (id);
 		if (errmsg) {
-			ca_error_dialog (_(errmsg));
+			dialog_error (_(errmsg));
 			
 		} else {
 			printf (_("Certificate Signing Request deleted.\n"));
@@ -933,14 +935,14 @@ int ca_callback_delete (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_crlgen (int argc, char **argv)
+int ca_cli_callback_crlgen (int argc, char **argv)
 {
 	guint64 id_ca = atoll(argv[1]);
 	gchar *filename = argv[2];
 	gchar *error = NULL;
 
 	if (! ca_file_check_if_is_ca_id (id_ca)) {
-		ca_error_dialog (_("The given CA id. is not valid"));
+		dialog_error (_("The given CA id. is not valid"));
 		return -1;
 	}
 
@@ -949,14 +951,14 @@ int ca_callback_crlgen (int argc, char **argv)
 	if (! error) {
 		printf (_("CRL generated successfully into file '%s'\n"), filename);
 	} else {
-		ca_error_dialog (error);
+		dialog_error (error);
 		return 1;
 	}
 
 	return 0;
 }
 
-int ca_callback_dhgen (int argc, char **argv)
+int ca_cli_callback_dhgen (int argc, char **argv)
 {
 	gint primebitlength = atoi (argv[1]);
 	gchar *filename = argv[2];
@@ -964,20 +966,20 @@ int ca_callback_dhgen (int argc, char **argv)
 	gchar *error = NULL;
 
 	if (primebitlength == 0 || primebitlength % 1024) {
-		ca_error_dialog (_("The bit-length of the prime number must be whole multiple of 1024"));
+		dialog_error (_("The bit-length of the prime number must be whole multiple of 1024"));
 		return 1;
 	}
 
-	error = ca_generate_dh_param (primebitlength, filename);
+	error = export_dh_param (primebitlength, filename);
 
 	if (error)
-		ca_error_dialog (error);
+		dialog_error (error);
 	else
 		printf (_("Diffie-Hellman parameters created and saved successfully in file '%s'\n"), filename);
 	return 0;
 }
 
-int ca_callback_changepassword (int argc, char **argv)
+int ca_cli_callback_changepassword (int argc, char **argv)
 {
 	gchar *current_pwd = NULL;
 	gchar *password = NULL;
@@ -985,8 +987,8 @@ int ca_callback_changepassword (int argc, char **argv)
 	// First, we check the current status
 
 	if (! ca_file_is_password_protected()) {
-		if (ca_ask_for_confirmation (_("Currently, the database is not password-protected."), _("Do you want to password protect it? [Yes]/No "),  TRUE)) {
-			password = ca_dialog_get_password (_("OK. You need to supply a password for protecting the private keys in the\n"
+		if (dialog_ask_for_confirmation (_("Currently, the database is not password-protected."), _("Do you want to password protect it? [Yes]/No "),  TRUE)) {
+			password = dialog_get_password (_("OK. You need to supply a password for protecting the private keys in the\n"
 							     "database, so nobody else but authorized people can use them. This password\n"
 							     "will be asked any time gnoMint will make use of any private key in database."),
 							   _("Insert password:"), _("Insert password (confirm):"), 
@@ -997,7 +999,7 @@ int ca_callback_changepassword (int argc, char **argv)
 			} 
 			
 			if (! ca_file_password_protect (password)) {
-				ca_error_dialog (_("Error while establishing database password. The operation was cancelled."));
+				dialog_error (_("Error while establishing database password. The operation was cancelled."));
 				g_free (password);
 				return 2;
 			} else {
@@ -1012,24 +1014,24 @@ int ca_callback_changepassword (int argc, char **argv)
 			return 0;
 		}
 	} else {
-		if (ca_ask_for_confirmation (_("Currently, the database IS password-protected."), _("Do you want to remove this password protection? Yes/[No] "),  FALSE)) {
+		if (dialog_ask_for_confirmation (_("Currently, the database IS password-protected."), _("Do you want to remove this password protection? Yes/[No] "),  FALSE)) {
 			do {
 				if (current_pwd)
 					g_free (current_pwd);
 				printf (_("For removing the password-protection, the current database password\nmust be supplied.\n"));
-				current_pwd = ca_ask_for_password (_("Please, insert the current database password (Empty to cancel): "));
+				current_pwd = dialog_ask_for_password (_("Please, insert the current database password (Empty to cancel): "));
 				if (! current_pwd) {
 					printf (_("Operation cancelled.\n"));
 					return 3;
 				}
 
 				if (! ca_file_check_password (current_pwd)) {
-					ca_error_dialog (_("The current password you have entered\ndoesn't match with the actual current database password."));
+					dialog_error (_("The current password you have entered\ndoesn't match with the actual current database password."));
 				} 
 			} while (! ca_file_check_password(current_pwd));
 
 			if (! ca_file_password_unprotect (current_pwd)) {
-				ca_error_dialog (_("Error while removing database password. \n"
+				dialog_error (_("Error while removing database password. \n"
 						   "The operation was cancelled."));
 				g_free (current_pwd);
 				return 4;
@@ -1045,18 +1047,18 @@ int ca_callback_changepassword (int argc, char **argv)
 				if (current_pwd)
 					g_free (current_pwd);
 				printf (_("You must supply the current database password before changing the password.\n"));
-				current_pwd = ca_ask_for_password (_("Please, insert the current database password (Empty to cancel): "));
+				current_pwd = dialog_ask_for_password (_("Please, insert the current database password (Empty to cancel): "));
 				if (! current_pwd) {
 					printf (_("Operation cancelled.\n"));
 					return 3;
 				}
 
 				if (! ca_file_check_password (current_pwd)) {
-					ca_error_dialog (_("The current password you have entered\ndoesn't match with the actual current database password."));
+					dialog_error (_("The current password you have entered\ndoesn't match with the actual current database password."));
 				}
 			} while (! ca_file_check_password(current_pwd));
 
-			password = ca_dialog_get_password (_("OK. Now you must supply a new password for protecting the private keys in the\n"
+			password = dialog_get_password (_("OK. Now you must supply a new password for protecting the private keys in the\n"
 							     "database, so nobody else but authorized people can use them. This password\n"
 							     "will be asked any time gnoMint will make use of any private key in database."),
 							   _("Insert new password:"), _("Insert new password (confirm):"), 
@@ -1068,7 +1070,7 @@ int ca_callback_changepassword (int argc, char **argv)
 			} 
 
 			if (! ca_file_password_change (current_pwd, password)) {
-				ca_error_dialog (_("Error while changing database password. \n"
+				dialog_error (_("Error while changing database password. \n"
 						   "The operation was cancelled."));
 				g_free (current_pwd);
 				g_free (password);
@@ -1087,12 +1089,12 @@ int ca_callback_changepassword (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_importfile (int argc, char **argv)
+int ca_cli_callback_importfile (int argc, char **argv)
 {
 	gchar *filename = argv[1];
 
 	if (! import_single_file (filename, NULL, NULL)) {
-		ca_error_dialog (_("Problem when importing the given file."));
+		dialog_error (_("Problem when importing the given file."));
 		return 1;
 	} else {
 		printf (_("File imported successfully.\n"));
@@ -1101,14 +1103,14 @@ int ca_callback_importfile (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_importdir (int argc, char **argv)
+int ca_cli_callback_importdir (int argc, char **argv)
 {
 	gchar *filename = argv[1];
 	gchar *error = NULL;
 
 	error = import_whole_dir (filename);
 	if (error) {
-		ca_error_dialog (error);
+		dialog_error (error);
 		return 1;
 	} else {
 		printf (_("Directory imported successfully.\n"));
@@ -1118,7 +1120,7 @@ int ca_callback_importdir (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_showcert (int argc, char **argv)
+int ca_cli_callback_showcert (int argc, char **argv)
 {
 	guint64 cert_id = atoll(argv[1]);
 	gchar * certificate_pem;
@@ -1132,7 +1134,7 @@ int ca_callback_showcert (int argc, char **argv)
 	gint i;
 
 	if (! ca_file_check_if_is_cert_id (cert_id)) {
-		ca_error_dialog (_("The given certificate id. is not valid"));
+		dialog_error (_("The given certificate id. is not valid"));
 		return -1;
 	}
 
@@ -1180,7 +1182,7 @@ int ca_callback_showcert (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_showcsr (int argc, char **argv)
+int ca_cli_callback_showcsr (int argc, char **argv)
 {
 	guint64 csr_id = atoll(argv[1]);
 	gchar * csr_pem;
@@ -1188,7 +1190,7 @@ int ca_callback_showcsr (int argc, char **argv)
 	TlsCsr * csr = NULL;
 
 	if (! ca_file_check_if_is_csr_id (csr_id)) {
-		ca_error_dialog (_("The given CSR id. is not valid"));
+		dialog_error (_("The given CSR id. is not valid"));
 		return -1;
 	}
 
@@ -1211,36 +1213,36 @@ int ca_callback_showcsr (int argc, char **argv)
 }
 
 typedef enum {
-	CA_CALLBACK_POLICY_C_INHERIT = 0,
-	CA_CALLBACK_POLICY_ST_INHERIT = 1,
-	CA_CALLBACK_POLICY_L_INHERIT = 2,
-	CA_CALLBACK_POLICY_O_INHERIT = 3,
-	CA_CALLBACK_POLICY_OU_INHERIT = 4,
-	CA_CALLBACK_POLICY_C_FORCE_SAME = 5,
-	CA_CALLBACK_POLICY_ST_FORCE_SAME = 6,
-	CA_CALLBACK_POLICY_L_FORCE_SAME = 7,
-	CA_CALLBACK_POLICY_O_FORCE_SAME = 8,
-	CA_CALLBACK_POLICY_OU_FORCE_SAME = 9,
-	CA_CALLBACK_POLICY_HOURS_BETWEEN_CRL_UPDATES = 10,
-	CA_CALLBACK_POLICY_MONTHS_TO_EXPIRE = 11,
-	CA_CALLBACK_POLICY_CA = 12,
-	CA_CALLBACK_POLICY_CRL_SIGN = 13,
-	CA_CALLBACK_POLICY_NON_REPUTATION = 14,
-	CA_CALLBACK_POLICY_DIGITAL_SIGNATURE = 15,
-	CA_CALLBACK_POLICY_KEY_ENCIPHERMENT = 16,
-	CA_CALLBACK_POLICY_KEY_AGREEMENT = 17,
-	CA_CALLBACK_POLICY_DATA_ENCIPHERMENT = 18,
-	CA_CALLBACK_POLICY_TLS_WEB_SERVER = 19,
-	CA_CALLBACK_POLICY_TLS_WEB_CLIENT = 20,
-	CA_CALLBACK_POLICY_TIME_STAMPING = 21,
-	CA_CALLBACK_POLICY_CODE_SIGNING = 22,
-	CA_CALLBACK_POLICY_EMAIL_PROTECTION = 23,
-	CA_CALLBACK_POLICY_OCSP_SIGNING = 24,
-	CA_CALLBACK_POLICY_ANY_PURPOSE = 25,
-	CA_CALLBACK_POLICY_NUMBER = 26
+	CA_CLI_CALLBACK_POLICY_C_INHERIT = 0,
+	CA_CLI_CALLBACK_POLICY_ST_INHERIT = 1,
+	CA_CLI_CALLBACK_POLICY_L_INHERIT = 2,
+	CA_CLI_CALLBACK_POLICY_O_INHERIT = 3,
+	CA_CLI_CALLBACK_POLICY_OU_INHERIT = 4,
+	CA_CLI_CALLBACK_POLICY_C_FORCE_SAME = 5,
+	CA_CLI_CALLBACK_POLICY_ST_FORCE_SAME = 6,
+	CA_CLI_CALLBACK_POLICY_L_FORCE_SAME = 7,
+	CA_CLI_CALLBACK_POLICY_O_FORCE_SAME = 8,
+	CA_CLI_CALLBACK_POLICY_OU_FORCE_SAME = 9,
+	CA_CLI_CALLBACK_POLICY_HOURS_BETWEEN_CRL_UPDATES = 10,
+	CA_CLI_CALLBACK_POLICY_MONTHS_TO_EXPIRE = 11,
+	CA_CLI_CALLBACK_POLICY_CA = 12,
+	CA_CLI_CALLBACK_POLICY_CRL_SIGN = 13,
+	CA_CLI_CALLBACK_POLICY_NON_REPUTATION = 14,
+	CA_CLI_CALLBACK_POLICY_DIGITAL_SIGNATURE = 15,
+	CA_CLI_CALLBACK_POLICY_KEY_ENCIPHERMENT = 16,
+	CA_CLI_CALLBACK_POLICY_KEY_AGREEMENT = 17,
+	CA_CLI_CALLBACK_POLICY_DATA_ENCIPHERMENT = 18,
+	CA_CLI_CALLBACK_POLICY_TLS_WEB_SERVER = 19,
+	CA_CLI_CALLBACK_POLICY_TLS_WEB_CLIENT = 20,
+	CA_CLI_CALLBACK_POLICY_TIME_STAMPING = 21,
+	CA_CLI_CALLBACK_POLICY_CODE_SIGNING = 22,
+	CA_CLI_CALLBACK_POLICY_EMAIL_PROTECTION = 23,
+	CA_CLI_CALLBACK_POLICY_OCSP_SIGNING = 24,
+	CA_CLI_CALLBACK_POLICY_ANY_PURPOSE = 25,
+	CA_CLI_CALLBACK_POLICY_NUMBER = 26
 } CaCallbackPolicy;
 
-static gchar *CaCallbackPolicyName[CA_CALLBACK_POLICY_NUMBER] = {
+static gchar *CaCallbackPolicyName[CA_CLI_CALLBACK_POLICY_NUMBER] = {
 	"C_INHERIT",
 	"ST_INHERIT",
 	"L_INHERIT",
@@ -1269,7 +1271,7 @@ static gchar *CaCallbackPolicyName[CA_CALLBACK_POLICY_NUMBER] = {
 	"ANY_PURPOSE"
 };
 
-static gchar *CaCallbackPolicyDescriptions[CA_CALLBACK_POLICY_NUMBER] = {
+static gchar *CaCallbackPolicyDescriptions[CA_CLI_CALLBACK_POLICY_NUMBER] = {
 	N_("Generated certs inherit Country from CA                           "),
 	N_("Generated certs inherit State from CA                             "),
 	N_("Generated certs inherit Locality from CA                          "),
@@ -1298,23 +1300,23 @@ static gchar *CaCallbackPolicyDescriptions[CA_CALLBACK_POLICY_NUMBER] = {
 	N_("Any purpose enabled in generated certs                            ")};
                                                                                 
 
-int ca_callback_showpolicy (int argc, char **argv)
+int ca_cli_callback_showpolicy (int argc, char **argv)
 {
 	guint64 ca_id = atoll(argv[1]);
 	gint i;
 
 
 	if (! ca_file_check_if_is_csr_id (ca_id)) {
-		ca_error_dialog (_("The given CA id. is not valid"));
+		dialog_error (_("The given CA id. is not valid"));
 		return -1;
 	}
 	
 	printf (_("Showing policies of the following certificate:\n"));
-	ca_callback_showcert (argc, argv);
+	ca_cli_callback_showcert (argc, argv);
 	printf (_("\nPolicies:\n"));
 	
 	printf (_("Id.\tDescription\t\t\t\t\t\t\t\tValue\n"));
-	for (i = 0; i < CA_CALLBACK_POLICY_NUMBER; i++) {
+	for (i = 0; i < CA_CLI_CALLBACK_POLICY_NUMBER; i++) {
 
 		printf ("%d\t%s\t%d\n", i, CaCallbackPolicyDescriptions[i], ca_file_policy_get(ca_id, CaCallbackPolicyName[i]));
 
@@ -1324,7 +1326,7 @@ int ca_callback_showpolicy (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_setpolicy (int argc, char **argv)
+int ca_cli_callback_setpolicy (int argc, char **argv)
 {
 	guint64 ca_id = atoll(argv[1]);
 	gint policy_id = atoi (argv[2]);
@@ -1334,12 +1336,12 @@ int ca_callback_setpolicy (int argc, char **argv)
 	gint i;
 
 	if (! ca_file_check_if_is_csr_id (ca_id)) {
-		ca_error_dialog (_("The given CA id. is not valid"));
+		dialog_error (_("The given CA id. is not valid"));
 		return -1;
 	}
 	
-	if (policy_id < 0 || policy_id >= CA_CALLBACK_POLICY_NUMBER) {
-		ca_error_dialog (_("The given policy id is not valid"));
+	if (policy_id < 0 || policy_id >= CA_CLI_CALLBACK_POLICY_NUMBER) {
+		dialog_error (_("The given policy id is not valid"));
 		return -2;
 	}
 
@@ -1355,7 +1357,7 @@ int ca_callback_setpolicy (int argc, char **argv)
 	g_free (description);
 
 
-	if (ca_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
+	if (dialog_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
 		if (! ca_file_policy_set (ca_id, CaCallbackPolicyName[i], value)) {
 			g_free (message);
 			return -1;
@@ -1372,7 +1374,7 @@ int ca_callback_setpolicy (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_showpreferences (int argc, char **argv)
+int ca_cli_callback_showpreferences (int argc, char **argv)
 {
 	printf (_("gnoMint-cli current preferences:\n"));
 
@@ -1382,14 +1384,14 @@ int ca_callback_showpreferences (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_setpreference (int argc, char **argv)
+int ca_cli_callback_setpreference (int argc, char **argv)
 {
 	gint preference_id = atoi (argv[1]);
 	gint value = atoi (argv[2]);
 	gchar *message = NULL;
 
 	if (preference_id != 0) {
-		ca_error_dialog (_("The given preference id is not valid"));
+		dialog_error (_("The given preference id is not valid"));
 		return -1;
 	}
 
@@ -1399,7 +1401,7 @@ int ca_callback_setpreference (int argc, char **argv)
 		break;
 	}
 
-	if (ca_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
+	if (dialog_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
 		switch (preference_id) {
 		case 0:
 			preferences_set_gnome_keyring_export (value);
@@ -1415,7 +1417,7 @@ int ca_callback_setpreference (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_about (int argc, char **argv)
+int ca_cli_callback_about (int argc, char **argv)
 {
         printf (_("%s version %s\n%s\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_COPYRIGHT);
         printf (_("\nAuthors:\n%s\n\n"), PACKAGE_AUTHORS);
@@ -1424,7 +1426,7 @@ int ca_callback_about (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_warranty  (int argc, char **argv)
+int ca_cli_callback_warranty  (int argc, char **argv)
 {
         printf ("%s",
                 _("THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
@@ -1442,7 +1444,7 @@ int ca_callback_warranty  (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_distribution  (int argc, char **argv)
+int ca_cli_callback_distribution  (int argc, char **argv)
 {
         printf ("%s",
                 _("This program is free software: you can redistribute it and/or modify\n"
@@ -1458,13 +1460,13 @@ int ca_callback_distribution  (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_version  (int argc, char **argv)
+int ca_cli_callback_version  (int argc, char **argv)
 {
         printf (_("%s version %s\n"), PACKAGE_NAME, PACKAGE_VERSION); 
 	return 0;
 }
 
-int ca_callback_help  (int argc, char **argv)
+int ca_cli_callback_help  (int argc, char **argv)
 {
 	gint i;
 
@@ -1478,7 +1480,7 @@ int ca_callback_help  (int argc, char **argv)
 	return 0;
 }
 
-int ca_callback_exit (int argc, char **argv)
+int ca_cli_callback_exit (int argc, char **argv)
 {
         printf (_("Exiting gnomint-cli...\n"));
         exit (0);

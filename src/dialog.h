@@ -17,30 +17,39 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _CA_CLI_H_
-#define _CA_CLI_H_
+#ifndef _DIALOG_H_
+#define _DIALOG_H_
 
 #include <glib.h>
 #include <glib/gstdio.h>
 
-typedef int  (* CaCommandCallback) (int argc, char **argv);
+#ifndef GNOMINTCLI
+#include <gtk/gtk.h>
+#endif
 
-typedef struct _CaCommand {
-        const gchar *command;
-        guint mandatory_params;
-        guint optional_params;
-        gchar *syntax;
-        gchar *help;
-        CaCommandCallback callback;
-} CaCommand;
+void dialog_error (gchar *message);
 
-gboolean ca_refresh_model (void);
+gchar * dialog_get_password (gchar *info_message, 
+			     gchar *password_message, gchar *confirm_message, 
+			     gchar *distinct_error_message, guint minimum_length);
 
-gboolean ca_open (gchar *filename, gboolean create);
+void dialog_todo_callback (void);
+
+#ifndef GNOMINTCLI
+
+void dialog_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data);
+
+#else
+
+gboolean dialog_ask_for_confirmation (gchar *message, gchar *prompt, gboolean default_answer);
+
+gint dialog_ask_for_number (gchar *message, gint minimum, gint maximum, gint default_value);
+
+gchar * dialog_ask_for_password (gchar *message);
+
+gchar * dialog_ask_for_string (gchar *message, gchar *default_answer);
 
 
-void ca_command_line ();
-
-
+#endif
 
 #endif

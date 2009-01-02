@@ -33,7 +33,7 @@
 
 #include "tls.h"
 #include "ca_file.h"
-#include "ca.h"
+#include "dialog.h"
 #include "pkey_manage.h"
 
 #include <glib/gi18n.h>
@@ -165,7 +165,7 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 					
 					if (tls_error == TLS_INVALID_PASSWORD) {
 						if (password)
-							ca_error_dialog (_("The given password doesn't match with the one used while crypting the file."));
+							dialog_error (_("The given password doesn't match with the one used while crypting the file."));
 
 						// We ask for a password
 						password = __pkey_manage_ask_external_file_password (cert->dn);
@@ -181,21 +181,21 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 				if (! pem_pkey) {
 					if (tls_error == TLS_NON_MATCHING_PRIVATE_KEY) {
 						// The file could be opened, but it didn't contain any recognized private key
-						ca_error_dialog (_("The file designated in database contains a private key, but it "
+						dialog_error (_("The file designated in database contains a private key, but it "
 								   "is not the private key corresponding to the certificate."));
 					} else {
 						// The file could be opened, but it didn't contain any recognized private key
-						ca_error_dialog (_("The file designated in database doesn't contain any recognized private key."));
+						dialog_error (_("The file designated in database doesn't contain any recognized private key."));
 					}
 				}
 			} else {
 				// The file cannot be opened
-				ca_error_dialog (_("The file designated in database couldn't be opened."));
+				dialog_error (_("The file designated in database couldn't be opened."));
 				
 			}
 		} else {
 			// The file doesn't exist
-			ca_error_dialog (_("The file designated in database doesn't exist."));
+			dialog_error (_("The file designated in database doesn't exist."));
 			
 		}
 		
@@ -625,7 +625,7 @@ gchar * pkey_manage_ask_password ()
 		is_key_ok = ca_file_check_password (password);
 		
 		if (! is_key_ok) {
-			ca_error_dialog (_("The given password doesn't match the one used in the database"));
+			dialog_error (_("The given password doesn't match the one used in the database"));
 		}
 
 	}
@@ -676,7 +676,7 @@ gchar * pkey_manage_ask_password ()
 		is_key_ok = ca_file_check_password (password);
 		
 		if (! is_key_ok) {
-			ca_error_dialog (_("The given password doesn't match the one used in the database"));
+			dialog_error (_("The given password doesn't match the one used in the database"));
 		}
 
 	}

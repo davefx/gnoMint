@@ -29,6 +29,7 @@
 #include "import.h"
 #include "tls.h"
 #include "ca.h"
+#include "dialog.h"
 #include "ca_file.h"
 
 
@@ -85,7 +86,7 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 		  "appropiate password.\n"));
 
 	prompt = g_strdup_printf (_("Please introduce password for `%s'"), crypted_part_description);
-	password = ca_ask_for_password (prompt);
+	password = dialog_ask_for_password (prompt);
 	g_free (prompt);
 	
 	return password;
@@ -140,7 +141,7 @@ gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id)
 		gchar *message = g_strdup_printf (_("Couldn't import the certificate request. \n"
 						    "The database returned this error: \n\n'%s'"),
 						  error_msg);
-		ca_error_dialog (message);
+		dialog_error (message);
 		g_free (message);
 	} else {
                 result = 1;
@@ -225,7 +226,7 @@ gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
 		gchar *message = g_strdup_printf (_("Couldn't import the certificate. \n"
 						    "The database returned this error: \n\n'%s'"),
 						  error_msg);
-		ca_error_dialog (message);
+		dialog_error (message);
 		g_free (message);
 	} else {
                 result = 1;
@@ -422,9 +423,9 @@ gint import_pkey_wo_passwd (guchar *file_contents, gsize file_contents_size)
 			
 		}
 
-                result_import = ca_file_import_privkey (pem_privkey);
+                result_import = ca_file_insert_imported_privkey (pem_privkey);
 		if (result_import) {
-                        ca_error_dialog (result_import);
+                        dialog_error (result_import);
                 } else {
                         result = 1;
                 }
@@ -557,9 +558,9 @@ gint import_pkcs8 (guchar *file_contents, gsize file_contents_size)
 			
 		}
 
-                error_msg = ca_file_import_privkey (pem_privkey);
+                error_msg = ca_file_insert_imported_privkey (pem_privkey);
 		if (error_msg) {
-                        ca_error_dialog (error_msg);
+                        dialog_error (error_msg);
                 } else {
                         result = 1;
                 }
@@ -589,7 +590,7 @@ gint import_pkcs8 (guchar *file_contents, gsize file_contents_size)
                         g_free (password);
 
                         if (result_decryption == GNUTLS_E_DECRYPTION_FAILED) {
-                                ca_error_dialog (_("The given password doesn't match the one used for crypting this part"));
+                                dialog_error (_("The given password doesn't match the one used for crypting this part"));
                         }
                 }
 
@@ -608,9 +609,9 @@ gint import_pkcs8 (guchar *file_contents, gsize file_contents_size)
                                 
                         }
                         
-                        error_msg = ca_file_import_privkey (pem_privkey);
+                        error_msg = ca_file_insert_imported_privkey (pem_privkey);
                         if (error_msg) {
-                                ca_error_dialog (error_msg);
+                                dialog_error (error_msg);
                         } else {
                                 result = 1;
                         }
@@ -700,7 +701,7 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                                                                                      password));
                                 if (!pkcs12_bag_decrypted) {                                                
                                         gint j;
-                                        ca_error_dialog (_("The given password doesn't match with the password used for encrypting this part."));
+                                        dialog_error (_("The given password doesn't match with the password used for encrypting this part."));
                                         for (j=0; j<n_bags; j++) {
                                                 gnutls_pkcs12_bag_deinit (* g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, j));
                                                 g_free (g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, j));
@@ -774,7 +775,7 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                                                                                                               password, 0);
 
                                                         if (result_decryption == GNUTLS_E_DECRYPTION_FAILED) {
-                                                                ca_error_dialog (_("The given password doesn't match the one used "
+                                                                dialog_error (_("The given password doesn't match the one used "
                                                                                    "for crypting this part"));
                                                         }
                                                 }
@@ -800,9 +801,9 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                                                         
                                                 }
                                                 
-                                                error_msg = ca_file_import_privkey (pem_privkey);
+                                                error_msg = ca_file_insert_imported_privkey (pem_privkey);
                                                 if (error_msg) {
-                                                        ca_error_dialog (error_msg);
+                                                        dialog_error (error_msg);
                                                 } else {
                                                         result = 1;
                                                 }
@@ -863,7 +864,7 @@ gboolean import_single_file (gchar *filename, gchar **dn, guint64 *id)
 	GMappedFile * mapped_file = g_mapped_file_new (filename, FALSE, &error);
 
 	if (error) {
-		ca_error_dialog (_(error->message));
+		dialog_error (_(error->message));
 		return FALSE;
 	}
 
@@ -911,7 +912,7 @@ gboolean import_single_file (gchar *filename, gchar **dn, guint64 *id)
 	if (successful_import) {
 		ca_refresh_model();
 	} else {
-		ca_error_dialog (_("Couldn't find any supported format in the given file"));
+		dialog_error (_("Couldn't find any supported format in the given file"));
 	}
 
 	return TRUE;
@@ -925,7 +926,7 @@ gint import_openssl_private_key (const gchar *filename, gchar **last_password, g
 
 	if (! g_file_get_contents (filename, &filecontents, NULL, NULL)) {
 		gchar *message = g_strdup_printf(_("Couldn't open %s file. Check permissions."), filename);
-		ca_error_dialog (message);
+		dialog_error (message);
 		g_free (message);
 		return result;
 	}
@@ -952,7 +953,7 @@ gint import_openssl_private_key (const gchar *filename, gchar **last_password, g
 
 		if (!keytype) {
 			gchar * message = g_strdup_printf(_("Couldn't recognize the file %s as a RSA or DSA private key."), filename);
-			ca_error_dialog (message);
+			dialog_error (message);
 			g_free (message);
 			g_free (filecontents);
 			return result;
@@ -1004,7 +1005,7 @@ gint import_openssl_private_key (const gchar *filename, gchar **last_password, g
 				g_free (filecontents);
 				g_free (temp_pwd);
 				g_free (dirname);
-				ca_error_dialog (_("Problem while calling to openssl for decyphering private key."));
+				dialog_error (_("Problem while calling to openssl for decyphering private key."));
 				break;					
 			}
 				
@@ -1015,7 +1016,7 @@ gint import_openssl_private_key (const gchar *filename, gchar **last_password, g
 				gchar *error_to_show = g_strdup_printf (_("OpenSSL has returned the following error "
 									  "while trying to decypher the private key:\n\n%s"),
 									error_message);
-				ca_error_dialog (error_to_show);
+				dialog_error (error_to_show);
 				g_free (error_to_show);
 				first_time = FALSE;
 			}
@@ -1276,7 +1277,7 @@ gchar * import_whole_dir (gchar *dirname)
 		filename = g_build_filename (dirname, "serial", NULL);
                 if (! g_file_get_contents (filename, &filecontents, NULL, NULL)) {
                         gchar *message = g_strdup_printf(_("Couldn't open %s file. Check permissions."), filename);
-                        ca_error_dialog (message);
+                        dialog_error (message);
                         g_free (message);
                         return result;
                 }
