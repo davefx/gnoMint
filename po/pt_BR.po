@@ -1,16 +1,16 @@
-# a gnoMint's Czech translation catalog
-# Copyright (C) 2006 David Marin Carreño
-# This file is distributed under the same license as the gnoMint package.
-# Luboš Staněk <lubek@users.sourceforge.net>, 2008.
+# Brazilian Portuguese translation for gnomint
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# This file is distributed under the same license as the gnomint package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnoMint 0.5.2\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: gnomint\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2008-12-16 07:39+0100\n"
-"PO-Revision-Date: 2008-11-18 11:23+0000\n"
-"Last-Translator: David Marín <Unknown>\n"
-"Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
+"PO-Revision-Date: 2009-01-01 16:15+0000\n"
+"Last-Translator: Enrico Nicoletto <liverig@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,39 +19,43 @@ msgstr ""
 
 #: ../gconf/gnomint.schemas.in.h:1
 msgid "Automatic exporting of certificates for gnome-keyring"
-msgstr ""
+msgstr "Exportação automática de certificados para o gnome-keyring"
 
 #: ../gconf/gnomint.schemas.in.h:2
 msgid "Certificate requests visibility"
-msgstr ""
+msgstr "Visibilidade de pedidos de certificado"
 
 #: ../gconf/gnomint.schemas.in.h:3
 msgid "Revoked certificates visibility"
-msgstr ""
+msgstr "Visibilidade de certificados revogados"
 
 #: ../gconf/gnomint.schemas.in.h:4
 msgid ""
 "The (width,length) size gnoMint should take when started. This cannot be "
 "smaller than (320,200)."
 msgstr ""
+"O tamanho (largura, comprimento) que o gnoMint deve ficar ao iniciar. Isto "
+"não pode ser menor que (320,200)."
 
 #: ../gconf/gnomint.schemas.in.h:5
 msgid "Whether the certificate requests should be visible."
-msgstr ""
+msgstr "Se os pedidos de certificado devem ser visíveis."
 
 #: ../gconf/gnomint.schemas.in.h:6
 msgid ""
 "Whether the created or imported certificates are automatically exported to "
 "gnome-keyring certificate-store."
 msgstr ""
+"Se os certificados criados ou importados são automaticamente exportados para "
+"o armazém de certificado do gnome-keyring."
 
 #: ../gconf/gnomint.schemas.in.h:7
 msgid "Whether the revoked certificates should be visible."
-msgstr ""
+msgstr "Se os certificados revogados devem ser visíveis."
 
 #: ../gconf/gnomint.schemas.in.h:8
 msgid "Window size"
-msgstr ""
+msgstr "Tamanho da janela"
 
 #: ../gui/gnomint.glade.h:1
 msgid " "
@@ -59,69 +63,71 @@ msgstr " "
 
 #: ../gui/gnomint.glade.h:2
 msgid "<b>CSR subject</b>"
-msgstr ""
+msgstr "<b>assunto CSR</b>"
 
 #: ../gui/gnomint.glade.h:3
 msgid "<b>Certificate fields</b>"
-msgstr ""
+msgstr "<b>Campos do certificado</b>"
 
 #: ../gui/gnomint.glade.h:4
 msgid "<b>Certificate hierarchy</b>"
-msgstr ""
+msgstr "<b>Hierarquia do certificado</b>"
 
 #: ../gui/gnomint.glade.h:5
 msgid "<b>Certificate purposes</b>"
-msgstr ""
+msgstr "<b>Objetivos do certificado</b>"
 
 #: ../gui/gnomint.glade.h:6
 msgid "<b>Certificate subject</b>"
-msgstr ""
+msgstr "<b>Assunto do certificado</b>"
 
 #: ../gui/gnomint.glade.h:7
 msgid "<b>Certificate uses</b>"
-msgstr ""
+msgstr "<b>Usos do certificado</b>"
 
 #: ../gui/gnomint.glade.h:8
 msgid "<b>Emmited by</b>"
-msgstr ""
+msgstr "<b>Emitido por</b>"
 
 #: ../gui/gnomint.glade.h:9
 msgid "<b>Fingerprints</b>"
-msgstr ""
+msgstr "<b>Impressões digitais</b>"
 
 #: ../gui/gnomint.glade.h:10
 msgid "<b>Inherited fields from CA subject</b>"
-msgstr ""
+msgstr "<b>Campos herdados do assunto de CA</b>"
 
 #: ../gui/gnomint.glade.h:11
 msgid "<b>Purposes of new generated certificates</b>"
-msgstr ""
+msgstr "<b>Objetivos dos novos certificados gerados</b>"
 
 #: ../gui/gnomint.glade.h:12
 msgid ""
 "<b>This Certificate Signing Request has its corresponding private key saved "
 "in the internal database.</b>"
 msgstr ""
+"<b>Este Pedido de Assinatura de Certificado possui a sua chave privada "
+"correspondente salva na base de dados interna.</b>"
 
 #: ../gui/gnomint.glade.h:13
 msgid "<b>This certificate has been verified for the following uses:</b>"
-msgstr "<b>Tento certifikát byl ověřen pro následující použití:</b>"
+msgstr "<b>Este certificado foi validado para os seguintes usos:</b>"
 
 #: ../gui/gnomint.glade.h:14
 msgid "<b>Uses of new generated certificates</b>"
-msgstr ""
+msgstr "<b>Usos dos novos certificados gerados</b>"
 
 #: ../gui/gnomint.glade.h:15
 msgid "<b>Validity</b>"
-msgstr "<b>Platnost</b>"
+msgstr "<b>Validade</b>"
 
 #: ../gui/gnomint.glade.h:16
 msgid "<big><b>New Certificate Revocation List</b></big>"
-msgstr ""
+msgstr "<big><b>Nova Lista de Certificados Revogados</b></big>"
 
 #: ../gui/gnomint.glade.h:17
 msgid "<big>CA Properties</big>\n"
-msgstr ""
+msgstr "<big>Propriedades da CA</big>\n"
 
 #: ../gui/gnomint.glade.h:19
 msgid "<big>CA Root certificate properties</big>\n"
@@ -129,7 +135,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:21
 msgid "<big>Certificate Request Properties</big>\n"
-msgstr ""
+msgstr "<big>Propriedades de Pedidos de Certificado</big>\n"
 
 #: ../gui/gnomint.glade.h:23
 msgid ""
@@ -138,14 +144,18 @@ msgid ""
 "For doing the selected operation, you must provide the file where resides "
 "the private key corresponding to the certificate:"
 msgstr ""
+"<big>Escolher arquivo de chave privada</big>\n"
+"\n"
+"Para realizar a operação selecionada, você deve fornecer o arquivo onde "
+"reside a chave privada correspondente ao certificado:"
 
 #: ../gui/gnomint.glade.h:26
 msgid "<big>New Certificate Properties</big>\n"
-msgstr ""
+msgstr "<big>Propriedades do Novo Certificado</big>\n"
 
 #: ../gui/gnomint.glade.h:28
 msgid "<big>Password protection</big>\n"
-msgstr ""
+msgstr "<big>Proteção com senha</big>\n"
 
 #: ../gui/gnomint.glade.h:30
 msgid ""
@@ -233,7 +243,7 @@ msgstr ""
 #: ../gui/gnomint.glade.h:50 ../src/certificate_properties.c:1130
 #: ../src/tls.c:1082
 msgid "Any purpose"
-msgstr "Jakýkoli účel"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:51
 msgid ""
@@ -324,11 +334,11 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:74
 msgid "City"
-msgstr "Město"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:75
 msgid "City: "
-msgstr "Město: "
+msgstr ""
 
 #: ../gui/gnomint.glade.h:76 ../src/certificate_properties.c:1126
 #: ../src/tls.c:1074
@@ -337,15 +347,15 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:77
 msgid "Common Name (CN)"
-msgstr "Společné jméno (CN)"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:78
 msgid "Country"
-msgstr "Země"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:79
 msgid "Country:"
-msgstr "Země:"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:80
 msgid "Creating CA Root Certificate"
@@ -353,7 +363,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:81
 msgid "DSA"
-msgstr "DSA"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:82 ../src/certificate_properties.c:352
 #: ../src/tls.c:1050
@@ -362,7 +372,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:83
 msgid "Details"
-msgstr "Podrobnosti"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:84 ../src/certificate_properties.c:346
 #: ../src/tls.c:1044
@@ -375,7 +385,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:86
 msgid "E_xport"
-msgstr "E_xportovat"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:87 ../src/certificate_properties.c:1127
 #: ../src/tls.c:1076
@@ -539,7 +549,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:130
 msgid "Organization (O)"
-msgstr "Organizace (O)"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:131
 msgid "Organization Unit:"
@@ -547,19 +557,19 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:132
 msgid "Organization:"
-msgstr "Organizace:"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:133
 msgid "Organizational Unit (OU)"
-msgstr "Organizační jednotka (OU)"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:134
 msgid "Organizational unit"
-msgstr "Organizační jednotka"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:135
 msgid "Password (confirm):"
-msgstr "Heslo (pro potvrzení):"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:136
 msgid "Password protect"
@@ -567,7 +577,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:137
 msgid "Password:"
-msgstr "Heslo:"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:138
 msgid "Please, choose the file:"
@@ -634,7 +644,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:156
 msgid "RSA"
-msgstr "RSA"
+msgstr ""
 
 #: ../gui/gnomint.glade.h:157
 msgid "Remember this password during this gnoMint session"
@@ -2396,16 +2406,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  David Marín https://launchpad.net/~davefx\n"
-"  Luboš Staněk https://launchpad.net/~lubek\n"
-"\n"
-"Launchpad Contributions:\n"
-"  David Marín https://launchpad.net/~davefx\n"
-"  Luboš Staněk https://launchpad.net/~lubek\n"
-"\n"
-"Launchpad Contributions:\n"
-"  David Marín https://launchpad.net/~davefx\n"
-"  Luboš Staněk https://launchpad.net/~lubek"
+"  Enrico Nicoletto https://launchpad.net/~liverig"
 
 #: ../src/ca-callbacks.c:1422
 #, c-format
