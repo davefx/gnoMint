@@ -32,20 +32,20 @@
 #include "ca_file.h"
 #include "ca_policy.h"
 #include "ca.h"
-#include "new_cert_creation_process.h"
+#include "creation_process_window.h"
 
-GladeXML * new_ca_window_process_xml = NULL;
+GladeXML * creation_process_window_xml = NULL;
 
 gint timer=0;
-GThread * new_cert_creation_process_ca_thread = NULL;
+GThread * creation_process_window_thread = NULL;
 
 
-void new_cert_creation_process_ca_error_dialog (gchar *message) 
+void creation_process_window_error_dialog (gchar *message) 
 {
 
    GtkWidget *dialog, *widget;
    
-   widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+   widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
    
    /* Create the widgets */
    
@@ -61,15 +61,15 @@ void new_cert_creation_process_ca_error_dialog (gchar *message)
    gtk_widget_destroy (dialog);
 }
 
-void new_cert_creation_process_ca_finish (void) 
+void creation_process_window_ca_finish (void) 
 {
 	GtkWidget *widget = NULL, *dialog = NULL;
 	
-	g_thread_join (new_cert_creation_process_ca_thread);
+	g_thread_join (creation_process_window_thread);
 	gtk_timeout_remove (timer);	       
 	timer = 0;
 	
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
 	
         ca_refresh_model();
 
@@ -89,7 +89,7 @@ void new_cert_creation_process_ca_finish (void)
 
 
 
-gint new_ca_creation_pulse (gpointer data)
+gint creation_process_window_ca_pulse (gpointer data)
 {
 	GtkWidget * widget = NULL;
 	gchar *error_message = NULL;
@@ -98,7 +98,7 @@ gint new_ca_creation_pulse (gpointer data)
 	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "status_message_label");
+	widget = glade_xml_get_widget (creation_process_window_xml, "status_message_label");
 
 	ca_creation_lock_status_mutex();
 
@@ -113,16 +113,16 @@ gint new_ca_creation_pulse (gpointer data)
 	gtk_main_iteration();
 
 	if (status > 0) {
-		new_cert_creation_process_ca_finish ();
+		creation_process_window_ca_finish ();
 	} else if (status < 0) {
-		error_message = (gchar *) g_thread_join (new_cert_creation_process_ca_thread);
+		error_message = (gchar *) g_thread_join (creation_process_window_thread);
 		gtk_timeout_remove (timer);	       
 		timer = 0;
 		if (error_message) {
-			new_cert_creation_process_ca_error_dialog (error_message);
+			creation_process_window_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
-		widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+		widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
 		gtk_widget_destroy (widget);
 	}
 
@@ -135,26 +135,26 @@ gint new_ca_creation_pulse (gpointer data)
 
 
 
-void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data)
+void creation_process_window_ca_display (CaCreationData * ca_creation_data)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
 	
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
-	new_ca_window_process_xml = glade_xml_new (xml_file, "new_ca_creation_process", NULL);
+	creation_process_window_xml = glade_xml_new (xml_file, "creation_process_window", NULL);
 	
 	g_free (xml_file);
 	
-	glade_xml_signal_autoconnect (new_ca_window_process_xml); 	
+	glade_xml_signal_autoconnect (creation_process_window_xml); 	
 	
-	new_cert_creation_process_ca_thread = ca_creation_launch_thread (ca_creation_data);
+	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_cert_creation_process_progressbar");
+	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
-	timer = g_timeout_add (100, new_ca_creation_pulse, widget);
+	timer = g_timeout_add (100, creation_process_window_ca_pulse, widget);
 
 
 }
@@ -171,7 +171,7 @@ void on_cancel_creation_process_clicked (GtkButton *button,
 	   timer = 0;
    }
    
-   widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+   widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
 
    /* Create the widgets */
 
@@ -194,14 +194,14 @@ void on_cancel_creation_process_clicked (GtkButton *button,
 
 // ********************** CSRs
 
-void new_csr_creation_process_finish (void) {
+void creation_process_window_csr_finish (void) {
 	GtkWidget *widget = NULL, *dialog = NULL;
 	
-	g_thread_join (new_cert_creation_process_ca_thread);
+	g_thread_join (creation_process_window_thread);
 	gtk_timeout_remove (timer);	       
 	timer = 0;
 	
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
 	
 	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -217,7 +217,7 @@ void new_csr_creation_process_finish (void) {
 	ca_refresh_model ();
 }
 
-gint new_csr_creation_pulse (gpointer data)
+gint creation_process_window_csr_pulse (gpointer data)
 {
 	GtkWidget * widget = NULL;
 	gchar *error_message = NULL;
@@ -226,7 +226,7 @@ gint new_csr_creation_pulse (gpointer data)
 	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "status_message_label");
+	widget = glade_xml_get_widget (creation_process_window_xml, "status_message_label");
 
 	csr_creation_lock_status_mutex();
 
@@ -241,16 +241,16 @@ gint new_csr_creation_pulse (gpointer data)
 	gtk_main_iteration();
 
 	if (status > 0) {
-		new_csr_creation_process_finish ();
+		creation_process_window_csr_finish ();
 	} else if (status < 0) {
-		error_message = (gchar *) g_thread_join (new_cert_creation_process_ca_thread);
+		error_message = (gchar *) g_thread_join (creation_process_window_thread);
 		gtk_timeout_remove (timer);	       
 		timer = 0;
 		if (error_message) {
-			new_cert_creation_process_ca_error_dialog (error_message);
+			creation_process_window_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
-		widget = glade_xml_get_widget (new_ca_window_process_xml, "new_ca_creation_process");
+		widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
 		gtk_widget_destroy (widget);
 	}
 
@@ -259,29 +259,29 @@ gint new_csr_creation_pulse (gpointer data)
 	return 1;
 }
 
-void new_csr_creation_process_window_display (CaCreationData * ca_creation_data)
+void creation_process_window_csr_display (CaCreationData * ca_creation_data)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
 	
 	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
 	 
-	new_ca_window_process_xml = glade_xml_new (xml_file, "new_ca_creation_process", NULL);
+	creation_process_window_xml = glade_xml_new (xml_file, "creation_process_window", NULL);
 	
 	g_free (xml_file);
 	
-	glade_xml_signal_autoconnect (new_ca_window_process_xml); 	
+	glade_xml_signal_autoconnect (creation_process_window_xml); 	
 	
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "titleLabel");
+	widget = glade_xml_get_widget (creation_process_window_xml, "titleLabel");
 	gtk_label_set_text (GTK_LABEL (widget), _("Creating Certificate Signing Request"));
 
-	new_cert_creation_process_ca_thread = csr_creation_launch_thread (ca_creation_data);
+	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 
-	widget = glade_xml_get_widget (new_ca_window_process_xml, "new_cert_creation_process_progressbar");
+	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
-	timer = g_timeout_add (100, new_csr_creation_pulse, widget);
+	timer = g_timeout_add (100, creation_process_window_csr_pulse, widget);
 
 
 }

@@ -17,23 +17,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef _NEW_CERT_CREATION_PROCESS_H_
-#define _NEW_CERT_CREATION_PROCESS_H_
+#ifndef _CREATION_PROCESS_WINDOW_H_
+#define _CREATION_PROCESS_WINDOW_H_
 
 #ifndef GNOMINTCLI
-void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data);
-
-void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
-
-void new_cert_creation_process_ca_error_dialog (gchar *message);
-void new_cert_creation_process_ca_finish (void);
-gint new_ca_creation_pulse (gpointer data);
-void new_cert_creation_process_ca_window_display (CaCreationData * ca_creation_data);
+void creation_process_window_error_dialog (gchar *message);
 void on_cancel_creation_process_clicked (GtkButton *button,
                                          gpointer user_data);
-void new_csr_creation_process_finish (void);
-gint new_csr_creation_pulse (gpointer data);
-void new_csr_creation_process_window_display (CaCreationData * ca_creation_data);
+
+void creation_process_window_ca_display (CaCreationData * ca_creation_data);
+void creation_process_window_csr_display (CaCreationData * ca_creation_data);
+
+void creation_process_window_ca_finish (void);
+gint creation_process_window_ca_pulse (gpointer data);
+
+void creation_process_window_csr_finish (void);
+gint creation_process_window_csr_pulse (gpointer data);
 #endif
 
 #endif
