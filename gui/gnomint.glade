@@ -1149,7 +1149,7 @@ with password:</property>
       </widget>
     </child>
   </widget>
-  <widget class="GtkWindow" id="new_ca_creation_process">
+  <widget class="GtkWindow" id="creation_process_window">
     <property name="visible">True</property>
     <property name="title">Creating new CA - gnoMint</property>
     <property name="modal">True</property>
@@ -1197,7 +1197,7 @@ with password:</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkProgressBar" id="new_cert_creation_process_progressbar">
+              <widget class="GtkProgressBar" id="creation_process_window_progressbar">
                 <property name="visible">True</property>
                 <property name="activity_mode">True</property>
                 <property name="pulse_step">0</property>
@@ -3424,7 +3424,7 @@ Common Name (CN):</property>
                     <property name="visible">True</property>
                     <property name="visibility">False</property>
                     <property name="activates_default">True</property>
-                    <signal name="changed" handler="ca_password_entry_changed_cb"/>
+                    <signal name="changed" handler="dialog_password_entry_changed_cb"/>
                   </widget>
                   <packing>
                     <property name="left_attach">1</property>

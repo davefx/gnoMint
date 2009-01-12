@@ -27,7 +27,7 @@
 #include "ca_creation.h"
 #include "ca_policy.h"
 #include "new_ca_window.h"
-#include "new_cert_creation_process.h"
+#include "creation_process_window.h"
 #include "ca_file.h"
 #include "tls.h"
 #include "ca.h"
@@ -297,7 +297,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	window = GTK_WINDOW(glade_xml_get_widget (new_ca_window_xml, "new_ca_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
 
-	new_cert_creation_process_ca_window_display (ca_creation_data);
+	creation_process_window_ca_display (ca_creation_data);
 	
 
 

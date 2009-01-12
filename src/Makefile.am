@@ -17,7 +17,7 @@ gnomint_SOURCES = \
         new_ca_window.c \
         new_req_window.c \
 	new_cert_window.c \
-	new_cert_creation_process.c \
+	creation_process_window.c \
 	dialog.c \
 	ca.c \
 	ca_creation.c \
@@ -97,7 +97,7 @@ EXTRA_DIST = \
 	dialog.h \
 	export.h \
 	main.h \
-	new_cert_creation_process.h \
+	creation_process_window.h \
 	new_ca_window.h \
 	new_req_window.h \
 	new_cert_window.h \
