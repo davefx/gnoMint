@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -380,7 +380,7 @@ void __ca_tree_view_private_key_in_db_datafunc (GtkTreeViewColumn *tree_column,
 
 
 
-gboolean ca_refresh_model () 
+gboolean ca_refresh_model_callback () 
 {
 	GtkTreeStore * new_model = NULL;
 	GtkTreeView * treeview = NULL;
@@ -1257,7 +1257,7 @@ void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_dat
 
 	g_free (filename);
 
-	ca_refresh_model ();
+	dialog_refresh_list();
 }
 
 
@@ -1296,7 +1296,7 @@ void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 
         }
 
-	ca_refresh_model ();
+	dialog_refresh_list();
   
 }
 
@@ -1331,7 +1331,7 @@ void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
 	ca_file_remove_csr (id);
 
-	ca_refresh_model ();
+	dialog_refresh_list();
 }
 
 void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
@@ -1341,13 +1341,14 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
 	gchar * csr_pem;
 	gchar * csr_parent_id;
+	guint64 csr_id;
 
 	if (type != 2)
 		return;
 		
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &csr_id, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
 
-	new_cert_window_display (csr_pem, csr_parent_id);
+	new_cert_window_display (csr_id, csr_pem, csr_parent_id);
 	
 	g_free (csr_pem);
         g_free (csr_parent_id);
@@ -1366,7 +1367,7 @@ gboolean ca_open (gchar *filename, gboolean create)
 	__enable_widget ("preferences1");
 
 
-	ca_refresh_model ();
+	dialog_refresh_list();
 	
 	
 	return TRUE;
@@ -1402,7 +1403,7 @@ void ca_update_csr_view (gboolean new_value, gboolean refresh)
         view_csr = new_value;
         gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(glade_xml_get_widget(main_window_xml, "csr_view_menuitem")), new_value);
         if (refresh)
-                ca_refresh_model ();
+                dialog_refresh_list();
 }
 
 gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
@@ -1419,7 +1420,7 @@ void ca_update_revoked_view (gboolean new_value, gboolean refresh)
         view_rcrt = new_value;
         gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(glade_xml_get_widget(main_window_xml, "revoked_view_menuitem")), new_value);
         if (refresh)
-                ca_refresh_model ();
+                dialog_refresh_list();
 }
 
 gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)

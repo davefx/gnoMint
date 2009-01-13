@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -34,6 +34,10 @@ gchar * dialog_get_password (gchar *info_message,
 			     gchar *distinct_error_message, guint minimum_length);
 
 void dialog_todo_callback (void);
+
+typedef gboolean (* DialogRefreshCallback) (void);
+void dialog_establish_refresh_function (DialogRefreshCallback callback);
+gboolean dialog_refresh_list (void);
 
 #ifndef GNOMINTCLI
 

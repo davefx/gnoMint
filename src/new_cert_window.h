@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -23,7 +23,7 @@
 #include "tls.h"
 
 #ifndef GNOMINTCLI
-void new_cert_window_display (const gchar * csr_pem, const gchar * csr_parent_id);
+void new_cert_window_display (const guint64 csr_id, const gchar * csr_pem, const gchar * csr_parent_id);
 void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointer userdata);
 void new_cert_tab_activate (int tab_number);
 void on_new_cert_next2_clicked (GtkButton *button,

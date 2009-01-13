@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //

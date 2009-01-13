@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -32,7 +32,7 @@
 #include "ca_file.h"
 #include "tls.h"
 #include "dialog.h"
-#include "ca.h"
+//#include "ca.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
 #include "new_cert_window.h"
@@ -221,7 +221,7 @@ gboolean __new_cert_window_find_ca (GtkTreeModel *model, GtkTreePath *path, GtkT
 }
 
 
-void new_cert_window_display(const gchar *csr_pem, const gchar *csr_parent_id)
+void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const gchar *csr_parent_id)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget;
@@ -242,6 +242,7 @@ void new_cert_window_display(const gchar *csr_pem, const gchar *csr_parent_id)
 	
         widget = glade_xml_get_widget (new_cert_window_xml, "new_cert_window");
         g_object_set_data_full (G_OBJECT(widget), "csr_info", csr_info, (GDestroyNotify) tls_csr_free);
+	g_object_set_data (G_OBJECT(widget), "csr_id", g_strdup_printf ("%" G_GUINT64_FORMAT, csr_id));
 
 	widget = glade_xml_get_widget (new_cert_window_xml, "c_label");
 	gtk_label_set_text (GTK_LABEL(widget), csr_info->c);
@@ -697,6 +698,8 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	GtkWidget *widget = NULL;
 	gint active = -1;
 	guint64 ca_id;
+	gchar * csr_id_str = g_object_get_data (G_OBJECT(glade_xml_get_widget(new_cert_window_xml, "new_cert_window")), "csr_id");
+	guint64 csr_id = atoll(csr_id_str);
 
 	const gchar *strerror = NULL;
 
@@ -740,7 +743,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	widget = glade_xml_get_widget (new_cert_window_xml, "any_purpose_check");
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
-	strerror = new_cert_window_sign_csr (ca_get_selected_row_id (), ca_id, cert_creation_data);
+	strerror = new_cert_window_sign_csr (csr_id, ca_id, cert_creation_data);
 
 	if (strerror) {
 		dialog_error ((gchar *) strerror);
@@ -749,7 +752,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	widget = GTK_WIDGET(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
         gtk_object_destroy(GTK_OBJECT(widget));	
 
-	ca_refresh_model();
+	dialog_refresh_list();
 
 }
 #endif

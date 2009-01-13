@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -28,7 +28,6 @@
 
 #include "import.h"
 #include "tls.h"
-#include "ca.h"
 #include "dialog.h"
 #include "ca_file.h"
 
@@ -910,7 +909,7 @@ gboolean import_single_file (gchar *filename, gchar **dn, guint64 *id)
         g_free (file_contents);
 
 	if (successful_import) {
-		ca_refresh_model();
+		dialog_refresh_list();
 	} else {
 		dialog_error (_("Couldn't find any supported format in the given file"));
 	}
@@ -1037,7 +1036,7 @@ gint import_openssl_private_key (const gchar *filename, gchar **last_password, g
 	result = import_pkey_wo_passwd ((guchar *) filecontents, strlen(filecontents));
 	
 	if (result == 1)
-		ca_refresh_model();
+		dialog_refresh_list();
 
 	g_free (filecontents);
 

@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -31,7 +31,7 @@
 #include "csr_creation.h"
 #include "ca_file.h"
 #include "ca_policy.h"
-#include "ca.h"
+#include "dialog.h"
 #include "creation_process_window.h"
 
 GladeXML * creation_process_window_xml = NULL;
@@ -71,7 +71,7 @@ void creation_process_window_ca_finish (void)
 	
 	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
 	
-        ca_refresh_model();
+        dialog_refresh_list();
 
         dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -214,7 +214,7 @@ void creation_process_window_csr_finish (void) {
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 	gtk_widget_destroy (widget);
 
-	ca_refresh_model ();
+	dialog_refresh_list ();
 }
 
 gint creation_process_window_csr_pulse (gpointer data)

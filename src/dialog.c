@@ -1,4 +1,3 @@
-
 //  gnoMint: a graphical interface for managing a certification authority
 //  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
@@ -25,6 +24,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include "dialog.h"
+
+DialogRefreshCallback dialog_refresh_callback = NULL;
+
+void dialog_establish_refresh_function (DialogRefreshCallback callback)
+{
+	dialog_refresh_callback = callback;
+}
+
+gboolean dialog_refresh_list (void)
+{
+	return dialog_refresh_callback();
+}
+
 
 #ifdef GNOMINTCLI
 

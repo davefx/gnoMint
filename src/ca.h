@@ -1,5 +1,5 @@
 //  gnoMint: a graphical interface for managing a certification authority
-//  Copyright (C) 2006,2007,2008 David Marín Carreño <davefx@gmail.com>
+//  Copyright (C) 2006-2009 David Marín Carreño <davefx@gmail.com>
 //
 //  This file is part of gnoMint.
 //
@@ -26,7 +26,7 @@
 #ifndef GNOMINTCLI
 #include <gtk/gtk.h>
 
-gboolean ca_refresh_model (void);
+gboolean ca_refresh_model_callback ();
 gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 				    GtkTreePath *path,
 				    GtkTreeViewColumn *column,
