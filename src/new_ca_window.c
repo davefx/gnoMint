@@ -30,7 +30,6 @@
 #include "creation_process_window.h"
 #include "ca_file.h"
 #include "tls.h"
-#include "ca.h"
 #include "pkey_manage.h"
 
 #include <glib/gi18n.h>

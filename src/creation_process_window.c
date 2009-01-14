@@ -29,8 +29,6 @@
 
 #include "ca_creation.h"
 #include "csr_creation.h"
-#include "ca_file.h"
-#include "ca_policy.h"
 #include "dialog.h"
 #include "creation_process_window.h"
 

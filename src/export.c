@@ -129,3 +129,145 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 
 	return NULL;
 }
+
+gchar * export_private_pem (guint64 id, gint type, gchar *filename)
+{
+	GIOChannel * file = NULL;
+	PkeyManageData * crypted_pkey = NULL;
+	gchar * dn = NULL;
+	gchar * pem = NULL;
+	GError * error = NULL;
+        
+        file = g_io_channel_new_file (filename, "w", &error);
+	if (error) {
+		return (_("There was an error while exporting private key."));
+	} 
+	
+	if (type == 1) {
+		crypted_pkey = pkey_manage_get_certificate_pkey (id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	} else {
+		crypted_pkey = pkey_manage_get_csr_pkey (id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+	}
+	
+	if (!crypted_pkey || !dn) {
+		pkey_manage_data_free(crypted_pkey);
+		g_free (dn);
+		return (_("There was an error while getting private key."));
+	}
+	
+	pem = pkey_manage_uncrypt (crypted_pkey, dn);
+
+	pkey_manage_data_free (crypted_pkey);
+	g_free (dn);
+	
+	if (!pem) {
+		return (_("There was an error while decrypting private key."));
+	}
+	
+	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+	if (error) {
+		return (_("There was an error while exporting private key."));
+	} 
+	g_free (pem);
+	
+	
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		g_io_channel_unref (file);
+		return (_("There was an error while exporting private key."));
+	} 
+	
+	g_io_channel_unref (file);
+        
+        return NULL;
+
+}
+
+gchar * export_pkcs12 (guint64 id, gint type, gchar *filename)
+{
+	GIOChannel * file = NULL;
+	gchar * password = NULL;
+	GError * error = NULL;
+	gchar * crt_pem = NULL;
+	PkeyManageData * crypted_pkey = NULL;
+	gchar * dn = NULL;
+	gchar * privatekey = NULL;
+        gnutls_datum_t * pkcs12_datum = NULL;
+
+	if (type == 1) {
+		crypted_pkey = pkey_manage_get_certificate_pkey (id);
+		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		crt_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	}
+		
+	
+	if (! crypted_pkey || ! dn || ! crt_pem) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (dn);
+		g_free (crt_pem);
+		return (_("There was an error while getting the certificate and private key from the internal database."));
+	}
+	
+	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
+
+	if (! privatekey) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (dn);
+		g_free (crt_pem);
+		return (_("There was an error while getting the certificate and private key from the internal database."));
+	}
+
+	password = dialog_get_password (_("You need to supply a passphrase for protecting the exported certificate, "
+					  "so nobody else but authorized people can use it. This passphrase will be asked "
+					  "by any application that will import the certificate."),
+					_("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"), 
+					_("The introduced passphrases are distinct."), 8);
+	if (! password) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (dn);
+		g_free (crt_pem);
+		g_free (privatekey);
+		return "";
+	}
+			
+	pkcs12_datum = tls_generate_pkcs12 (crt_pem, privatekey, password); 
+	g_free (password);
+	g_free (privatekey);
+	pkey_manage_data_free (crypted_pkey);
+	g_free (dn);
+	g_free (crt_pem);
+	
+	
+	if (!pkcs12_datum) {		
+		return (_("There was an error while generating the PKCS#12 package."));
+	}
+	
+	file = g_io_channel_new_file (filename, "w", &error);
+	if (error) {
+		return (_("There was an error while exporting certificate."));
+	} 
+
+        g_io_channel_set_encoding (file, NULL, NULL);
+        
+	g_io_channel_write_chars (file, (gchar *) pkcs12_datum->data, pkcs12_datum->size, NULL, &error);
+	if (error) {
+                g_free (pkcs12_datum->data);
+                g_free (pkcs12_datum);
+		return (_("There was an error while exporting the certificate."));
+	} 
+        g_free (pkcs12_datum->data);
+	g_free (pkcs12_datum);
+	
+	
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		g_io_channel_unref (file);
+		return (_("There was an error while exporting the certificate."));
+	} 
+	
+	g_io_channel_unref (file);
+
+        return NULL;
+}
