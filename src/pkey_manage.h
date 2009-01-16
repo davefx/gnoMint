@@ -40,7 +40,7 @@ void pkey_manage_data_free (PkeyManageData *pkeydata);
 
 /* PRIVATE KEY PASSWORD PROTECTION RELATED FUNCTIONS */
 
-void pkey_manage_crypt_auto (CaCreationData *creation_data,
+void pkey_manage_crypt_auto (gchar *password,
 			     gchar **pem_private_key,
 			     const gchar *pem_root_certificate);
 

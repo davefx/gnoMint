@@ -27,6 +27,7 @@
 #include "ca-cli-callbacks.h"
 #include "ca-cli.h"
 #include "dialog.h"
+#include "ca_creation.h"
 #include "ca_file.h"
 #include "ca_policy.h"
 #include "csr_creation.h"
@@ -266,7 +267,7 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 
 	gboolean change_data = FALSE;
 
-	CaCreationData *csr_creation_data = NULL;
+	TlsCreationData *csr_creation_data = NULL;
 
 	if (argc == 2) {
 		ca_id = atoll (argv[1]);
@@ -277,7 +278,7 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		}
 	}
 
-	csr_creation_data = g_new0 (CaCreationData, 1);
+	csr_creation_data = g_new0 (TlsCreationData, 1);
 
 	if (with_ca_id) {
 		TlsCert *tlscert = NULL;
@@ -427,14 +428,14 @@ int ca_cli_callback_addca (int argc, char **argv)
 {
 	gboolean change_data = FALSE;
 
-	CaCreationData *ca_creation_data = NULL;
+	TlsCreationData *ca_creation_data = NULL;
 
 	time_t tmp;
 	struct tm * expiration_time;
 	struct tm timer;
 	char model_time_str[100];
 
-	ca_creation_data = g_new0 (CaCreationData, 1);
+	ca_creation_data = g_new0 (TlsCreationData, 1);
 
 
 	// Enter default values
@@ -653,7 +654,7 @@ int ca_cli_callback_revoke (int argc, char **argv)
 }
 
 
-void __ca_cli_callback_show_uses_and_purposes (CertCreationData *cert_creation_data)
+void __ca_cli_callback_show_uses_and_purposes (TlsCertCreationData *cert_creation_data)
 {
 	printf (_("Certificate uses:\n"));
 
@@ -748,7 +749,7 @@ void __ca_cli_callback_show_uses_and_purposes (CertCreationData *cert_creation_d
 
 int ca_cli_callback_sign (int argc, char **argv)
 {
-	CertCreationData *cert_creation_data = NULL;
+	TlsCertCreationData *cert_creation_data = NULL;
 	
 	guint64 csr_id;
 	guint64 ca_id;
@@ -762,7 +763,7 @@ int ca_cli_callback_sign (int argc, char **argv)
 	}
 
 
-	cert_creation_data = g_new0 (CertCreationData, 1);
+	cert_creation_data = g_new0 (TlsCertCreationData, 1);
 
 	printf (_("You are about to sign the following Certificate Signing Request:\n"));
 	ca_cli_callback_showcsr (argc, argv);

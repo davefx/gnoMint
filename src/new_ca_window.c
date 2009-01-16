@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ca_creation.h"
 #include "ca_policy.h"
 #include "new_ca_window.h"
 #include "creation_process_window.h"
@@ -183,7 +182,7 @@ void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton,
 void on_new_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data) 
 {
-	CaCreationData *ca_creation_data = NULL;
+	TlsCreationData *ca_creation_data = NULL;
 
 	GtkWidget *widget = NULL;
 	GtkWindow *window = NULL;
@@ -195,7 +194,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	time_t tmp;
 	struct tm * expiration_time;
 
-	ca_creation_data = g_new0 (CaCreationData, 1);
+	ca_creation_data = g_new0 (TlsCreationData, 1);
 	widget = glade_xml_get_widget (new_ca_window_xml, "country_combobox");
 	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
 

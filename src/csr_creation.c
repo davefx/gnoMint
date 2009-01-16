@@ -33,13 +33,13 @@ static GStaticMutex csr_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
 gint csr_creation_thread_status = 0;
 gchar * csr_creation_message = "";
 
-gchar * csr_creation_database_save (CaCreationData * creation_data, 
+gchar * csr_creation_database_save (TlsCreationData * creation_data, 
 				   gchar * private_key, 
 				   gchar * root_certificate);
 
 gpointer csr_creation_thread (gpointer data)
 {
-	CaCreationData *creation_data = (CaCreationData *) data;
+	TlsCreationData *creation_data = (TlsCreationData *) data;
 	
 	gchar * private_key = NULL;
 	gchar * pkey = NULL;
@@ -163,7 +163,7 @@ gpointer csr_creation_thread (gpointer data)
 
 
 
-GThread * csr_creation_launch_thread (CaCreationData *creation_data)
+GThread * csr_creation_launch_thread (TlsCreationData *creation_data)
 {
 	return g_thread_create (csr_creation_thread,
 				creation_data,
@@ -192,11 +192,12 @@ gchar * csr_creation_get_thread_message()
 	return csr_creation_message;
 }
 
-gchar * csr_creation_database_save (CaCreationData * creation_data, 
+gchar * csr_creation_database_save (TlsCreationData * creation_data, 
 				    gchar * private_key, 
 				    gchar * certificate_sign_request)
 {
-	return ca_file_insert_csr (creation_data, 
-				   private_key,
-				   certificate_sign_request, NULL);
+	return ca_file_insert_csr (private_key,
+				   certificate_sign_request, 
+				   creation_data->parent_ca_id_str,
+				   NULL);
 }

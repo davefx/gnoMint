@@ -31,7 +31,6 @@
 #include "ca_file.h"
 #include "tls.h"
 #include "dialog.h"
-//#include "ca.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
 #include "new_cert_window.h"
@@ -692,7 +691,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
         GtkTreeModel *model;
 	GtkTreeIter iter;
 
-	CertCreationData *cert_creation_data = NULL;
+	TlsCertCreationData *cert_creation_data = NULL;
 
 	GtkWidget *widget = NULL;
 	gint active = -1;
@@ -706,7 +705,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
         gtk_tree_model_get_value (model, &iter, NEW_CERT_CA_MODEL_COLUMN_ID, value);
         ca_id = g_value_get_uint64(value);
 
-	cert_creation_data = g_new0 (CertCreationData, 1);
+	cert_creation_data = g_new0 (TlsCertCreationData, 1);
 		
 	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton1");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
@@ -756,7 +755,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 }
 #endif
 
-const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, CertCreationData *cert_creation_data)
+const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data)
 {
 	gchar *csr_pem = NULL;
 	
@@ -811,11 +810,11 @@ const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, CertCreati
                         
                         if (csr_pkey)
                                 if (csr_pkey->is_in_db)
-                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 1, csr_pkey->pkey_data, certificate);
+                                        error = ca_file_insert_cert (cert_creation_data->ca, 1, csr_pkey->pkey_data, certificate);
                                 else
-                                        error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, csr_pkey->external_file, certificate);			
+                                        error = ca_file_insert_cert (cert_creation_data->ca, 0, csr_pkey->external_file, certificate);			
                         else
-                                error = ca_file_insert_cert (cert_creation_data, cert_creation_data->ca, 0, NULL, certificate);
+                                error = ca_file_insert_cert (cert_creation_data->ca, 0, NULL, certificate);
                         
                         if (!error)
                                 ca_file_remove_csr (csr_id);

@@ -133,7 +133,7 @@ gint creation_process_window_ca_pulse (gpointer data)
 
 
 
-void creation_process_window_ca_display (CaCreationData * ca_creation_data)
+void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;
@@ -257,7 +257,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 	return 1;
 }
 
-void creation_process_window_csr_display (CaCreationData * ca_creation_data)
+void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 {
 	gchar     * xml_file = NULL;
 	GtkWidget * widget = NULL;

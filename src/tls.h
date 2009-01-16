@@ -20,7 +20,6 @@
 #ifndef _TLS_H_
 #define _TLS_H_
 
-#include "ca_creation.h"
 #include "uint160.h"
 
 #include <gnutls/gnutls.h>
@@ -30,6 +29,60 @@
 
 #define TLS_INVALID_PASSWORD GNUTLS_E_DECRYPTION_FAILED
 #define TLS_NON_MATCHING_PRIVATE_KEY -2000
+
+typedef struct {
+	gchar * country;
+	gchar * state;
+	gchar * city;
+	gchar * org;
+	gchar * ou;
+	gchar * cn;
+	gchar * emailAddress;
+
+	gint key_type;
+	gint key_bitlength;
+
+	gint key_months_before_expiration;
+	time_t activation;
+	time_t expiration;
+
+	/* Now, as the DB is not related to CAs anymore, the field is_pwd_protected has no sense
+	   in CA creation process */
+
+	/* gboolean is_pwd_protected; */
+
+	/* However, the password is needed */
+	gchar * password; 
+
+        gchar * parent_ca_id_str;
+} TlsCreationData;
+
+typedef struct {
+	gint key_months_before_expiration;
+	time_t activation;
+	time_t expiration;
+	
+	UInt160 serial;
+
+        gboolean ca;
+        gboolean crl_signing;
+	gboolean digital_signature;
+	gboolean data_encipherment;
+	gboolean key_encipherment;
+	gboolean non_repudiation;
+	gboolean key_agreement;
+
+	gboolean email_protection;
+	gboolean code_signing;
+	gboolean web_client;
+	gboolean web_server;
+	gboolean time_stamping;
+	gboolean ocsp_signing;
+	gboolean any_purpose;
+
+	gchar * cadb_password;
+
+} TlsCertCreationData;
 
 typedef struct __TlsCert {	
 	UInt160 serial_number;
@@ -78,11 +131,11 @@ typedef struct __TlsCsr {
 
 void tls_init (void);
 
-gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
+gchar * tls_generate_rsa_keys (TlsCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key);
 
-gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
+gchar * tls_generate_dsa_keys (TlsCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key);
 
@@ -91,15 +144,15 @@ gchar * tls_load_pkcs8_private_key (gchar *pem, gchar *passphrase, const gchar *
 
 gnutls_datum_t * tls_generate_pkcs12 (gchar *certificate, gchar *private_key, gchar *passphrase);
 
-gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
+gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate);
 
-gchar * tls_generate_csr (CaCreationData * creation_data, 
+gchar * tls_generate_csr (TlsCreationData * creation_data, 
 			  gnutls_x509_privkey_t *key,
 			  gchar ** csr);
 
-gchar * tls_generate_certificate (CertCreationData * creation_data,
+gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 				  gchar *csr_pem,
 				  gchar *ca_cert_pem,
 				  gchar *ca_priv_key_pem,
@@ -111,6 +164,8 @@ void tls_cert_free (TlsCert *);
 
 TlsCsr * tls_parse_csr_pem (const char * pem_csr);
 void tls_csr_free (TlsCsr *);
+
+void tls_creation_data_free (TlsCreationData *cd);
 
 gchar * tls_generate_crl (GList * revoked_certs, 
                           guchar *ca_pem, 

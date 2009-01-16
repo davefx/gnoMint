@@ -33,13 +33,13 @@ static GStaticMutex ca_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
 gint ca_creation_thread_status = 0;
 gchar * ca_creation_message = "";
 
-gchar * ca_creation_database_save (CaCreationData * creation_data, 
+gchar * ca_creation_database_save (TlsCreationData * creation_data, 
 				   gchar * private_key, 
 				   gchar * root_certificate);
 
 gpointer ca_creation_thread (gpointer data)
 {
-	CaCreationData *creation_data = (CaCreationData *) data;
+	TlsCreationData *creation_data = (TlsCreationData *) data;
 	
 	gchar * private_key = NULL;
 	gnutls_x509_privkey_t * ca_key = NULL;
@@ -64,7 +64,7 @@ gpointer ca_creation_thread (gpointer data)
 
 			g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-			ca_creation_data_free (creation_data);
+			tls_creation_data_free (creation_data);
 			return ca_creation_message;
 			// return error_message;
 		}
@@ -90,7 +90,7 @@ gpointer ca_creation_thread (gpointer data)
 
 
  			//return error_message; 
-			ca_creation_data_free (creation_data);
+			tls_creation_data_free (creation_data);
 			return ca_creation_message;
  		} 
 
@@ -113,7 +113,7 @@ gpointer ca_creation_thread (gpointer data)
 
 		g_free (error_message);
  		//return error_message; 
-		ca_creation_data_free (creation_data);
+		tls_creation_data_free (creation_data);
 		return ca_creation_message;
  	} 
 
@@ -121,7 +121,7 @@ gpointer ca_creation_thread (gpointer data)
 	ca_creation_message =  _("Creating CA database");
 	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 
-	pkey_manage_crypt_auto (creation_data, &private_key, root_certificate);
+	pkey_manage_crypt_auto (creation_data->password, &private_key, root_certificate);
 
 	error_message = ca_creation_database_save (creation_data, private_key, root_certificate);
 	if (error_message) {
@@ -133,7 +133,7 @@ gpointer ca_creation_thread (gpointer data)
 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
 		
 		g_free (error_message);
-		ca_creation_data_free (creation_data);
+		tls_creation_data_free (creation_data);
 
 		return ca_creation_message;
 	}
@@ -150,7 +150,7 @@ gpointer ca_creation_thread (gpointer data)
 		g_free (ca_key);
 	}
 
-	ca_creation_data_free (creation_data);
+	tls_creation_data_free (creation_data);
         g_free (private_key);
 
 	return NULL;
@@ -159,7 +159,7 @@ gpointer ca_creation_thread (gpointer data)
 
 
 
-GThread * ca_creation_launch_thread (CaCreationData *creation_data)
+GThread * ca_creation_launch_thread (TlsCreationData *creation_data)
 {
 	return g_thread_create (ca_creation_thread,
 				creation_data,
@@ -188,35 +188,12 @@ gchar * ca_creation_get_thread_message()
 	return ca_creation_message;
 }
 
-gchar * ca_creation_database_save (CaCreationData * creation_data, 
+gchar * ca_creation_database_save (TlsCreationData * creation_data, 
 				   gchar * private_key, 
 				   gchar * root_certificate)
 {
-	return ca_file_insert_self_signed_ca (creation_data, 
-                                              private_key,
+	return ca_file_insert_self_signed_ca (private_key,
                                               root_certificate);
 }
 
-void ca_creation_data_free (CaCreationData *cd)
-{
-	if (cd->country)
-		g_free (cd->country);
-	if (cd->state)
-		g_free (cd->state);
-	if (cd->city)
-		g_free (cd->city);
-	if (cd->org)
-		g_free (cd->org);
-	if (cd->ou)
-		g_free (cd->ou);
-	if (cd->cn)
-		g_free (cd->cn);
-	if (cd->emailAddress)
-		g_free (cd->emailAddress);
-	if (cd->password)
-		g_free (cd->password);
-        if (cd->parent_ca_id_str)
-                g_free (cd->parent_ca_id_str);
-	g_free (cd);
-}
 

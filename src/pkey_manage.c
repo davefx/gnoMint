@@ -550,7 +550,7 @@ gboolean pkey_manage_check_password (const gchar *checking_password, const gchar
 	return res;
 }
 
-void pkey_manage_crypt_auto (CaCreationData *creation_data,
+void pkey_manage_crypt_auto (gchar *password,
 			     gchar **pem_private_key,
 			     const gchar *pem_ca_certificate)
 {
@@ -560,7 +560,7 @@ void pkey_manage_crypt_auto (CaCreationData *creation_data,
 
 	tls_cert = tls_parse_cert_pem (pem_ca_certificate);
 
-	res = pkey_manage_crypt_w_pwd (clean_private_key, tls_cert->dn, creation_data->password);
+	res = pkey_manage_crypt_w_pwd (clean_private_key, tls_cert->dn, password);
 
 	tls_cert_free (tls_cert);
 

@@ -20,13 +20,15 @@
 #ifndef _CREATION_PROCESS_WINDOW_H_
 #define _CREATION_PROCESS_WINDOW_H_
 
+#include "tls.h"
+
 #ifndef GNOMINTCLI
 void creation_process_window_error_dialog (gchar *message);
 void on_cancel_creation_process_clicked (GtkButton *button,
                                          gpointer user_data);
 
-void creation_process_window_ca_display (CaCreationData * ca_creation_data);
-void creation_process_window_csr_display (CaCreationData * ca_creation_data);
+void creation_process_window_ca_display (TlsCreationData * ca_creation_data);
+void creation_process_window_csr_display (TlsCreationData * ca_creation_data);
 
 void creation_process_window_ca_finish (void);
 gint creation_process_window_ca_pulse (gpointer data);

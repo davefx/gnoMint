@@ -95,22 +95,11 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 
 gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id)
 {
-	CaCreationData * creation_data = g_new0(CaCreationData, 1);
 	gchar * pem_csr=NULL;
 	size_t size;
 	gchar * error_msg;
         gint result = -1;
 	gchar *aux = NULL;
-	
-	size = 0;
-	gnutls_x509_crq_get_dn_by_oid (*crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-	if (size) {
-		aux = g_new0(gchar, size);
-		gnutls_x509_crq_get_dn_by_oid (*crq, GNUTLS_OID_X520_COMMON_NAME, 0, 0, aux, &size);
-		creation_data->cn = g_strdup (aux);
-		g_free (aux);
-		aux = NULL;
-	}	        
 	
         
         if (csr_dn) {
@@ -133,7 +122,7 @@ gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id)
 		
 	}
 	
-	error_msg = ca_file_insert_csr (creation_data, NULL, pem_csr, id);
+	error_msg = ca_file_insert_csr (NULL, pem_csr, NULL, id);
 	
 	
 	if (error_msg) {
@@ -150,7 +139,6 @@ gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id)
 
 gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
 {
-	CertCreationData * creation_data = g_new0(CertCreationData, 1);
 	guchar *serial_str = NULL;
 	UInt160 serial;
 	gchar * pem_cert=NULL;
@@ -197,13 +185,6 @@ gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
         }
 
 	
-	// Activation
-	creation_data->activation = gnutls_x509_crt_get_activation_time (*cert);
-	
-	// Expiration
-	creation_data->expiration = gnutls_x509_crt_get_expiration_time (*cert);
-        
-	
 	// Now we re-export the PEM (as the original PEM can be a list of certs)
 	size = 0;
 	gnutls_x509_crt_export (*cert, GNUTLS_X509_FMT_PEM, aux, &size);
@@ -215,7 +196,7 @@ gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
 		aux = NULL;
 	}
 	
-	error_msg = ca_file_insert_imported_cert (creation_data, is_ca, serial, pem_cert, id);
+	error_msg = ca_file_insert_imported_cert (is_ca, serial, pem_cert, id);
         
 	if (pem_cert)
 		g_free (pem_cert);

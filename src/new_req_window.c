@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "new_ca_window.h"
-#include "ca_creation.h"
 #include "ca_policy.h"
 #include "creation_process_window.h"
 #include "ca_file.h"
@@ -412,7 +411,7 @@ void on_new_req_cancel_clicked (GtkButton *widget,
 void on_new_req_commit_clicked (GtkButton *widg,
 			       gpointer user_data) 
 {
-	CaCreationData *csr_creation_data = NULL;
+	TlsCreationData *csr_creation_data = NULL;
 
 	GtkWidget *widget = NULL;
 	GtkWindow *window = NULL;
@@ -421,7 +420,7 @@ void on_new_req_commit_clicked (GtkButton *widg,
 	GtkTreeModel *tree_model = NULL;
 	GtkTreeIter tree_iter;
 	
-	csr_creation_data = g_new0 (CaCreationData, 1);
+	csr_creation_data = g_new0 (TlsCreationData, 1);
 
         if (new_req_ca_id_valid)
                 csr_creation_data->parent_ca_id_str = g_strdup_printf ("'%"G_GUINT64_FORMAT"'", new_req_ca_id);

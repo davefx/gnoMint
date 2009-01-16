@@ -1066,8 +1066,7 @@ gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id)
 }
 
 
-gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data, 
-                                       gchar *pem_ca_private_key,
+gchar * ca_file_insert_self_signed_ca (gchar *pem_ca_private_key,
                                        gchar *pem_ca_certificate)
 {
 	gchar *sql = NULL;
@@ -1104,9 +1103,9 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
                                "private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, issuer_key_id) "
                                "VALUES (NULL, 1, '%q', '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q', 0, ':', %s, %s);", 
                                serialstr,
-			       creation_data->cn,
-			       creation_data->activation,
-			       creation_data->expiration,
+			       tls_cert->cn,
+			       tls_cert->activation_time,
+			       tls_cert->expiration_time,
 			       pem_ca_certificate,
 			       pem_ca_private_key,
 			       tls_cert->dn,
@@ -1168,8 +1167,7 @@ gchar * ca_file_insert_self_signed_ca (CaCreationData *creation_data,
 }
 
 
-gchar * ca_file_insert_cert (CertCreationData *creation_data, 
-                             gboolean is_ca,
+gchar * ca_file_insert_cert (gboolean is_ca,
                              gboolean private_key_in_db, 
 			     gchar *private_key_info,                             
 			     gchar *pem_certificate)
@@ -1227,8 +1225,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
-				       creation_data->activation,
-				       creation_data->expiration,
+				       tlscert->activation_time,
+				       tlscert->expiration_time,
 				       pem_certificate,
                                        private_key_in_db,
 				       private_key_info,
@@ -1247,8 +1245,8 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
-				       creation_data->activation,
-				       creation_data->expiration,
+				       tlscert->activation_time,
+				       tlscert->expiration_time,
 				       pem_certificate,
 				       tlscert->dn,
 				       tlscert->i_dn,
@@ -1336,8 +1334,7 @@ gchar * ca_file_insert_cert (CertCreationData *creation_data,
 
 }
 
-gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data, 
-                                      gboolean is_ca,
+gchar * ca_file_insert_imported_cert (gboolean is_ca,
                                       const UInt160 serial,
                                       const gchar *pem_certificate,
                                       guint64 *id)
@@ -1453,8 +1450,8 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
                                is_ca,
                                serialstr,
                                tlscert->cn,
-                               creation_data->activation,
-                               creation_data->expiration,
+                               tlscert->activation_time,
+                               tlscert->expiration_time,
                                pem_certificate,
                                tlscert->dn,
                                tlscert->i_dn,
@@ -1585,9 +1582,9 @@ gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
 
 }
 
-gchar * ca_file_insert_csr (CaCreationData *creation_data, 
-			    gchar *pem_csr_private_key,
+gchar * ca_file_insert_csr (gchar *pem_csr_private_key,
 			    gchar *pem_csr,
+	                    gchar *parent_ca_id_str,
                             guint64 *id)
 {
 	gchar *sql = NULL;
@@ -1601,19 +1598,19 @@ gchar * ca_file_insert_csr (CaCreationData *creation_data,
 	if (pem_csr_private_key)
 		sql = sqlite3_mprintf ("INSERT INTO cert_requests (id, subject, pem, private_key_in_db, private_key, dn, parent_ca) "
                                        "VALUES (NULL, '%q', '%q', 1, '%q','%q', %s);", 
-				       creation_data->cn,
+				       tlscsr->cn,
 				       pem_csr,
 				       pem_csr_private_key,
 				       tlscsr->dn,
-                                       (creation_data->parent_ca_id_str ? creation_data->parent_ca_id_str : "NULL")
+                                       (parent_ca_id_str ? parent_ca_id_str : "NULL")
                         );
 	else
 		sql = sqlite3_mprintf ("INSERT INTO cert_requests (id, subject, pem, private_key_in_db, private_key, dn, parent_ca) "
                                        "VALUES (NULL, '%q', '%q', 0, NULL, '%q', %s);", 
-				       creation_data->cn,
+				       tlscsr->cn,
 				       pem_csr,
 				       tlscsr->dn,
-                                       (creation_data->parent_ca_id_str ? creation_data->parent_ca_id_str : "NULL")
+                                       (parent_ca_id_str ? parent_ca_id_str : "NULL")
                         );
 
 	tls_csr_free (tlscsr);

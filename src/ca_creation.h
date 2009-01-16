@@ -22,63 +22,11 @@
 
 #include <glib.h>
 #include <time.h>
+
 #include "uint160.h"
+#include "tls.h"
 
-typedef struct {
-	gchar * country;
-	gchar * state;
-	gchar * city;
-	gchar * org;
-	gchar * ou;
-	gchar * cn;
-	gchar * emailAddress;
-
-	gint key_type;
-	gint key_bitlength;
-
-	gint key_months_before_expiration;
-	time_t activation;
-	time_t expiration;
-
-	/* Now, as the DB is not related to CAs anymore, the field is_pwd_protected has no sense
-	   in CA creation process */
-
-	/* gboolean is_pwd_protected; */
-
-	/* However, the password is needed */
-	gchar * password; 
-
-        gchar * parent_ca_id_str;
-} CaCreationData;
-
-typedef struct {
-	gint key_months_before_expiration;
-	time_t activation;
-	time_t expiration;
-	
-	UInt160 serial;
-
-        gboolean ca;
-        gboolean crl_signing;
-	gboolean digital_signature;
-	gboolean data_encipherment;
-	gboolean key_encipherment;
-	gboolean non_repudiation;
-	gboolean key_agreement;
-
-	gboolean email_protection;
-	gboolean code_signing;
-	gboolean web_client;
-	gboolean web_server;
-	gboolean time_stamping;
-	gboolean ocsp_signing;
-	gboolean any_purpose;
-
-	gchar * cadb_password;
-
-} CertCreationData;
-
-GThread * ca_creation_launch_thread (CaCreationData *creation_data);
+GThread * ca_creation_launch_thread (TlsCreationData *creation_data);
 
 
 void ca_creation_lock_status_mutex (void);
@@ -87,8 +35,6 @@ void ca_creation_unlock_status_mutex (void);
 gint ca_creation_get_thread_status (void);
 
 gchar * ca_creation_get_thread_message(void);
-
-void ca_creation_data_free (CaCreationData *cd);
 
 gpointer ca_creation_thread (gpointer data);
 

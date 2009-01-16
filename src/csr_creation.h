@@ -23,9 +23,9 @@
 #include <glib.h>
 #include <time.h>
 
-#include "ca_creation.h"
+#include "tls.h"
 
-GThread * csr_creation_launch_thread (CaCreationData *creation_data);
+GThread * csr_creation_launch_thread (TlsCreationData *creation_data);
 
 void csr_creation_lock_status_mutex (void);
 void csr_creation_unlock_status_mutex (void);

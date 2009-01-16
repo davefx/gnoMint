@@ -21,7 +21,6 @@
 #define _CA_FILE_H_
 
 #include <sqlite3.h>
-#include "ca_creation.h"
 #include "uint160.h"
 
 typedef int (*CaFileCallbackFunc) (void *pArg, int argc, char **argv, char **columnNames);
@@ -45,25 +44,22 @@ gint ca_file_get_number_of_csrs ();
 void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id);
 gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id);
 
-gchar * ca_file_insert_self_signed_ca (CaCreationData * creation_data, 
-                                       gchar *pem_ca_private_key,
+gchar * ca_file_insert_self_signed_ca (gchar *pem_ca_private_key,
                                        gchar *pem_ca_certificate);                                      
 
-gchar * ca_file_insert_cert (CertCreationData * creation_data,
-                             gboolean is_ca,
+gchar * ca_file_insert_cert (gboolean is_ca,
                              gboolean private_key_in_db,
 			     gchar *pem_private_key_info,
 			     gchar *pem_certificate);
 
-gchar * ca_file_insert_imported_cert (const CertCreationData *creation_data,
-                                      gboolean is_ca,
+gchar * ca_file_insert_imported_cert (gboolean is_ca,
                                       const UInt160 serial,
                                       const gchar *pem_certificate,
                                       guint64 *id);
 
-gchar * ca_file_insert_csr (CaCreationData * creation_data,
-			    gchar *pem_private_key,
+gchar * ca_file_insert_csr (gchar *pem_private_key,
 			    gchar *pem_csr,
+	                    gchar *parent_ca_id_str,
                             guint64 *id);
 gchar * ca_file_insert_imported_privkey (const gchar *privkey_pem);
 

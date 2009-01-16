@@ -30,7 +30,7 @@ void tls_init ()
 
 }
 
-gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
+gchar * tls_generate_rsa_keys (TlsCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key)
 {
@@ -64,7 +64,7 @@ gchar * tls_generate_rsa_keys (CaCreationData *creation_data,
 	return NULL;
 }
 
-gchar * tls_generate_dsa_keys (CaCreationData *creation_data,
+gchar * tls_generate_dsa_keys (TlsCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key)
 {
@@ -416,7 +416,7 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
 }
 
 
-gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data, 
+gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data, 
 					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate)
 {
@@ -560,7 +560,7 @@ gchar * tls_generate_self_signed_certificate (CaCreationData * creation_data,
 }
 
 
-gchar * tls_generate_csr (CaCreationData * creation_data, 
+gchar * tls_generate_csr (TlsCreationData * creation_data, 
 			  gnutls_x509_privkey_t *key,
 			  gchar ** csr)
 {
@@ -625,7 +625,7 @@ gchar * tls_generate_csr (CaCreationData * creation_data,
 
 }
 
-gchar * tls_generate_certificate (CertCreationData * creation_data,
+gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 				  gchar *csr_pem,
 				  gchar *ca_cert_pem,
 				  gchar *ca_priv_key_pem,
@@ -1595,6 +1595,30 @@ gchar * tls_get_public_key_id (const gchar *certificate_pem)
 
 }
 
+void tls_creation_data_free (TlsCreationData *cd)
+{
+	if (cd->country)
+		g_free (cd->country);
+	if (cd->state)
+		g_free (cd->state);
+	if (cd->city)
+		g_free (cd->city);
+	if (cd->org)
+		g_free (cd->org);
+	if (cd->ou)
+		g_free (cd->ou);
+	if (cd->cn)
+		g_free (cd->cn);
+	if (cd->emailAddress)
+		g_free (cd->emailAddress);
+	if (cd->password)
+		g_free (cd->password);
+        if (cd->parent_ca_id_str)
+                g_free (cd->parent_ca_id_str);
+	g_free (cd);
+}
+
+
 #ifdef ADVANCED_GNUTLS
 
 gchar * tls_get_csr_public_key_id (const gchar *csr_pem)
@@ -1641,5 +1665,7 @@ gchar * tls_get_csr_public_key_id (const gchar *csr_pem)
         
 
 }
+
+
 
 #endif
