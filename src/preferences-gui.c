@@ -21,7 +21,6 @@
 #include <gconf/gconf-client.h>
 
 
-#include "ca.h"
 #include "preferences-gui.h"
 
 #include <glib/gi18n.h>
@@ -29,6 +28,18 @@
 
 static GConfClient * preferences_client;
 
+PreferencesGuiChangeCallback csr_visible_callback = NULL;
+PreferencesGuiChangeCallback revoked_visible_callback = NULL;
+
+void preferences_gui_set_csr_visible_callback (PreferencesGuiChangeCallback callback)
+{
+	csr_visible_callback = callback;
+}
+
+void preferences_gui_set_revoked_visible_callback (PreferencesGuiChangeCallback callback)
+{
+	revoked_visible_callback = callback;
+}
 
 
 void preferences_changed_callback(GConfClient* client,
@@ -36,12 +47,13 @@ void preferences_changed_callback(GConfClient* client,
                                   GConfEntry *entry,
                                   gpointer user_data)
 {
-        gboolean value = gconf_value_get_bool (gconf_entry_get_value(entry));
-        if (! strcmp (gconf_entry_get_key(entry), "/apps/gnomint/crq_visible"))
-                ca_update_csr_view (value, TRUE);
 
-        if (! strcmp (gconf_entry_get_key(entry), "/apps/gnomint/revoked_visible"))
-                ca_update_revoked_view (value, TRUE);
+        gboolean value = gconf_value_get_bool (gconf_entry_get_value(entry));
+        if (! strcmp (gconf_entry_get_key(entry), "/apps/gnomint/crq_visible") && csr_visible_callback)
+                csr_visible_callback (value, TRUE);
+
+        if (! strcmp (gconf_entry_get_key(entry), "/apps/gnomint/revoked_visible") && revoked_visible_callback)
+                revoked_visible_callback (value, TRUE);
 
 }
 

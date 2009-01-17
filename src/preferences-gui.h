@@ -20,6 +20,12 @@
 #ifndef _PREFERENCES_H_
 #define _PREFERENCES_H_
 
+typedef void (* PreferencesGuiChangeCallback) (gboolean, gboolean);
+
+void preferences_gui_set_csr_visible_callback (PreferencesGuiChangeCallback callback);
+
+void preferences_gui_set_revoked_visible_callback (PreferencesGuiChangeCallback callback);
+
 void preferences_init (int, char**);
 
 gchar *preferences_get_size(void);

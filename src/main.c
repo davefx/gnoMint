@@ -127,6 +127,10 @@ int main (int   argc,
 
 	g_thread_init (NULL);
 	gtk_init (&argc, &argv);
+	
+	preferences_gui_set_csr_visible_callback (ca_update_csr_view);
+	preferences_gui_set_revoked_visible_callback (ca_update_revoked_view);
+
         preferences_init (argc, argv);
 
 	ctx = g_option_context_new (_("- A graphical Certification Authority manager"));

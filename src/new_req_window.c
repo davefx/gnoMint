@@ -24,24 +24,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "new_ca_window.h"
 #include "ca_policy.h"
 #include "creation_process_window.h"
 #include "ca_file.h"
+#include "country_table.h"
 #include "tls.h"
 #include "pkey_manage.h"
 #include "new_req_window.h"
 
 #include <glib/gi18n.h>
-
-typedef struct {
-	char * name;
-	char * code;
-} CountryItem;
-
-#define NUMBER_OF_COUNTRIES 244
-CountryItem country_table[NUMBER_OF_COUNTRIES];
-
 
 GladeXML * new_req_window_xml = NULL;
 GtkTreeStore * new_req_ca_list_model = NULL;
@@ -239,7 +230,7 @@ void new_req_window_display()
 	
 	glade_xml_signal_autoconnect (new_req_window_xml); 	
 	
-	new_ca_populate_country_combobox(GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml, "country_combobox1")));
+	country_table_populate_combobox(GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml, "country_combobox1")));
 
 	__new_req_populate_ca_treeview (GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview")));
 

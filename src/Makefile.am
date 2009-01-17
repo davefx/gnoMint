@@ -14,6 +14,7 @@ gnomint_CFLAGS = \
 
 gnomint_SOURCES = \
 	main.c \
+	country_table.c \
         new_ca_window.c \
         new_req_window.c \
 	new_cert_window.c \
@@ -92,6 +93,7 @@ EXTRA_DIST = \
 	ca.h \
 	ca_policy.h \
 	certificate_properties.h \
+	country_table.h \
 	csr_creation.h \
 	csr_properties.h \
 	dialog.h \

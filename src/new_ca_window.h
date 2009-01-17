@@ -23,7 +23,6 @@
 #ifndef GNOMINTCLI
 
 void new_ca_window_display (void);
-void new_ca_populate_country_combobox(GtkComboBox *country_combobox);
 void new_ca_tab_activate (int tab_number);
 void on_cn_entry_changed (GtkEditable *editable,
                           gpointer user_data) ;
@@ -43,8 +42,6 @@ void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton,
                                                 gpointer user_data);
 void on_new_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data);
-void populate_country_table(void);
-void new_ca_populate_country_combobox(GtkComboBox *country_combobox);
 
 #endif 
 
