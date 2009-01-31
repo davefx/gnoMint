@@ -41,7 +41,7 @@ extern gchar * gnomint_current_opened_file;
 sqlite3 * ca_db = NULL;
 
 
-#define CURRENT_GNOMINT_DB_VERSION 11
+#define CURRENT_GNOMINT_DB_VERSION 12
 
 void __ca_file_concat_string (sqlite3_context *context, int argc, sqlite3_value **argv);
 void __ca_file_zeropad (sqlite3_context *context, int argc, sqlite3_value **argv);
@@ -197,10 +197,17 @@ gchar * ca_file_create (const gchar *filename)
 		return error;
 
 	if (sqlite3_exec (ca_db,
-                          "CREATE TABLE ca_properties (id INTEGER PRIMARY KEY, ca_id INTEGER, name TEXT, value TEXT, UNIQUE (name, ca_id));",
+                          "CREATE TABLE db_properties (id INTEGER PRIMARY KEY, name TEXT, value TEXT, UNIQUE (name));",
                           NULL, NULL, &error)) {
 		return error;
 	}
+
+	if (sqlite3_exec (ca_db,
+                          "CREATE VIEW ca_properties AS SELECT id, name, value FROM db_properties;",
+                          NULL, NULL, &error)) {
+		return error;
+	}
+
 	if (sqlite3_exec (ca_db,
                           "CREATE TABLE certificates (id INTEGER PRIMARY KEY, is_ca BOOLEAN, serial TEXT, subject TEXT, "
 			  "activation TIMESTAMP, expiration TIMESTAMP, revocation TIMESTAMP, pem TEXT, private_key_in_db BOOLEAN, "
@@ -231,37 +238,19 @@ gchar * ca_file_create (const gchar *filename)
 	}
 
 	
-	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, 0, 'ca_db_version', %d);", CURRENT_GNOMINT_DB_VERSION);
+	sql = sqlite3_mprintf ("INSERT INTO db_properties (id, name, value) VALUES (NULL, 'ca_db_version', %d);", CURRENT_GNOMINT_DB_VERSION);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	sqlite3_free (sql);
 
-	/* if (creation_data->is_pwd_protected) { */
-	/* 	gchar *hashed_pwd = pkey_manage_encrypt_password (creation_data->password); */
 
-	/* 	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, 0, 'ca_db_is_password_protected', 1);"); */
-
-	/* 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) */
-	/* 		return error; */
-	/* 	sqlite3_free (sql); */
-
-	/* 	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, 0, 'ca_db_hashed_password', '%q');", */
-	/* 			       hashed_pwd); */
-
-	/* 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) */
-	/* 		return error; */
-	/* 	sqlite3_free (sql); */
-
-	/* 	g_free (hashed_pwd);				        */
-	/* } else  { */
-
-        sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, 0, 'ca_db_is_password_protected', '0');");
+        sql = sqlite3_mprintf ("INSERT INTO db_properties (id, name, value) VALUES (NULL, 'is_password_protected', '0');");
         
         if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
                 return error;
         sqlite3_free (sql);
         
-        sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, 0, 'ca_db_hashed_password', '');");
+        sql = sqlite3_mprintf ("INSERT INTO db_properties (id, name, value) VALUES (NULL, 'hashed_password', '');");
         
         if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
                 return error;
@@ -294,9 +283,11 @@ gchar * __ca_file_check_and_update_version ()
 	}
 
 	if (!result || !result[0]) {
+		
 		db_version_in_file = 1;
 		if (result)
 			g_strfreev (result);
+
 	} else {
 		db_version_in_file = atoi(result[0]);
 		g_strfreev (result);
@@ -883,6 +874,107 @@ gchar * __ca_file_check_and_update_version ()
 
 
         case 11:
+		if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error)) {
+			return error;
+		}
+		
+		if (sqlite3_exec (ca_db,
+				  "CREATE TABLE db_properties (id INTEGER PRIMARY KEY, name TEXT, value TEXT, UNIQUE (name));",
+				  NULL, NULL, &error)) {			
+			return error;
+		}
+		
+
+		{
+			gchar **data_table;
+			gint rows, cols;
+			gint i;
+
+			if (sqlite3_get_table (ca_db, 
+                                               "SELECT ca_id, name, value FROM ca_properties",
+					       &data_table,
+					       &rows,
+					       &cols,
+					       &error)) {
+				return error;
+			}
+			for (i = 1; i <= rows; i++) {
+
+				// Check if the property should be moved to ca_policies (ca_id != 0 && name != "ca_root_certificate_pem")
+				if (atoi(data_table[(i*3)]) != 0 && strcmp(data_table[(i*3)+1], "ca_root_certificate_pem")) {
+					if (!strcmp (data_table[(i*3)+1], "ca_root_last_assigned_serial")) {
+						sql = sqlite3_mprintf ("INSERT INTO ca_policies (ca_id, name, value) VALUES (%s, 'ca_last_assigned_serial', '%s')",
+								       data_table[(i*3)], data_table[(i*3)+2]);
+						
+						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+							return error;
+						}					
+						sqlite3_free (sql);
+					} else if (!strcmp (data_table[(i*3)+1], "ca_root_must_check_serial_dups")) {
+						sql = sqlite3_mprintf ("INSERT INTO ca_policies (ca_id, name, value) VALUES (%s, 'ca_must_check_serial_dups', '%s')",
+								       data_table[(i*3)], data_table[(i*3)+2]);
+						
+						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+							return error;
+						}					
+						sqlite3_free (sql);
+					} 
+				}
+
+				if (! strcmp(data_table[(i*3)+1], "ca_db_version")) {
+						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) VALUES ('ca_db_version', '%s')", data_table[(i*3)+2]);
+						
+						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+							return error;
+						}					
+						sqlite3_free (sql);
+
+				}
+				if (! strcmp(data_table[(i*3)+1], "ca_db_is_password_protected")) {
+						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) VALUES ('is_password_protected', '%s')", data_table[(i*3)+2]);
+						
+						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+							return error;
+						}					
+						sqlite3_free (sql);
+
+				}
+				if (! strcmp(data_table[(i*3)+1], "ca_db_hashed_password")) {
+						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) VALUES ('hashed_password', '%s')", data_table[(i*3)+2]);
+						
+						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+							return error;
+						}					
+						sqlite3_free (sql);
+
+				}
+                                
+			}
+
+			sqlite3_free_table (data_table);
+
+                }
+
+		if (sqlite3_exec (ca_db, "DROP TABLE ca_properties", NULL, NULL, &error))
+			return error;
+
+		if (sqlite3_exec (ca_db,
+				  "CREATE VIEW ca_properties AS SELECT id, name, value FROM db_properties;",
+				  NULL, NULL, &error)) {
+			return error;
+		}
+
+		sql = sqlite3_mprintf ("UPDATE db_properties SET value=%d WHERE name='ca_db_version';", 12);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)){
+			return error;
+		}
+		sqlite3_free (sql);
+
+		if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
+			return error;
+
+
+	case 12:
 		/* Nothing must be done, as this is the current gnoMint db version */
 		break;
 	}
@@ -1011,13 +1103,13 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 	gchar *serialstr = NULL;
 	gchar **row = NULL;
 
-	row = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_root_last_assigned_serial' AND ca_id=%"
+	row = __ca_file_get_single_row ("SELECT value FROM ca_policies WHERE name='ca_last_assigned_serial' AND ca_id=%"
                                       G_GUINT64_FORMAT";", ca_id);
         uint160_read_escaped (serial, row[0], strlen (row[0]));
 	g_strfreev (row);
 
-        row = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE "
-				      "name='ca_root_must_check_serial_dups' AND ca_id=%"G_GUINT64_FORMAT";",
+        row = __ca_file_get_single_row ("SELECT value FROM ca_policies WHERE "
+				      "name='ca_must_check_serial_dups' AND ca_id=%"G_GUINT64_FORMAT";",
                                       ca_id);
         if (row) {
                 if (atoi(row[0])) {
@@ -1053,7 +1145,7 @@ gboolean ca_file_set_next_serial (UInt160 *serial, guint64 ca_id)
         uint160_write_escaped (serial, NULL, &size);
         serialstr = g_new0(gchar, size+1);
         uint160_write_escaped (serial, serialstr, &size);                
-        sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", serialstr, ca_id);
+        sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%q' WHERE name='ca_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", serialstr, ca_id);
         if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
                 fprintf (stderr, "%s: %s\n", error, sql);
                 sqlite3_free (sql);
@@ -1126,18 +1218,12 @@ gchar * ca_file_insert_self_signed_ca (gchar *pem_ca_private_key,
 				      rootca_rowid);
 	rootca_id = atoll (row[0]);
 	g_strfreev (row);
-
-	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_certificate_pem', '%q');", 
-			       rootca_id, pem_ca_certificate);
-	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
-		return error;
-	sqlite3_free (sql);
         
         size = 0;
         uint160_write_escaped (&sn, NULL, &size);
         aux = g_new0 (gchar, size + 1);
         uint160_write_escaped (&sn, aux, &size);
-	sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
+	sql = sqlite3_mprintf ("INSERT INTO ca_policies (id, ca_id, name, value) VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_last_assigned_serial', '%q');",
                                rootca_id, aux);
         g_free (aux);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
@@ -1280,7 +1366,7 @@ gchar * ca_file_insert_cert (gboolean is_ca,
         uint160_write_escaped (&serial, NULL, &size);
         serialstr = g_new0(gchar, size+1);
         uint160_write_escaped (&serial, serialstr, &size);
-	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_root_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", 
+	sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%q' WHERE name='ca_last_assigned_serial' and ca_id=%"G_GUINT64_FORMAT";", 
 			       serialstr, parent_id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -1297,8 +1383,8 @@ gchar * ca_file_insert_cert (gboolean is_ca,
                 uint160_write_escaped (&serial, NULL, &size);
                 serialstr = g_new0(gchar, size+1);
                 uint160_write_escaped (&serial, serialstr, &size);                
-		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
-				       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
+		sql = sqlite3_mprintf ("INSERT INTO ca_policies (id, ca_id, name, value) "
+				       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_last_assigned_serial', '%q');",
 				       cert_id, serialstr);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -1533,8 +1619,8 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
                 uint160_write_escaped (&new_serial, NULL, &size);
                 serialstr = g_new0(gchar, size+1);
                 uint160_write_escaped (&new_serial, serialstr, &size);                
-		sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
-				       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_last_assigned_serial', '%q');",
+		sql = sqlite3_mprintf ("INSERT INTO ca_policies (id, ca_id, name, value) "
+				       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_last_assigned_serial', '%q');",
 				       cert_id, serialstr);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -1545,8 +1631,8 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
 		sqlite3_free (sql);
                 g_free (serialstr);
 
-                sql = sqlite3_mprintf ("INSERT INTO ca_properties (id, ca_id, name, value) "
-                                       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_root_must_check_serial_dups', 1);", cert_id);
+                sql = sqlite3_mprintf ("INSERT INTO ca_policies (id, ca_id, name, value) "
+                                       "VALUES (NULL, %"G_GUINT64_FORMAT", 'ca_must_check_serial_dups', 1);", cert_id);
                 if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 			fprintf (stderr, "%s\n", sql);
@@ -1947,7 +2033,7 @@ gboolean ca_file_is_password_protected()
 	if (! ca_db)
 		return FALSE;
 	
-	result = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_is_password_protected';");
+	result = __ca_file_get_single_row ("SELECT value FROM db_properties WHERE name='is_password_protected';");
 	res = ((result != NULL) && (strcmp(result[0], "0")));
 	
 	if (result)
@@ -1964,7 +2050,7 @@ gboolean ca_file_check_password (const gchar *password)
 	if (! ca_file_is_password_protected())
 		return FALSE;
 
-	result = __ca_file_get_single_row ("SELECT value FROM ca_properties WHERE name='ca_db_hashed_password';");
+	result = __ca_file_get_single_row ("SELECT value FROM db_properties WHERE name='hashed_password';");
 	if (! result)
 		return FALSE;	
 
@@ -2049,7 +2135,7 @@ gboolean ca_file_password_unprotect(const gchar *old_password)
 		return FALSE;
 	}
 
-	if (sqlite3_exec (ca_db, "UPDATE ca_properties SET value='0' WHERE name='ca_db_is_password_protected';", 
+	if (sqlite3_exec (ca_db, "UPDATE db_properties SET value='0' WHERE name='is_password_protected';", 
 			  NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
 		return FALSE;
@@ -2107,14 +2193,14 @@ gboolean ca_file_password_protect(const gchar *new_password)
 	
 	pwd_change.new_password = new_password;
 
-	if (sqlite3_exec (ca_db, "UPDATE ca_properties SET value='1' WHERE name='ca_db_is_password_protected';", 
+	if (sqlite3_exec (ca_db, "UPDATE db_properties SET value='1' WHERE name='is_password_protected';", 
 			  NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
 		return FALSE;
 	}	
 
 	hashed_pwd = pkey_manage_encrypt_password (new_password);
-	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_db_hashed_password';",
+	sql = sqlite3_mprintf ("UPDATE db_properties SET value='%q' WHERE name='hashed_password';",
 			       hashed_pwd);
 	g_free (hashed_pwd);
 
@@ -2225,7 +2311,7 @@ gboolean ca_file_password_change(const gchar *old_password, const gchar *new_pas
 	}
 
 	hashed_pwd = pkey_manage_encrypt_password (new_password);
-	sql = sqlite3_mprintf ("UPDATE ca_properties SET value='%q' WHERE name='ca_db_hashed_password';",
+	sql = sqlite3_mprintf ("UPDATE db_properties SET value='%q' WHERE name='hashed_password';",
 			       hashed_pwd);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_free (sql);
