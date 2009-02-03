@@ -903,7 +903,8 @@ gchar * __ca_file_check_and_update_version ()
 				// Check if the property should be moved to ca_policies (ca_id != 0 && name != "ca_root_certificate_pem")
 				if (atoi(data_table[(i*3)]) != 0 && strcmp(data_table[(i*3)+1], "ca_root_certificate_pem")) {
 					if (!strcmp (data_table[(i*3)+1], "ca_root_last_assigned_serial")) {
-						sql = sqlite3_mprintf ("INSERT INTO ca_policies (ca_id, name, value) VALUES (%s, 'ca_last_assigned_serial', '%s')",
+						sql = sqlite3_mprintf ("INSERT INTO ca_policies (ca_id, name, value) "
+                                                                       "VALUES (%s, 'ca_last_assigned_serial', '%q')",
 								       data_table[(i*3)], data_table[(i*3)+2]);
 						
 						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
@@ -911,7 +912,8 @@ gchar * __ca_file_check_and_update_version ()
 						}					
 						sqlite3_free (sql);
 					} else if (!strcmp (data_table[(i*3)+1], "ca_root_must_check_serial_dups")) {
-						sql = sqlite3_mprintf ("INSERT INTO ca_policies (ca_id, name, value) VALUES (%s, 'ca_must_check_serial_dups', '%s')",
+						sql = sqlite3_mprintf ("INSERT INTO ca_policies (ca_id, name, value) "
+                                                                       "VALUES (%s, 'ca_must_check_serial_dups', '%q')",
 								       data_table[(i*3)], data_table[(i*3)+2]);
 						
 						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
@@ -922,7 +924,8 @@ gchar * __ca_file_check_and_update_version ()
 				}
 
 				if (! strcmp(data_table[(i*3)+1], "ca_db_version")) {
-						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) VALUES ('ca_db_version', '%s')", data_table[(i*3)+2]);
+						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) "
+                                                                       "VALUES ('ca_db_version', '%q')", data_table[(i*3)+2]);
 						
 						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 							return error;
@@ -931,7 +934,8 @@ gchar * __ca_file_check_and_update_version ()
 
 				}
 				if (! strcmp(data_table[(i*3)+1], "ca_db_is_password_protected")) {
-						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) VALUES ('is_password_protected', '%s')", data_table[(i*3)+2]);
+						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) "
+                                                                       "VALUES ('is_password_protected', '%q')", data_table[(i*3)+2]);
 						
 						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 							return error;
@@ -940,7 +944,8 @@ gchar * __ca_file_check_and_update_version ()
 
 				}
 				if (! strcmp(data_table[(i*3)+1], "ca_db_hashed_password")) {
-						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) VALUES ('hashed_password', '%s')", data_table[(i*3)+2]);
+						sql = sqlite3_mprintf ("INSERT INTO db_properties (name, value) "
+                                                                       "VALUES ('hashed_password', '%q')", data_table[(i*3)+2]);
 						
 						if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 							return error;
