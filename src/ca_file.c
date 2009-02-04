@@ -2146,6 +2146,13 @@ gboolean ca_file_password_unprotect(const gchar *old_password)
 		return FALSE;
 	}	
 
+	if (sqlite3_exec (ca_db, "DELETE db_properties WHERE name='hashed_password';", 
+			  NULL, NULL, &error)) {
+		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, &error);	
+		return FALSE;
+	}	
+        
+
 	sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error);	
 
 
