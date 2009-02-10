@@ -29,7 +29,6 @@
 #include "dialog.h"
 #include "ca_creation.h"
 #include "ca_file.h"
-#include "ca_policy.h"
 #include "csr_creation.h"
 #include "export.h"
 #include "import.h"
@@ -772,8 +771,8 @@ int ca_cli_callback_sign (int argc, char **argv)
 
 	cert_creation_data->key_months_before_expiration = dialog_ask_for_number (_("Introduce number of months before expiration of the new certificate (0 to cancel)"),
 									      0,
-									      ca_policy_get (ca_id, "MONTHS_TO_EXPIRE"), 
-									      ca_policy_get (ca_id, "MONTHS_TO_EXPIRE"));
+									      ca_file_policy_get (ca_id, "MONTHS_TO_EXPIRE"), 
+									      ca_file_policy_get (ca_id, "MONTHS_TO_EXPIRE"));
 	
 	if (cert_creation_data->key_months_before_expiration == 0) {
 		g_free (cert_creation_data);
@@ -782,105 +781,105 @@ int ca_cli_callback_sign (int argc, char **argv)
 
 	printf (_("The certificate will be generated with the following uses and purposes:\n"));
 
-	cert_creation_data->ca = ca_policy_get (ca_id, "CA");
-	cert_creation_data->crl_signing = ca_policy_get (ca_id, "CRL_SIGN");
-	cert_creation_data->digital_signature = ca_policy_get (ca_id, "DIGITAL_SIGNATURE");
-	cert_creation_data->data_encipherment =  ca_policy_get (ca_id, "DATA_ENCIPHERMENT");
-	cert_creation_data->key_encipherment = ca_policy_get (ca_id, "KEY_ENCIPHERMENT");
-	cert_creation_data->non_repudiation = ca_policy_get (ca_id, "NON_REPUDIATION");
-	cert_creation_data->key_agreement = ca_policy_get (ca_id, "KEY_AGREEMENT");
+	cert_creation_data->ca = ca_file_policy_get (ca_id, "CA");
+	cert_creation_data->crl_signing = ca_file_policy_get (ca_id, "CRL_SIGN");
+	cert_creation_data->digital_signature = ca_file_policy_get (ca_id, "DIGITAL_SIGNATURE");
+	cert_creation_data->data_encipherment =  ca_file_policy_get (ca_id, "DATA_ENCIPHERMENT");
+	cert_creation_data->key_encipherment = ca_file_policy_get (ca_id, "KEY_ENCIPHERMENT");
+	cert_creation_data->non_repudiation = ca_file_policy_get (ca_id, "NON_REPUDIATION");
+	cert_creation_data->key_agreement = ca_file_policy_get (ca_id, "KEY_AGREEMENT");
 
-	cert_creation_data->email_protection = ca_policy_get (ca_id, "EMAIL_PROTECTION");
-	cert_creation_data->code_signing = ca_policy_get (ca_id, "CODE_SIGNING");
-	cert_creation_data->web_client =  ca_policy_get (ca_id, "TLS_WEB_CLIENT");
-	cert_creation_data->web_server = ca_policy_get (ca_id, "TLS_WEB_SERVER");
-	cert_creation_data->time_stamping = ca_policy_get (ca_id, "TIME_STAMPING");
-	cert_creation_data->ocsp_signing = ca_policy_get (ca_id, "OCSP_SIGNING");
-	cert_creation_data->any_purpose = ca_policy_get (ca_id, "ANY_PURPOSE");
+	cert_creation_data->email_protection = ca_file_policy_get (ca_id, "EMAIL_PROTECTION");
+	cert_creation_data->code_signing = ca_file_policy_get (ca_id, "CODE_SIGNING");
+	cert_creation_data->web_client =  ca_file_policy_get (ca_id, "TLS_WEB_CLIENT");
+	cert_creation_data->web_server = ca_file_policy_get (ca_id, "TLS_WEB_SERVER");
+	cert_creation_data->time_stamping = ca_file_policy_get (ca_id, "TIME_STAMPING");
+	cert_creation_data->ocsp_signing = ca_file_policy_get (ca_id, "OCSP_SIGNING");
+	cert_creation_data->any_purpose = ca_file_policy_get (ca_id, "ANY_PURPOSE");
 
 	printf (_("The new certificate will be created with the following uses and purposes:\n"));
 	__ca_cli_callback_show_uses_and_purposes (cert_creation_data);
 	
 	while (dialog_ask_for_confirmation (NULL, _("Do you want to change any property of the new certificate? Yes/[No] "), FALSE)) {
 
-		if (ca_policy_get (ca_id, "CA")) {
+		if (ca_file_policy_get (ca_id, "CA")) {
 			cert_creation_data->ca = dialog_ask_for_confirmation (NULL, _("* Enable Certification Authority use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Certification Authority use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "CRL_SIGN")) {
+		if (ca_file_policy_get (ca_id, "CRL_SIGN")) {
 			cert_creation_data->crl_signing = dialog_ask_for_confirmation (NULL, _("* Enable CRL Signing? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* CRL signing use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "DIGITAL_SIGNATURE")) {
+		if (ca_file_policy_get (ca_id, "DIGITAL_SIGNATURE")) {
 			cert_creation_data->digital_signature = dialog_ask_for_confirmation (NULL, _("* Enable Digital Signature use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Digital Signature use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "DATA_ENCIPHERMENT")) {
+		if (ca_file_policy_get (ca_id, "DATA_ENCIPHERMENT")) {
 			cert_creation_data->data_encipherment = dialog_ask_for_confirmation (NULL, _("Enable Data Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Data Encipherment use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "KEY_ENCIPHERMENT")) {
+		if (ca_file_policy_get (ca_id, "KEY_ENCIPHERMENT")) {
 			cert_creation_data->key_encipherment = dialog_ask_for_confirmation (NULL, _("Enable Key Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Encipherment use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "NON_REPUDIATION")) {
+		if (ca_file_policy_get (ca_id, "NON_REPUDIATION")) {
 			cert_creation_data->non_repudiation = dialog_ask_for_confirmation (NULL, _("Enable Non Repudiation use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Non Repudiation use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "KEY_AGREEMENT")) {
+		if (ca_file_policy_get (ca_id, "KEY_AGREEMENT")) {
 			cert_creation_data->key_agreement = dialog_ask_for_confirmation (NULL, _("Enable Key Agreement use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Agreement use disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "EMAIL_PROTECTION")) {
+		if (ca_file_policy_get (ca_id, "EMAIL_PROTECTION")) {
 			cert_creation_data->email_protection = dialog_ask_for_confirmation (NULL, _("Enable Email Protection purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Email Protection purpose disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "CODE_SIGNING")) {
+		if (ca_file_policy_get (ca_id, "CODE_SIGNING")) {
 			cert_creation_data->code_signing = dialog_ask_for_confirmation (NULL, _("Enable Code Signing purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Code Signing purpose disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "TLS_WEB_CLIENT")) {
+		if (ca_file_policy_get (ca_id, "TLS_WEB_CLIENT")) {
 			cert_creation_data->web_client = dialog_ask_for_confirmation (NULL, _("Enable TLS Web Client purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Client purpose disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "TLS_WEB_SERVER")) {
+		if (ca_file_policy_get (ca_id, "TLS_WEB_SERVER")) {
 			cert_creation_data->web_server = dialog_ask_for_confirmation (NULL, _("Enable TLS Web Server purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Server purpose disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "TIME_STAMPING")) {
+		if (ca_file_policy_get (ca_id, "TIME_STAMPING")) {
 			cert_creation_data->time_stamping = dialog_ask_for_confirmation (NULL, _("Enable Time Stamping purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Time Stamping purpose disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "OCSP_SIGNING")) {
+		if (ca_file_policy_get (ca_id, "OCSP_SIGNING")) {
 			cert_creation_data->ocsp_signing = dialog_ask_for_confirmation (NULL, _("Enable OCSP Signing purpose? [Yes]/No "), TRUE);		} else {
 			printf (_("* OCSP Signing purpose disabled by policy\n"));
 		}
 
-		if (ca_policy_get (ca_id, "ANY_PURPOSE")) {
+		if (ca_file_policy_get (ca_id, "ANY_PURPOSE")) {
 			cert_creation_data->any_purpose = dialog_ask_for_confirmation (NULL, _("Enable any purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Any purpose disabled by policy\n"));

@@ -21,11 +21,5 @@
 #define _CA_POLICY_H_
 
 void ca_policy_populate (guint64 ca_id);
-guint ca_policy_get (guint64 ca_id, gchar *property_name);
-void ca_policy_set (guint64 ca_id, gchar *property_name, guint value);
-
-void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata);
-void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer userdata);
-void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata);
 
 #endif

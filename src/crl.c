@@ -32,7 +32,6 @@
 #include "pkey_manage.h"
 #include "dialog.h"
 #include "tls.h"
-#include "ca_policy.h"
 
 void __crl_gfree_gfunc (gpointer data, gpointer user_data);
 
@@ -342,7 +341,7 @@ gchar * crl_generate (guint64 ca_id, gchar *filename)
                                         (guchar *) private_key,
                                         crl_version,
                                         timestamp,
-                                        timestamp + (3600 * ca_policy_get (ca_id, "HOURS_BETWEEN_CRL_UPDATES")));
+                                        timestamp + (3600 * ca_file_policy_get (ca_id, "HOURS_BETWEEN_CRL_UPDATES")));
                 
 
 		g_free (ca_pem);

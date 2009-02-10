@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ca_policy.h"
 #include "new_ca_window.h"
 #include "creation_process_window.h"
 #include "ca_file.h"

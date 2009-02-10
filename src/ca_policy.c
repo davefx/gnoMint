@@ -34,7 +34,6 @@
 #include <string.h>
 #include <ca_file.h> 
 
-#include "tls.h"
 #include "ca_policy.h"
 
 
@@ -180,17 +179,6 @@ void ca_policy_populate (guint64 ca_id)
 
 #endif
 
-guint ca_policy_get (guint64 ca_id, gchar *property_name)
-{
-	return ca_file_policy_get (ca_id, property_name);
-}
-
-
-void ca_policy_set (guint64 ca_id, gchar *property_name, guint value)
-{
-	ca_file_policy_set (ca_id, property_name, value);
-
-}
 
 #ifndef GNOMINTCLI
 
@@ -208,7 +196,7 @@ void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer use
 
 	cert_id = atoll(cert_id_str);
 
-	ca_policy_set (cert_id, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
+	ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
 
 }
 
@@ -226,7 +214,7 @@ void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer use
 
 	cert_id = atoll(cert_id_str);
 
-	ca_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
+	ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
 
 }
 
@@ -312,16 +300,16 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                               "time_stamping_check2")), FALSE);
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
-                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
-                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
+                            ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml,
                                                                                                       "email_protection_check2")), FALSE);
                         }
 
                         // We must check if OCSP_SIGNING can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
                                 // If is not active, we must deactivate OCSP_SIGNING
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml,
                                                                                                       "ocsp_signing_check2")), FALSE);
@@ -334,15 +322,15 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "digital_signature_check4")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
-                        if (! ca_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
-                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                        if (! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
+                            ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "webserver_check2")), FALSE);
                         }
 
                         // We must check if TLS_WEB_CLIENT can be active
-                        if (! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                        if (! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_CLIENT
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "webclient_check2")), FALSE);
@@ -356,16 +344,16 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                                                                                              "code_signing_check2")), FALSE);
 
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! ca_policy_get (cert_id, "NON_REPUDIATION") &&
-                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
-                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                        if (! ca_file_policy_get (cert_id, "NON_REPUDIATION") &&
+                            ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
+                            ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "email_protection_check2")), FALSE);
                         }
 
                         // We must check if OCSP_SIGNING can be active
-                        if (! ca_policy_get (cert_id, "NON_REPUDIATION")) {
+                        if (! ca_file_policy_get (cert_id, "NON_REPUDIATION")) {
                                 // If none is active, we must deactivate OCSP_SIGNING
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "ocsp_signing_check2")), FALSE);
@@ -379,17 +367,17 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "key_encipherment_check2")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
-                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "webserver_check2")), FALSE);
                         }
 
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
-                            ! ca_policy_get (cert_id, "NON_REPUDIATION") &&
-                            ! ca_policy_get (cert_id, "KEY_AGREEMENT")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_file_policy_get (cert_id, "NON_REPUDIATION") &&
+                            ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "email_protection_check2")), FALSE);
@@ -403,23 +391,23 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "key_agreement_check2")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
-                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "webserver_check2")), FALSE);
                         }
                         // We must check if TLS_WEB_CLIENT can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
                                 // If none is active, we must deactivate TLS_WEB_CLIENT
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "webclient_check2")), FALSE);
                         }
 
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
-                            ! ca_policy_get (cert_id, "NON_REPUDIATION") &&
-                            ! ca_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
+                        if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                            ! ca_file_policy_get (cert_id, "NON_REPUDIATION") &&
+                            ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "email_protection_check2")), FALSE);
@@ -443,9 +431,9 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "webserver_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
-                        if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
-                               ca_policy_get (cert_id, "KEY_ENCIPHERMENT") ||
-                               ca_policy_get (cert_id, "KEY_AGREEMENT"))) {
+                        if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
+                               ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") ||
+                               ca_file_policy_get (cert_id, "KEY_AGREEMENT"))) {
                                 // If none is active, we activate key encipherment
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "key_encipherment_check2")), TRUE);
@@ -458,8 +446,8 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "webclient_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
-                        if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
-                               ca_policy_get (cert_id, "KEY_AGREEMENT"))) {
+                        if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
+                               ca_file_policy_get (cert_id, "KEY_AGREEMENT"))) {
                                 // If none is active, we activate digital signature
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "digital_signature_check4")), TRUE);
@@ -472,8 +460,8 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "time_stamping_check2")){
                 if (is_active) {
                         // We must check digitalSignature && nonRepudiation
-                        if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
-                               ca_policy_get (cert_id, "NON_REPUDIATION"))) {
+                        if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
+                               ca_file_policy_get (cert_id, "NON_REPUDIATION"))) {
                                 // If none is active, we activate them both
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "digital_signature_check4")), TRUE);
@@ -488,7 +476,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "code_signing_check2")) {
                 if (is_active) {
                         // We must check digitalSignature
-                        if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE"))) {
+                        if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE"))) {
                                 // If it is not active, we activate it
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "digital_signature_check4")), TRUE);
@@ -501,10 +489,10 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "email_protection_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation || (keyEncipherment || keyAgreement)
-                        if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
-                               ca_policy_get (cert_id, "NON_REPUDIATION") ||
-                               ca_policy_get (cert_id, "KEY_ENCIPHERMENT") ||
-                               ca_policy_get (cert_id, "KEY_AGREEMENT"))) {
+                        if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
+                               ca_file_policy_get (cert_id, "NON_REPUDIATION") ||
+                               ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") ||
+                               ca_file_policy_get (cert_id, "KEY_AGREEMENT"))) {
                                 // If none is active, we activate key encipherment
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "digital_signature_check4")), TRUE);
@@ -519,8 +507,8 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	if (! strcmp(glade_get_widget_name (button), "ocsp_signing_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation
-                        if (!( ca_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
-                               ca_policy_get (cert_id, "NON_REPUDIATION"))) {
+                        if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
+                               ca_file_policy_get (cert_id, "NON_REPUDIATION"))) {
                                 // If none is active, we activate digital signature
                                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
                                                                                                       "digital_signature_check4")), TRUE);
@@ -534,7 +522,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "ANY_PURPOSE";
 
 	if (property_name)
-		ca_policy_set (cert_id, property_name, is_active);
+		ca_file_policy_set (cert_id, property_name, is_active);
 
 }
 
