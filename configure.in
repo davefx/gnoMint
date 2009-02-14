@@ -78,7 +78,6 @@ PKG_CHECK_MODULES(GNOMINT,
 	gconf-2.0 >= $GCONF_REQUIRED \
 	gtk+-2.0 >= $GTK_REQUIRED \
 	gdk-pixbuf-2.0 \
-	libgnomeui-2.0 >= $LIBGNOMEUI_REQUIRED \
 	libglade-2.0 >= $LIBGLADE_REQUIRED \
 	gnutls >= $GNUTLS_REQUIRED \
 )
