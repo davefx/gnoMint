@@ -52,6 +52,7 @@ gchar * __pkey_manage_aes_encrypt_aux (const gchar *in, const gchar *password, c
 gchar * __pkey_manage_aes_decrypt_aux (const gchar *string, const gchar *password, const guchar *iv, const guchar *ctr);
 
 #ifndef GNOMINTCLI
+
 // CALLBACKS
 gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data);
 
