@@ -48,6 +48,8 @@ guchar * __pkey_manage_from_hex (const gchar *input);
 guchar *__pkey_manage_create_key(const gchar *password);
 gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password);
 gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password);
+gchar * __pkey_manage_aes_encrypt_aux (const gchar *in, const gchar *password, const guchar *iv, const guchar *ctr);
+gchar * __pkey_manage_aes_decrypt_aux (const gchar *string, const gchar *password, const guchar *iv, const guchar *ctr);
 
 #ifndef GNOMINTCLI
 // CALLBACKS
@@ -344,14 +346,14 @@ void pkey_manage_data_free (PkeyManageData *pkeydata)
 
 
 
-unsigned char iv[16] =
-    { 'a', 'g', 'z', 'e', 'Q', '5', 'E', '7', 'c', '+', '*', 'G', '1', 'D',
-	'u', '='
+guchar old_iv[16] =
+{ 'a', 'g', 'z', 'e', 'Q', '5', 'E', '7', 'c', '+', '*', 'G', '1', 'D',
+  'u', '='
 };
 
-unsigned char ctr[16] =
-    { 'd', 'g', '4', 'e', 'J', '5', '3', 'l', 'c', '-', '!', 'G', 'z', 'A',
-	'z', '='
+guchar old_ctr[16] =
+{ 'd', 'g', '4', 'e', 'J', '5', '3', 'l', 'c', '-', '!', 'G', 'z', 'A',
+  'z', '='
 };
 
 gchar *saved_password = NULL;
@@ -416,6 +418,49 @@ guchar *__pkey_manage_create_key(const gchar *password)
 
 gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password)
 {
+	gchar * result = NULL;
+
+	gint i;
+	guint in_length = strlen (in);
+	guchar * random_data = NULL;
+	guchar * sha256 = NULL;
+	gchar * sha256_hex = NULL;
+
+	gchar * cyphered = NULL;
+
+	random_data = g_new0 (guchar, in_length);
+
+	// Fill random_data with random data
+	gcry_create_nonce (random_data, in_length);
+
+	// XOR random_data with in => random_data
+	for (i=0; i<in_length; i++) {
+		random_data[i] = random_data[i] ^ in[i];
+	}
+
+	// SHA-2 256 random_data
+	sha256 = g_new0 (guchar, gcry_md_get_algo_dlen(GCRY_MD_SHA256));
+	gcry_md_hash_buffer (GCRY_MD_SHA256, sha256, random_data, in_length);
+	
+	sha256_hex = __pkey_manage_to_hex (sha256, 32);
+
+	cyphered = __pkey_manage_aes_encrypt_aux (in, password, &sha256[0], &sha256[16]);
+	
+	result = g_strdup_printf ("gCP%s%s", sha256_hex, cyphered);
+
+	g_free (sha256_hex);
+	g_free (cyphered);
+
+	g_free (sha256);
+	g_free (random_data);
+
+	return result;
+	
+}
+
+
+gchar * __pkey_manage_aes_encrypt_aux (const gchar *in, const gchar *password, const guchar *iv, const guchar *ctr)
+{
 	guchar *key = __pkey_manage_create_key (password);
 	guchar *out = (guchar *) g_strdup(in);
 	gchar *res;
@@ -429,17 +474,39 @@ gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password)
 		return NULL;
 	}
 
-	get = gcry_cipher_setiv(cry_ctxt, &iv, 16);
-	if (get) {
-		fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
-		return NULL;
-	}
-	get = gcry_cipher_setctr(cry_ctxt, &ctr, 16);
-	if (get) {
-		fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
-		return NULL;
-	}
+	if (! iv || !ctr) {
 
+		get = gcry_cipher_setiv(cry_ctxt, &old_iv, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+
+		if (! ctr)
+			ctr = old_ctr;
+
+		get = gcry_cipher_setctr(cry_ctxt, &old_ctr, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+
+	} else {
+		get = gcry_cipher_setiv(cry_ctxt, iv, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+
+		if (! ctr)
+			ctr = old_ctr;
+
+		get = gcry_cipher_setctr(cry_ctxt, ctr, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+	}
 	get = gcry_cipher_setkey (cry_ctxt, key, 32);
 	if (get) {
 		fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
@@ -463,6 +530,37 @@ gchar * __pkey_manage_aes_encrypt (const gchar *in, const gchar *password)
 
 gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password)
 {
+	gchar iv_hex[33];
+	gchar ctr_hex[33];
+	const gchar *ciphered = NULL;
+	guchar *iv;
+	guchar *ctr;
+
+	gchar * result;
+	
+	// If it is not a new-type ciphered message, decrypt it with old static iv and ctr
+	if (strncmp (string, "gCP", 3)) {
+		return __pkey_manage_aes_decrypt_aux (string, password, NULL, NULL);
+	}
+
+	// It's a new-type ciphered message. 
+	strncpy (iv_hex, &string[3], 32);
+	strncpy (ctr_hex, &string[35], 32);
+	ciphered = &string[67];
+
+	iv = __pkey_manage_from_hex (iv_hex);
+	ctr = __pkey_manage_from_hex (ctr_hex);
+
+	result = __pkey_manage_aes_decrypt_aux (ciphered, password, iv, ctr);
+
+	g_free (iv);
+	g_free (ctr);
+	
+	return result;
+}
+
+gchar * __pkey_manage_aes_decrypt_aux (const gchar *string, const gchar *password, const guchar *iv, const guchar *ctr)
+{
 	guchar *out = __pkey_manage_from_hex(string);
 
 	guchar *key = __pkey_manage_create_key (password);
@@ -476,15 +574,38 @@ gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password)
 		return NULL;
 	}
 
-	get = gcry_cipher_setiv(cry_ctxt, &iv, 16);
-	if (get) {
-		fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
-		return NULL;
-	}
-	get = gcry_cipher_setctr(cry_ctxt, &ctr, 16);
-	if (get) {
-		fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
-		return NULL;
+	if (! iv || !ctr) {
+
+		get = gcry_cipher_setiv(cry_ctxt, &old_iv, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+
+		if (! ctr)
+			ctr = old_ctr;
+
+		get = gcry_cipher_setctr(cry_ctxt, &old_ctr, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+
+	} else {
+		get = gcry_cipher_setiv(cry_ctxt, iv, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
+
+		if (! ctr)
+			ctr = old_ctr;
+
+		get = gcry_cipher_setctr(cry_ctxt, ctr, 16);
+		if (get) {
+			fprintf (stderr, "ERR GCRYPT: %ud\n", gcry_err_code(get));
+			return NULL;
+		}
 	}
 
 	get = gcry_cipher_setkey (cry_ctxt, key, 32);
@@ -540,9 +661,19 @@ gboolean pkey_manage_check_password (const gchar *checking_password, const gchar
 
 	password = g_strdup_printf ("%sgnoMintPassword%s", salt, checking_password);
 
-	cp = __pkey_manage_aes_encrypt (password, password);
+	if (strncmp (&hashed_password[2], "gCP", 3)) {
+		cp = __pkey_manage_aes_encrypt_aux (password, password, NULL, NULL);
+		res = (! strcmp(cp, &hashed_password[2]));
+		
+		g_free (cp);
+		g_free (password);
+		
+		return res;		
+	} 
 
-	res = (! strcmp(cp, &hashed_password[2]));
+	cp = __pkey_manage_aes_decrypt (&hashed_password[2], password);
+
+	res = (! strcmp(cp, password));
 
 	g_free (cp);
 	g_free (password);
