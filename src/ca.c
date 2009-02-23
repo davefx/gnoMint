@@ -689,7 +689,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	GtkTreePath *selection_path = NULL;
 
 	if (gtk_tree_selection_count_selected_rows (selection) != 1)
-		return 0;
+		return -1;
 
 	gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
 	if (iter)
@@ -701,7 +701,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
 		gtk_tree_path_free (parent);
 		/* It's a certificate */
-		return 1;
+		return CA_FILE_ELEMENT_TYPE_CERT;
 	}
 
 	gtk_tree_path_free (parent);
@@ -709,11 +709,11 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
 		gtk_tree_path_free (parent);
 		/* It's a CSR */
-		return 2;
+		return CA_FILE_ELEMENT_TYPE_CSR;
 	}
 
 	gtk_tree_path_free (parent);
-	return 0;
+	return -1;
 }
 
 gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
@@ -721,13 +721,13 @@ gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 {
 	GtkTreeIter *selection_iter;
 	switch (__ca_selection_type (tree_view, &selection_iter)) {
-	case 1:
+	case CA_FILE_ELEMENT_TYPE_CERT:
 		__ca_activate_certificate_selection (selection_iter);
 		break;
-	case 2:
+	case CA_FILE_ELEMENT_TYPE_CSR:
 		__ca_activate_csr_selection (selection_iter);
 		break;
-	case 0:
+	case -1:
 	default:
 		__ca_deactivate_actions();
 		break;
@@ -807,7 +807,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 
                 if (error) {
                         gtk_widget_destroy (GTK_WIDGET(dialog));
-                        if (type == 1)
+                        if (type == CA_FILE_ELEMENT_TYPE_CERT)
                                 dialog_error (_("There was an error while exporting certificate."));
                         else
                                 dialog_error (_("There was an error while exporting CSR."));
@@ -817,7 +817,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                 g_io_channel_shutdown (file, TRUE, &error);
                 if (error) {
                         gtk_widget_destroy (GTK_WIDGET(dialog));
-                        if (type == 1)
+                        if (type == CA_FILE_ELEMENT_TYPE_CERT)
                                 dialog_error (_("There was an error while exporting certificate."));
                         else
                                 dialog_error (_("There was an error while exporting CSR."));
@@ -827,7 +827,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                 g_io_channel_unref (file);
 
                 gtk_widget_destroy (GTK_WIDGET(dialog));
-                if (type == 1)
+                if (type == CA_FILE_ELEMENT_TYPE_CERT)
                         dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
                                                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                                                     GTK_MESSAGE_INFO,
@@ -1028,7 +1028,7 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	widget = glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2");
 	gtk_widget_set_sensitive (widget, has_pk_in_db);
 
-	if (type == 2) {
+	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
  	        widget = glade_xml_get_widget (dialog_xml, "export_certificate_dialog");
 		gtk_window_set_title (GTK_WINDOW(widget), _("Export CSR - gnoMint"));
 
@@ -1123,7 +1123,7 @@ void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_dat
 		return;
 	}
 	
-	if (type == 1)
+	if (type == CA_FILE_ELEMENT_TYPE_CERT)
 		ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CERT, filename, id);
 	else
 		ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CSR, filename, id);
@@ -1144,7 +1144,7 @@ void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gint response = 0;
 	gint id = 0;
 
-	if (type == 2)
+	if (type == CA_FILE_ELEMENT_TYPE_CSR)
 		return;
 	
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -1183,7 +1183,7 @@ void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gint response = 0;
 	gint id = 0;
 
-	if (type != 2)
+	if (type != CA_FILE_ELEMENT_TYPE_CSR)
 		return;
 	
 	widget = glade_xml_get_widget (main_window_xml, "main_window1");
@@ -1216,7 +1216,7 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gchar * csr_parent_id;
 	guint64 csr_id;
 
-	if (type != 2)
+	if (type != CA_FILE_ELEMENT_TYPE_CSR)
 		return;
 		
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &csr_id, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
@@ -1325,7 +1325,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 	selection_type  = __ca_selection_type (tree_view, &iter);
 	switch (selection_type) {
 		
-	case 1:
+	case CA_FILE_ELEMENT_TYPE_CERT:
 		menu = glade_xml_get_widget (cert_popup_menu_xml,
 					     "certificate_popup_menu");
 		
@@ -1342,7 +1342,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
 				event_button->button, event_button->time);
 		return FALSE;
-	case 2:
+	case CA_FILE_ELEMENT_TYPE_CSR:
 		menu = glade_xml_get_widget (csr_popup_menu_xml,
 					     "csr_popup_menu");
 
@@ -1357,7 +1357,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 				event_button->button, event_button->time);
 		return FALSE;
 	default:
-	case 0:
+	case -1:
 		return FALSE;
 	}
 
