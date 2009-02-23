@@ -31,7 +31,7 @@ typedef struct _UInt160 {
 UInt160 * uint160_new(void);
 
 void uint160_assign (UInt160 *var, guint64 new_value);
-gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value);
+gboolean uint160_assign_hexstr (UInt160 *var, const gchar *new_value);
 void uint160_add (UInt160 *var, guint64 new_value);
 void uint160_inc (UInt160 *var);
 void uint160_dec (UInt160 *var);

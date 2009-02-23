@@ -52,11 +52,13 @@ void uint160_assign (UInt160 *var, guint64 new_value)
 }
 
 
-gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value_hex)
+gboolean uint160_assign_hexstr (UInt160 *var, const gchar *new_value_hex)
 {
         guint i;
         gchar c;
-        gchar * stripped_value = g_strstrip (new_value_hex);
+
+        gchar * orig_stripped_value = g_strdup (new_value_hex);
+	gchar * stripped_value = g_strstrip (orig_stripped_value);
 
         /* fprintf (stderr, "Antes de asignar Uint160=%s: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n", */
 	/* 	 stripped_value, var->value2, var->value1, var->value0); */
@@ -74,6 +76,7 @@ gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value_hex)
                         memset (var, 0, sizeof(UInt160));
                         fprintf (stderr, "Error al asignar valor %s Uint160: caracter «%c» encontrado.\n",
                                  stripped_value, c);
+			g_free (orig_stripped_value);
                         return FALSE;
                 }
                 
@@ -134,6 +137,7 @@ gboolean uint160_assign_hexstr (UInt160 *var, gchar *new_value_hex)
 
         /* fprintf (stderr, "Asignado valor %s Uint160: %u:%"G_GUINT64_FORMAT":%"G_GUINT64_FORMAT"\n", */
 	/* 	 stripped_value, var->value2, var->value1, var->value0); */
+	g_free (orig_stripped_value);
         return TRUE;
 }
 
@@ -205,13 +209,35 @@ void uint160_shift (UInt160 *var, guint positions)
 
 gboolean uint160_write (const UInt160 *var, guchar *buffer, gsize * max_size)
 {
-        if (*max_size < sizeof(UInt160)) {
-                *max_size = sizeof(UInt160);
+        if (*max_size < 20) {
+                *max_size = 20;
                 return FALSE;
         }
 
-        memcpy (buffer, var, sizeof(UInt160));
-        *max_size = sizeof(UInt160);
+	buffer[0] = ((var->value2 & 0xFF000000) >> 24);
+	buffer[1] = ((var->value2 & 0x00FF0000) >> 16);
+	buffer[2] = ((var->value2 & 0x0000FF00) >> 8);
+	buffer[3] = ((var->value2 & 0x000000FF));
+
+	buffer[4] = ((var->value1 & G_GUINT64_CONSTANT(0xFF00000000000000)) >> 56);
+	buffer[5] = ((var->value1 & G_GUINT64_CONSTANT(0x00FF000000000000)) >> 48);
+	buffer[6] = ((var->value1 & G_GUINT64_CONSTANT(0x0000FF0000000000)) >> 40);
+	buffer[7] = ((var->value1 & G_GUINT64_CONSTANT(0x000000FF00000000)) >> 32);
+	buffer[8] = ((var->value1 & G_GUINT64_CONSTANT(0x00000000FF000000)) >> 24);
+	buffer[9] = ((var->value1 & G_GUINT64_CONSTANT(0x0000000000FF0000)) >> 16);
+	buffer[10] = ((var->value1 & G_GUINT64_CONSTANT(0x000000000000FF00)) >> 8);
+	buffer[11] = ((var->value1 & G_GUINT64_CONSTANT(0x00000000000000FF)));
+
+	buffer[12] = ((var->value0 & G_GUINT64_CONSTANT(0xFF00000000000000)) >> 56);
+	buffer[13] = ((var->value0 & G_GUINT64_CONSTANT(0x00FF000000000000)) >> 48);
+	buffer[14] = ((var->value0 & G_GUINT64_CONSTANT(0x0000FF0000000000)) >> 40);
+	buffer[15] = ((var->value0 & G_GUINT64_CONSTANT(0x000000FF00000000)) >> 32);
+	buffer[16] = ((var->value0 & G_GUINT64_CONSTANT(0x00000000FF000000)) >> 24);
+	buffer[17] = ((var->value0 & G_GUINT64_CONSTANT(0x0000000000FF0000)) >> 16);
+	buffer[18] = ((var->value0 & G_GUINT64_CONSTANT(0x000000000000FF00)) >> 8);
+	buffer[19] = ((var->value0 & G_GUINT64_CONSTANT(0x00000000000000FF)));
+
+        *max_size = 20;
         return TRUE;
         
 }
@@ -229,7 +255,7 @@ gboolean uint160_read (UInt160 *var, guchar *buffer, gsize buffer_size)
 
         start = 0;
 
-        if (start < buffer_size && buffer[start] == 0)
+        while (start < buffer_size && buffer[start] == 0)
                 start++;
 
         for (i=start; i < buffer_size; i++) {
@@ -355,48 +381,50 @@ gboolean uint160_read_escaped_old_format (UInt160 *var, gchar *buffer, gsize buf
 gchar * uint160_strdup_printf (const UInt160 *var)
 {
 
-        if (var->value2==0 && var->value1==0) {
-                return g_strdup_printf ("%"G_GUINT64_FORMAT, var->value0);
-        } else {
-                GString *string = g_string_new("");
-                guint64 val;
-                gsize size;
-                guchar * pointer;
-                int i;
-
-                /* First, we calculate how many bytes are filled */
-                if (var->value2 != 0) {
-                        size = 16;
-                        val = var->value2;
-                        while (val != 0) {
-                                val = val >> 1;
-                                size++;
-                        }
-                } else {
-                        size = 8;
-                        val = var->value1;
-                        while (val != 0) {
-                                val = val >> 1;
-                                size ++;
-                        }
-                }
-                        
-                for (i=size-1; i>=0; i--) {
-                        if (i < 8) {
-                                pointer = (guchar *) &(var->value0);
-                                g_string_append_printf (string, "%s%02X", (i==(size-1)?"":":"), pointer[i]);
-                        } else if (i < 16) {
-                                pointer = (guchar *) &(var->value1);
-                                g_string_append_printf (string, "%s%02X", (i==(size-1)?"":":"), pointer[i-8]);
-                        } else {
+	GString *string = g_string_new("");
+	guint64 val;
+	gsize size = 0;
+	guchar * pointer;
+	int i;
+	
+	/* First, we calculate how many bytes are filled */
+	if (var->value2 != 0) {
+		size = 16;
+		val = var->value2;
+		while (val != 0) {
+			val = val >> 8;
+			size++;
+		}
+	} else if (var->value1 != 0) {
+		size = 8;
+		val = var->value1;
+		while (val != 0) {
+			val = val >> 8;
+			size ++;
+		}
+	} else if (var->value0 != 0) {
+		val = var->value0;
+		while (val != 0) {
+			val = val >> 8;
+			size ++;
+		}
+	}
+        
+	for (i=size-1; i>=0; i--) {
+		if (i < 8) {
+			pointer = (guchar *) &(var->value0);
+			g_string_append_printf (string, "%s%02X", (i==(size-1)?"":":"), pointer[i]);
+		} else if (i < 16) {
+			pointer = (guchar *) &(var->value1);
+			g_string_append_printf (string, "%s%02X", (i==(size-1)?"":":"), pointer[i-8]);
+		} else {
                                 pointer = (guchar *) &(var->value2);
                                 g_string_append_printf (string, "%s%02X", (i==(size-1)?"":":"), pointer[i-16]);
-                        }
-                }
+		}
+	}
                 
-                return g_string_free (string, FALSE);
+	return g_string_free (string, FALSE);
 
-        }
 }
 
 void uint160_free (UInt160 *var)
