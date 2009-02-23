@@ -143,7 +143,7 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 		return (_("There was an error while exporting private key."));
 	} 
 	
-	if (type == 1) {
+	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
 		crypted_pkey = pkey_manage_get_certificate_pkey (id);
 		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
 	} else {
@@ -196,7 +196,7 @@ gchar * export_pkcs12 (guint64 id, gint type, gchar *filename)
 	gchar * privatekey = NULL;
         gnutls_datum_t * pkcs12_datum = NULL;
 
-	if (type == 1) {
+	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
 		crypted_pkey = pkey_manage_get_certificate_pkey (id);
 		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
 		crt_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
