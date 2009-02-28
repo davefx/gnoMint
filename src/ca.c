@@ -1027,6 +1027,8 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &has_pk_in_db, -1);			
 	widget = glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2");
 	gtk_widget_set_sensitive (widget, has_pk_in_db);
+	widget = glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3");
+	gtk_widget_set_sensitive (widget, has_pk_in_db);
 
 	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
  	        widget = glade_xml_get_widget (dialog_xml, "export_certificate_dialog");
