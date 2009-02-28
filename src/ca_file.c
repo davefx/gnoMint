@@ -1551,7 +1551,6 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
                                sql_subject_key_id,
                                sql_issuer_key_id);
         g_free (serialstr);
-        g_free (parent_route);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -1606,7 +1605,8 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
                                                        tlscert->dn,
                                                        cert_id,
                                                        parent_route,cert_id,
-                                                       orphan_res[i*2]);
+                                                       orphan_res[i*2]);				
+				printf("%s\n",sql);
                                 if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
                                         sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
                                         fprintf (stderr, "%s\n", sql);
@@ -1614,6 +1614,22 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
                                         tls_cert_free (tlscert);
                                         return error;
                                 }
+				sqlite3_free (sql);
+
+                                sql = sqlite3_mprintf ("UPDATE certificates SET "
+                                                       "parent_route=concat('%s%"G_GUINT64_FORMAT"',parent_route)"
+                                                       "WHERE parent_route LIKE ':%s:%%';",
+                                                       parent_route, cert_id,
+                                                       orphan_res[i*2]);				
+				printf("%s\n",sql);
+                                if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+                                        sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
+                                        fprintf (stderr, "%s\n", sql);
+                                        sqlite3_free (sql);
+                                        tls_cert_free (tlscert);
+                                        return error;
+                                }
+				sqlite3_free (sql);
                         }
                         
                 }
@@ -1664,6 +1680,7 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
 
         }
 
+        g_free (parent_route);
         tls_cert_free (tlscert);
 
 	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
