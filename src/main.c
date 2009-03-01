@@ -28,7 +28,7 @@
 #include "dialog.h"
 #include "new_ca_window.h"
 #include "new_req_window.h"
-#include "new_cert_window.h"
+#include "new_cert.h"
 #include "tls.h"
 #include "ca.h"
 #include "ca_file.h"

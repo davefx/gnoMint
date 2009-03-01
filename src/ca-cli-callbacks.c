@@ -32,7 +32,7 @@
 #include "csr_creation.h"
 #include "export.h"
 #include "import.h"
-#include "new_cert_window.h"
+#include "new_cert.h"
 #include "pkey_manage.h"
 #include "preferences.h"
 #include "tls.h"
@@ -892,7 +892,7 @@ int ca_cli_callback_sign (int argc, char **argv)
 	
 	if (dialog_ask_for_confirmation (_("All the mandatory data for the certificate generation has been gathered."), _("Do you want to proceed with the signing? [Yes]/No "), TRUE)) {
 
-		const gchar * strerror = new_cert_window_sign_csr (csr_id, ca_id, cert_creation_data);
+		const gchar * strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
 		if (strerror)
 			dialog_error ((gchar *) strerror);
 		else

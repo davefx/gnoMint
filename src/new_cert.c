@@ -32,7 +32,7 @@
 #include "dialog.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
-#include "new_cert_window.h"
+#include "new_cert.h"
 
 #ifndef GNOMINTCLI
 GladeXML * new_cert_window_xml = NULL;
@@ -740,7 +740,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	widget = glade_xml_get_widget (new_cert_window_xml, "any_purpose_check");
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
-	strerror = new_cert_window_sign_csr (csr_id, ca_id, cert_creation_data);
+	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
 
 	if (strerror) {
 		dialog_error ((gchar *) strerror);
@@ -754,7 +754,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 }
 #endif
 
-const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data)
+const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data)
 {
 	gchar *csr_pem = NULL;
 	

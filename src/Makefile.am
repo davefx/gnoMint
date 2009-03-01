@@ -17,7 +17,7 @@ gnomint_SOURCES = \
 	country_table.c \
         new_ca_window.c \
         new_req_window.c \
-	new_cert_window.c \
+	new_cert.c \
 	creation_process_window.c \
 	dialog.c \
 	ca.c \
@@ -70,7 +70,7 @@ gnomint_cli_SOURCES = \
 	crl.c \
         csr_creation.c \
         import.c \
-	new_cert_window.c \
+	new_cert.c \
 	preferences.c \
 	pkey_manage.c \
 	tls.c \
@@ -102,7 +102,7 @@ EXTRA_DIST = \
 	creation_process_window.h \
 	new_ca_window.h \
 	new_req_window.h \
-	new_cert_window.h \
+	new_cert.h \
 	tls.h\
 	pkey_manage.h \
 	preferences.h \

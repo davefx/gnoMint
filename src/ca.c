@@ -40,7 +40,7 @@
 #include "export.h"
 #include "new_ca_window.h"
 #include "new_req_window.h"
-#include "new_cert_window.h"
+#include "new_cert.h"
 #include "preferences-gui.h"
 #include "import.h"
 

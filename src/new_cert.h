@@ -42,7 +42,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data);
 #endif
 
-const gchar *new_cert_window_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data);
+const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data);
 
 
 #endif
