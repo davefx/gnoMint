@@ -210,7 +210,7 @@ gchar * export_pkcs12 (guint64 id, gint type, gchar *filename)
 		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
 		crt_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
 	} else {
-		return (_("Unsupported operation: you cannot generate a PKCS\#12 for a CSR."));
+		return (_("Unsupported operation: you cannot generate a PKCS#12 for a CSR."));
 	}
 		
 	
