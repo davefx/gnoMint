@@ -72,8 +72,17 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 		g_free (password);
 		return (_("There was an error while exporting private key."));
 	} 
-	
-	crypted_pkey = pkey_manage_get_certificate_pkey (id);
+
+	switch (type) {
+	case CA_FILE_ELEMENT_TYPE_CERT:
+		crypted_pkey = pkey_manage_get_certificate_pkey (id);
+		break;
+	case CA_FILE_ELEMENT_TYPE_CSR:
+		crypted_pkey = pkey_manage_get_csr_pkey (id);
+		break;
+	default:
+		break;
+	}
 	dn = ca_file_get_dn_from_id (type, id);
 			
 	if (!crypted_pkey || !dn) {
