@@ -12,7 +12,11 @@ glade_DATA =   \
 	gnomint.glade \
 	gnomint.png \
 	key-16.png \
-	ca-stamp-16.png
+	ca-stamp-16.png \
+	addca.png \
+	addcsr.png \
+	extractpkey.png \
+	sign.png
 
 EXTRA_DIST = $(glade_DATA) $(deskicon_DATA) $(desktop_in_files)
 

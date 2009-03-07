@@ -621,18 +621,26 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
 			   CA_MODEL_COLUMN_IS_CA, &is_ca, 
 			   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 			   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
-	if (pk_indb) {
-		widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
-		gtk_widget_set_sensitive (widget, TRUE);
-	}
+
+	widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
+	gtk_widget_set_sensitive (widget, pk_indb);
+	widget = glade_xml_get_widget (main_window_xml, "extractpkey_toolbutton");
+	gtk_widget_set_sensitive (widget, pk_indb);
 
         widget = glade_xml_get_widget (main_window_xml, "revoke1");
         gtk_widget_set_sensitive (widget, (! is_revoked));
+        widget = glade_xml_get_widget (main_window_xml, "revoke_toolbutton");
+        gtk_widget_set_sensitive (widget, (! is_revoked));
+
 
 	widget = glade_xml_get_widget (main_window_xml, "sign1");
 	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "sign_toolbutton");
+	gtk_widget_set_sensitive (widget, FALSE);
 
 	widget = glade_xml_get_widget (main_window_xml, "delete2");
+	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
 	gtk_widget_set_sensitive (widget, FALSE);
 
 }
@@ -646,18 +654,25 @@ void __ca_activate_csr_selection (GtkTreeIter *iter)
 	gtk_widget_set_sensitive (widget, TRUE);
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, -1);
-	if (pk_indb) {
-		widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
-		gtk_widget_set_sensitive (widget, TRUE);
-	}
+
+	widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
+	gtk_widget_set_sensitive (widget, pk_indb);
+	widget = glade_xml_get_widget (main_window_xml, "extractpkey_toolbutton");
+	gtk_widget_set_sensitive (widget, pk_indb);
 
 	widget = glade_xml_get_widget (main_window_xml, "revoke1");
+	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "revoke_toolbutton");
 	gtk_widget_set_sensitive (widget, FALSE);
 
 	widget = glade_xml_get_widget (main_window_xml, "sign1");
 	gtk_widget_set_sensitive (widget, TRUE);
+	widget = glade_xml_get_widget (main_window_xml, "sign_toolbutton");
+	gtk_widget_set_sensitive (widget, TRUE);
 
 	widget = glade_xml_get_widget (main_window_xml, "delete2");
+	gtk_widget_set_sensitive (widget, TRUE);
+	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
 	gtk_widget_set_sensitive (widget, TRUE);
 }
 
@@ -670,14 +685,22 @@ void __ca_deactivate_actions ()
 
 	widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
 	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "extractpkey_toolbutton");
+	gtk_widget_set_sensitive (widget, FALSE);
 
 	widget = glade_xml_get_widget (main_window_xml, "revoke1");
+	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "revoke_toolbutton");
 	gtk_widget_set_sensitive (widget, FALSE);
 
 	widget = glade_xml_get_widget (main_window_xml, "sign1");
 	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "sign_toolbutton");
+	gtk_widget_set_sensitive (widget, FALSE);
 
 	widget = glade_xml_get_widget (main_window_xml, "delete2");
+	gtk_widget_set_sensitive (widget, FALSE);
+	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
 	gtk_widget_set_sensitive (widget, FALSE);
 }
 

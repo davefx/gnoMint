@@ -22,7 +22,7 @@ src/gnomint-cli.c
 src/import.c
 src/main.c
 src/new_ca_window.c
-src/new_cert_window.c
+src/new_cert.c
 src/new_req_window.c
 src/preferences.c
 src/preferences-gui.c
