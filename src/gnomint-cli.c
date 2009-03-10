@@ -25,7 +25,6 @@
 #include "ca_file.h"
 #include "ca-cli.h"
 #include "preferences.h"
-#include "import.h"
 
 gchar * gnomint_current_opened_file = NULL;
 

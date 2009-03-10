@@ -1,3 +1,236 @@
+2009-03-07 12:23  davefx
+
+	* [r308] gui/Makefile.am, gui/addca.png, gui/addcsr.png,
+	  gui/extractpkey.png, gui/gnomint.glade, gui/sign.png,
+	  po/POTFILES.in, src/ca.c:
+	  Adding functional toolbar. Fixing bug: extract private key action
+	  was enabled and never disabled afterwards (while a selected
+	  element exists)
+
+2009-03-01 09:07  davefx
+
+	* [r307] src/Makefile.am, src/ca-cli-callbacks.c, src/ca.c,
+	  src/main.c, src/new_cert.c, src/new_cert.h,
+	  src/new_cert_window.c, src/new_cert_window.h:
+	  Renaming new_cert_window by new_cert
+
+2009-03-01 09:01  davefx
+
+	* [r306] src/export.c:
+	  Fixing compile error
+
+2009-03-01 08:01  davefx
+
+	* [r305] src/export.c:
+	  Adding protection: export_pkcs12 shouldn't be called for
+	  exporting CSR information.
+
+2009-03-01 07:38  davefx
+
+	* [r304] src/export.c:
+	  Fixing error while exporting private key of CSRs to PKCS#8
+	  format: we were exporting a certificate private key instead of
+	  the CSR private key.
+
+2009-02-28 11:51  davefx
+
+	* [r303] src/ca_file.c:
+	  Correcting bug: while importing a CA certificate, if it has
+	  children in the database, its grand-children get also the correct
+	  parent-route.
+	  
+	  In that case too, corrected a possible segv in the parent-route
+	  assignation to children.
+
+2009-02-28 07:42  davefx
+
+	* [r302] src/ca.c:
+	  If the private key is not known by the application, you cannot
+	  export it into a PKCS#12
+
+2009-02-23 21:34  davefx
+
+	* [r301] src/uint160.c, src/uint160.h:
+	  Making uint160_write a platform_independent function. Correcting
+	  uint160_strdup_printf.
+
+2009-02-23 18:30  davefx
+
+	* [r300] src/export.c:
+	  Resolving bug about cyphered private key exports
+
+2009-02-23 18:28  davefx
+
+	* [r299] src/ca.c:
+	  Resolving bug about cyphered private key exports
+
+2009-02-21 16:26  davefx
+
+	* [r298] src/pkey_manage.c:
+	  New method for ciphering passwords and private keys. More secure,
+	  it does not reutilize the same initial vector nor initial
+	  counter.
+	  
+	  Keeping compatibility with old method. New passwords and keys
+	  will be ciphered using the new method. It is recommended change
+	  database password, so all the private keys are reciphered using
+	  the new method.
+	  
+	  (Dummy upload. The actual change was in the previous commit)
+
+2009-02-21 16:23  davefx
+
+	* [r297] src/ca_file.c, src/pkey_manage.c:
+	  Now, when a db is password-unprotected, the password entry is
+	  reset and it is not removed
+
+2009-02-21 14:29  davefx
+
+	* [r296] src/ca_file.c:
+	  Removing SQL syntax error
+
+2009-02-14 11:01  davefx
+
+	* [r295] configure.in:
+	  Removing libgnomeui dependence
+
+2009-02-10 19:22  davefx
+
+	* [r294] src/ca-cli-callbacks.c, src/ca_policy.c, src/ca_policy.h,
+	  src/crl.c, src/new_ca_window.c, src/new_cert_window.c,
+	  src/new_req_window.c:
+	  Replacing ca_policy_[sg]et with ca_file_policy_[sg]et, and
+	  removing extra dependences
+
+2009-02-04 19:33  davefx
+
+	* [r293] src/ca_file.c:
+	  When the DB is password-unprotected, delete the property with the
+	  old password from the DB
+
+2009-02-03 18:55  davefx
+
+	* [r292] src/ca_file.c:
+	  Fixing bug while upgrading password-protected database
+
+2009-01-31 15:56  davefx
+
+	* [r291] src/ca_file.c:
+	  Removing table ca_properties. Adding new table db_properties, and
+	  view ca_properties for keeping backward/forward compatibility
+
+2009-01-17 12:30  davefx
+
+	* [r290] src/Makefile.am, src/country_table.c, src/country_table.h,
+	  src/main.c, src/new_ca_window.c, src/new_ca_window.h,
+	  src/new_req_window.c, src/preferences-gui.c,
+	  src/preferences-gui.h:
+	  Advancing in cleaning of dependences
+
+2009-01-16 20:31  davefx
+
+	* [r289] src/ca-cli-callbacks.c, src/ca_creation.c,
+	  src/ca_creation.h, src/ca_file.c, src/ca_file.h,
+	  src/creation_process_window.c, src/creation_process_window.h,
+	  src/csr_creation.c, src/csr_creation.h, src/import.c,
+	  src/new_ca_window.c, src/new_cert_window.c,
+	  src/new_cert_window.h, src/new_req_window.c, src/pkey_manage.c,
+	  src/pkey_manage.h, src/tls.c, src/tls.h:
+	  Cleaning up the code a little more
+
+2009-01-14 19:44  davefx
+
+	* [r288] src/new_cert_window.c:
+	  Removing unneeded dependences
+
+2009-01-14 19:34  davefx
+
+	* [r287] src/ca.c, src/creation_process_window.c, src/export.c,
+	  src/export.h, src/new_ca_window.c, src/new_req_window.c:
+	  Removing dependences from ca.c
+
+2009-01-13 20:14  davefx
+
+	* [r286] configure.in, src/ca-cli-callbacks.c,
+	  src/ca-cli-callbacks.h, src/ca-cli.c, src/ca-cli.h, src/ca.c,
+	  src/ca.h, src/ca_creation.c, src/ca_creation.h, src/ca_file.c,
+	  src/ca_file.h, src/ca_policy.c, src/ca_policy.h,
+	  src/certificate_properties.c, src/certificate_properties.h,
+	  src/creation_process_window.c, src/creation_process_window.h,
+	  src/crl.c, src/crl.h, src/csr_creation.c, src/csr_creation.h,
+	  src/csr_properties.c, src/csr_properties.h, src/dialog.c,
+	  src/dialog.h, src/gnomint-cli.c, src/import.c, src/import.h,
+	  src/main.c, src/main.h, src/new_ca_window.c, src/new_ca_window.h,
+	  src/new_cert_window.c, src/new_cert_window.h,
+	  src/new_req_window.c, src/new_req_window.h, src/pkey_manage.c,
+	  src/pkey_manage.h, src/preferences-gui.c, src/preferences-gui.h,
+	  src/preferences-window.c, src/preferences-window.h,
+	  src/preferences.c, src/preferences.h, src/tls.c, src/tls.h,
+	  src/uint160.c, src/uint160.h:
+	  Updating Copyright date. Removing dependence of ca.[ch] because
+	  of only ca_refresh_list.
+
+2009-01-12 21:18  davefx
+
+	* [r285] src/creation_process_window.c,
+	  src/creation_process_window.h:
+	  Tidying up the code a litte bit
+
+2009-01-12 21:15  davefx
+
+	* [r284] gui/gnomint.glade, po/POTFILES.in, src/Makefile.am,
+	  src/new_ca_window.c, src/new_cert_window.c, src/new_req_window.c:
+	  Tidying up the code a litte bit
+
+2009-01-12 20:41  davefx
+
+	* [r283] src/creation_process_window.h,
+	  src/new_cert_creation_process.h:
+	  Renaming source file...
+
+2009-01-12 20:39  davefx
+
+	* [r282] src/creation_process_window.c,
+	  src/new_cert_creation_process.c:
+	  Renaming source file...
+
+2009-01-04 20:56  davefx
+
+	* [r281] configure.in, po/cs.po, po/de.po, po/fr.po, po/it.po,
+	  po/pt_BR.po, po/sv.po:
+	  Uploading new translations from Launchpad
+
+2009-01-02 17:21  davefx
+
+	* [r280] src/Makefile.am, src/ca-callbacks.c, src/ca-callbacks.h,
+	  src/ca-cli-callbacks.c, src/ca-cli-callbacks.h, src/ca-cli.c,
+	  src/ca-cli.h, src/ca.c, src/ca.h, src/ca_file.c, src/ca_file.h,
+	  src/crl.c, src/dialog.c, src/dialog.h, src/export.c,
+	  src/export.h, src/import.c, src/new_cert_window.c,
+	  src/pkey_manage.c:
+	  Refactoring some functions
+
+2008-12-25 22:16  davefx
+
+	* [r279] AUTHORS, m4/intltool.m4:
+	  Reverting error
+
+2008-12-25 22:13  davefx
+
+	* [r278] AUTHORS, m4/intltool.m4, m4/libtool.m4, m4/ltoptions.m4,
+	  m4/ltsugar.m4, m4/ltversion.m4, m4/lt~obsolete.m4:
+	  Removing files problematic while compiling in Ubuntu 8.04
+
+2008-12-22 10:29  davefx
+
+	* [r277] src/import.c:
+	  Improving OpenSSL import. Now, it is less restrictive.
+
+2008-12-18 06:39  davefx
+
+	* [r275] ChangeLog:
+	  Updating to version 0.9.1
+
 2008-12-18 06:38  davefx
 
 	* [r274] configure.in:

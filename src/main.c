@@ -25,23 +25,13 @@
 #include <stdlib.h>
 
 #include "main.h"
-#include "dialog.h"
-#include "new_ca_window.h"
-#include "new_req_window.h"
-#include "new_cert.h"
-#include "tls.h"
 #include "ca.h"
+#include "dialog.h"
+#include "tls.h"
 #include "ca_file.h"
 #include "preferences-gui.h"
-#include "preferences-window.h"
-#include "import.h"
 
 #define GNOMINT_MIME_TYPE "application/x-gnomint"
-
-/* gchar * PACKAGE_AUTHORS[] = { */
-/* 	"David Marín Carreño <davefx@gmail.com>", */
-/* 	NULL */
-/* }; */
 
 GladeXML * main_window_xml = NULL;
 GladeXML * csr_popup_menu_xml = NULL;
@@ -228,97 +218,6 @@ gboolean on_main_window1_delete (GtkWidget *widget,
 	return TRUE;
 }
 
-
-/*
- *
- *   FILE MENU CALLBACKS
- *
- */ 
-
-
-void on_add_self_signed_ca_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	new_ca_window_display();
-	
-}
-
-void on_add_csr_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	new_req_window_display();
-	
-}
-
-void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	gchar *filename;
-        gchar *error = NULL;
-
-	GtkWidget *dialog, *widget;
-	
-	widget = glade_xml_get_widget (main_window_xml, "main_window");
-	
-	dialog = gtk_file_chooser_dialog_new (_("Create new CA database"),
-					      GTK_WINDOW(widget),
-					      GTK_FILE_CHOOSER_ACTION_SAVE,
-					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-					      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-					      NULL);
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
-
-	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-	{
-		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-		gtk_widget_destroy (dialog);
-	} else {
-		gtk_widget_destroy (dialog);
-		return;
-	}		
-	
-        if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
-                /* The file already exists. The user has confirmed its overwriting.
-                   So we, first, rename it to "filename~", after deleting "filename~" if it already exists */
-
-                gchar *backup_filename = g_strdup_printf ("%s~", filename);
-                if (g_file_test (backup_filename, G_FILE_TEST_EXISTS)) {
-                        g_remove (backup_filename);
-                }
-
-                g_rename (filename, backup_filename);
-                
-                g_free (backup_filename);
-        }
-
-        error = ca_file_create (filename);
-        if (error) {
-		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-						 GTK_DIALOG_DESTROY_WITH_PARENT,
-						 GTK_MESSAGE_ERROR,
-						 GTK_BUTTONS_CLOSE,
-						 _("Problem when creating '%s' CA database:\n%s"),
-						 filename, error);
-		
-		gtk_dialog_run (GTK_DIALOG(dialog));
-		                
-                return;
-        }
-
-	if (! ca_open (filename, FALSE)) {
-		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-						 GTK_DIALOG_DESTROY_WITH_PARENT,
-						 GTK_MESSAGE_ERROR,
-						 GTK_BUTTONS_CLOSE,
-						 _("Problem when opening new '%s' CA database"),
-						 filename);
-		
-		gtk_dialog_run (GTK_DIALOG(dialog));
-		
-		gtk_widget_destroy (dialog);
-	}
-	return;
-
-}
-
 void __recent_add_utf8_filename (const gchar *utf8_filename)
 {
         GtkRecentData *recent_data;
@@ -491,109 +390,6 @@ void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 }
 
 
-void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-
-	gchar *filename;
-
-	GtkWidget *dialog, *main_window_widget, *widget;
-	GladeXML * dialog_xml = NULL;
-        GtkToggleButton *radiobutton = NULL;
-	gchar     * xml_file = NULL;
-	gint response = 0;
-        gboolean import_file = TRUE;
-	
-	main_window_widget = glade_xml_get_widget (main_window_xml, "main_window");
-
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "import_file_or_directory_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
-
-        widget = glade_xml_get_widget (dialog_xml, "import_file_or_directory_dialog");
-        response = gtk_dialog_run (GTK_DIALOG(widget));
-
-        if (response < 0) {
-                gtk_widget_destroy (widget);
-                g_object_unref (G_OBJECT(dialog_xml));
-                return;
-        }
-
-        radiobutton = GTK_TOGGLE_BUTTON(glade_xml_get_widget (dialog_xml, "importfile_radiobutton"));
-        import_file = gtk_toggle_button_get_active(radiobutton);
-
-        gtk_widget_destroy (widget);
-
-        if (import_file) {
-                // Import single file
-                dialog = gtk_file_chooser_dialog_new (_("Select PEM file to import"),
-                                                      GTK_WINDOW(main_window_widget),
-                                                      GTK_FILE_CHOOSER_ACTION_OPEN,
-                                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                                      NULL);
-                
-                if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-                {
-                        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-                        gtk_widget_destroy (dialog);
-                } else {
-                        gtk_widget_destroy (dialog);
-                        return;
-                }		
-                
-                if (! import_single_file (filename, NULL, NULL)) {
-                        dialog = gtk_message_dialog_new (GTK_WINDOW(main_window_widget),
-                                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                         GTK_MESSAGE_ERROR,
-                                                         GTK_BUTTONS_CLOSE,
-                                                         _("Problem when importing '%s' file"),
-                                                         filename);
-                        
-                        gtk_dialog_run (GTK_DIALOG(dialog));
-                        
-                        gtk_widget_destroy (dialog);
-                }
-                return;
-        } else {
-                // Import directory
-
-                gchar * result = NULL;
-
-                dialog = gtk_file_chooser_dialog_new (_("Select directory to import"),
-                                                      GTK_WINDOW(main_window_widget),
-                                                      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                                      NULL);
-                
-                if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-                {
-                        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-                        gtk_widget_destroy (dialog);
-                } else {
-                        gtk_widget_destroy (dialog);
-                        return;
-                }		
-
-                result = import_whole_dir (filename);
-
-                if (result) {
-                        dialog = gtk_message_dialog_new (GTK_WINDOW(main_window_widget),
-                                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                         GTK_MESSAGE_ERROR,
-                                                         GTK_BUTTONS_CLOSE,
-                                                         "%s", result);
-                        
-                        gtk_dialog_run (GTK_DIALOG(dialog));
-                        
-                        gtk_widget_destroy (dialog);
-                }
-                return;
-
-        }
-}
-
 
 void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
@@ -602,33 +398,6 @@ void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 
 
-/*
- *
- *   EDIT MENU CALLBACKS
- *
- */ 
-
-void on_clear1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	printf ("clear1 Activated\n");
-}
-
-void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-	ca_treeview_row_activated (NULL, NULL, NULL, NULL);
-}
-
-void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
-{
-        preferences_window_display ();
-}
-
-
-/*
- *
- *   VIEW MENU CALLBACKS
- *
- */ 
 
 
 /*
