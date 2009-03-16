@@ -21,7 +21,6 @@
 #define _PKEY_MANAGE_H_
 
 #include <glib.h>
-/* #include <gtk/gtk.h> */
 
 /* FUNCTIONS RELATED WITH PRIVATE KEY BEING SAVED IN EXTERNAL FILES */
 

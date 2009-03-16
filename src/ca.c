@@ -648,6 +648,10 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
 	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
 	gtk_widget_set_sensitive (widget, FALSE);
 
+	widget = glade_xml_get_widget (main_window_xml, "properties1");
+	gtk_widget_set_sensitive (widget, TRUE);
+
+
 }
 
 void __ca_activate_csr_selection (GtkTreeIter *iter)
@@ -679,6 +683,9 @@ void __ca_activate_csr_selection (GtkTreeIter *iter)
 	gtk_widget_set_sensitive (widget, TRUE);
 	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
 	gtk_widget_set_sensitive (widget, TRUE);
+
+	widget = glade_xml_get_widget (main_window_xml, "properties1");
+	gtk_widget_set_sensitive (widget, TRUE);
 }
 
 void __ca_deactivate_actions ()
@@ -706,6 +713,9 @@ void __ca_deactivate_actions ()
 	widget = glade_xml_get_widget (main_window_xml, "delete2");
 	gtk_widget_set_sensitive (widget, FALSE);
 	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
+	gtk_widget_set_sensitive (widget, FALSE);
+
+	widget = glade_xml_get_widget (main_window_xml, "properties1");
 	gtk_widget_set_sensitive (widget, FALSE);
 }
 
@@ -1266,7 +1276,6 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 	__enable_widget ("new_certificate1");
 	__enable_widget ("save_as1");
-	__enable_widget ("properties1");
 	__enable_widget ("preferences1");
 
 
