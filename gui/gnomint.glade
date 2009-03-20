@@ -4,7 +4,7 @@
   <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkWindow" id="main_window1">
     <property name="visible">True</property>
-    <property name="title">gnoMint</property>
+    <property name="title" translatable="yes">gnoMint</property>
     <property name="role">gnoMint_main</property>
     <property name="window_position">center</property>
     <property name="default_width">400</property>
@@ -531,7 +531,7 @@
   </widget>
   <widget class="GtkWindow" id="new_ca_window">
     <property name="visible">True</property>
-    <property name="title">New CA - gnoMint</property>
+    <property name="title" translatable="yes">New CA - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
@@ -1344,7 +1344,7 @@ with password:</property>
   </widget>
   <widget class="GtkWindow" id="creation_process_window">
     <property name="visible">True</property>
-    <property name="title">Creating new CA - gnoMint</property>
+    <property name="title" translatable="yes">Creating new CA - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
@@ -1441,7 +1441,7 @@ with password:</property>
     </child>
   </widget>
   <widget class="GtkWindow" id="certificate_properties_dialog">
-    <property name="title">Certificate properties - gnoMint</property>
+    <property name="title" translatable="yes">Certificate properties - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
@@ -1928,7 +1928,6 @@ with password:</property>
                 <property name="spacing">5</property>
                 <child>
                   <widget class="GtkLabel" id="label82">
-                    <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Certificate hierarchy&lt;/b&gt;</property>
@@ -1941,14 +1940,12 @@ with password:</property>
                 </child>
                 <child>
                   <widget class="GtkScrolledWindow" id="scrolledwindow1">
-                    <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <property name="shadow_type">in</property>
                     <child>
                       <widget class="GtkTreeView" id="treeview3">
-                        <property name="visible">True</property>
                         <property name="headers_visible">False</property>
                       </widget>
                     </child>
@@ -2759,7 +2756,7 @@ Please, define the maximum set of properties for the certificates that this CA w
   </widget>
   <widget class="GtkWindow" id="new_req_window">
     <property name="visible">True</property>
-    <property name="title">New certificate request - gnoMint</property>
+    <property name="title" translatable="yes">New certificate request - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
@@ -3484,7 +3481,7 @@ Common Name (CN):</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="export_certificate_dialog">
-    <property name="title">Export certificate - gnoMint</property>
+    <property name="title" translatable="yes">Export certificate - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
@@ -3691,6 +3688,7 @@ Common Name (CN):</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="get_password_dialog">
+    <property name="title" translatable="yes">Enter password - gnoMint</property>
     <property name="modal">True</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>
@@ -3823,7 +3821,7 @@ Common Name (CN):</property>
     </child>
   </widget>
   <widget class="GtkWindow" id="csr_properties_dialog">
-    <property name="title">CSR properties - gnoMint</property>
+    <property name="title" translatable="yes">CSR properties - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
@@ -4063,7 +4061,7 @@ Common Name (CN):</property>
   </widget>
   <widget class="GtkWindow" id="new_cert_window">
     <property name="visible">True</property>
-    <property name="title">New Certificate - gnoMint</property>
+    <property name="title" translatable="yes">New Certificate - gnoMint</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
@@ -4985,18 +4983,25 @@ Common Name (CN):</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="cert_export_menuitem">
-        <property name="label">E_xport</property>
+        <property name="label" translatable="yes">E_xport</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Exports the certificate so it can be imported by any other application</property>
         <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
+        <property name="use_stock">False</property>
         <signal name="activate" handler="ca_on_export1_activate"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image1">
+            <property name="visible">True</property>
+            <property name="stock">gtk-save-as</property>
+            <property name="icon-size">1</property>
+          </widget>
+        </child>
       </widget>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="extract_pkey_menuitem">
-        <property name="label">Extrac_t private key</property>
+        <property name="label" translatable="yes">Extrac_t private key</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Extracts the private key of the selected 
@@ -5004,8 +5009,14 @@ certificate from the database to an
 external file. This file must be provided 
 each time the certificate will be used</property>
         <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
+        <property name="use_stock">False</property>
         <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image2">
+            <property name="visible">True</property>
+            <property name="pixbuf">extractpkey.png</property>
+          </widget>
+        </child>
       </widget>
     </child>
     <child>
@@ -5015,13 +5026,20 @@ each time the certificate will be used</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="revoke_menuitem">
-        <property name="label">Revo_ke</property>
+        <property name="label" translatable="yes">Revo_ke</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Revokes the selected certificate</property>
         <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
+        <property name="use_stock">False</property>
         <signal name="activate" handler="ca_on_revoke_activate"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image3">
+            <property name="visible">True</property>
+            <property name="stock">gtk-stop</property>
+            <property name="icon-size">1</property>
+          </widget>
+        </child>
       </widget>
     </child>
   </widget>
@@ -5046,18 +5064,25 @@ each time the certificate will be used</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="csr_export_menuitem">
-        <property name="label">E_xport</property>
+        <property name="label" translatable="yes">E_xport</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Exports the CSR so it can be imported by any other application</property>
         <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
+        <property name="use_stock">False</property>
         <signal name="activate" handler="ca_on_export1_activate"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image1">
+            <property name="visible">True</property>
+            <property name="stock">gtk-save</property>
+            <property name="icon-size">1</property>
+          </widget>
+        </child>
       </widget>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="extract_pkey_menuitem3">
-        <property name="label">Extrac_t private key</property>
+        <property name="label" translatable="yes">Extrac_t private key</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Extracts the private key of the selected 
@@ -5065,8 +5090,14 @@ certificate from the database to an
 external file. This file must be provided 
 each time the CSR will be used</property>
         <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
+        <property name="use_stock">False</property>
         <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image2">
+            <property name="visible">True</property>
+            <property name="pixbuf">extractpkey.png</property>
+          </widget>
+        </child>
       </widget>
     </child>
     <child>
@@ -5076,12 +5107,18 @@ each time the CSR will be used</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="sign_csr_menuitem">
-        <property name="label">_Sign</property>
+        <property name="label" translatable="yes">_Sign</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
+        <property name="use_stock">False</property>
         <signal name="activate" handler="ca_on_sign1_activate"/>
+        <child internal-child="image">
+          <widget class="GtkImage" id="image3">
+            <property name="visible">True</property>
+            <property name="pixbuf">sign.png</property>
+          </widget>
+        </child>
       </widget>
     </child>
     <child>
@@ -5096,6 +5133,7 @@ each time the CSR will be used</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="get_db_password_dialog">
+    <property name="title" translatable="yes">Enter password - gnoMint</property>
     <property name="modal">True</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>
@@ -5240,6 +5278,7 @@ Please insert the database password.</property>
   <widget class="GtkDialog" id="change_password_dialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">Database password protection - gnoMint</property>
     <property name="window_position">center-on-parent</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>
@@ -5691,6 +5730,7 @@ Gnome-keyring certificate store</property>
   </widget>
   <widget class="GtkDialog" id="dh_parameters_dialog">
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">New Diffie-Hellman parameters - gnoMint</property>
     <property name="window_position">center-on-parent</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>
@@ -5804,6 +5844,7 @@ applications for a secure interchange of their keys over insecure channels.&lt;/
   </widget>
   <widget class="GtkDialog" id="new_crl_dialog">
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">New CRL - gnoMint</property>
     <property name="window_position">center-on-parent</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>
@@ -5905,6 +5946,7 @@ Revocation List is going to be created:</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="import_password_dialog">
+    <property name="title" translatable="yes">Enter password - gnoMint</property>
     <property name="modal">True</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>
@@ -6059,6 +6101,7 @@ For importing the file into gnoMint database, you must provide an appropiate pas
   </widget>
   <widget class="GtkDialog" id="import_file_or_directory_dialog">
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">Import selection - gnoMint</property>
     <property name="window_position">center-on-parent</property>
     <property name="icon">gnomint.png</property>
     <property name="type_hint">dialog</property>

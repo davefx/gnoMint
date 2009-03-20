@@ -7,7 +7,7 @@ gui/gnomint.desktop.in
 mime/gnomint.xml.in
 src/ca.c
 src/ca-cli.c
-src/ca-callbacks.c
+src/ca-cli-callbacks.c
 src/ca_creation.c
 src/ca_file.c
 src/ca_policy.c
