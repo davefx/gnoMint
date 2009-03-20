@@ -1,13 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--*- mode: xml -*-->
+<?xml version="1.0"?>
 <glade-interface>
+  <!-- interface-requires gtk+ 2.10 -->
+  <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkWindow" id="main_window1">
     <property name="visible">True</property>
     <property name="title">gnoMint</property>
-    <property name="startup_id">gnoMint_main</property>
     <property name="role">gnoMint_main</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
     <property name="icon">gnomint.png</property>
@@ -27,26 +26,32 @@
                   <widget class="GtkMenu" id="file1_menu1">
                     <child>
                       <widget class="GtkImageMenuItem" id="new1">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">_New certificate database</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="on_new1_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image14">
+                          <widget class="GtkImage" id="image4">
+                            <property name="visible">True</property>
                             <property name="stock">gtk-new</property>
+                            <property name="icon-size">1</property>
                           </widget>
                         </child>
                       </widget>
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="open1">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">_Open certificate database</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="on_open1_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image13">
+                          <widget class="GtkImage" id="image5">
+                            <property name="visible">True</property>
                             <property name="stock">gtk-open</property>
+                            <property name="icon-size">1</property>
                           </widget>
                         </child>
                       </widget>
@@ -60,13 +65,16 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="save_as1">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">_Save certificate database as...</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="on_save_as1_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image15">
+                          <widget class="GtkImage" id="image6">
+                            <property name="visible">True</property>
                             <property name="stock">gtk-save-as</property>
+                            <property name="icon-size">1</property>
                           </widget>
                         </child>
                       </widget>
@@ -78,8 +86,8 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="gtk-add">
+                        <property name="label">gtk-add</property>
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-add</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <child>
@@ -87,15 +95,14 @@
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkImageMenuItem" id="new2">
-                                <property name="visible">True</property>
                                 <property name="label" translatable="yes">_Add self-signed CA</property>
+                                <property name="visible">True</property>
                                 <property name="use_underline">True</property>
+                                <property name="use_stock">False</property>
                                 <signal name="activate" handler="on_add_self_signed_ca_activate"/>
                                 <child internal-child="image">
-                                  <widget class="GtkImage" id="menu-item-image1">
+                                  <widget class="GtkImage" id="image1">
                                     <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="yalign">0</property>
                                     <property name="pixbuf">addca.png</property>
                                   </widget>
                                 </child>
@@ -103,11 +110,12 @@
                             </child>
                             <child>
                               <widget class="GtkImageMenuItem" id="new_certificate1">
-                                <property name="visible">True</property>
                                 <property name="label" translatable="yes">Add _Certificate Request</property>
+                                <property name="visible">True</property>
                                 <property name="use_underline">True</property>
+                                <property name="use_stock">False</property>
                                 <child internal-child="image">
-                                  <widget class="GtkImage" id="menu-item-image21">
+                                  <widget class="GtkImage" id="image2">
                                     <property name="visible">True</property>
                                     <property name="pixbuf">addcsr.png</property>
                                   </widget>
@@ -120,14 +128,15 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="extractprivatekey1">
+                        <property name="label" translatable="yes">Extrac_t private key</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
                         <property name="tooltip" translatable="yes">Extract the saved private key to an external file or device</property>
-                        <property name="label" translatable="yes">Extrac_t private key</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image19">
+                          <widget class="GtkImage" id="image3">
                             <property name="visible">True</property>
                             <property name="pixbuf">extractpkey.png</property>
                           </widget>
@@ -136,28 +145,31 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="revoke1">
+                        <property name="label" translatable="yes">Revo_ke</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
-                        <property name="label" translatable="yes">Revo_ke</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="ca_on_revoke_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image20">
+                          <widget class="GtkImage" id="image7">
                             <property name="visible">True</property>
-                            <property name="stock">gtk-cancel</property>
+                            <property name="stock">gtk-stop</property>
+                            <property name="icon-size">1</property>
                           </widget>
                         </child>
                       </widget>
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="sign1">
+                        <property name="label" translatable="yes">_Sign</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
-                        <property name="label" translatable="yes">_Sign</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="ca_on_sign1_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image18">
+                          <widget class="GtkImage" id="image8">
                             <property name="visible">True</property>
                             <property name="pixbuf">sign.png</property>
                           </widget>
@@ -166,9 +178,9 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="delete2">
+                        <property name="label">gtk-delete</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
-                        <property name="label">gtk-delete</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="ca_on_delete2_activate"/>
@@ -223,14 +235,17 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="import1">
+                        <property name="label" translatable="yes">_Import</property>
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">_Import</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="on_import1_activate"/>
                         <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image6">
+                          <widget class="GtkImage" id="image9">
+                            <property name="visible">True</property>
                             <property name="stock">gtk-convert</property>
+                            <property name="icon-size">1</property>
                           </widget>
                         </child>
                       </widget>
@@ -250,8 +265,8 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="quit1">
-                        <property name="visible">True</property>
                         <property name="label">gtk-quit</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_quit1_activate"/>
@@ -270,8 +285,8 @@
                   <widget class="GtkMenu" id="edit1_menu1">
                     <child>
                       <widget class="GtkImageMenuItem" id="properties1">
-                        <property name="visible">True</property>
                         <property name="label">gtk-properties</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_properties1_activate"/>
@@ -284,8 +299,8 @@
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="preferences1">
-                        <property name="visible">True</property>
                         <property name="label">gtk-preferences</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_preferences1_activate"/>
@@ -338,8 +353,8 @@
                   <widget class="GtkMenu" id="help1_menu1">
                     <child>
                       <widget class="GtkImageMenuItem" id="about1">
-                        <property name="visible">True</property>
                         <property name="label">gtk-about</property>
+                        <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_about1_activate"/>
@@ -353,6 +368,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
@@ -366,6 +382,7 @@
                 <signal name="clicked" handler="on_new1_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -377,6 +394,7 @@
                 <signal name="clicked" handler="on_open1_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -385,6 +403,7 @@
                 <property name="visible">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -397,6 +416,7 @@
                 <signal name="clicked" handler="on_add_self_signed_ca_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -409,6 +429,7 @@
                 <signal name="clicked" handler="on_add_csr_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -417,6 +438,7 @@
                 <property name="visible">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -430,6 +452,7 @@
                 <signal name="clicked" handler="ca_on_extractprivatekey1_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -443,6 +466,7 @@
                 <signal name="clicked" handler="ca_on_revoke_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -456,6 +480,7 @@
                 <signal name="clicked" handler="ca_on_sign1_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -468,6 +493,7 @@
                 <signal name="clicked" handler="ca_on_delete2_activate"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="homogeneous">True</property>
               </packing>
             </child>
@@ -482,17 +508,17 @@
           <widget class="GtkScrolledWindow" id="scrolledwindow6">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-            <property name="shadow_type">GTK_SHADOW_IN</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
             <child>
               <widget class="GtkTreeView" id="ca_treeview">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="rules_hint">True</property>
                 <signal name="button_press_event" handler="ca_treeview_popup_handler"/>
-                <signal name="row_activated" handler="ca_treeview_row_activated"/>
                 <signal name="cursor_changed" handler="ca_treeview_selection_change"/>
+                <signal name="row_activated" handler="ca_treeview_row_activated"/>
               </widget>
             </child>
           </widget>
@@ -507,9 +533,9 @@
     <property name="visible">True</property>
     <property name="title">New CA - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <child>
       <widget class="GtkNotebook" id="new_ca_notebook">
         <property name="visible">True</property>
@@ -535,6 +561,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -554,6 +581,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -733,43 +761,52 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox1">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button3">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_cancel1">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_next1">
+                    <property name="label">gtk-media-next</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-next</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_next1_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -793,8 +830,8 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">CA properties</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
         <child>
@@ -815,6 +852,7 @@ Common Name (CN):</property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -833,6 +871,7 @@ Common Name (CN):</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -894,25 +933,26 @@ Common Name (CN):</property>
                     <property name="homogeneous">True</property>
                     <child>
                       <widget class="GtkRadioButton" id="rsa_radiobutton">
+                        <property name="label" translatable="yes">RSA</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">RSA</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="dsa_radiobutton">
+                        <property name="label" translatable="yes">DSA</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">DSA</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
                       </widget>
@@ -965,56 +1005,67 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox12">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button8">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_cancel2">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_previous2">
+                    <property name="label">gtk-media-previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-previous</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_previous2_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_commit">
+                    <property name="label">gtk-ok</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-ok</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_commit_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -1037,9 +1088,9 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">Root certificate prop</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="position">1</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
         <child>
@@ -1060,6 +1111,7 @@ Common Name (CN):</property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -1078,6 +1130,7 @@ Common Name (CN):</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -1137,26 +1190,27 @@ Common Name (CN):</property>
                     <property name="homogeneous">True</property>
                     <child>
                       <widget class="GtkRadioButton" id="new_ca_pwd_protect_yes_radiobutton">
+                        <property name="label" translatable="yes">_Yes</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">_Yes</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_ca_pwd_protect_radiobutton_toggled"/>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="new_ca_pwd_protect_no_radiobutton">
+                        <property name="label" translatable="yes">_No</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">_No</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">new_ca_pwd_protect_yes_radiobutton</property>
@@ -1211,42 +1265,51 @@ with password:</property>
               <widget class="GtkHButtonBox" id="hbuttonbox4">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button12">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_cancel3">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_ca_previous3">
+                    <property name="label">gtk-media-previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-previous</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_ca_previous3_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -1271,9 +1334,9 @@ with password:</property>
             <property name="label" translatable="yes">Password protect</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="position">2</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
       </widget>
@@ -1283,9 +1346,9 @@ with password:</property>
     <property name="visible">True</property>
     <property name="title">Creating new CA - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <child>
       <widget class="GtkHBox" id="hbox5">
         <property name="visible">True</property>
@@ -1296,6 +1359,9 @@ with password:</property>
             <property name="yalign">0</property>
             <property name="label" translatable="yes"> </property>
           </widget>
+          <packing>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <widget class="GtkVBox" id="vbox5">
@@ -1312,6 +1378,7 @@ with password:</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -1340,11 +1407,11 @@ with password:</property>
             </child>
             <child>
               <widget class="GtkButton" id="button20">
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="label">gtk-cancel</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_cancel_creation_process_clicked"/>
               </widget>
               <packing>
@@ -1376,9 +1443,9 @@ with password:</property>
   <widget class="GtkWindow" id="certificate_properties_dialog">
     <property name="title">Certificate properties - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <child>
       <widget class="GtkVBox" id="vbox4">
         <property name="visible">True</property>
@@ -1402,15 +1469,18 @@ with password:</property>
                         <property name="label" translatable="yes">&lt;b&gt;This certificate has been verified for the following uses:&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkHSeparator" id="certPropSeparator">
-                  </widget>
+                  <widget class="GtkHSeparator" id="certPropSeparator"/>
                   <packing>
                     <property name="expand">False</property>
                     <property name="position">1</property>
@@ -1847,8 +1917,8 @@ with password:</property>
                 <property name="label" translatable="yes">General</property>
               </widget>
               <packing>
-                <property name="type">tab</property>
                 <property name="tab_fill">False</property>
+                <property name="type">tab</property>
               </packing>
             </child>
             <child>
@@ -1866,15 +1936,16 @@ with password:</property>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                    <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                    <property name="shadow_type">GTK_SHADOW_IN</property>
+                    <property name="hscrollbar_policy">automatic</property>
+                    <property name="vscrollbar_policy">automatic</property>
+                    <property name="shadow_type">in</property>
                     <child>
                       <widget class="GtkTreeView" id="treeview3">
                         <property name="visible">True</property>
@@ -1904,9 +1975,9 @@ with password:</property>
                   <widget class="GtkScrolledWindow" id="scrolledwindow4">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                    <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                    <property name="shadow_type">GTK_SHADOW_IN</property>
+                    <property name="hscrollbar_policy">automatic</property>
+                    <property name="vscrollbar_policy">automatic</property>
+                    <property name="shadow_type">in</property>
                     <child>
                       <widget class="GtkTreeView" id="certTreeView">
                         <property name="visible">True</property>
@@ -1931,9 +2002,9 @@ with password:</property>
                 <property name="label" translatable="yes">Details</property>
               </widget>
               <packing>
-                <property name="type">tab</property>
                 <property name="position">1</property>
                 <property name="tab_fill">False</property>
+                <property name="type">tab</property>
               </packing>
             </child>
             <child>
@@ -1957,6 +2028,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -1971,6 +2043,9 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="label" translatable="yes">Maximum number of months before expiration of the new generated certificates:</property>
                         <property name="wrap">True</property>
                       </widget>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                     <child>
                       <widget class="GtkSpinButton" id="months_before_expiration_spinbutton2">
@@ -2004,6 +2079,9 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="label" translatable="yes">Hours between CRL updates:</property>
                         <property name="wrap">True</property>
                       </widget>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                     <child>
                       <widget class="GtkSpinButton" id="hours_between_crl_updates_spinbutton">
@@ -2037,20 +2115,22 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="n_columns">2</property>
                         <child>
                           <widget class="GtkCheckButton" id="country_inherited_check">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Country</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="state_inherited_check">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">State or Province name</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2064,23 +2144,26 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkRadioButton" id="country_same_radiobutton">
+                                <property name="label" translatable="yes">must be the same</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">must be the same</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">country_differ_radiobutton</property>
                                 <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                               </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                             <child>
                               <widget class="GtkRadioButton" id="country_differ_radiobutton">
+                                <property name="label" translatable="yes">may differ</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">may differ</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
@@ -2099,23 +2182,26 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkRadioButton" id="state_same_radiobutton">
+                                <property name="label" translatable="yes">must be the same</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">must be the same</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">state_differ_radiobutton</property>
                                 <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                               </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                             <child>
                               <widget class="GtkRadioButton" id="state_differ_radiobutton">
+                                <property name="label" translatable="yes">may differ</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">may differ</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
@@ -2133,10 +2219,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="city_inherited_check">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">City</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2147,10 +2234,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="organization_inherited_check">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Organization</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2161,10 +2249,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="ou_inherited_check">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Organizational unit</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2178,23 +2267,26 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkRadioButton" id="city_same_radiobutton">
+                                <property name="label" translatable="yes">must be the same</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">must be the same</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">city_differ_radiobutton</property>
                                 <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                               </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                             <child>
                               <widget class="GtkRadioButton" id="city_differ_radiobutton">
+                                <property name="label" translatable="yes">may differ</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">may differ</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
@@ -2215,23 +2307,26 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkRadioButton" id="organization_same_radiobutton">
+                                <property name="label" translatable="yes">must be the same</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">must be the same</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">organization_differ_radiobutton</property>
                                 <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                               </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                             <child>
                               <widget class="GtkRadioButton" id="organization_differ_radiobutton">
+                                <property name="label" translatable="yes">may differ</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">may differ</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
@@ -2252,23 +2347,26 @@ Please, define the maximum set of properties for the certificates that this CA w
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkRadioButton" id="ou_same_radiobutton">
+                                <property name="label" translatable="yes">must be the same</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">must be the same</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">ou_differ_radiobutton</property>
                                 <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                               </widget>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
                             </child>
                             <child>
                               <widget class="GtkRadioButton" id="ou_differ_radiobutton">
+                                <property name="label" translatable="yes">may differ</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">may differ</property>
-                                <property name="response_id">0</property>
+                                <property name="receives_default">False</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </widget>
@@ -2317,20 +2415,22 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="n_columns">2</property>
                         <child>
                           <widget class="GtkCheckButton" id="ca_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Certification Authority</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="non_repudiation_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Non repudiation</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2341,10 +2441,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="key_encipherment_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Key encipherment</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2358,10 +2459,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="data_encipherment_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Data encipherment</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2375,10 +2477,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="key_agreement_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Key agreement</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2390,10 +2493,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="digital_signature_check4">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Digital signature</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2405,10 +2509,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="crl_signing_check1">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">CRL signing</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2461,10 +2566,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         <property name="n_columns">2</property>
                         <child>
                           <widget class="GtkCheckButton" id="email_protection_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Email protection</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2478,10 +2584,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="code_signing_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Code signing</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2492,10 +2599,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="webclient_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">TLS Web client</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2507,10 +2615,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="webserver_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">TLS Web server</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
@@ -2518,10 +2627,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="time_stamping_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Time stamping</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2532,10 +2642,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="any_purpose_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">Any purpose</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2546,10 +2657,11 @@ Please, define the maximum set of properties for the certificates that this CA w
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="ocsp_signing_check2">
-                            <property name="visible">True</property>
                             <property name="label" translatable="yes">OCSP signing</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">False</property>
                             <property name="use_underline">True</property>
-                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="ca_policy_toggle_button_toggled"/>
                           </widget>
@@ -2605,31 +2717,40 @@ Please, define the maximum set of properties for the certificates that this CA w
                 <property name="label" translatable="yes">CA Policy</property>
               </widget>
               <packing>
-                <property name="type">tab</property>
                 <property name="position">2</property>
                 <property name="tab_fill">False</property>
+                <property name="type">tab</property>
               </packing>
             </child>
           </widget>
+          <packing>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <widget class="GtkHButtonBox" id="hbuttonbox2">
             <property name="visible">True</property>
             <property name="border_width">10</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button2">
-                <property name="visible">True</property>
                 <property name="label">gtk-close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="certificate_properties_close_clicked"/>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
             <property name="position">1</property>
           </packing>
         </child>
@@ -2640,9 +2761,9 @@ Please, define the maximum set of properties for the certificates that this CA w
     <property name="visible">True</property>
     <property name="title">New certificate request - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <child>
       <widget class="GtkNotebook" id="new_req_notebook">
         <property name="visible">True</property>
@@ -2668,6 +2789,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -2686,6 +2808,7 @@ Please, define the maximum set of properties for the certificates that this CA w
               </widget>
               <packing>
                 <property name="expand">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -2702,10 +2825,10 @@ Please, define the maximum set of properties for the certificates that this CA w
             </child>
             <child>
               <widget class="GtkRadioButton" id="dont_inherit_radiobutton">
+                <property name="label" translatable="yes">Don't inherit any fields from existing Certification Authorities</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="label" translatable="yes">Don't inherit any fields from existing Certification Authorities</property>
-                <property name="response_id">0</property>
+                <property name="receives_default">False</property>
                 <property name="active">True</property>
                 <property name="draw_indicator">True</property>
               </widget>
@@ -2715,10 +2838,10 @@ Please, define the maximum set of properties for the certificates that this CA w
             </child>
             <child>
               <widget class="GtkRadioButton" id="inherit_radiobutton">
+                <property name="label" translatable="yes">Inherit fields according to selected Certification Authority and its policy.</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="label" translatable="yes">Inherit fields according to selected Certification Authority and its policy.</property>
-                <property name="response_id">0</property>
+                <property name="receives_default">False</property>
                 <property name="draw_indicator">True</property>
                 <property name="group">dont_inherit_radiobutton</property>
                 <signal name="toggled" handler="new_req_inherit_fields_toggled"/>
@@ -2731,9 +2854,9 @@ Please, define the maximum set of properties for the certificates that this CA w
               <widget class="GtkScrolledWindow" id="scrolledwindow7">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="shadow_type">GTK_SHADOW_IN</property>
+                <property name="hscrollbar_policy">automatic</property>
+                <property name="vscrollbar_policy">automatic</property>
+                <property name="shadow_type">in</property>
                 <child>
                   <widget class="GtkTreeView" id="new_req_ca_treeview">
                     <property name="visible">True</property>
@@ -2751,42 +2874,51 @@ Please, define the maximum set of properties for the certificates that this CA w
               <widget class="GtkHButtonBox" id="hbuttonbox13">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button14">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_cancel1">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_next1">
+                    <property name="label">gtk-media-next</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-next</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_next1_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -2806,8 +2938,8 @@ Please, define the maximum set of properties for the certificates that this CA w
             <property name="label" translatable="yes">CA properties</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
         <child>
@@ -2829,6 +2961,7 @@ Please, define the maximum set of properties for the certificates that this CA w
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -2848,6 +2981,7 @@ Please, define the maximum set of properties for the certificates that this CA w
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -3026,57 +3160,68 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox10">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button5">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_ca_cancel1">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_previous2">
+                    <property name="label">gtk-media-previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-previous</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_previous2_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_next2">
+                    <property name="label">gtk-media-next</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-next</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_next2_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -3100,9 +3245,9 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">Root certificate prop</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="position">1</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
         <child>
@@ -3123,6 +3268,7 @@ Common Name (CN):</property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -3141,6 +3287,7 @@ Common Name (CN):</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -3172,11 +3319,11 @@ Common Name (CN):</property>
                     <property name="homogeneous">True</property>
                     <child>
                       <widget class="GtkRadioButton" id="rsa_radiobutton1">
+                        <property name="label" translatable="yes">RSA</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">RSA</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">dsa_radiobutton1</property>
@@ -3184,15 +3331,16 @@ Common Name (CN):</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="dsa_radiobutton1">
+                        <property name="label" translatable="yes">DSA</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">DSA</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton1</property>
@@ -3246,56 +3394,67 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox11">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button6">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_cancel2">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_previous3">
+                    <property name="label">gtk-media-previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-previous</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_previous3_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_req_ca_commit2">
+                    <property name="label">gtk-ok</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-ok</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_req_commit_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -3316,9 +3475,9 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">page 3</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="position">2</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
       </widget>
@@ -3327,10 +3486,10 @@ Common Name (CN):</property>
   <widget class="GtkDialog" id="export_certificate_dialog">
     <property name="title">Export certificate - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <property name="urgency_hint">True</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
@@ -3349,19 +3508,26 @@ Common Name (CN):</property>
                 <property name="label" translatable="yes">Please, choose which part of the saved certificate you want to export:</property>
                 <property name="wrap">True</property>
               </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkVBox" id="vbox14">
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkRadioButton" id="publicpart_radiobutton1">
-                    <property name="visible">True</property>
                     <property name="label" translatable="yes">Only the pu_blic part.</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
                   </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkLabel" id="label5">
@@ -3372,7 +3538,7 @@ Common Name (CN):</property>
                     <property name="ypad">9</property>
                     <property name="label" translatable="yes">&lt;i&gt;Export only the certificate to a public file, in PEM format.&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
-                    <property name="justify">GTK_JUSTIFY_FILL</property>
+                    <property name="justify">fill</property>
                     <property name="wrap">True</property>
                   </widget>
                   <packing>
@@ -3381,11 +3547,12 @@ Common Name (CN):</property>
                 </child>
                 <child>
                   <widget class="GtkRadioButton" id="privatepart_radiobutton2">
+                    <property name="label" translatable="yes">Only the private key (crypted).</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
-                    <property name="label" translatable="yes">Only the private key (crypted).</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">publicpart_radiobutton1</property>
                   </widget>
@@ -3402,7 +3569,7 @@ Common Name (CN):</property>
                     <property name="ypad">9</property>
                     <property name="label" translatable="yes">&lt;i&gt;Export the saved private key to a PKCS#8 password-protected file. This file should only be accessed by the subject of the certificate.&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
-                    <property name="justify">GTK_JUSTIFY_FILL</property>
+                    <property name="justify">fill</property>
                     <property name="wrap">True</property>
                   </widget>
                   <packing>
@@ -3411,10 +3578,11 @@ Common Name (CN):</property>
                 </child>
                 <child>
                   <widget class="GtkRadioButton" id="privatepart_uncrypted_radiobutton2">
-                    <property name="visible">True</property>
                     <property name="label" translatable="yes">Only the private key (uncrypted).</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">publicpart_radiobutton1</property>
                   </widget>
@@ -3431,7 +3599,7 @@ Common Name (CN):</property>
                     <property name="ypad">9</property>
                     <property name="label" translatable="yes">&lt;i&gt;Export the saved private key to a PEM file. This option should only be used for exporting certificates that will be used in unattended servers.&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
-                    <property name="justify">GTK_JUSTIFY_FILL</property>
+                    <property name="justify">fill</property>
                     <property name="wrap">True</property>
                   </widget>
                   <packing>
@@ -3440,10 +3608,11 @@ Common Name (CN):</property>
                 </child>
                 <child>
                   <widget class="GtkRadioButton" id="bothparts_radiobutton3">
-                    <property name="visible">True</property>
                     <property name="label" translatable="yes">Both parts.</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">publicpart_radiobutton1</property>
                   </widget>
@@ -3460,7 +3629,7 @@ Common Name (CN):</property>
                     <property name="ypad">9</property>
                     <property name="label" translatable="yes">&lt;i&gt;Export both (private and public) parts to a password-protected PKCS#12 file. This kind of file can be imported by other common programs, such as web or mail clients.&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
-                    <property name="justify">GTK_JUSTIFY_FILL</property>
+                    <property name="justify">fill</property>
                     <property name="wrap">True</property>
                   </widget>
                   <packing>
@@ -3480,31 +3649,42 @@ Common Name (CN):</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button1">
-                <property name="visible">True</property>
                 <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button4">
-                <property name="visible">True</property>
-                <property name="has_focus">True</property>
                 <property name="label">gtk-ok</property>
-                <property name="use_stock">True</property>
                 <property name="response_id">1</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="has_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_stock">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -3512,7 +3692,8 @@ Common Name (CN):</property>
   </widget>
   <widget class="GtkDialog" id="get_password_dialog">
     <property name="modal">True</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox2">
@@ -3530,6 +3711,9 @@ Common Name (CN):</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
               </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkTable" id="table3">
@@ -3596,32 +3780,43 @@ Common Name (CN):</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area2">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button10">
-                <property name="visible">True</property>
                 <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="password_dialog_ok_button">
+                <property name="label">gtk-ok</property>
+                <property name="response_id">1</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
+                <property name="can_focus">False</property>
                 <property name="has_focus">True</property>
-                <property name="label">gtk-ok</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">1</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -3630,9 +3825,9 @@ Common Name (CN):</property>
   <widget class="GtkWindow" id="csr_properties_dialog">
     <property name="title">CSR properties - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <property name="urgency_hint">True</property>
     <child>
       <widget class="GtkVBox" id="vbox21">
@@ -3661,10 +3856,14 @@ Common Name (CN):</property>
                         <property name="use_markup">True</property>
                         <property name="wrap">True</property>
                       </widget>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -3808,8 +4007,8 @@ Common Name (CN):</property>
                 <property name="label" translatable="yes">General</property>
               </widget>
               <packing>
-                <property name="type">tab</property>
                 <property name="tab_fill">False</property>
+                <property name="type">tab</property>
               </packing>
             </child>
             <child>
@@ -3823,30 +4022,39 @@ Common Name (CN):</property>
                 <property name="label" translatable="yes">Details</property>
               </widget>
               <packing>
-                <property name="type">tab</property>
                 <property name="position">1</property>
                 <property name="tab_fill">False</property>
+                <property name="type">tab</property>
               </packing>
             </child>
           </widget>
+          <packing>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <widget class="GtkHButtonBox" id="hbuttonbox5">
             <property name="visible">True</property>
             <property name="border_width">10</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button13">
-                <property name="visible">True</property>
                 <property name="label">gtk-close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="csr_properties_close_clicked"/>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
           </widget>
           <packing>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
             <property name="position">1</property>
           </packing>
         </child>
@@ -3857,9 +4065,9 @@ Common Name (CN):</property>
     <property name="visible">True</property>
     <property name="title">New Certificate - gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="window_position">center</property>
     <property name="icon">gnomint.png</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="type_hint">dialog</property>
     <child>
       <widget class="GtkNotebook" id="new_cert_notebook">
         <property name="visible">True</property>
@@ -3882,6 +4090,7 @@ Common Name (CN):</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -3890,7 +4099,7 @@ Common Name (CN):</property>
                 <property name="xalign">0</property>
                 <property name="yalign">0</property>
                 <property name="label" translatable="yes">You are about to sign a Certificate Signing Request, and this way, creating a new certificate. Please check the certificate properties.</property>
-                <property name="justify">GTK_JUSTIFY_FILL</property>
+                <property name="justify">fill</property>
                 <property name="wrap">True</property>
               </widget>
               <packing>
@@ -4079,42 +4288,51 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox14">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button16">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_cancel1">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_next1">
+                    <property name="label">gtk-media-next</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-next</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_next1_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -4138,8 +4356,8 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">CA properties</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
         <child>
@@ -4158,6 +4376,7 @@ Common Name (CN):</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -4166,7 +4385,7 @@ Common Name (CN):</property>
                 <property name="xalign">0</property>
                 <property name="yalign">0</property>
                 <property name="label" translatable="yes">You are about to sign a Certificate Signing Request. Please, choose the Certification Authority you are going to use for signing it.</property>
-                <property name="justify">GTK_JUSTIFY_FILL</property>
+                <property name="justify">fill</property>
                 <property name="wrap">True</property>
               </widget>
               <packing>
@@ -4177,9 +4396,9 @@ Common Name (CN):</property>
               <widget class="GtkScrolledWindow" id="scrolledwindow5">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="shadow_type">GTK_SHADOW_IN</property>
+                <property name="hscrollbar_policy">automatic</property>
+                <property name="vscrollbar_policy">automatic</property>
+                <property name="shadow_type">in</property>
                 <child>
                   <widget class="GtkTreeView" id="signing_ca_treeview">
                     <property name="visible">True</property>
@@ -4197,57 +4416,68 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox3">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button9">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_cancel3">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_previous2">
+                    <property name="label">gtk-media-previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-previous</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_previous2_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_next2">
+                    <property name="label">gtk-media-next</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-next</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_next2_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -4271,9 +4501,9 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">Choose CA for signing the CSR</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="position">2</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
         <child>
@@ -4291,6 +4521,7 @@ Common Name (CN):</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -4304,6 +4535,9 @@ Common Name (CN):</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">Months before certificate expiration:</property>
                   </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkSpinButton" id="months_before_expiration_spinbutton1">
@@ -4336,10 +4570,11 @@ Common Name (CN):</property>
                     <property name="n_columns">2</property>
                     <child>
                       <widget class="GtkCheckButton" id="data_encipherment_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Data encipherment</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4353,10 +4588,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="key_encipherment_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Key encipherment</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4370,10 +4606,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="digital_signature_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Digital signature</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4385,22 +4622,23 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="ca_check">
-                        <property name="visible">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text">This certificate will be used as the public key of a new CA, in the hierarchy of a previously created root CA.</property>
                         <property name="label" translatable="yes">Certification Authority</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
+                        <property name="has_tooltip">True</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="key_agreement_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Key agreement</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4412,10 +4650,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="non_repudiation_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Non repudiation</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
@@ -4426,12 +4665,12 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="crl_signing_check">
-                        <property name="visible">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text">This certificate will be used as the public key of a new CA, in the hierarchy of a previously created root CA.</property>
                         <property name="label" translatable="yes">CRL signing</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
+                        <property name="has_tooltip">True</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
@@ -4497,10 +4736,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="ocsp_signing_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">OCSP signing</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
@@ -4513,10 +4753,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="any_purpose_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Any purpose</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
@@ -4527,10 +4768,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="time_stamping_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Time stamping</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
@@ -4541,10 +4783,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="webserver_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">TLS Web server</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4552,10 +4795,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="webclient_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">TLS Web client</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4567,10 +4811,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="code_signing_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Code signing</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
                       </widget>
@@ -4581,10 +4826,11 @@ Common Name (CN):</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="email_protection_check">
-                        <property name="visible">True</property>
                         <property name="label" translatable="yes">Email protection</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">False</property>
                         <property name="use_underline">True</property>
-                        <property name="response_id">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_new_cert_property_toggled"/>
@@ -4629,56 +4875,67 @@ Common Name (CN):</property>
               <widget class="GtkHButtonBox" id="hbuttonbox15">
                 <property name="visible">True</property>
                 <property name="spacing">12</property>
-                <property name="layout_style">GTK_BUTTONBOX_END</property>
+                <property name="layout_style">end</property>
                 <child>
                   <widget class="GtkButton" id="button17">
+                    <property name="label">gtk-help</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-help</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_cancel2">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-cancel</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_cancel_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_previous3">
+                    <property name="label">gtk-media-previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-media-previous</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_previous3_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkButton" id="new_cert_commit">
+                    <property name="label">gtk-ok</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="can_default">True</property>
-                    <property name="label">gtk-ok</property>
+                    <property name="receives_default">False</property>
                     <property name="use_stock">True</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_new_cert_commit_clicked"/>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -4699,9 +4956,9 @@ Common Name (CN):</property>
             <property name="label" translatable="yes">Certificate properties</property>
           </widget>
           <packing>
-            <property name="type">tab</property>
             <property name="position">2</property>
             <property name="tab_fill">False</property>
+            <property name="type">tab</property>
           </packing>
         </child>
       </widget>
@@ -4712,10 +4969,10 @@ Common Name (CN):</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <child>
       <widget class="GtkImageMenuItem" id="cert_properties_menuitem">
+        <property name="label">gtk-properties</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Shows the certificate properties window</property>
-        <property name="label" translatable="yes">gtk-properties</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
         <signal name="activate" handler="on_properties1_activate"/>
@@ -4728,41 +4985,27 @@ Common Name (CN):</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="cert_export_menuitem">
+        <property name="label">E_xport</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Exports the certificate so it can be imported by any other application</property>
-        <property name="label" translatable="yes">E_xport</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_export1_activate"/>
-        <child internal-child="image">
-          <widget class="GtkImage" id="menu-item-image7">
-            <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="yalign">0</property>
-            <property name="stock">gtk-convert</property>
-          </widget>
-        </child>
       </widget>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="extract_pkey_menuitem">
+        <property name="label">Extrac_t private key</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Extracts the private key of the selected 
 certificate from the database to an 
 external file. This file must be provided 
 each time the certificate will be used</property>
-        <property name="label" translatable="yes">Extrac_t private key</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
-        <child internal-child="image">
-          <widget class="GtkImage" id="menu-item-image8">
-            <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="yalign">0</property>
-            <property name="pixbuf">extractpkey.png</property>
-          </widget>
-        </child>
       </widget>
     </child>
     <child>
@@ -4772,20 +5015,13 @@ each time the certificate will be used</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="revoke_menuitem">
+        <property name="label">Revo_ke</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Revokes the selected certificate</property>
-        <property name="label" translatable="yes">Revo_ke</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_revoke_activate"/>
-        <child internal-child="image">
-          <widget class="GtkImage" id="menu-item-image9">
-            <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="yalign">0</property>
-            <property name="stock">gtk-cancel</property>
-          </widget>
-        </child>
       </widget>
     </child>
   </widget>
@@ -4794,10 +5030,10 @@ each time the certificate will be used</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <child>
       <widget class="GtkImageMenuItem" id="csr_properties_menuitem">
+        <property name="label">gtk-properties</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Shows the CSR properties window</property>
-        <property name="label" translatable="yes">gtk-properties</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
         <signal name="activate" handler="on_properties1_activate"/>
@@ -4810,41 +5046,27 @@ each time the certificate will be used</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="csr_export_menuitem">
+        <property name="label">E_xport</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Exports the CSR so it can be imported by any other application</property>
-        <property name="label" translatable="yes">E_xport</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_export1_activate"/>
-        <child internal-child="image">
-          <widget class="GtkImage" id="menu-item-image16">
-            <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="yalign">0</property>
-            <property name="stock">gtk-convert</property>
-          </widget>
-        </child>
       </widget>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="extract_pkey_menuitem3">
+        <property name="label">Extrac_t private key</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="tooltip" translatable="yes">Extracts the private key of the selected 
 certificate from the database to an 
 external file. This file must be provided 
 each time the CSR will be used</property>
-        <property name="label" translatable="yes">Extrac_t private key</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
-        <child internal-child="image">
-          <widget class="GtkImage" id="menu-item-image17">
-            <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="yalign">0</property>
-            <property name="pixbuf">extractpkey.png</property>
-          </widget>
-        </child>
       </widget>
     </child>
     <child>
@@ -4854,23 +5076,19 @@ each time the CSR will be used</property>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="sign_csr_menuitem">
+        <property name="label">_Sign</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-        <property name="label" translatable="yes">_Sign</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_sign1_activate"/>
-        <child internal-child="image">
-          <widget class="GtkImage" id="menu-item-image12">
-            <property name="pixbuf">sign.png</property>
-          </widget>
-        </child>
       </widget>
     </child>
     <child>
       <widget class="GtkImageMenuItem" id="csr_delete_menuitem">
+        <property name="label">gtk-delete</property>
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-        <property name="label" translatable="yes">gtk-delete</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
         <signal name="activate" handler="ca_on_delete2_activate"/>
@@ -4879,7 +5097,8 @@ each time the CSR will be used</property>
   </widget>
   <widget class="GtkDialog" id="get_db_password_dialog">
     <property name="modal">True</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox4">
@@ -4898,13 +5117,14 @@ each time the CSR will be used</property>
 
 Please insert the database password.</property>
                 <property name="use_markup">True</property>
-                <property name="justify">GTK_JUSTIFY_FILL</property>
+                <property name="justify">fill</property>
                 <property name="wrap">True</property>
                 <property name="width_chars">40</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -4915,9 +5135,12 @@ Please insert the database password.</property>
                   <widget class="GtkImage" id="image1">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="icon_size">6</property>
                     <property name="icon_name">dialog-password</property>
+                    <property name="icon-size">6</property>
                   </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkLabel" id="password_message2">
@@ -4950,13 +5173,13 @@ Please insert the database password.</property>
             </child>
             <child>
               <widget class="GtkCheckButton" id="remember_password_checkbutton">
+                <property name="label" translatable="yes">Remember this password during this gnoMint session</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">Remember this password during this gnoMint session</property>
                 <property name="focus_on_click">False</property>
                 <property name="xalign">0</property>
-                <property name="response_id">0</property>
                 <property name="draw_indicator">True</property>
               </widget>
               <packing>
@@ -4973,31 +5196,42 @@ Please insert the database password.</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area4">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button11">
-                <property name="visible">True</property>
                 <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="cadb_password_dialog_ok_button">
-                <property name="visible">True</property>
-                <property name="has_focus">True</property>
                 <property name="label">gtk-ok</property>
-                <property name="use_stock">True</property>
                 <property name="response_id">1</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="has_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_stock">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5006,8 +5240,9 @@ Please insert the database password.</property>
   <widget class="GtkDialog" id="change_password_dialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox5">
@@ -5028,26 +5263,27 @@ Please insert the database password.</property>
                 <property name="homogeneous">True</property>
                 <child>
                   <widget class="GtkRadioButton" id="ca_changepwd_pwd_protect_yes_radiobutton">
+                    <property name="label" translatable="yes">_Yes</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">_Yes</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <signal name="toggled" handler="ca_changepwd_pwd_protect_radiobutton_toggled"/>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkRadioButton" id="ca_changepwd_pwd_protect_no_radiobutton">
+                    <property name="label" translatable="yes">_No</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">_No</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">ca_changepwd_pwd_protect_yes_radiobutton</property>
                   </widget>
@@ -5086,7 +5322,7 @@ keys with password:</property>
                 <property name="label" translatable="yes">Enter new password again 
 for confirmation:</property>
                 <property name="wrap">True</property>
-                <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
+                <property name="wrap_mode">word-char</property>
               </widget>
               <packing>
                 <property name="top_attach">3</property>
@@ -5181,36 +5417,43 @@ password:</property>
           <widget class="GtkHButtonBox" id="dialog-action_area5">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="ca_changepwd_cancel_button">
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="ca_changepwd_commit_button">
+                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="response_id">1</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">1</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5221,8 +5464,9 @@ password:</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Choose private key file. gnoMint</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox6">
@@ -5245,12 +5489,13 @@ password:</property>
 For doing the selected operation, you must provide the file where resides the private key corresponding to the certificate:</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
-                <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
+                <property name="wrap_mode">word-char</property>
                 <property name="width_chars">40</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -5272,7 +5517,7 @@ For doing the selected operation, you must provide the file where resides the pr
                 <property name="label" translatable="yes">Please, choose the file:</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
-                <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
+                <property name="wrap_mode">word-char</property>
                 <property name="width_chars">40</property>
               </widget>
               <packing>
@@ -5285,7 +5530,7 @@ For doing the selected operation, you must provide the file where resides the pr
               <widget class="GtkFileChooserButton" id="pkey_filechooser">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <signal name="file_set" handler="pkey_manage_filechooser_file_set_cb"/>
+                <signal name="selection_changed" handler="pkey_manage_filechooser_file_set_cb"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -5295,12 +5540,12 @@ For doing the selected operation, you must provide the file where resides the pr
             </child>
             <child>
               <widget class="GtkCheckButton" id="save_filename_checkbutton">
+                <property name="label" translatable="yes">_Save filename in the database for automatic loading</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">_Save filename in the database for automatic loading</property>
                 <property name="use_underline">True</property>
-                <property name="response_id">0</property>
                 <property name="draw_indicator">True</property>
               </widget>
               <packing>
@@ -5319,29 +5564,35 @@ For doing the selected operation, you must provide the file where resides the pr
           <widget class="GtkHButtonBox" id="dialog-action_area6">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button15">
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button7">
+                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="response_id">1</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">1</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -5349,7 +5600,8 @@ For doing the selected operation, you must provide the file where resides the pr
           <packing>
             <property name="expand">False</property>
             <property name="padding">4</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5360,8 +5612,9 @@ For doing the selected operation, you must provide the file where resides the pr
     <property name="title" translatable="yes">General Preferences - gnoMint</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox7">
@@ -5376,15 +5629,18 @@ For doing the selected operation, you must provide the file where resides the pr
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkCheckButton" id="gnomekeyring_export_check">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
                     <property name="label" translatable="yes">Automatically export created certificates to 
 Gnome-keyring certificate store</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <signal name="toggled" handler="preferences_window_gnomekeyring_export_toggled"/>
                   </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
               </widget>
             </child>
@@ -5394,8 +5650,8 @@ Gnome-keyring certificate store</property>
                 <property name="label" translatable="yes">Export options</property>
               </widget>
               <packing>
-                <property name="type">tab</property>
                 <property name="tab_fill">False</property>
+                <property name="type">tab</property>
               </packing>
             </child>
           </widget>
@@ -5407,22 +5663,27 @@ Gnome-keyring certificate store</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area7">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="preferences_ok_button">
+                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="preferences_window_ok_button_clicked_cb"/>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5430,8 +5691,9 @@ Gnome-keyring certificate store</property>
   </widget>
   <widget class="GtkDialog" id="dh_parameters_dialog">
     <property name="border_width">5</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="transient_for">main_window1</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
@@ -5446,17 +5708,20 @@ Gnome-keyring certificate store</property>
               <widget class="GtkLabel" id="label47">
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">You are about to create and export a set of Diffie·Hellman parameters into a PKCS#3 structure file.</property>
+                <property name="label" translatable="yes">You are about to create and export a set of Diffie&#xB7;Hellman parameters into a PKCS#3 structure file.</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
               </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkLabel" id="label48">
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
                 <property name="xpad">8</property>
-                <property name="label" translatable="yes">&lt;small&gt;&lt;i&gt;PKCS#3 files containing Diffie·Hellman parameters are used by some cryptographic 
+                <property name="label" translatable="yes">&lt;small&gt;&lt;i&gt;PKCS#3 files containing Diffie&#xB7;Hellman parameters are used by some cryptographic 
 applications for a secure interchange of their keys over insecure channels.&lt;/i&gt;&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
@@ -5497,34 +5762,41 @@ applications for a secure interchange of their keys over insecure channels.&lt;/
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area8">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button19">
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button18">
+                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="response_id">1</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">1</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5532,8 +5804,9 @@ applications for a secure interchange of their keys over insecure channels.&lt;/
   </widget>
   <widget class="GtkDialog" id="new_crl_dialog">
     <property name="border_width">5</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox9">
@@ -5570,9 +5843,9 @@ Revocation List is going to be created:</property>
           <widget class="GtkScrolledWindow" id="scrolledwindow2">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-            <property name="shadow_type">GTK_SHADOW_IN</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
             <child>
               <widget class="GtkTreeView" id="crl_ca_treeview">
                 <property name="visible">True</property>
@@ -5589,37 +5862,43 @@ Revocation List is going to be created:</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area9">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button22">
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="crl_cancel_clicked_cb"/>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="crl_ok_button">
+                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="crl_ok_clicked_cb"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5627,7 +5906,8 @@ Revocation List is going to be created:</property>
   </widget>
   <widget class="GtkDialog" id="import_password_dialog">
     <property name="modal">True</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox12">
@@ -5646,13 +5926,14 @@ Revocation List is going to be created:</property>
 
 For importing the file into gnoMint database, you must provide an appropiate password.</property>
                 <property name="use_markup">True</property>
-                <property name="justify">GTK_JUSTIFY_FILL</property>
+                <property name="justify">fill</property>
                 <property name="wrap">True</property>
                 <property name="width_chars">40</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -5663,7 +5944,7 @@ For importing the file into gnoMint database, you must provide an appropiate pas
                 <property name="label" translatable="yes">&lt;small&gt;&lt;i&gt;The part that is being imported has the description:&lt;/i&gt;&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
-                <property name="justify">GTK_JUSTIFY_RIGHT</property>
+                <property name="justify">right</property>
               </widget>
               <packing>
                 <property name="position">1</property>
@@ -5677,7 +5958,7 @@ For importing the file into gnoMint database, you must provide an appropiate pas
                 <property name="label" translatable="yes">&lt;small&gt;&lt;i&gt;#Description#&lt;/i&gt;&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
-                <property name="justify">GTK_JUSTIFY_RIGHT</property>
+                <property name="justify">right</property>
               </widget>
               <packing>
                 <property name="position">2</property>
@@ -5691,9 +5972,12 @@ For importing the file into gnoMint database, you must provide an appropiate pas
                   <widget class="GtkImage" id="image2">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="icon_size">6</property>
                     <property name="icon_name">dialog-password</property>
+                    <property name="icon-size">6</property>
                   </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkLabel" id="password_message1">
@@ -5732,31 +6016,42 @@ For importing the file into gnoMint database, you must provide an appropiate pas
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area12">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button21">
-                <property name="visible">True</property>
                 <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="import_password_dialog_ok_button1">
-                <property name="visible">True</property>
-                <property name="has_focus">True</property>
                 <property name="label">gtk-ok</property>
-                <property name="use_stock">True</property>
                 <property name="response_id">1</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="has_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_stock">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
@@ -5764,8 +6059,9 @@ For importing the file into gnoMint database, you must provide an appropiate pas
   </widget>
   <widget class="GtkDialog" id="import_file_or_directory_dialog">
     <property name="border_width">5</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="icon">gnomint.png</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox11">
@@ -5784,19 +6080,26 @@ For importing the file into gnoMint database, you must provide an appropiate pas
                 <property name="label" translatable="yes">Please, choose the more suitable option for what you want to import:</property>
                 <property name="wrap">True</property>
               </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkVBox" id="vbox11">
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkRadioButton" id="importfile_radiobutton">
-                    <property name="visible">True</property>
                     <property name="label" translatable="yes">Import a single file.</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">0</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
                   </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkLabel" id="label54">
@@ -5815,10 +6118,11 @@ For importing the file into gnoMint database, you must provide an appropiate pas
                 </child>
                 <child>
                   <widget class="GtkRadioButton" id="importdirectory_radiobutton">
-                    <property name="visible">True</property>
                     <property name="label" translatable="yes">Import a whole directory.</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="use_underline">True</property>
-                    <property name="response_id">2</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">importfile_radiobutton</property>
                   </widget>
@@ -5836,7 +6140,7 @@ For importing the file into gnoMint database, you must provide an appropiate pas
                     <property name="label" translatable="yes">&lt;i&gt;Import a directory containing the structure of
 a whole CA made with OpenSSL .&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
-                    <property name="justify">GTK_JUSTIFY_FILL</property>
+                    <property name="justify">fill</property>
                     <property name="wrap">True</property>
                   </widget>
                   <packing>
@@ -5856,34 +6160,41 @@ a whole CA made with OpenSSL .&lt;/i&gt;</property>
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area11">
             <property name="visible">True</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="button24">
+                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="response_id">-1</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">-1</property>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button23">
+                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>
