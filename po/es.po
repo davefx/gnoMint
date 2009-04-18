@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-03-20 16:28+0100\n"
-"PO-Revision-Date: 2009-03-20 16:40+0100\n"
+"PO-Revision-Date: 2009-03-20 22:15+0100\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -903,7 +903,7 @@ msgstr ""
 #: ../gui/gnomint.glade.h:204 ../src/certificate_properties.c:1128
 #: ../src/tls.c:1078
 msgid "Time stamping"
-msgstr "Marcado de fecha"
+msgstr "Sellado de tiempo"
 
 #: ../gui/gnomint.glade.h:205
 msgid ""
