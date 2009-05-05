@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-18 08:47+0200\n"
+"POT-Creation-Date: 2009-05-05 20:07+0200\n"
 "PO-Revision-Date: 2009-03-20 22:15+0100\n"
 "Last-Translator: David Marín Carreño <davefx@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -3050,6 +3050,14 @@ msgstr "La solicitud no se pudo guardar"
 #: ../src/csr_creation.c:150
 msgid "CSR generated successfully"
 msgstr "Solicitud de certificación generada con éxito"
+
+#: ../src/csr_properties.c:78
+msgid ""
+"<b>This Certificate Signing Request has its corresponding private key saved "
+"in a external file.</b>"
+msgstr ""
+"<b>La clave privada correspondiente a esta petición de certificación está "
+"almacenada en un fichero externo.</b>"
 
 #: ../src/dialog.c:74
 #, c-format

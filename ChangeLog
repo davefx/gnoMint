@@ -1,3 +1,32 @@
+2009-03-20 15:48  davefx
+
+	* [r313] gui/gnomint.glade, po/POTFILES.in, po/es.po,
+	  po/gnoMint.pot:
+	  Upgrading Spanish translation
+
+2009-03-20 10:07  davefx
+
+	* [r312] configure.in, gui/gnomint.glade:
+	  Preparing 0.9.9 version. Making Glade file fully GTK+-2.10
+	  compliant
+
+2009-03-17 18:50  davefx
+
+	* [r311] src/ca.c, src/ca_file.c, src/main.c:
+	  Correcting behaviour when problems while opening, saving or
+	  creating file. Now the last open file is always reopened
+
+2009-03-16 18:25  davefx
+
+	* [r310] doc/gnomint-db.dia, src/ca.c, src/pkey_manage.h:
+	  Disabling Properties option when there is no item selected
+
+2009-03-10 19:14  davefx
+
+	* [r309] ChangeLog, gui/gnomint.glade, src/ca.c, src/gnomint-cli.c,
+	  src/main.c:
+	  Moving some callbacks from main.c to ca.c
+
 2009-03-07 12:23  davefx
 
 	* [r308] gui/Makefile.am, gui/addca.png, gui/addcsr.png,
