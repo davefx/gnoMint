@@ -46,7 +46,7 @@ msgid ""
 "gnome-keyring certificate-store."
 msgstr ""
 "Si los certificados recién creados o importados son exportados "
-"automáticamenteal almacén de certificados de gnome-keyring."
+"automáticamente al almacén de certificados de gnome-keyring."
 
 #: ../gconf/gnomint.schemas.in.h:7
 msgid "Whether the revoked certificates should be visible."
@@ -204,7 +204,7 @@ msgid ""
 msgstr ""
 "<i>Importar un único fichero, en formato DER o PEM, que contiene "
 "certificados, claves privadas (cifradas o en claro), solicitudes "
-"decertificación (CSRs), listas de revocación (CRLs) o paquetes PKCS#12.</i>"
+"de certificación (CSRs), listas de revocación (CRLs) o paquetes PKCS#12.</i>"
 
 #: ../gui/gnomint.glade.h:37
 msgid ""
@@ -534,9 +534,9 @@ msgid ""
 "external file. This file must be provided \n"
 "each time the CSR will be used"
 msgstr ""
-"Extrae de la base de datos la clave privadadel certificado seleccionado, "
-"almacenándolaen un fichero externo. Este fichero deberáproporcionarse cada "
-"vez que se emplee lasolicitud de certificación"
+"Extrae de la base de datos la clave privada del certificado seleccionado, "
+"almacenándola en un fichero externo. Este fichero deberá proporcionarse cada "
+"vez que se emplee la solicitud de certificación"
 
 #: ../gui/gnomint.glade.h:115
 msgid ""
@@ -545,9 +545,9 @@ msgid ""
 "external file. This file must be provided \n"
 "each time the certificate will be used"
 msgstr ""
-"Extrae de la base de datos la clave privadadel certificado seleccionado, "
-"almacenándolaen un fichero externo. Este fichero deberáproporcionarse cada "
-"vez que se emplee elcertificado"
+"Extrae de la base de datos la clave privada del certificado seleccionado, "
+"almacenándola en un fichero externo. Este fichero deberá proporcionarse cada "
+"vez que se emplee el certificado"
 
 #: ../gui/gnomint.glade.h:119
 msgid "General"
@@ -883,10 +883,10 @@ msgid ""
 "password."
 msgstr ""
 "Todo el fichero seleccionado, o alguno de los elementos que lo conforman, "
-"parecehaber sido cifrado empleando una contraseña.\n"
+"parece haber sido cifrado empleando una contraseña.\n"
 "\n"
 "Para importar el fichero en la base de datos de gnoMint, deberá proporcionar "
-"unacontraseña adecuada."
+"una contraseña adecuada."
 
 #: ../gui/gnomint.glade.h:201
 msgid ""
@@ -1279,8 +1279,8 @@ msgid ""
 "Extract the private key of the certificate with the given internal id and "
 "saves it into the given file"
 msgstr ""
-"Extraer clae privada del certificado con el identificador proporcionado "
-"yalmacenarla en el fichero indicado"
+"Extraer clave privada del certificado con el identificador proporcionado "
+"y almacenarla en el fichero indicado"
 
 #. 8
 #: ../src/ca-cli.c:49
@@ -1292,7 +1292,7 @@ msgid ""
 "Extract the private key of the CSR with the given internal id and saves it "
 "into the given file"
 msgstr ""
-"Extraer clave privada del CSR con identificador indicado y almacenarlaen el "
+"Extraer clave privada del CSR con identificador indicado y almacenarla en el "
 "fichero proporcionado"
 
 #. 9
@@ -1736,7 +1736,7 @@ msgstr "Titular:\n"
 #: ../src/ca-cli-callbacks.c:389 ../src/ca-cli-callbacks.c:527
 #, c-format
 msgid "\tDistinguished Name: "
-msgstr "\tNombre distinguido: "
+msgstr "\tNombre distintivo: "
 
 #: ../src/ca-cli-callbacks.c:403 ../src/ca-cli-callbacks.c:541
 #, c-format
@@ -2357,7 +2357,7 @@ msgstr "\tNº de serie: %s\n"
 #: ../src/ca-cli-callbacks.c:1205
 #, c-format
 msgid "\tDistinguished Name: %s\n"
-msgstr "\tNombre distinguido: %s\n"
+msgstr "\tNombre distintivo: %s\n"
 
 #: ../src/ca-cli-callbacks.c:1153 ../src/ca-cli-callbacks.c:1154
 #: ../src/ca-cli-callbacks.c:1157 ../src/ca-cli-callbacks.c:1158
