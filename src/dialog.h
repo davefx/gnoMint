@@ -27,6 +27,7 @@
 #include <gtk/gtk.h>
 #endif
 
+void dialog_info (gchar *message);
 void dialog_error (gchar *message);
 
 gchar * dialog_get_password (gchar *info_message, 

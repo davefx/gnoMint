@@ -44,6 +44,11 @@ gboolean dialog_refresh_list (void)
 #include <readline/readline.h>
 #include <readline/history.h>
 
+
+void dialog_info (gchar *message) {
+        printf ("\nInfo: %s\n\n", message);
+}
+
 void dialog_error (gchar *message) {
         fprintf (stderr, "\nError: %s\n\n", message);
 }
@@ -243,6 +248,24 @@ gchar * dialog_ask_for_string (gchar *message, gchar *default_answer)
 #include <glade/glade.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+
+void dialog_info (gchar *message) {
+        GtkWidget *dialog;
+   
+        /* Create the widgets */
+   
+        dialog = gtk_message_dialog_new (NULL,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         GTK_MESSAGE_INFO,
+                                         GTK_BUTTONS_CLOSE,
+                                         "%s",
+                                         message);
+   
+        gtk_dialog_run (GTK_DIALOG(dialog));
+   
+        gtk_widget_destroy (dialog);
+
+}
 
 void dialog_error (gchar *message) {
         GtkWidget *dialog;
