@@ -1204,7 +1204,7 @@ int ca_cli_callback_showcsr (int argc, char **argv)
 	printf (_("Subject:\n"));
 	printf (_("\tDistinguished Name: %s\n"), csr->dn);
 	#ifdef ADVANCED_GNUTLS
-	printf (_("\tUnique ID: %s\n"), csr->subject_key_id);
+	printf (_("\tUnique ID: %s\n"), csr->key_id);
 	#endif
 
 	tls_csr_free (csr);

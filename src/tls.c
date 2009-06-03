@@ -1190,6 +1190,7 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	gnutls_datum_t pem_datum;
 	gnutls_x509_crq_t * csr = g_new0 (gnutls_x509_crq_t, 1);
 	gchar *aux = NULL;
+	guchar *uaux = NULL;
 	
 	size_t size;
 
@@ -1273,13 +1274,13 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 
 #ifdef ADVANCED_GNUTLS
 	size = 0;
-	gnutls_x509_crq_get_key_id (*csr, aux, &size);
+	gnutls_x509_crq_get_key_id (*csr, 0, uaux, &size);
 	if (size) {
 		aux = g_new0(gchar, size);
-		gnutls_x509_crq_get_key_id (*csr, aux, &size);
+		gnutls_x509_crq_get_key_id (*csr, 0, uaux, &size);
 		res->key_id = g_strdup (aux);
 		g_free (aux);
-		aux = NULL;
+		uaux = NULL;
 	}
 #endif
 
