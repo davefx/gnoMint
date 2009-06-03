@@ -776,7 +776,7 @@ const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationDa
 	localtime_r (&tmp, expiration_time);      
 	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
-	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
+	expiration_time->tm_mon = expiration_time->tm_mon % 12;		
 	cert_creation_data->expiration = mktime(expiration_time);
 	g_free (expiration_time);
 
@@ -788,6 +788,21 @@ const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationDa
 	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 					      
 	if (pem && crypted_pkey && dn) {
+
+		TlsCert * ca_cert = tls_parse_cert_pem (pem);
+		
+		/* Check if expiration of the new cert is due after the expiration of the CA certificate.
+		   In that case, we reset the expiration date to the CA certificate expiration date, and
+		   show a info message.
+		*/
+		if (cert_creation_data->expiration > ca_cert->expiration_time) {
+			dialog_info (_("The expiration date of the new certificate is after the expiration date of the CA certificate.\n\n"
+				       "According to the current standards, this is not allowed. The new certificate will be created with the same "
+				       "expiration date as the CA certificate."));
+			cert_creation_data->expiration = ca_cert->expiration_time;
+		}
+		
+		tls_cert_free (ca_cert);
 		
 		PkeyManageData *csr_pkey = NULL;
 
