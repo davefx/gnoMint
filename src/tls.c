@@ -1190,8 +1190,10 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	gnutls_datum_t pem_datum;
 	gnutls_x509_crq_t * csr = g_new0 (gnutls_x509_crq_t, 1);
 	gchar *aux = NULL;
+#ifdef ADVANCED_GNUTLS
 	guchar *uaux = NULL;
-	
+#endif
+
 	size_t size;
 
 	TlsCsr *res = g_new0 (TlsCsr, 1);
