@@ -1,3 +1,83 @@
+2009-06-03 21:17  davefx
+
+	* [r329] configure.in:
+	  Uploading change to version 1.0.0
+
+2009-06-03 21:15  davefx
+
+	* [r328] po/ru.po:
+	  Committing last Russian translation, by aquanaut
+
+2009-06-03 21:11  davefx
+
+	* [r327] po/es.po, po/gnoMint.pot:
+	  Updating template and Spanish translation
+
+2009-06-03 21:06  davefx
+
+	* [r326] src/new_cert.c:
+	  Checking if new cert expiration date is after the CA expiration
+	  date. In that case, show an info message and set the new cert
+	  expiration date to the CA expiration date.
+
+2009-06-03 21:04  davefx
+
+	* [r325] src/tls.c:
+	  Fixing compile error if GNUTLS_VERSION < 2.8
+
+2009-06-03 21:04  davefx
+
+	* [r324] src/dialog.c, src/dialog.h:
+	  Adding new function dialog_info for showing information messages
+
+2009-06-03 20:30  davefx
+
+	* [r323] src/ca-cli-callbacks.c, src/tls.c:
+	  Enabling compilation with GnuTLS 2.8.0 (Fix provided by anonymous
+	  contributor in Sourceforge)
+
+2009-05-05 18:51  davefx
+
+	* [r322] src/ca-cli.c:
+	  Adding forgotten crlgen function to gnomint-cli
+
+2009-05-05 18:42  davefx
+
+	* [r321] po/es.po:
+	  Correcting some Spanish .po file bugs
+
+2009-05-05 18:10  davefx
+
+	* [r320] ChangeLog, po/es.po, po/gnoMint.pot, src/csr_properties.c:
+	  Making a string translatable
+
+2009-05-04 18:45  davefx
+
+	* [r319] TODO:
+	  Updating TODO list
+
+2009-04-18 06:50  davefx
+
+	* [r318] po/cs.po, po/de.po, po/es.po, po/fi.po, po/fr.po,
+	  po/gnoMint.pot, po/it.po, po/pt_BR.po, po/ru.po, po/sv.po:
+	  Updating pot file and merging with all translations before
+	  uploading to Launchpad
+
+2009-04-18 06:36  davefx
+
+	* [r317] po/es.po, po/sv.po:
+	  Updating Slovak and Spanish translations
+
+2009-04-18 06:35  davefx
+
+	* [r316] configure.in, po/fi.po, po/ru.po:
+	  Adding new Russian and Finnish translations
+
+2009-03-23 19:09  davefx
+
+	* [r314] gui/gnomint.glade:
+	  Correcting error while adding a csr
+
 2009-03-20 15:48  davefx
 
 	* [r313] gui/gnomint.glade, po/POTFILES.in, po/es.po,
