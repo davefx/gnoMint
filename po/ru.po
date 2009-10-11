@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-18 08:47+0200\n"
-"PO-Revision-Date: 2009-05-05 05:21+0000\n"
+"POT-Creation-Date: 2009-06-03 23:09+0200\n"
+"PO-Revision-Date: 2009-06-04 11:05+0000\n"
 "Last-Translator: aquanaut <Unknown>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-06-03 21:12+0000\n"
+"X-Launchpad-Export-Date: 2009-10-11 21:04+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -229,6 +229,18 @@ msgstr ""
 msgid "<small><i>#Description#</i></small>"
 msgstr "<small><i>#Описание#</i></small>"
 
+#: ../gui/gnomint.glade.h:44
+msgid ""
+"<small><i>PKCS#3 files containing Diffie&#xB7;Hellman parameters are used by "
+"some cryptographic \n"
+"applications for a secure interchange of their keys over insecure "
+"channels.</i></small>"
+msgstr ""
+"<small><i>файлы PKCS#3, содержащие Diffie&#xB7;Hellman параметры "
+"используются некоторыми криптографическими \n"
+"приложениями для безопасного обмена своих ключей через небезопасные "
+"каналы.</i></small>"
+
 #: ../gui/gnomint.glade.h:46
 msgid ""
 "<small><i>The part that is being imported has the description:</i></small>"
@@ -252,9 +264,25 @@ msgstr ""
 msgid "Activated on"
 msgstr "Активировано на"
 
+#: ../gui/gnomint.glade.h:49
+msgid "Add CSR"
+msgstr "Добавить CSR"
+
 #: ../gui/gnomint.glade.h:50
 msgid "Add _Certificate Request"
 msgstr "Добавить запрос _Сертификата"
+
+#: ../gui/gnomint.glade.h:51
+msgid "Add a new Certificate Signing Request"
+msgstr "Добавить новый Запрос на Подпись Сертификата"
+
+#: ../gui/gnomint.glade.h:52
+msgid "Add an autosigned CA"
+msgstr "Добавить самоподписанный CA"
+
+#: ../gui/gnomint.glade.h:53
+msgid "Add autosigned CA certificate"
+msgstr "Добавить самоподписанный CA сертификат"
 
 #: ../gui/gnomint.glade.h:54 ../src/certificate_properties.c:1130
 #: ../src/tls.c:1082
@@ -306,6 +334,10 @@ msgstr "CAOU"
 msgid "CRL signing"
 msgstr "Подпись CRL"
 
+#: ../gui/gnomint.glade.h:66
+msgid "CSR properties - gnoMint"
+msgstr "Свойства CSR - gnoMint"
+
 #: ../gui/gnomint.glade.h:67
 msgid "CertActivationDate"
 msgstr "ДатаАктвацииСертификата"
@@ -337,6 +369,10 @@ msgstr "Запрос _Подписи сертификата"
 #: ../gui/gnomint.glade.h:74
 msgid "Certificate properties"
 msgstr "Свойства сертификата"
+
+#: ../gui/gnomint.glade.h:75
+msgid "Certificate properties - gnoMint"
+msgstr "Свойства сертификата - gnoMint"
 
 #: ../gui/gnomint.glade.h:76 ../src/tls.c:1039
 msgid "Certification Authority"
@@ -379,9 +415,17 @@ msgstr "Страна"
 msgid "Country:"
 msgstr "Страна:"
 
+#: ../gui/gnomint.glade.h:86
+msgid "Create a new database"
+msgstr "Создать новую базу"
+
 #: ../gui/gnomint.glade.h:87
 msgid "Creating CA Root Certificate"
 msgstr "Создание корневого сертификата CA"
+
+#: ../gui/gnomint.glade.h:88
+msgid "Creating new CA - gnoMint"
+msgstr "Создать новый CA - gnoMint"
 
 #: ../gui/gnomint.glade.h:89
 msgid "DSA"
@@ -391,6 +435,14 @@ msgstr "DSA"
 #: ../src/tls.c:1050
 msgid "Data encipherment"
 msgstr "Шифрование данных"
+
+#: ../gui/gnomint.glade.h:91
+msgid "Database password protection - gnoMint"
+msgstr "Защита базы паролем - gnoMint"
+
+#: ../gui/gnomint.glade.h:92
+msgid "Delete the selected Certificate Signing Request"
+msgstr "Удалить выбранный Запрос на Подпись Сертификата"
 
 #: ../gui/gnomint.glade.h:93
 msgid "Details"
@@ -422,6 +474,10 @@ msgstr ""
 "Введите новый пароль снова \n"
 "для подтверждения:"
 
+#: ../gui/gnomint.glade.h:100
+msgid "Enter password - gnoMint"
+msgstr "Введите пароль - gnoMint"
+
 #: ../gui/gnomint.glade.h:101
 msgid "Enter password again for confirmation:"
 msgstr "Введите пароль снова для подтверждения:"
@@ -429,6 +485,10 @@ msgstr "Введите пароль снова для подтверждения
 #: ../gui/gnomint.glade.h:102
 msgid "Expires on"
 msgstr "Срок истечения"
+
+#: ../gui/gnomint.glade.h:103
+msgid "Export certificate - gnoMint"
+msgstr "Экспорт сертификата - gnoMint"
 
 #: ../gui/gnomint.glade.h:104
 msgid "Export options"
@@ -448,6 +508,14 @@ msgstr ""
 #: ../gui/gnomint.glade.h:107
 msgid "Extrac_t private key"
 msgstr "Извлечени_е закрытого ключа"
+
+#: ../gui/gnomint.glade.h:108
+msgid "Extract Private Key"
+msgstr "Извлечь Закрытый Ключ"
+
+#: ../gui/gnomint.glade.h:109
+msgid "Extract the private key of the selected item into a external file"
+msgstr "Извлечь закрытый ключ выбранного объекта во внешний файл"
 
 #: ../gui/gnomint.glade.h:110
 msgid "Extract the saved private key to an external file or device"
@@ -510,6 +578,10 @@ msgstr "Импорт один файл."
 msgid "Import a whole directory."
 msgstr "Импорт всего каталога"
 
+#: ../gui/gnomint.glade.h:127
+msgid "Import selection - gnoMint"
+msgstr "Импорт выбранного - gnoMint"
+
 #: ../gui/gnomint.glade.h:128
 msgid ""
 "Inherit fields according to selected Certification Authority and its policy."
@@ -550,6 +622,22 @@ msgstr "Количество месяцев до истечения срока �
 msgid "Months before root certificate expiration:"
 msgstr "Количество месяцев до истечения срока корневого сертификата"
 
+#: ../gui/gnomint.glade.h:136
+msgid "New CA - gnoMint"
+msgstr "Новый CA - gnoMint"
+
+#: ../gui/gnomint.glade.h:137
+msgid "New CRL - gnoMint"
+msgstr "Новый CRL - gnoMint"
+
+#: ../gui/gnomint.glade.h:138
+msgid "New Certificate - gnoMint"
+msgstr "Новый Сертификат - gnoMint"
+
+#: ../gui/gnomint.glade.h:139
+msgid "New Diffie-Hellman parameters - gnoMint"
+msgstr "Новые параметры Diffie-Hellman - gnoMint"
+
 #: ../gui/gnomint.glade.h:140
 msgid ""
 "New certificate \n"
@@ -557,6 +645,10 @@ msgid ""
 msgstr ""
 "Новый сертификат \n"
 "Обычное имя (CN):"
+
+#: ../gui/gnomint.glade.h:142
+msgid "New certificate request - gnoMint"
+msgstr "Новый запрос сертификата - gnoMint"
 
 #: ../gui/gnomint.glade.h:143 ../src/certificate_properties.c:348
 #: ../src/tls.c:1046
@@ -583,6 +675,10 @@ msgstr "Только пу_бличную часть."
 #: ../gui/gnomint.glade.h:148
 msgid "Open _recents"
 msgstr "Открыть _недавние"
+
+#: ../gui/gnomint.glade.h:149
+msgid "Open an existing database"
+msgstr "Открыть существующую базу"
 
 #: ../gui/gnomint.glade.h:150
 msgid "Organization"
@@ -709,6 +805,14 @@ msgstr "Запомнить этот пароль на время текущей 
 msgid "Revo_ke"
 msgstr "Отоз_вать"
 
+#: ../gui/gnomint.glade.h:180
+msgid "Revoke"
+msgstr "Отозвать"
+
+#: ../gui/gnomint.glade.h:181
+msgid "Revoke the selected certificate"
+msgstr "Отозвать выбранные сертификаты"
+
 #: ../gui/gnomint.glade.h:182
 msgid "Revokes the selected certificate"
 msgstr "Отозвать выбранный сертификат"
@@ -736,6 +840,14 @@ msgstr "Показывать окно свойств CSR"
 #: ../gui/gnomint.glade.h:188
 msgid "Shows the certificate properties window"
 msgstr "Показывать окно свойств сертификата"
+
+#: ../gui/gnomint.glade.h:189
+msgid "Sign"
+msgstr "Подписать"
+
+#: ../gui/gnomint.glade.h:190
+msgid "Sign the selected Certificate Signing Request"
+msgstr "Подписать выбранный Запрос на Подпись Сертификата"
 
 #: ../gui/gnomint.glade.h:191
 msgid "State or Province name"
@@ -793,6 +905,14 @@ msgstr ""
 #: ../src/tls.c:1078
 msgid "Time stamping"
 msgstr "Временная отметка"
+
+#: ../gui/gnomint.glade.h:205
+msgid ""
+"You are about to create and export a set of Diffie&#xB7;Hellman parameters "
+"into a PKCS#3 structure file."
+msgstr ""
+"Вы собираетесь создать и экспортировать набор параметров Diffie&#xB7;Hellman "
+"в файл структуры PKCS#3."
 
 #: ../gui/gnomint.glade.h:206
 msgid ""
@@ -865,6 +985,10 @@ msgstr "_Вид"
 #: ../gui/gnomint.glade.h:221
 msgid "_Yes"
 msgstr "_Да"
+
+#: ../gui/gnomint.glade.h:222
+msgid "gnoMint"
+msgstr "gnoMint"
 
 #: ../gui/gnomint.glade.h:223
 msgid "gtk-cancel"
@@ -1188,135 +1312,145 @@ msgstr "Удалить данный CSR из базы данных"
 
 #. 12
 #: ../src/ca-cli.c:55
+msgid "crlgen <ca-id> <filename>"
+msgstr "crlgen <ca-id> <filename>"
+
+#: ../src/ca-cli.c:55
+msgid ""
+"Generate a new CRL for the given CA, saving it into the file <filename>"
+msgstr "Создать новый CRL для данного CA, сохранив его в файле <filename>"
+
+#. 13
+#: ../src/ca-cli.c:56
 msgid "dhgen <prime-bitlength> <filename>"
 msgstr "dhgen <prime-bitlength> <filename>"
 
-#: ../src/ca-cli.c:55
+#: ../src/ca-cli.c:56
 msgid "Generate a new DH-parameter set, saving it into the file <filename>"
 msgstr ""
 "Генерировать новый набор DH-параметров, сохраняя его в файле <имяфайла>"
 
-#. 13
-#: ../src/ca-cli.c:56
+#. 14
+#: ../src/ca-cli.c:57
 msgid "Change password for the current database"
 msgstr "Изменить пароль для текущей базы данных"
 
-#. 14
-#: ../src/ca-cli.c:57
+#. 15
+#: ../src/ca-cli.c:58
 msgid "importfile <filename>"
 msgstr "importfile <filename>"
 
-#: ../src/ca-cli.c:57
+#: ../src/ca-cli.c:58
 msgid "Import the file with the given name <filename>"
 msgstr "Импорт файла с заданым именем <имяфайла>"
 
-#. 15
-#: ../src/ca-cli.c:58
+#. 16
+#: ../src/ca-cli.c:59
 msgid "importdir <dirname>"
 msgstr "importdir <dirname>"
 
-#: ../src/ca-cli.c:58
+#: ../src/ca-cli.c:59
 msgid "Import the given directory, as a OpenSSL-CA directory"
 msgstr "Импорт данного каталога как OpenSSL-CA каталога"
 
-#. 16
-#: ../src/ca-cli.c:59
+#. 17
+#: ../src/ca-cli.c:60
 msgid "showcert <cert-id>"
 msgstr "showcert <cert-id>"
 
-#: ../src/ca-cli.c:59
+#: ../src/ca-cli.c:60
 msgid "Show properties of the given certificate"
 msgstr "Показать свойства данного сертификата"
 
-#. 17
-#: ../src/ca-cli.c:60
+#. 18
+#: ../src/ca-cli.c:61
 msgid "showcsr <csr-id>"
 msgstr "showcsr <csr-id>"
 
-#: ../src/ca-cli.c:60
+#: ../src/ca-cli.c:61
 msgid "Show properties of the given CSR"
 msgstr "Показать свойства данного CSR"
 
-#. 18
-#: ../src/ca-cli.c:61
+#. 19
+#: ../src/ca-cli.c:62
 msgid "showpolicy <ca-id>"
 msgstr "showpolicy <ca-id>"
 
-#: ../src/ca-cli.c:61
+#: ../src/ca-cli.c:62
 msgid "Show CA policy"
 msgstr "Показать политики CA"
 
-#. 19
-#: ../src/ca-cli.c:62
+#. 20
+#: ../src/ca-cli.c:63
 msgid "setpolicy <ca-id> <policy-id> <value>"
 msgstr "setpolicy <ca-id> <policy-id> <value>"
 
-#: ../src/ca-cli.c:62
+#: ../src/ca-cli.c:63
 msgid "Change the given CA policy"
 msgstr "Изменить данную политику CA"
 
-#. 20
-#: ../src/ca-cli.c:63
+#. 21
+#: ../src/ca-cli.c:64
 msgid "Show program preferences"
 msgstr "Показать настройки программы"
 
-#. 21
-#: ../src/ca-cli.c:64
+#. 22
+#: ../src/ca-cli.c:65
 msgid "setpreference <preference-id> <value>"
 msgstr "setpreference <preference-id> <value>"
 
-#: ../src/ca-cli.c:64
+#: ../src/ca-cli.c:65
 msgid "Set the given program preference"
 msgstr "Установить данную настройку программы"
 
-#. 22
-#: ../src/ca-cli.c:65
+#. 23
+#: ../src/ca-cli.c:66
 msgid "Show about message"
 msgstr "Показать сведения о программе"
 
-#. 23
-#: ../src/ca-cli.c:66
+#. 24
+#: ../src/ca-cli.c:67
 msgid "Show warranty information"
 msgstr "Показать сведения о гарантиях"
 
-#. 24
-#: ../src/ca-cli.c:67
+#. 25
+#: ../src/ca-cli.c:68
 msgid "Show distribution information"
 msgstr "Показать сведения о распространении"
 
-#. 25
-#: ../src/ca-cli.c:68
+#. 26
+#: ../src/ca-cli.c:69
 msgid "Show version information"
 msgstr "Показать сведения о версии"
 
-#. 26
-#: ../src/ca-cli.c:69
+#. 27
+#: ../src/ca-cli.c:70
 msgid "Show (this) help message"
 msgstr "Показать (это) сообщение помощи"
 
-#. 27
 #. 28
 #. 29
-#: ../src/ca-cli.c:70 ../src/ca-cli.c:71 ../src/ca-cli.c:72
+#. 30
+#: ../src/ca-cli.c:71 ../src/ca-cli.c:72 ../src/ca-cli.c:73
 msgid "Close database and exit program"
 msgstr "Закрыть базу данных и выйти из программы"
 
-#: ../src/ca-cli.c:94
+#: ../src/ca-cli.c:95
 #, c-format
 msgid "Opening database %s..."
 msgstr "Открыть базу данных %s..."
 
-#: ../src/ca-cli.c:98
+#: ../src/ca-cli.c:99
 #, c-format
 msgid " OK.\n"
 msgstr " OK.\n"
 
-#: ../src/ca-cli.c:100
+#: ../src/ca-cli.c:101
 #, c-format
 msgid " Error.\n"
 msgstr " Ошибка.\n"
 
-#: ../src/ca-cli.c:127
+#: ../src/ca-cli.c:128
 #, c-format
 msgid ""
 "\n"
@@ -1331,7 +1465,7 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: ../src/ca-cli.c:128
+#: ../src/ca-cli.c:129
 #, c-format
 msgid ""
 "This program comes with ABSOLUTELY NO WARRANTY;\n"
@@ -1340,7 +1474,7 @@ msgstr ""
 "Эта программа идёт АБСОЛЮТНО БЕЗ ГАРАНТИЙ;\n"
 "для подробностей наберите 'warranty'.\n"
 
-#: ../src/ca-cli.c:129
+#: ../src/ca-cli.c:130
 #, c-format
 msgid ""
 "This is free software, and you are welcome to redistribute it\n"
@@ -1352,12 +1486,12 @@ msgstr ""
 "\n"
 
 #. Unpaired quotes
-#: ../src/ca-cli.c:171
+#: ../src/ca-cli.c:172
 #, c-format
 msgid "Unpaired quotes\n"
 msgstr "Непарные кавычки\n"
 
-#: ../src/ca-cli.c:249
+#: ../src/ca-cli.c:250
 #, c-format
 msgid ""
 "Invalid command. Try 'help' for getting a list of recognized commands.\n"
@@ -1365,12 +1499,12 @@ msgstr ""
 "Неверная команда. Попробуйте 'help' для получения списка распознаваемых "
 "команд.\n"
 
-#: ../src/ca-cli.c:253
+#: ../src/ca-cli.c:254
 #, c-format
 msgid "Incorrect number of parameters.\n"
 msgstr "Неверное число параметров.\n"
 
-#: ../src/ca-cli.c:254
+#: ../src/ca-cli.c:255
 #, c-format
 msgid "Syntax: %s\n"
 msgstr "Синтакс: %s\n"
@@ -2504,9 +2638,6 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  aquanaut https://launchpad.net/~thecrux\n"
-"\n"
-"Launchpad Contributions:\n"
 "  David Marín https://launchpad.net/~davefx\n"
 "  aquanaut https://launchpad.net/~thecrux"
 
@@ -2967,7 +3098,15 @@ msgstr "CSR не может быть сохранено"
 msgid "CSR generated successfully"
 msgstr "CSR успешно создан"
 
-#: ../src/dialog.c:74
+#: ../src/csr_properties.c:78
+msgid ""
+"<b>This Certificate Signing Request has its corresponding private key saved "
+"in a external file.</b>"
+msgstr ""
+"<b>Этот Запрос на Подпись Сертификата имеет соответствующий закрытый ключ, "
+"сохранённый во внешнем файле.<b>"
+
+#: ../src/dialog.c:79
 #, c-format
 msgid ""
 "\n"
@@ -2976,15 +3115,15 @@ msgstr ""
 "\n"
 "Пароль должен содержать по крайне мере %d символов\n"
 
-#: ../src/dialog.c:98
+#: ../src/dialog.c:103
 msgid "List of affirmative answers, separated with #|Yes#yes#Y#y"
 msgstr "Список утвердительных ответов, разделённых #|Yes#yes#Y#y"
 
-#: ../src/dialog.c:99
+#: ../src/dialog.c:104
 msgid "List of negative answers, separated with #|No#no#N#n"
 msgstr "Список отрицательных ответов, разделённых #|No#no#N#n"
 
-#: ../src/dialog.c:349
+#: ../src/dialog.c:372
 msgid "To do. Feature not implemented yet."
 msgstr "Предстоит сделать. Возможность пока не реализована."
 
@@ -3039,6 +3178,10 @@ msgstr "Произошла ошибка при защите паролем за�
 #: ../src/export.c:175
 msgid "There was an error while decrypting private key."
 msgstr "Произошла ошибка во время расшифровки закрытого ключа."
+
+#: ../src/export.c:213
+msgid "Unsupported operation: you cannot generate a PKCS#12 for a CSR."
+msgstr "Неподдерживаемая операция: вы не можете создать PKCS#12 для CSR."
 
 #: ../src/export.c:221 ../src/export.c:230
 msgid ""
@@ -3203,6 +3346,22 @@ msgstr ""
 msgid "There was a problem while opening the directory certs/."
 msgstr "Произошла ошибка при открытии каталога сертификатов/."
 
+#: ../src/import.c:1157
+msgid "There was a problem while opening the directory newcerts/."
+msgstr "Произошла ошибка при открытии каталога newcerts/."
+
+#: ../src/import.c:1184
+msgid "There was a problem while opening the directory req."
+msgstr "Произошла ошибка при открытии каталога req."
+
+#: ../src/import.c:1210
+msgid "There was a problem while opening the directory crl/."
+msgstr "Произошла ошибка при открытии каталога crl/."
+
+#: ../src/import.c:1232
+msgid "There was a problem while opening the directory keys/."
+msgstr "Произошла ошибка при открытии каталога keys/."
+
 #: ../src/import.c:1290
 msgid "Files in the directory don't belong to any supported CA format."
 msgstr ""
@@ -3323,7 +3482,19 @@ msgstr ""
 "Политика данного CA требует, чтобы поле организационная единица сертификата "
 "было таким же как в сертификате CA."
 
-#: ../src/new_cert.c:800
+#: ../src/new_cert.c:799
+msgid ""
+"The expiration date of the new certificate is after the expiration date of "
+"the CA certificate.\n"
+"\n"
+"According to the current standards, this is not allowed. The new certificate "
+"will be created with the same expiration date as the CA certificate."
+msgstr ""
+"Срок истечения нового сертификата превышает срок истечения CA сертификата.\n"
+"В соответствии с текущими стандартами, это не допускается. Новый сертификат "
+"будет создан с тем же сроком истечения, что и CA сертификат."
+
+#: ../src/new_cert.c:815
 msgid "Error while signing CSR."
 msgstr "Ошибка при подписи CSR."
 
@@ -3509,147 +3680,3 @@ msgstr "Только для ключа дешифрования"
 #: ../src/tls.c:1072
 msgid "TLS WWW Client."
 msgstr "TLS WWW Клиент."
-
-#: ../gui/gnomint.glade.h:44
-msgid ""
-"<small><i>PKCS#3 files containing Diffie&#xB7;Hellman parameters are used by "
-"some cryptographic \n"
-"applications for a secure interchange of their keys over insecure "
-"channels.</i></small>"
-msgstr ""
-"<small><i>файлы PKCS#3, содержащие Diffie&#xB7;Hellman параметры "
-"используются некоторыми криптографическими \n"
-"приложениями для безопасного обмена своих ключей через небезопасные "
-"каналы.</i></small>"
-
-#: ../gui/gnomint.glade.h:49
-msgid "Add CSR"
-msgstr "Добавить CSR"
-
-#: ../gui/gnomint.glade.h:51
-msgid "Add a new Certificate Signing Request"
-msgstr "Добавить новый Запрос на Подпись Сертификата"
-
-#: ../gui/gnomint.glade.h:52
-msgid "Add an autosigned CA"
-msgstr "Добавить самоподписанный CA"
-
-#: ../gui/gnomint.glade.h:53
-msgid "Add autosigned CA certificate"
-msgstr "Добавить самоподписанный CA сертификат"
-
-#: ../gui/gnomint.glade.h:66
-msgid "CSR properties - gnoMint"
-msgstr "Свойства CSR - gnoMint"
-
-#: ../gui/gnomint.glade.h:75
-msgid "Certificate properties - gnoMint"
-msgstr "Свойства сертификата - gnoMint"
-
-#: ../gui/gnomint.glade.h:86
-msgid "Create a new database"
-msgstr "Создать новую базу"
-
-#: ../gui/gnomint.glade.h:88
-msgid "Creating new CA - gnoMint"
-msgstr "Создать новый CA - gnoMint"
-
-#: ../gui/gnomint.glade.h:91
-msgid "Database password protection - gnoMint"
-msgstr "Защита базы паролем - gnoMint"
-
-#: ../gui/gnomint.glade.h:92
-msgid "Delete the selected Certificate Signing Request"
-msgstr "Удалить выбранный Запрос на Подпись Сертификата"
-
-#: ../gui/gnomint.glade.h:100
-msgid "Enter password - gnoMint"
-msgstr "Введите пароль - gnoMint"
-
-#: ../gui/gnomint.glade.h:103
-msgid "Export certificate - gnoMint"
-msgstr "Экспорт сертификата - gnoMint"
-
-#: ../gui/gnomint.glade.h:108
-msgid "Extract Private Key"
-msgstr "Извлечь Закрытый Ключ"
-
-#: ../gui/gnomint.glade.h:109
-msgid "Extract the private key of the selected item into a external file"
-msgstr "Извлечь закрытый ключ выбранного объекта во внешний файл"
-
-#: ../gui/gnomint.glade.h:127
-msgid "Import selection - gnoMint"
-msgstr "Импорт выбранного - gnoMint"
-
-#: ../gui/gnomint.glade.h:136
-msgid "New CA - gnoMint"
-msgstr "Новый CA - gnoMint"
-
-#: ../gui/gnomint.glade.h:137
-msgid "New CRL - gnoMint"
-msgstr "Новый CRL - gnoMint"
-
-#: ../gui/gnomint.glade.h:138
-msgid "New Certificate - gnoMint"
-msgstr "Новый Сертификат - gnoMint"
-
-#: ../gui/gnomint.glade.h:139
-msgid "New Diffie-Hellman parameters - gnoMint"
-msgstr "Новые параметры Diffie-Hellman - gnoMint"
-
-#: ../gui/gnomint.glade.h:142
-msgid "New certificate request - gnoMint"
-msgstr "Новый запрос сертификата - gnoMint"
-
-#: ../gui/gnomint.glade.h:149
-msgid "Open an existing database"
-msgstr "Открыть существующую базу"
-
-#: ../gui/gnomint.glade.h:180
-msgid "Revoke"
-msgstr "Отозвать"
-
-#: ../gui/gnomint.glade.h:181
-msgid "Revoke the selected certificate"
-msgstr "Отозвать выбранные сертификаты"
-
-#: ../gui/gnomint.glade.h:189
-msgid "Sign"
-msgstr "Подписать"
-
-#: ../gui/gnomint.glade.h:190
-msgid "Sign the selected Certificate Signing Request"
-msgstr "Подписать выбранный Запрос на Подпись Сертификата"
-
-#: ../gui/gnomint.glade.h:205
-msgid ""
-"You are about to create and export a set of Diffie&#xB7;Hellman parameters "
-"into a PKCS#3 structure file."
-msgstr ""
-"Вы собираетесь создать и экспортировать набор параметров Diffie&#xB7;Hellman "
-"в файл структуры PKCS#3."
-
-#: ../gui/gnomint.glade.h:222
-msgid "gnoMint"
-msgstr "gnoMint"
-
-#: ../src/export.c:213
-msgid "Unsupported operation: you cannot generate a PKCS#12 for a CSR."
-msgstr "Неподдерживаемая операция: вы не можете создать PKCS#12 для CSR."
-
-#: ../src/import.c:1157
-msgid "There was a problem while opening the directory newcerts/."
-msgstr "Произошла ошибка при открытии каталога newcerts/."
-
-#: ../src/import.c:1184
-msgid "There was a problem while opening the directory req."
-msgstr "Произошла ошибка при открытии каталога req."
-
-#: ../src/import.c:1210
-msgid "There was a problem while opening the directory crl/."
-msgstr "Произошла ошибка при открытии каталога crl/."
-
-#: ../src/import.c:1232
-msgid "There was a problem while opening the directory keys/."
-msgstr "Произошла ошибка при открытии каталога keys/."

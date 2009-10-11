@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.5.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-18 08:47+0200\n"
-"PO-Revision-Date: 2008-11-18 11:23+0000\n"
+"POT-Creation-Date: 2009-06-03 23:09+0200\n"
+"PO-Revision-Date: 2009-06-03 22:27+0000\n"
 "Last-Translator: David Marín <Unknown>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-01-04 13:48+0000\n"
+"X-Launchpad-Export-Date: 2009-10-11 21:04+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -204,8 +204,8 @@ msgstr ""
 msgid ""
 "<small><i>PKCS#3 files containing Diffie&#xB7;Hellman parameters are used by "
 "some cryptographic \n"
-"applications for a secure interchange of their keys over insecure channels.</"
-"i></small>"
+"applications for a secure interchange of their keys over insecure "
+"channels.</i></small>"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:46
@@ -218,8 +218,8 @@ msgid ""
 "<small>The subject of the new certificate request can inherit information "
 "from one of the existing Certification Authorities. This is a must if the "
 "policy of the CA you are going to use is defined to force some fields of a "
-"certificate subject to be the same as the ones in the CA cert subject.</"
-"small>"
+"certificate subject to be the same as the ones in the CA cert "
+"subject.</small>"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:48
@@ -453,7 +453,8 @@ msgid "Exports the CSR so it can be imported by any other application"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:106
-msgid "Exports the certificate so it can be imported by any other application"
+msgid ""
+"Exports the certificate so it can be imported by any other application"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:107
@@ -661,7 +662,8 @@ msgid "Please, choose the more suitable option for what you want to import:"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:161
-msgid "Please, choose which part of the saved certificate you want to export:"
+msgid ""
+"Please, choose which part of the saved certificate you want to export:"
 msgstr ""
 
 #: ../gui/gnomint.glade.h:162
@@ -1019,8 +1021,8 @@ msgstr ""
 
 #: ../src/ca.c:1083
 msgid ""
-"<i>Export the Certificate Signing Request to a public file, in PEM format.</"
-"i>"
+"<i>Export the Certificate Signing Request to a public file, in PEM "
+"format.</i>"
 msgstr ""
 
 #: ../src/ca.c:1088
@@ -1207,134 +1209,144 @@ msgstr ""
 
 #. 12
 #: ../src/ca-cli.c:55
-msgid "dhgen <prime-bitlength> <filename>"
+msgid "crlgen <ca-id> <filename>"
 msgstr ""
 
 #: ../src/ca-cli.c:55
-msgid "Generate a new DH-parameter set, saving it into the file <filename>"
+msgid ""
+"Generate a new CRL for the given CA, saving it into the file <filename>"
 msgstr ""
 
 #. 13
 #: ../src/ca-cli.c:56
-msgid "Change password for the current database"
+msgid "dhgen <prime-bitlength> <filename>"
+msgstr ""
+
+#: ../src/ca-cli.c:56
+msgid "Generate a new DH-parameter set, saving it into the file <filename>"
 msgstr ""
 
 #. 14
 #: ../src/ca-cli.c:57
-msgid "importfile <filename>"
-msgstr ""
-
-#: ../src/ca-cli.c:57
-msgid "Import the file with the given name <filename>"
+msgid "Change password for the current database"
 msgstr ""
 
 #. 15
 #: ../src/ca-cli.c:58
-msgid "importdir <dirname>"
+msgid "importfile <filename>"
 msgstr ""
 
 #: ../src/ca-cli.c:58
-msgid "Import the given directory, as a OpenSSL-CA directory"
+msgid "Import the file with the given name <filename>"
 msgstr ""
 
 #. 16
 #: ../src/ca-cli.c:59
-msgid "showcert <cert-id>"
+msgid "importdir <dirname>"
 msgstr ""
 
 #: ../src/ca-cli.c:59
-msgid "Show properties of the given certificate"
+msgid "Import the given directory, as a OpenSSL-CA directory"
 msgstr ""
 
 #. 17
 #: ../src/ca-cli.c:60
-msgid "showcsr <csr-id>"
+msgid "showcert <cert-id>"
 msgstr ""
 
 #: ../src/ca-cli.c:60
-msgid "Show properties of the given CSR"
+msgid "Show properties of the given certificate"
 msgstr ""
 
 #. 18
 #: ../src/ca-cli.c:61
-msgid "showpolicy <ca-id>"
+msgid "showcsr <csr-id>"
 msgstr ""
 
 #: ../src/ca-cli.c:61
-msgid "Show CA policy"
+msgid "Show properties of the given CSR"
 msgstr ""
 
 #. 19
 #: ../src/ca-cli.c:62
-msgid "setpolicy <ca-id> <policy-id> <value>"
+msgid "showpolicy <ca-id>"
 msgstr ""
 
 #: ../src/ca-cli.c:62
-msgid "Change the given CA policy"
+msgid "Show CA policy"
 msgstr ""
 
 #. 20
 #: ../src/ca-cli.c:63
-msgid "Show program preferences"
+msgid "setpolicy <ca-id> <policy-id> <value>"
+msgstr ""
+
+#: ../src/ca-cli.c:63
+msgid "Change the given CA policy"
 msgstr ""
 
 #. 21
 #: ../src/ca-cli.c:64
-msgid "setpreference <preference-id> <value>"
-msgstr ""
-
-#: ../src/ca-cli.c:64
-msgid "Set the given program preference"
+msgid "Show program preferences"
 msgstr ""
 
 #. 22
 #: ../src/ca-cli.c:65
-msgid "Show about message"
+msgid "setpreference <preference-id> <value>"
+msgstr ""
+
+#: ../src/ca-cli.c:65
+msgid "Set the given program preference"
 msgstr ""
 
 #. 23
 #: ../src/ca-cli.c:66
-msgid "Show warranty information"
+msgid "Show about message"
 msgstr ""
 
 #. 24
 #: ../src/ca-cli.c:67
-msgid "Show distribution information"
+msgid "Show warranty information"
 msgstr ""
 
 #. 25
 #: ../src/ca-cli.c:68
-msgid "Show version information"
+msgid "Show distribution information"
 msgstr ""
 
 #. 26
 #: ../src/ca-cli.c:69
-msgid "Show (this) help message"
+msgid "Show version information"
 msgstr ""
 
 #. 27
+#: ../src/ca-cli.c:70
+msgid "Show (this) help message"
+msgstr ""
+
 #. 28
 #. 29
-#: ../src/ca-cli.c:70 ../src/ca-cli.c:71 ../src/ca-cli.c:72
+#. 30
+#: ../src/ca-cli.c:71 ../src/ca-cli.c:72 ../src/ca-cli.c:73
 msgid "Close database and exit program"
 msgstr ""
 
-#: ../src/ca-cli.c:94
+#: ../src/ca-cli.c:95
 #, c-format
 msgid "Opening database %s..."
 msgstr ""
 
-#: ../src/ca-cli.c:98
+#: ../src/ca-cli.c:99
 #, c-format
 msgid " OK.\n"
 msgstr ""
 
-#: ../src/ca-cli.c:100
+#: ../src/ca-cli.c:101
 #, c-format
 msgid " Error.\n"
 msgstr ""
 
-#: ../src/ca-cli.c:127
+#: ../src/ca-cli.c:128
 #, c-format
 msgid ""
 "\n"
@@ -1344,14 +1356,14 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli.c:128
+#: ../src/ca-cli.c:129
 #, c-format
 msgid ""
 "This program comes with ABSOLUTELY NO WARRANTY;\n"
 "for details type 'warranty'.\n"
 msgstr ""
 
-#: ../src/ca-cli.c:129
+#: ../src/ca-cli.c:130
 #, c-format
 msgid ""
 "This is free software, and you are welcome to redistribute it\n"
@@ -1360,23 +1372,23 @@ msgid ""
 msgstr ""
 
 #. Unpaired quotes
-#: ../src/ca-cli.c:171
+#: ../src/ca-cli.c:172
 #, c-format
 msgid "Unpaired quotes\n"
 msgstr ""
 
-#: ../src/ca-cli.c:249
+#: ../src/ca-cli.c:250
 #, c-format
 msgid ""
 "Invalid command. Try 'help' for getting a list of recognized commands.\n"
 msgstr ""
 
-#: ../src/ca-cli.c:253
+#: ../src/ca-cli.c:254
 #, c-format
 msgid "Incorrect number of parameters.\n"
 msgstr ""
 
-#: ../src/ca-cli.c:254
+#: ../src/ca-cli.c:255
 #, c-format
 msgid "Syntax: %s\n"
 msgstr ""
@@ -1489,7 +1501,8 @@ msgstr ""
 
 #: ../src/ca-cli-callbacks.c:208
 #, c-format
-msgid "Id.\tIs CA?\tCertificate Subject\tKey in DB?\tActivation\t\tExpiration"
+msgid ""
+"Id.\tIs CA?\tCertificate Subject\tKey in DB?\tActivation\t\tExpiration"
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:211
@@ -2048,7 +2061,8 @@ msgstr ""
 
 #: ../src/ca-cli-callbacks.c:978
 #, c-format
-msgid "Diffie-Hellman parameters created and saved successfully in file '%s'\n"
+msgid ""
+"Diffie-Hellman parameters created and saved successfully in file '%s'\n"
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:990
@@ -2410,14 +2424,6 @@ msgstr ""
 #: ../src/main.c:502
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  David Marín https://launchpad.net/~davefx\n"
-"  Luboš Staněk https://launchpad.net/~lubek\n"
-"\n"
-"Launchpad Contributions:\n"
-"  David Marín https://launchpad.net/~davefx\n"
-"  Luboš Staněk https://launchpad.net/~lubek\n"
-"\n"
 "Launchpad Contributions:\n"
 "  David Marín https://launchpad.net/~davefx\n"
 "  Luboš Staněk https://launchpad.net/~lubek"
@@ -2836,22 +2842,28 @@ msgstr ""
 msgid "CSR generated successfully"
 msgstr ""
 
-#: ../src/dialog.c:74
+#: ../src/csr_properties.c:78
+msgid ""
+"<b>This Certificate Signing Request has its corresponding private key saved "
+"in a external file.</b>"
+msgstr ""
+
+#: ../src/dialog.c:79
 #, c-format
 msgid ""
 "\n"
 "The password must have, at least, %d characters\n"
 msgstr ""
 
-#: ../src/dialog.c:98
+#: ../src/dialog.c:103
 msgid "List of affirmative answers, separated with #|Yes#yes#Y#y"
 msgstr ""
 
-#: ../src/dialog.c:99
+#: ../src/dialog.c:104
 msgid "List of negative answers, separated with #|No#no#N#n"
 msgstr ""
 
-#: ../src/dialog.c:349
+#: ../src/dialog.c:372
 msgid "To do. Feature not implemented yet."
 msgstr ""
 
@@ -3149,7 +3161,16 @@ msgid ""
 "certificates to be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert.c:800
+#: ../src/new_cert.c:799
+msgid ""
+"The expiration date of the new certificate is after the expiration date of "
+"the CA certificate.\n"
+"\n"
+"According to the current standards, this is not allowed. The new certificate "
+"will be created with the same expiration date as the CA certificate."
+msgstr ""
+
+#: ../src/new_cert.c:815
 msgid "Error while signing CSR."
 msgstr ""
 
