@@ -142,7 +142,7 @@ int main (int   argc,
 
 	cert_popup_menu_gtkb = gtk_builder_new();
 	gtk_builder_add_from_file (cert_popup_menu_gtkb, 
-				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "cert_popup_menu.ui", NULL),
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_popup_menu.ui", NULL),
 				   NULL);
 
 
