@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #ifndef GNOMINTCLI
-#include <glade/glade.h>
+
 #include <gtk/gtk.h>
 #endif
 
@@ -40,39 +40,39 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 {
 #ifndef GNOMINTCLI
 	gchar *password;
-	GtkWidget * widget = NULL, * password_widget = NULL, *description_widget = NULL;
-	GladeXML * dialog_xml = NULL;
-	gchar     * xml_file = NULL;
+	GObject * widget = NULL, * password_widget = NULL, *description_widget = NULL;
+	GtkBuilder * dialog_gtkb = NULL;
         gchar     * label = NULL;
 	gint response = 0;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "import_password_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_password_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (dialog_gtkb, NULL);
 	
-	password_widget = glade_xml_get_widget (dialog_xml, "import_password_entry");
-	description_widget = glade_xml_get_widget (dialog_xml, "import_crypted_part_description");
+	password_widget = gtk_builder_get_object (dialog_gtkb, "import_password_entry");
+	description_widget = gtk_builder_get_object (dialog_gtkb, "import_crypted_part_description");
 
         label = g_strdup_printf ("<small><i>%s</i></small>", crypted_part_description);
         gtk_label_set_markup (GTK_LABEL(description_widget), (const gchar *) label);
         g_free (label);
 
-        gtk_widget_grab_focus (password_widget);
-        widget = glade_xml_get_widget (dialog_xml, "import_password_dialog");
+        gtk_widget_grab_focus (GTK_WIDGET(password_widget));
+        widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
         response = gtk_dialog_run(GTK_DIALOG(widget)); 
 	
         if (!response) {
-                gtk_widget_destroy (widget);
-                g_object_unref (G_OBJECT(dialog_xml));
+                gtk_widget_destroy (GTK_WIDGET(widget));
+                g_object_unref (G_OBJECT(dialog_gtkb));
                 return NULL;
         } else {
                 password = g_strdup ((gchar *) gtk_entry_get_text (GTK_ENTRY(password_widget)));
         }
 
-	widget = glade_xml_get_widget (dialog_xml, "import_password_dialog");
-	gtk_widget_destroy (widget);
-	g_object_unref (G_OBJECT(dialog_xml));
+	widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
+	gtk_widget_destroy (GTK_WIDGET(widget));
+	g_object_unref (G_OBJECT(dialog_gtkb));
 
 	return password;
 #else

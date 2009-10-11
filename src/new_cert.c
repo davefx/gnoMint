@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #ifndef GNOMINTCLI
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #endif
@@ -35,7 +35,7 @@
 #include "new_cert.h"
 
 #ifndef GNOMINTCLI
-GladeXML * new_cert_window_xml = NULL;
+GtkBuilder * new_cert_window_gtkb = NULL;
 GtkTreeStore * new_cert_ca_list_model = NULL;
 
 
@@ -195,9 +195,9 @@ void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointe
 {
         GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         if (gtk_tree_selection_count_selected_rows(selection) == 0)
-                gtk_widget_set_sensitive (glade_xml_get_widget (new_cert_window_xml, "new_cert_next2"), FALSE);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_next2")), FALSE);
         else
-                gtk_widget_set_sensitive (glade_xml_get_widget (new_cert_window_xml, "new_cert_next2"), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_next2")), TRUE);
 }
 
 gboolean __new_cert_window_find_ca (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
@@ -220,51 +220,47 @@ gboolean __new_cert_window_find_ca (GtkTreeModel *model, GtkTreePath *path, GtkT
 
 void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const gchar *csr_parent_id)
 {
-	gchar     * xml_file = NULL;
-	GtkWidget * widget;
+	GObject * object;
         TlsCsr * csr_info = NULL;
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
 	csr_info = tls_parse_csr_pem (csr_pem);
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	// Workaround for libglade
-	tst = foo;
-	new_cert_window_xml = glade_xml_new (xml_file, "new_cert_window", NULL);
+	new_cert_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (new_cert_window_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_cert_window.ui", NULL ),
+				   NULL);
 	
-	g_free (xml_file);               
 
-	glade_xml_signal_autoconnect (new_cert_window_xml); 	
+	gtk_builder_connect_signals (new_cert_window_gtkb, NULL); 	
 	
-        widget = glade_xml_get_widget (new_cert_window_xml, "new_cert_window");
-        g_object_set_data_full (G_OBJECT(widget), "csr_info", csr_info, (GDestroyNotify) tls_csr_free);
-	g_object_set_data (G_OBJECT(widget), "csr_id", g_strdup_printf ("%" G_GUINT64_FORMAT, csr_id));
+        object = gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window");
+        g_object_set_data_full (G_OBJECT(object), "csr_info", csr_info, (GDestroyNotify) tls_csr_free);
+	g_object_set_data (G_OBJECT(object), "csr_id", g_strdup_printf ("%" G_GUINT64_FORMAT, csr_id));
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "c_label");
-	gtk_label_set_text (GTK_LABEL(widget), csr_info->c);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "c_label");
+	gtk_label_set_text (GTK_LABEL(object), csr_info->c);
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "st_label");
-	gtk_label_set_text (GTK_LABEL(widget), csr_info->st);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "st_label");
+	gtk_label_set_text (GTK_LABEL(object), csr_info->st);
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "l_label");
-	gtk_label_set_text (GTK_LABEL(widget), csr_info->l);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "l_label");
+	gtk_label_set_text (GTK_LABEL(object), csr_info->l);
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "o_label");
-	gtk_label_set_text (GTK_LABEL(widget), csr_info->o);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "o_label");
+	gtk_label_set_text (GTK_LABEL(object), csr_info->o);
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "ou_label");
-	gtk_label_set_text (GTK_LABEL(widget), csr_info->ou);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "ou_label");
+	gtk_label_set_text (GTK_LABEL(object), csr_info->ou);
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "cn_label");
-	gtk_label_set_text (GTK_LABEL(widget), csr_info->cn);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "cn_label");
+	gtk_label_set_text (GTK_LABEL(object), csr_info->cn);
 	
-        widget = glade_xml_get_widget (new_cert_window_xml, "signing_ca_treeview");
-        __new_cert_populate_ca_treeview (GTK_TREE_VIEW(widget));
+        object = gtk_builder_get_object (new_cert_window_gtkb, "signing_ca_treeview");
+        __new_cert_populate_ca_treeview (GTK_TREE_VIEW(object));
 
         if (csr_parent_id) {
                 GtkTreeIter iter; 
-                GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(widget)); 
+                GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(object)); 
                 __NewCertWindowFindCaUserData *userdata = g_new0 (__NewCertWindowFindCaUserData, 1);
 
                 userdata->iter = &iter;
@@ -273,7 +269,7 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
                 gtk_tree_model_foreach (model, __new_cert_window_find_ca, userdata);
                 
                 if (userdata->found) {
-                        GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(widget));
+                        GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW(object));
                         gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
                         gtk_tree_selection_select_iter (selection, &iter);
                 }
@@ -286,7 +282,7 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 
 void new_cert_tab_activate (int tab_number)
 {
-	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_cert_window_xml, "new_cert_notebook"));
+	GtkNotebook *notebook = GTK_NOTEBOOK(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_notebook"));
 	
 	gtk_notebook_set_current_page (notebook, tab_number);
 
@@ -299,17 +295,17 @@ void on_new_cert_next2_clicked (GtkButton *button,
 	// have to select the CA for signing the CSR.
 
 	// Meanwhile, we choose the unique CA, and determine its policy.
-	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(new_cert_window_xml, "signing_ca_treeview"));
+	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_cert_window_gtkb, "signing_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         GValue *value = g_new0(GValue, 1);
         GtkTreeModel *model;
 	GtkTreeIter iter;
-	GtkWidget * widget;
+	GObject * object;
 	guint i_value;
 	guint64 ca_id;
         const gchar *ca_pem;
         TlsCert *tls_ca_cert = NULL;
-        TlsCsr * tls_csr = g_object_get_data (G_OBJECT(glade_xml_get_widget(new_cert_window_xml, "new_cert_window")), "csr_info");
+        TlsCsr * tls_csr = g_object_get_data (G_OBJECT(gtk_builder_get_object(new_cert_window_gtkb, "new_cert_window")), "csr_info");
 
         gtk_tree_selection_get_selected (selection, &model, &iter);
         gtk_tree_model_get_value (model, &iter, NEW_CERT_CA_MODEL_COLUMN_ID, value);
@@ -359,81 +355,81 @@ void on_new_cert_next2_clicked (GtkButton *button,
         tls_cert_free (tls_ca_cert);
 
 	i_value = ca_file_policy_get (ca_id, "MONTHS_TO_EXPIRE");
-	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton1");
-	gtk_spin_button_set_range (GTK_SPIN_BUTTON(widget), 1, i_value);
-	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "months_before_expiration_spinbutton1");
+	gtk_spin_button_set_range (GTK_SPIN_BUTTON(object), 1, i_value);
+	gtk_spin_button_set_value (GTK_SPIN_BUTTON(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "CA");
-	widget = glade_xml_get_widget (new_cert_window_xml, "ca_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "ca_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 
 /* 	i_value = ca_file_policy_get (ca_id, "CERT_SIGN")); */
-/* 	widget = glade_xml_get_widget (new_cert_window_xml, "cert_signing_check2"); */
-/* 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value); */
+/* 	object = gtk_builder_get_object (new_cert_window_gtkb, "cert_signing_check2"); */
+/* 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value); */
 
 	i_value = ca_file_policy_get (ca_id, "CRL_SIGN");
-	widget = glade_xml_get_widget (new_cert_window_xml, "crl_signing_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "crl_signing_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "NON_REPUDIATION");
-	widget = glade_xml_get_widget (new_cert_window_xml, "non_repudiation_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "non_repudiation_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "DIGITAL_SIGNATURE");
-	widget = glade_xml_get_widget (new_cert_window_xml, "digital_signature_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "digital_signature_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "KEY_ENCIPHERMENT");
-	widget = glade_xml_get_widget (new_cert_window_xml, "key_encipherment_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "key_encipherment_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "KEY_AGREEMENT");
-	widget = glade_xml_get_widget (new_cert_window_xml, "key_agreement_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "key_agreement_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "DATA_ENCIPHERMENT");
-	widget = glade_xml_get_widget (new_cert_window_xml, "data_encipherment_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "data_encipherment_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "TLS_WEB_SERVER");
-	widget = glade_xml_get_widget (new_cert_window_xml, "webserver_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "webserver_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "TLS_WEB_CLIENT");
-	widget = glade_xml_get_widget (new_cert_window_xml, "webclient_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "webclient_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "TIME_STAMPING");
-	widget = glade_xml_get_widget (new_cert_window_xml, "time_stamping_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "time_stamping_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "CODE_SIGNING");
-	widget = glade_xml_get_widget (new_cert_window_xml, "code_signing_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "code_signing_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "EMAIL_PROTECTION");
-	widget = glade_xml_get_widget (new_cert_window_xml, "email_protection_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "email_protection_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 	
 	i_value = ca_file_policy_get (ca_id, "OCSP_SIGNING");
-	widget = glade_xml_get_widget (new_cert_window_xml, "ocsp_signing_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "ocsp_signing_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	i_value = ca_file_policy_get (ca_id, "ANY_PURPOSE");
-	widget = glade_xml_get_widget (new_cert_window_xml, "any_purpose_check");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), i_value);
-	gtk_widget_set_sensitive (widget, i_value);
+	object = gtk_builder_get_object (new_cert_window_gtkb, "any_purpose_check");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
+	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
 	
 	new_cert_tab_activate (2);
@@ -461,7 +457,7 @@ void on_new_cert_previous3_clicked (GtkButton *widget,
 void on_new_cert_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
-	GtkWidget * window = GTK_WIDGET(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
+	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
         gtk_object_destroy(GTK_OBJECT(window));	
 	
 }
@@ -475,67 +471,67 @@ void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
 
         is_active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
 
-	if (! strcmp(glade_get_widget_name (button), "non_repudiation_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "non_repudiation_check")) {
                 if (! is_active) {
                         // TIME_STAMPING cannot be inactive
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                               "time_stamping_check")), FALSE);
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) &&
-                            ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check"))) &&
-                            ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check")))) {
+                        if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) &&
+                            ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check"))) &&
+                            ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check")))) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml,
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb,
                                                                                                       "email_protection_check")), FALSE);
                         }
                         
                         // We must check if OCSP_SIGNING can be active
-                        if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check")))) {
+                        if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check")))) {
                                 // If is not active, we must deactivate OCSP_SIGNING
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml,
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb,
                                                                                                       "ocsp_signing_check")), FALSE);
                         }
                         
                 }
         }
         
-	if (! strcmp(glade_get_widget_name (button), "digital_signature_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "digital_signature_check")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
-                        if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check"))) &&
-                            ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check")))) {
+                        if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check"))) &&
+                            ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check")))) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "webserver_check")), FALSE);
                         }
 
                         // We must check if TLS_WEB_CLIENT can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check")))) {
                                 // If none is active, we must deactivate TLS_WEB_CLIENT
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "webclient_check")), FALSE);
                         }
 
                         // TIME_STAMPING and CODE_SIGNING cannot be active if digital signature is deactivated
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,
                                                                                              "time_stamping_check")), FALSE);
 
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,
                                                                                              "code_signing_check")), FALSE);
 
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check")))) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "email_protection_check")), FALSE);
                         }
 
                         // We must check if OCSP_SIGNING can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation_check")))) {
                                 // If none is active, we must deactivate OCSP_SIGNING
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "ocsp_signing_check")), FALSE);
                         }
                         
@@ -543,22 +539,22 @@ void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
                 }
         }
         
-	if (! strcmp(glade_get_widget_name (button), "key_encipherment_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "key_encipherment_check")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml, "digital_signature_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb, "digital_signature_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check")))) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "webserver_check")), FALSE);
                         }
 
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check")))) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "email_protection_check")), FALSE);
                         }
 
@@ -566,28 +562,28 @@ void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
                 }
         }
 
-	if (! strcmp(glade_get_widget_name (button), "key_agreement_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "key_agreement_check")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check")))) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "webserver_check")), FALSE);
                         }
                         // We must check if TLS_WEB_CLIENT can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check")))) {
                                 // If none is active, we must deactivate TLS_WEB_CLIENT
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "webclient_check")), FALSE);
                         }
 
                         // We must check if EMAIL_PROTECTION can be active
-                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation_check"))) &&
-                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check")))) {
+                        if (! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation_check"))) &&
+                            ! gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check")))) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "email_protection_check")), FALSE);
                         }
                 }
@@ -599,79 +595,79 @@ void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
         // Purposes
 
 
-	if (! strcmp(glade_get_widget_name (button), "webserver_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "webserver_check")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
-                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check"))))) {
+                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check"))))) {
                                 // If none is active, we activate key encipherment
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "key_encipherment_check")), TRUE);
                         }
                         
                 }
         }
         
-	if (! strcmp(glade_get_widget_name (button), "webclient_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "webclient_check")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
-                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check"))))) {
+                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check"))))) {
                                 // If none is active, we activate digital signature
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "digital_signature_check")), TRUE);
                         }
                         
                 }
         }
 
-	if (! strcmp(glade_get_widget_name (button), "time_stamping_check")){
+	if (! strcmp(gtk_widget_get_name (button), "time_stamping_check")){
                 if (is_active) {
                         // We must check digitalSignature && nonRepudiation
-                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) &&
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation_check"))))) {
+                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) &&
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation_check"))))) {
                                 // If none is active, we activate them both
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "digital_signature_check")), TRUE);
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "non_repudiation_check")), TRUE);
                         }
                                
                 }
         }
 
-	if (! strcmp(glade_get_widget_name (button), "code_signing_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "code_signing_check")) {
                 if (is_active) {
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                               "digital_signature_check")), TRUE);
                 }
         }
 
-	if (! strcmp(glade_get_widget_name (button), "email_protection_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "email_protection_check")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation || (keyEncipherment || keyAgreement)
-                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_encipherment_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"key_agreement_check"))))) {
+                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_encipherment_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"key_agreement_check"))))) {
                                 // If none is active, we activate key encipherment
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "digital_signature_check")), TRUE);
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "key_encipherment_check")), TRUE);
                         }
                                
                 }
         }
 
-	if (! strcmp(glade_get_widget_name (button), "ocsp_signing_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "ocsp_signing_check")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation
-                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"digital_signature_check"))) ||
-                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_cert_window_xml,"non_repudiation"))))) {
+                        if (!( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"digital_signature_check"))) ||
+                               gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_cert_window_gtkb,"non_repudiation"))))) {
                                 // If none is active, we activate digital signature
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (new_cert_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_cert_window_gtkb, 
                                                                                                       "digital_signature_check")), TRUE);
                         }
                                
@@ -684,7 +680,7 @@ void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
 void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data) 
 {
-	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(new_cert_window_xml, "signing_ca_treeview"));
+	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_cert_window_gtkb, "signing_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         GValue *value = g_new0(GValue, 1);
         GtkTreeModel *model;
@@ -692,10 +688,10 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	TlsCertCreationData *cert_creation_data = NULL;
 
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	gint active = -1;
 	guint64 ca_id;
-	gchar * csr_id_str = g_object_get_data (G_OBJECT(glade_xml_get_widget(new_cert_window_xml, "new_cert_window")), "csr_id");
+	gchar * csr_id_str = g_object_get_data (G_OBJECT(gtk_builder_get_object(new_cert_window_gtkb, "new_cert_window")), "csr_id");
 	guint64 csr_id = atoll(csr_id_str);
 
 	const gchar *strerror = NULL;
@@ -706,38 +702,38 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 
 	cert_creation_data = g_new0 (TlsCertCreationData, 1);
 		
-	widget = glade_xml_get_widget (new_cert_window_xml, "months_before_expiration_spinbutton1");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "months_before_expiration_spinbutton1");
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	cert_creation_data->key_months_before_expiration = active;
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "ca_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "ca_check");
 	cert_creation_data->ca = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "crl_signing_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "crl_signing_check");
 	cert_creation_data->crl_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "digital_signature_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "digital_signature_check");
 	cert_creation_data->digital_signature = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "data_encipherment_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "data_encipherment_check");
 	cert_creation_data->data_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "key_encipherment_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "key_encipherment_check");
 	cert_creation_data->key_encipherment = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "non_repudiation_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "non_repudiation_check");
 	cert_creation_data->non_repudiation = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "key_agreement_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "key_agreement_check");
 	cert_creation_data->key_agreement = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
-	widget = glade_xml_get_widget (new_cert_window_xml, "email_protection_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "email_protection_check");
 	cert_creation_data->email_protection = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "code_signing_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "code_signing_check");
 	cert_creation_data->code_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "webclient_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "webclient_check");
 	cert_creation_data->web_client = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "webserver_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "webserver_check");
 	cert_creation_data->web_server = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "time_stamping_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "time_stamping_check");
 	cert_creation_data->time_stamping = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "ocsp_signing_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "ocsp_signing_check");
 	cert_creation_data->ocsp_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	widget = glade_xml_get_widget (new_cert_window_xml, "any_purpose_check");
+	widget = gtk_builder_get_object (new_cert_window_gtkb, "any_purpose_check");
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
@@ -746,7 +742,7 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 		dialog_error ((gchar *) strerror);
 	}
 
-	widget = GTK_WIDGET(glade_xml_get_widget (new_cert_window_xml, "new_cert_window"));
+	widget = G_OBJECT(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
         gtk_object_destroy(GTK_OBJECT(widget));	
 
 	dialog_refresh_list();

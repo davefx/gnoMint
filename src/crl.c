@@ -23,7 +23,7 @@
 
 #ifndef GNOMINTCLI
 #include <glib-object.h>
-#include <glade/glade.h>
+
 #include <gtk/gtk.h>
 #endif
 
@@ -36,7 +36,7 @@
 void __crl_gfree_gfunc (gpointer data, gpointer user_data);
 
 #ifndef GNOMINTCLI
-GladeXML *crl_window_xml = NULL;
+GtkBuilder *crl_window_gtkb = NULL;
 GtkTreeStore * crl_ca_list_model = NULL;
 
 
@@ -187,41 +187,34 @@ void crl_treeview_cursor_changed_cb (GtkTreeView *treeview, gpointer userdata)
 {
         GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         if (gtk_tree_selection_count_selected_rows(selection) == 0)
-                gtk_widget_set_sensitive (glade_xml_get_widget (crl_window_xml, "crl_ok_button"), FALSE);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "crl_ok_button")), FALSE);
         else
-                gtk_widget_set_sensitive (glade_xml_get_widget (crl_window_xml, "crl_ok_button"), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "crl_ok_button")), TRUE);
 }
 
 
 
 void crl_window_display (void)
 {
-	gchar     * xml_file = NULL;
         GtkWidget * widget = NULL;
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	// Workaround for libglade
-	tst = foo;
-	crl_window_xml = glade_xml_new (xml_file, "new_crl_dialog", NULL);
+	crl_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (crl_window_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_crl_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (crl_window_gtkb, NULL);
 	
-	g_free (xml_file);
-	
-	glade_xml_signal_autoconnect (crl_window_xml); 	
-	
-        widget = glade_xml_get_widget (crl_window_xml, "new_crl_dialog");
+        widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_widget_show (widget);
 
-        widget = glade_xml_get_widget (crl_window_xml, "crl_ca_treeview");
-        __crl_populate_ca_treeview (GTK_TREE_VIEW(widget));
+        __crl_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object (crl_window_gtkb, "crl_ca_treeview")));
 
 }
 
 
 void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata)
 {
-	GtkWidget * window = GTK_WIDGET(glade_xml_get_widget (crl_window_xml, "new_crl_dialog"));
+	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_object_destroy(GTK_OBJECT(window));	
 
 }
@@ -234,7 +227,7 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	guint64 ca_id = 0;
         gchar * strerror = NULL;
 
-	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(crl_window_xml, "crl_ca_treeview"));
+	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(crl_window_gtkb, "crl_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         GValue *value = g_new0(GValue, 1);
         GtkTreeModel *model;
@@ -245,7 +238,7 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
         ca_id = g_value_get_uint(value);
 
 
-	widget = glade_xml_get_widget (crl_window_xml, "new_crl_dialog");
+	widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
 	
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export Certificate Revocation List"),
 							  GTK_WINDOW(widget),
@@ -282,7 +275,7 @@ void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 
-        dialog = GTK_DIALOG(glade_xml_get_widget (crl_window_xml, "new_crl_dialog"));
+        dialog = GTK_DIALOG(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_object_destroy(GTK_OBJECT(dialog));	
 			
 }

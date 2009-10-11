@@ -19,7 +19,7 @@
 
 #ifndef GNOMINTCLI
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -78,9 +78,9 @@ enum {CSR_MODEL_COLUMN_ID=0,
 
 
 
-extern GladeXML * main_window_xml;
-extern GladeXML * cert_popup_menu_xml;
-extern GladeXML * csr_popup_menu_xml;
+extern GtkBuilder * main_window_gtkb;
+extern GtkBuilder * cert_popup_menu_gtkb;
+extern GtkBuilder * csr_popup_menu_gtkb;
 
 
 static GtkTreeStore * ca_model = NULL;
@@ -424,7 +424,7 @@ gboolean ca_refresh_model_callback ()
         if (view_csr)
 		ca_file_foreach_csr (__ca_refresh_model_add_csr, new_model);
 
-	treeview = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
+	treeview = GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
 
 	if (ca_model) {
                 GList * column_list;
@@ -582,7 +582,7 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
                 GtkTreeSelection *selection;
                 GtkTreeIter selection_iter;
 		
-                tree_view = GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
+                tree_view = GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
                 selection = gtk_tree_view_get_selection (tree_view);
 		
                 if (gtk_tree_selection_count_selected_rows (selection) != 1)
@@ -614,109 +614,109 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 
 void __ca_activate_certificate_selection (GtkTreeIter *iter)
 {
-	GtkWidget *widget;
+	GObject *widget;
 	gboolean is_ca = FALSE;
 	gboolean pk_indb = FALSE;
 	gint is_revoked = FALSE;
 	
-	widget = glade_xml_get_widget (main_window_xml, "export1");
-	gtk_widget_set_sensitive (widget, TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "export1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
 			   CA_MODEL_COLUMN_IS_CA, &is_ca, 
 			   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 			   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
 
-	widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
-	gtk_widget_set_sensitive (widget, pk_indb);
-	widget = glade_xml_get_widget (main_window_xml, "extractpkey_toolbutton");
-	gtk_widget_set_sensitive (widget, pk_indb);
+	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+	widget = gtk_builder_get_object (main_window_gtkb, "extractpkey_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 
-        widget = glade_xml_get_widget (main_window_xml, "revoke1");
-        gtk_widget_set_sensitive (widget, (! is_revoked));
-        widget = glade_xml_get_widget (main_window_xml, "revoke_toolbutton");
-        gtk_widget_set_sensitive (widget, (! is_revoked));
+        widget = gtk_builder_get_object (main_window_gtkb, "revoke1");
+        gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
+        widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
+        gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
 
-	widget = glade_xml_get_widget (main_window_xml, "sign1");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "sign_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "delete2");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "delete2");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "delete_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "properties1");
-	gtk_widget_set_sensitive (widget, TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "properties1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
 
 }
 
 void __ca_activate_csr_selection (GtkTreeIter *iter)
 {
-	GtkWidget *widget;
+	GObject *widget;
 	gboolean pk_indb = FALSE;
 	
-	widget = glade_xml_get_widget (main_window_xml, "export1");
-	gtk_widget_set_sensitive (widget, TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "export1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, -1);
 
-	widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
-	gtk_widget_set_sensitive (widget, pk_indb);
-	widget = glade_xml_get_widget (main_window_xml, "extractpkey_toolbutton");
-	gtk_widget_set_sensitive (widget, pk_indb);
+	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+	widget = gtk_builder_get_object (main_window_gtkb, "extractpkey_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 
-	widget = glade_xml_get_widget (main_window_xml, "revoke1");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "revoke_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "revoke1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "sign1");
-	gtk_widget_set_sensitive (widget, TRUE);
-	widget = glade_xml_get_widget (main_window_xml, "sign_toolbutton");
-	gtk_widget_set_sensitive (widget, TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-	widget = glade_xml_get_widget (main_window_xml, "delete2");
-	gtk_widget_set_sensitive (widget, TRUE);
-	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
-	gtk_widget_set_sensitive (widget, TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "delete2");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "delete_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-	widget = glade_xml_get_widget (main_window_xml, "properties1");
-	gtk_widget_set_sensitive (widget, TRUE);
+	widget = gtk_builder_get_object (main_window_gtkb, "properties1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 }
 
 void __ca_deactivate_actions ()
 {
-	GtkWidget *widget;
+	GObject *widget;
 	
-	widget = glade_xml_get_widget (main_window_xml, "export1");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "export1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "extractprivatekey1");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "extractpkey_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "extractpkey_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "revoke1");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "revoke_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "revoke1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "sign1");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "sign_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "delete2");
-	gtk_widget_set_sensitive (widget, FALSE);
-	widget = glade_xml_get_widget (main_window_xml, "delete_toolbutton");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "delete2");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "delete_toolbutton");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-	widget = glade_xml_get_widget (main_window_xml, "properties1");
-	gtk_widget_set_sensitive (widget, FALSE);
+	widget = gtk_builder_get_object (main_window_gtkb, "properties1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 }
 
 gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
@@ -777,7 +777,7 @@ gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 
 void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 {
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	GIOChannel * file = NULL;
 	gchar * filename = NULL;
 	gchar * pem = NULL;
@@ -785,7 +785,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	
 	if (type == 1)
 		dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export certificate"),
@@ -889,13 +889,13 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 
 gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 {
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
 	gint id;
 	gchar * strerror = NULL;
 
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export crypted private key"),
 							  GTK_WINDOW(widget),
@@ -940,13 +940,13 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 
 void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 {
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
 	gint id;
         gchar * error_msg = NULL;
 
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export uncrypted private key"),
 							  GTK_WINDOW(widget),
@@ -989,14 +989,14 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 
 void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 {
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
 	gint id;
 
         gchar *error_msg = NULL;
 
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new 
 			       (_("Export whole certificate in PKCS#12 package"),
@@ -1048,101 +1048,101 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 
 void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	//GtkDialog * dialog = NULL;
 	GtkTreeIter *iter;	
-	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
-	GladeXML * dialog_xml = NULL;
-	gchar     * xml_file = NULL;
+	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	GtkBuilder * dialog_gtkb = NULL;
 	gboolean has_pk_in_db = FALSE;
 	gint response = 0;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "export_certificate_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "export_certificate_dialog.ui", NULL ),
+				   NULL);
+	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &has_pk_in_db, -1);			
-	widget = glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2");
-	gtk_widget_set_sensitive (widget, has_pk_in_db);
-	widget = glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3");
-	gtk_widget_set_sensitive (widget, has_pk_in_db);
+	widget = gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), has_pk_in_db);
+	widget = gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), has_pk_in_db);
 
 	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
- 	        widget = glade_xml_get_widget (dialog_xml, "export_certificate_dialog");
+ 	        widget = gtk_builder_get_object (dialog_gtkb, "export_certificate_dialog");
 		gtk_window_set_title (GTK_WINDOW(widget), _("Export CSR - gnoMint"));
 
-		widget = glade_xml_get_widget (dialog_xml, "label2");
+		widget = gtk_builder_get_object (dialog_gtkb, "label2");
 		gtk_label_set_text 
                         (GTK_LABEL(widget), 
                          _("Please, choose which part of the saved Certificate Signing Request you want to export:"));
 
-		widget = glade_xml_get_widget (dialog_xml, "label5");
+		widget = gtk_builder_get_object (dialog_gtkb, "label5");
 		gtk_label_set_markup 
                         (GTK_LABEL(widget), 
                          _("<i>Export the Certificate Signing Request to a public file, in PEM format.</i>"));
 
-		widget = glade_xml_get_widget (dialog_xml, "label15");
+		widget = gtk_builder_get_object (dialog_gtkb, "label15");
 		gtk_label_set_markup 
                         (GTK_LABEL(widget), 
                          _("<i>Export the saved private key to a PKCS#8 password-protected file. This file should only be accessed by the subject of the Certificate Signing Request.</i>"));
 
-	        widget = glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3");
+	        widget = gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3");
 		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
-	        widget = glade_xml_get_widget (dialog_xml, "label19");
+	        widget = gtk_builder_get_object (dialog_gtkb, "label19");
 		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
 
 	}
 	
 
-	widget = glade_xml_get_widget (dialog_xml, "export_certificate_dialog");
+	widget = gtk_builder_get_object (dialog_gtkb, "export_certificate_dialog");
 
 	response = gtk_dialog_run(GTK_DIALOG(widget)); 
 	
 	if (!response || response == GTK_RESPONSE_CANCEL) {
-		gtk_widget_destroy (widget);
-		g_object_unref (G_OBJECT(dialog_xml));
+		gtk_widget_destroy (GTK_WIDGET(widget));
+		g_object_unref (G_OBJECT(dialog_gtkb));
 		return;
 	} 
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "publicpart_radiobutton1")))) {
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
 		/* Export public part */
 		__ca_export_public_pem (iter, type);
-		gtk_widget_destroy (widget);
-		g_object_unref (G_OBJECT(dialog_xml));
+		gtk_widget_destroy (GTK_WIDGET(widget));
+		g_object_unref (G_OBJECT(dialog_gtkb));
 		
 		return;
 	}
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "privatepart_radiobutton2")))) {
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
 		/* Export private part (crypted) */
 		g_free (__ca_export_private_pkcs8 (iter, type));
-		gtk_widget_destroy (widget);
-		g_object_unref (G_OBJECT(dialog_xml));
+		gtk_widget_destroy (GTK_WIDGET(widget));
+		g_object_unref (G_OBJECT(dialog_gtkb));
 		
 		return;
 	}
 
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "privatepart_uncrypted_radiobutton2")))) {
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
 		/* Export private part (uncrypted) */
 		__ca_export_private_pem (iter, type);
-		gtk_widget_destroy (widget);
-		g_object_unref (G_OBJECT(dialog_xml));
+		gtk_widget_destroy (GTK_WIDGET(widget));
+		g_object_unref (G_OBJECT(dialog_gtkb));
 		
 		return;
 	}
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (glade_xml_get_widget (dialog_xml, "bothparts_radiobutton3")))) {
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
 		/* Export PKCS#12 structure */
 		__ca_export_pkcs12 (iter, type);
-		gtk_widget_destroy (widget);
-		g_object_unref (G_OBJECT(dialog_xml));
+		gtk_widget_destroy (GTK_WIDGET(widget));
+		g_object_unref (G_OBJECT(dialog_gtkb));
 		
 		return;
 	}
 	
-	gtk_widget_destroy (widget);
-	g_object_unref (G_OBJECT(dialog_xml));
+	gtk_widget_destroy (GTK_WIDGET(widget));
+	g_object_unref (G_OBJECT(dialog_gtkb));
 	dialog_error (_("Unexpected error"));
 }
 
@@ -1153,7 +1153,7 @@ void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_dat
 	gchar *filename = NULL;
 	gint id;
 
-	type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
 
@@ -1176,18 +1176,18 @@ void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_dat
 
 void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
         gchar * errmsg = NULL;
 	GtkTreeIter *iter;	
-	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
 	gint id = 0;
 
 	if (type == CA_FILE_ELEMENT_TYPE_CSR)
 		return;
 	
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 						    GTK_DIALOG_DESTROY_WITH_PARENT,
 						    GTK_MESSAGE_QUESTION,
@@ -1216,17 +1216,17 @@ void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 
 void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
 	GtkTreeIter *iter;	
-	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
 	gint id = 0;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CSR)
 		return;
 	
-	widget = glade_xml_get_widget (main_window_xml, "main_window1");
+	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 						    GTK_DIALOG_DESTROY_WITH_PARENT,
 						    GTK_MESSAGE_QUESTION,
@@ -1251,7 +1251,7 @@ void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GtkTreeIter *iter;
 
-	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gchar * csr_pem;
 	gchar * csr_parent_id;
 	guint64 csr_id;
@@ -1290,7 +1290,7 @@ guint64 ca_get_selected_row_id ()
 	GtkTreeIter *iter;
 	guint64 result;
 
-	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
 
 	type = 0;
@@ -1302,7 +1302,7 @@ gchar * ca_get_selected_row_pem ()
 	GtkTreeIter *iter;
 	gchar * result;
 
-	gint type = __ca_selection_type (GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview")), &iter);
+	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
 	
 	type = 0;
@@ -1313,7 +1313,7 @@ gchar * ca_get_selected_row_pem ()
 void ca_update_csr_view (gboolean new_value, gboolean refresh)
 {
         view_csr = new_value;
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(glade_xml_get_widget(main_window_xml, "csr_view_menuitem")), new_value);
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_window_gtkb, "csr_view_menuitem")), new_value);
         if (refresh)
                 dialog_refresh_list();
 }
@@ -1330,7 +1330,7 @@ gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
 void ca_update_revoked_view (gboolean new_value, gboolean refresh)
 {
         view_rcrt = new_value;
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(glade_xml_get_widget(main_window_xml, "revoked_view_menuitem")), new_value);
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_window_gtkb, "revoked_view_menuitem")), new_value);
         if (refresh)
                 dialog_refresh_list();
 }
@@ -1354,8 +1354,8 @@ void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data)
 
 gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 {
-	GtkWidget *menu, *widget;
-	GtkTreeView * tree_view =  GTK_TREE_VIEW(glade_xml_get_widget (main_window_xml, "ca_treeview"));
+	GObject *menu, *widget;
+	GtkTreeView * tree_view =  GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
 	GdkEventButton *event_button = (GdkEventButton *) data;
 	GtkTreeIter *iter;
 	gboolean pk_indb, is_revoked;
@@ -1365,32 +1365,32 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 	switch (selection_type) {
 		
 	case CA_FILE_ELEMENT_TYPE_CERT:
-		menu = glade_xml_get_widget (cert_popup_menu_xml,
+		menu = gtk_builder_get_object (cert_popup_menu_gtkb,
 					     "certificate_popup_menu");
 		
 		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
 				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 				   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
 		
-		widget = glade_xml_get_widget (cert_popup_menu_xml, "extract_pkey_menuitem");
-		gtk_widget_set_sensitive (widget, pk_indb);
+		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
-		widget = glade_xml_get_widget (cert_popup_menu_xml, "revoke_menuitem");
-		gtk_widget_set_sensitive (widget, (! is_revoked));
+		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
 		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
 				event_button->button, event_button->time);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
-		menu = glade_xml_get_widget (csr_popup_menu_xml,
+		menu = gtk_builder_get_object (csr_popup_menu_gtkb,
 					     "csr_popup_menu");
 
 		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
 				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 				   -1);
 		
-		widget = glade_xml_get_widget (csr_popup_menu_xml, "extract_pkey_menuitem3");
-		gtk_widget_set_sensitive (widget, pk_indb);
+		widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
 		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
 				event_button->button, event_button->time);
@@ -1429,99 +1429,99 @@ gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 
 void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data) 
 {
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
-	GladeXML * dialog_xml = NULL;
-	gchar     * xml_file = NULL;
+	GtkBuilder * dialog_gtkb = NULL;
 	const gchar *newpwd;
 	const gchar *currpwd;
 
 	gint response = 0;
 	gboolean repeat;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "change_password_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "change_password_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 
 	if (ca_file_is_password_protected()) {
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label1");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label1");
 		g_object_set (G_OBJECT(widget), "visible", TRUE, NULL);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
 		g_object_set (G_OBJECT(widget), "visible", TRUE, NULL);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_commit_button");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_commit_button");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
 	} else {
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_no_radiobutton");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_no_radiobutton");
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label1");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label1");
 		g_object_set (G_OBJECT(widget), "visible", FALSE, NULL);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
 		g_object_set (G_OBJECT(widget), "visible", FALSE, NULL);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
 	}
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
-	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
+	g_object_set_data (G_OBJECT(widget), "dialog_gtkb", dialog_gtkb);
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
-	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
+	g_object_set_data (G_OBJECT(widget), "dialog_gtkb", dialog_gtkb);
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
-	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
+	g_object_set_data (G_OBJECT(widget), "dialog_gtkb", dialog_gtkb);
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
-	g_object_set_data (G_OBJECT(widget), "dialog_xml", dialog_xml);
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
+	g_object_set_data (G_OBJECT(widget), "dialog_gtkb", dialog_gtkb);
 
 	
 	do {
 
-		widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+		widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
 		gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
 		response = gtk_dialog_run(GTK_DIALOG(widget)); 
 		
 		if (!response || response == GTK_RESPONSE_CANCEL) {
-			gtk_widget_destroy (widget);
-			g_object_unref (G_OBJECT(dialog_xml));
+			gtk_widget_destroy (GTK_WIDGET(widget));
+			g_object_unref (G_OBJECT(dialog_gtkb));
 			return;
 		} 
 		
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
 		newpwd = gtk_entry_get_text (GTK_ENTRY(widget));
 		
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
 		currpwd = gtk_entry_get_text (GTK_ENTRY(widget));
 
 		repeat = (ca_file_is_password_protected() && ! ca_file_check_password (currpwd));
@@ -1529,13 +1529,13 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 		if (repeat) {
 			dialog_error (_("The current password you have entered  "
 					   "doesn't match with the actual current database password."));
-			widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
-			gtk_widget_grab_focus (widget);
+			widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
+			gtk_widget_grab_focus (GTK_WIDGET(widget));
 		} 
 
 	} while (repeat);
 	
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
 	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
 
 		if (ca_file_is_password_protected()) {
@@ -1545,7 +1545,7 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 				dialog_error (_("Error while changing database password. "
 						   "The operation was cancelled."));
 			} else {
-				widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+				widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
 				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 									    GTK_DIALOG_DESTROY_WITH_PARENT,
 									    GTK_MESSAGE_INFO,
@@ -1565,7 +1565,7 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 						   "The operation was cancelled."));
 
 			} else {
-				widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+				widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
 				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 									    GTK_DIALOG_DESTROY_WITH_PARENT,
 									    GTK_MESSAGE_INFO,
@@ -1584,7 +1584,7 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 				dialog_error (_("Error while removing database password. "
 						   "The operation was cancelled."));
 			} else {
-				widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
+				widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
 				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 									    GTK_DIALOG_DESTROY_WITH_PARENT,
 									    GTK_MESSAGE_INFO,
@@ -1604,46 +1604,46 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 
 	}
 
-	widget = glade_xml_get_widget (dialog_xml, "change_password_dialog");
-	gtk_widget_destroy (widget);
+	widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
+	gtk_widget_destroy (GTK_WIDGET(widget));
 
 }
 
 
 gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data)
 {
-	GladeXML * dialog_xml = g_object_get_data (G_OBJECT(entry), "dialog_xml");
-	GtkWidget *widget;
+	GtkBuilder * dialog_gtkb = g_object_get_data (G_OBJECT(entry), "dialog_gtkb");
+	GObject *widget;
 
 	const gchar *pwd1;
 	const gchar *pwd2;
 	const gchar *currpwd;
 	gboolean pwd_protect;
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
 	pwd_protect = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
 	pwd1 = gtk_entry_get_text (GTK_ENTRY(widget));
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
 	pwd2 = gtk_entry_get_text (GTK_ENTRY(widget));
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_current_pwd_entry");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
 	currpwd = gtk_entry_get_text (GTK_ENTRY(widget));
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_commit_button");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_commit_button");
 	if (pwd_protect) {
 		if (strlen(pwd1) && strlen(pwd2) && ! strcmp(pwd1, pwd2)) {
 			if (!ca_file_is_password_protected() || (ca_file_is_password_protected() && strlen(currpwd)))
-				gtk_widget_set_sensitive (widget, TRUE);
+				gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 			else
-				gtk_widget_set_sensitive (widget, FALSE);			
+				gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);			
 		} else {
-			gtk_widget_set_sensitive (widget, FALSE);		
+			gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);		
 		}
 	} else {
-		gtk_widget_set_sensitive (widget, TRUE);
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 	}
 
 	return FALSE;
@@ -1651,48 +1651,48 @@ gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data
 
 gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data)
 {
-	GladeXML * dialog_xml;
-	GtkWidget * widget = NULL;
+	GtkBuilder * dialog_gtkb;
+	GObject * widget = NULL;
 
 
 	if (! G_IS_OBJECT(button))
 		return TRUE;
 
-	dialog_xml = g_object_get_data (G_OBJECT(button), "dialog_xml");
-	if (! dialog_xml)
+	dialog_gtkb = g_object_get_data (G_OBJECT(button), "dialog_gtkb");
+	if (! dialog_gtkb)
 		return TRUE;
 
-	widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_pwd_protect_yes_radiobutton");
+	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
 	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
 		/* We want to password-protect the database */
 		
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
-		gtk_widget_set_sensitive (widget, TRUE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
 		ca_changepwd_newpwd_entry_changed (button, NULL);
 	
 	} else {
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label2");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_label3");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label3");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry1");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
-		widget = glade_xml_get_widget (dialog_xml, "ca_changepwd_newpwd_entry2");
-		gtk_widget_set_sensitive (widget, FALSE);
+		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
+		gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 	}
 
 	return FALSE;
@@ -1701,31 +1701,31 @@ gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpoint
 
 void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
 {
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	GtkDialog * dialog = NULL, * dialog2 = NULL;
-	GladeXML * dialog_xml = NULL;
-	gchar     * xml_file = NULL;
+	GtkBuilder * dialog_gtkb = NULL;
 	gchar *filename;
 	gint response = 0;
 	guint dh_size;
 	gchar *strerror;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "dh_parameters_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "dh_parameters_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 	
 
-	dialog = GTK_DIALOG(glade_xml_get_widget (dialog_xml, "dh_parameters_dialog"));
+	dialog = GTK_DIALOG(gtk_builder_get_object (dialog_gtkb, "dh_parameters_dialog"));
 	response = gtk_dialog_run(dialog); 
 	
 	if (!response) {
 		gtk_widget_destroy (GTK_WIDGET(dialog));
-		g_object_unref (G_OBJECT(dialog_xml));
+		g_object_unref (G_OBJECT(dialog_gtkb));
 		return;
 	} 
 
-	widget = glade_xml_get_widget (dialog_xml, "dh_prime_size_spinbutton");
+	widget = gtk_builder_get_object (dialog_gtkb, "dh_prime_size_spinbutton");
 	dh_size = gtk_spin_button_get_value (GTK_SPIN_BUTTON(widget));
 
 	dialog2 = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Save Diffie-Hellman parameters"),
@@ -1793,33 +1793,34 @@ void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 	gchar *filename;
 
-	GtkWidget *dialog, *main_window_widget, *widget;
-	GladeXML * dialog_xml = NULL;
+	GObject *main_window_widget, *widget;
+	GtkWidget *dialog;
+	GtkBuilder * dialog_gtkb = NULL;
         GtkToggleButton *radiobutton = NULL;
-	gchar     * xml_file = NULL;
 	gint response = 0;
         gboolean import_file = TRUE;
 	
-	main_window_widget = glade_xml_get_widget (main_window_xml, "main_window");
+	main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window");
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "import_file_or_directory_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_file_or_directory_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (dialog_gtkb, NULL);
 
-        widget = glade_xml_get_widget (dialog_xml, "import_file_or_directory_dialog");
+        widget = gtk_builder_get_object (dialog_gtkb, "import_file_or_directory_dialog");
         response = gtk_dialog_run (GTK_DIALOG(widget));
 
         if (response < 0) {
-                gtk_widget_destroy (widget);
-                g_object_unref (G_OBJECT(dialog_xml));
+                gtk_widget_destroy (GTK_WIDGET(widget));
+                g_object_unref (G_OBJECT(dialog_gtkb));
                 return;
         }
 
-        radiobutton = GTK_TOGGLE_BUTTON(glade_xml_get_widget (dialog_xml, "importfile_radiobutton"));
+        radiobutton = GTK_TOGGLE_BUTTON(gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
         import_file = gtk_toggle_button_get_active(radiobutton);
 
-        gtk_widget_destroy (widget);
+        gtk_widget_destroy (GTK_WIDGET(widget));
 
         if (import_file) {
                 // Import single file

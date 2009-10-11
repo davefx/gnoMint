@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkMenu" id="csr_popup_menu">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <child>
+      <object class="GtkImageMenuItem" id="csr_properties_menuitem">
+        <property name="label">gtk-properties</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Shows the CSR properties window</property>
+        <property name="tooltip_text" translatable="yes">Shows the CSR properties window</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_properties1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="sep_menuitem7">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="csr_export_menuitem">
+        <property name="label" translatable="yes">E_xport</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Exports the CSR so it can be imported by any other application</property>
+        <property name="tooltip_text" translatable="yes">Exports the CSR so it can be imported by any other application</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_export1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="extract_pkey_menuitem3">
+        <property name="label" translatable="yes">Extrac_t private key</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Extracts the private key of the selected 
+certificate from the database to an 
+external file. This file must be provided 
+each time the CSR will be used</property>
+        <property name="tooltip_text" translatable="yes">Extracts the private key of the selected 
+certificate from the database to an 
+external file. This file must be provided 
+each time the CSR will be used</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="sep_menuitem8">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="sign_csr_menuitem">
+        <property name="label" translatable="yes">_Sign</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_sign1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="csr_delete_menuitem">
+        <property name="label">gtk-delete</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="ca_on_delete2_activate"/>
+      </object>
+    </child>
+  </object>
+</interface>

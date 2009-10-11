@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkMenu" id="certificate_popup_menu">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <child>
+      <object class="GtkImageMenuItem" id="cert_properties_menuitem">
+        <property name="label">gtk-properties</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Shows the certificate properties window</property>
+        <property name="tooltip_text" translatable="yes">Shows the certificate properties window</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_properties1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="sep_menuitem5">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="cert_export_menuitem">
+        <property name="label" translatable="yes">E_xport</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Exports the certificate so it can be imported by any other application</property>
+        <property name="tooltip_text" translatable="yes">Exports the certificate so it can be imported by any other application</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_export1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="extract_pkey_menuitem">
+        <property name="label" translatable="yes">Extrac_t private key</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Extracts the private key of the selected 
+certificate from the database to an 
+external file. This file must be provided 
+each time the certificate will be used</property>
+        <property name="tooltip_text" translatable="yes">Extracts the private key of the selected 
+certificate from the database to an 
+external file. This file must be provided 
+each time the certificate will be used</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_extractprivatekey1_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="sep_menuitem6">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="revoke_menuitem">
+        <property name="label" translatable="yes">Revo_ke</property>
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_markup">Revokes the selected certificate</property>
+        <property name="tooltip_text" translatable="yes">Revokes the selected certificate</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_revoke_activate"/>
+      </object>
+    </child>
+  </object>
+</interface>

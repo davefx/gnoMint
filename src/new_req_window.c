@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <libintl.h>
@@ -33,7 +33,7 @@
 
 #include <glib/gi18n.h>
 
-GladeXML * new_req_window_xml = NULL;
+GtkBuilder * new_req_window_gtkb = NULL;
 GtkTreeStore * new_req_ca_list_model = NULL;
 gboolean new_req_ca_id_valid = FALSE;
 guint64 new_req_ca_id;
@@ -191,12 +191,12 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data)
 {
-	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview"));
+	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
 	GtkTreeIter iter;
 
 
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_req_window_xml, "inherit_radiobutton")))) {
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")))) {
 		/* Inherit */
 		gtk_widget_set_sensitive (GTK_WIDGET(treeview), TRUE);
 		gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
@@ -216,30 +216,25 @@ void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data
 
 void new_req_window_display()
 {
-	gchar     * xml_file = NULL;
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
+	new_req_window_gtkb = gtk_builder_new();
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	// Workaround for libglade
-	tst = foo;
-	new_req_window_xml = glade_xml_new (xml_file, "new_req_window", NULL);
+	gtk_builder_add_from_file (new_req_window_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL),
+				   NULL);
 	
-	g_free (xml_file);
+	gtk_builder_connect_signals (new_req_window_gtkb, NULL); 	
 	
-	glade_xml_signal_autoconnect (new_req_window_xml); 	
-	
-	country_table_populate_combobox(GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml, "country_combobox1")));
+	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_req_window_gtkb, "country_combobox1")));
 
-	__new_req_populate_ca_treeview (GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview")));
+	__new_req_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview")));
 
-	new_req_inherit_fields_toggled (GTK_TOGGLE_BUTTON(glade_xml_get_widget(new_req_window_xml, "inherit_radiobutton")), NULL);
+	new_req_inherit_fields_toggled (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
 
 }
 
 void new_req_tab_activate (int tab_number)
 {
-	GtkNotebook *notebook = GTK_NOTEBOOK(glade_xml_get_widget (new_req_window_xml, "new_req_notebook"));
+	GtkNotebook *notebook = GTK_NOTEBOOK(gtk_builder_get_object (new_req_window_gtkb, "new_req_notebook"));
 	
 	gtk_notebook_set_current_page (notebook, tab_number);
 
@@ -248,7 +243,7 @@ void new_req_tab_activate (int tab_number)
 void on_new_req_cn_entry_changed (GtkEditable *editable,
 			 gpointer user_data) 
 {
-	GtkButton *button = GTK_BUTTON(glade_xml_get_widget (new_req_window_xml, "new_req_next2"));
+	GtkButton *button = GTK_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "new_req_next2"));
 
 	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
 		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
@@ -268,7 +263,7 @@ gboolean __new_req_window_lookup_country (GtkTreeModel *model,
         
         gtk_tree_model_get_value (model, iter, 1, value);
         if (! strcmp (country, g_value_get_string(value))) {
-                gtk_combo_box_set_active_iter (GTK_COMBO_BOX(glade_xml_get_widget(new_req_window_xml,"country_combobox1")), iter);
+                gtk_combo_box_set_active_iter (GTK_COMBO_BOX(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1")), iter);
 		g_free (value);
                 return TRUE;
         }
@@ -281,7 +276,7 @@ gboolean __new_req_window_lookup_country (GtkTreeModel *model,
 void on_new_req_next1_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
-	GtkTreeView *treeview = GTK_TREE_VIEW(glade_xml_get_widget(new_req_window_xml, "new_req_ca_treeview"));
+	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         GValue *value = g_new0(GValue, 1);
         GtkTreeModel *model;
@@ -304,7 +299,7 @@ void on_new_req_next1_clicked (GtkButton *button,
                 new_req_ca_id_valid = TRUE;
                 new_req_ca_id = g_value_get_uint64(value);
 
-		widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
+		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 if (ca_file_policy_get (new_req_ca_id, "C_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "C_FORCE_SAME"));
                         model = GTK_TREE_MODEL(gtk_combo_box_get_model (GTK_COMBO_BOX(widget)));
@@ -314,7 +309,7 @@ void on_new_req_next1_clicked (GtkButton *button,
 			gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
                 }
                 
-		widget = glade_xml_get_widget(new_req_window_xml,"st_entry1");
+		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 if (ca_file_policy_get (new_req_ca_id, "ST_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "ST_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->st);
@@ -323,7 +318,7 @@ void on_new_req_next1_clicked (GtkButton *button,
                         gtk_entry_set_text(GTK_ENTRY(widget), "");
                 }
                 
-		widget = glade_xml_get_widget(new_req_window_xml,"city_entry1");
+		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 if (ca_file_policy_get (new_req_ca_id, "L_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "L_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->l);
@@ -332,7 +327,7 @@ void on_new_req_next1_clicked (GtkButton *button,
                         gtk_entry_set_text(GTK_ENTRY(widget), "");
                 }
                 
-		widget = glade_xml_get_widget(new_req_window_xml,"o_entry1");
+		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 if (ca_file_policy_get (new_req_ca_id, "O_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "O_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->o);
@@ -341,7 +336,7 @@ void on_new_req_next1_clicked (GtkButton *button,
                         gtk_entry_set_text(GTK_ENTRY(widget), "");
                 }
                 
-                widget = glade_xml_get_widget(new_req_window_xml,"ou_entry1");
+                widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 if (ca_file_policy_get (new_req_ca_id, "OU_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "OU_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->ou);
@@ -354,15 +349,15 @@ void on_new_req_next1_clicked (GtkButton *button,
         } else {
                 new_req_ca_id_valid = FALSE;
 
-                widget = glade_xml_get_widget(new_req_window_xml,"country_combobox1");
+                widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-                widget = glade_xml_get_widget(new_req_window_xml,"st_entry1");
+                widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-                widget = glade_xml_get_widget(new_req_window_xml,"city_entry1");
+                widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-                widget = glade_xml_get_widget(new_req_window_xml,"o_entry1");
+                widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-                widget = glade_xml_get_widget(new_req_window_xml,"ou_entry1");
+                widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
         }
 
@@ -392,7 +387,7 @@ void on_new_req_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	
-	GtkWindow *window = GTK_WINDOW(glade_xml_get_widget (new_req_window_xml, "new_req_window"));
+	GtkWindow *window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
 
 	gtk_object_destroy(GTK_OBJECT(window));
 	
@@ -415,7 +410,7 @@ void on_new_req_commit_clicked (GtkButton *widg,
         if (new_req_ca_id_valid)
                 csr_creation_data->parent_ca_id_str = g_strdup_printf ("'%"G_GUINT64_FORMAT"'", new_req_ca_id);
 
-	widget = glade_xml_get_widget (new_req_window_xml, "country_combobox1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "country_combobox1"));
 	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
 
 	if (active < 0) {
@@ -429,46 +424,46 @@ void on_new_req_commit_clicked (GtkButton *widg,
 		
 	}
 		
-	widget = glade_xml_get_widget (new_req_window_xml, "st_entry1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "st_entry1"));
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->state = g_strdup (text);
 	else
 		csr_creation_data->state = NULL;
 
-	widget = glade_xml_get_widget (new_req_window_xml, "city_entry1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "city_entry1"));
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->city = g_strdup (text);
 	else
 		csr_creation_data->city = NULL;
 
-	widget = glade_xml_get_widget (new_req_window_xml, "o_entry1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "o_entry1"));
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->org = g_strdup (text);
 	else
 		csr_creation_data->org = NULL;
 
-	widget = glade_xml_get_widget (new_req_window_xml, "ou_entry1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "ou_entry1"));
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->ou = g_strdup (text);
 	else
 		csr_creation_data->ou = NULL;
 
-	widget = glade_xml_get_widget (new_req_window_xml, "cn_entry1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "cn_entry1"));
 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
 	if (strlen (text))
 		csr_creation_data->cn = g_strdup (text);
 	else
 		csr_creation_data->cn = NULL;
 
-	widget = glade_xml_get_widget (new_req_window_xml, "dsa_radiobutton1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	csr_creation_data->key_type = active;
 
-	widget = glade_xml_get_widget (new_req_window_xml, "keylength_spinbutton1");
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "keylength_spinbutton1"));
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
 	csr_creation_data->key_bitlength = active;
 
@@ -481,7 +476,7 @@ void on_new_req_commit_clicked (GtkButton *widg,
                 }
         }
 
-	window = GTK_WINDOW(glade_xml_get_widget (new_req_window_xml, "new_req_window"));
+	window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
 	gtk_object_destroy(GTK_OBJECT(window));
 
 	creation_process_window_csr_display (csr_creation_data);	

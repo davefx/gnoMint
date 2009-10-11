@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <libintl.h>
@@ -30,51 +30,45 @@
 #include <glib/gi18n.h>
 
 
-GladeXML * csr_properties_window_xml = NULL;
+GtkBuilder * csr_properties_window_gtkb = NULL;
 
 void __csr_properties_populate (const char *csr_pem, gboolean);
 
 void csr_properties_display(const char *csr_pem, gboolean privkey_in_db)
 {
-	gchar     * xml_file = NULL;
-	GtkWidget * widget = NULL;
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
+	GObject * widget = NULL;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	// Workaround for libglade
-	tst = foo;
-	csr_properties_window_xml = glade_xml_new (xml_file, "csr_properties_dialog", NULL);
-	
-	g_free (xml_file);
-	
-	glade_xml_signal_autoconnect (csr_properties_window_xml); 	
+	csr_properties_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (csr_properties_window_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "csr_properties_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (csr_properties_window_gtkb, NULL);
 	
 	__csr_properties_populate (csr_pem, privkey_in_db);
        
-	widget = glade_xml_get_widget (csr_properties_window_xml, "csr_properties_dialog");
-	gtk_widget_show (widget);
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "csr_properties_dialog");
+	gtk_widget_show (GTK_WIDGET(widget));
 }
 
 
 void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 {
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	TlsCsr * csr = NULL;
 
 	csr = tls_parse_csr_pem (csr_pem);
 
-	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectCNLabel1");	
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectCNLabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->cn);
 
-	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectOLabel1");	
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectOLabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->o);
 
-	widget = glade_xml_get_widget (csr_properties_window_xml, "certSubjectOULabel1");	
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectOULabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->ou);
 
 	if (! privkey_in_db) {
-		widget = glade_xml_get_widget (csr_properties_window_xml, "privatekey_in_db_label");
+		widget = gtk_builder_get_object (csr_properties_window_gtkb, "privatekey_in_db_label");
 		gtk_label_set_markup (GTK_LABEL(widget), _("<b>This Certificate Signing Request has its corresponding private key saved in a external file.</b>"));
 
 	}
@@ -84,9 +78,9 @@ void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 
 void csr_properties_close_clicked (const char *csr_pem)
 {
-        GtkWidget *widget = NULL;
-	widget = glade_xml_get_widget (csr_properties_window_xml, "csr_properties_dialog");
+        GObject *widget = NULL;
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "csr_properties_dialog");
 	g_assert (widget);
-	gtk_widget_destroy (widget);
+	gtk_widget_destroy (GTK_WIDGET(widget));
 }
 

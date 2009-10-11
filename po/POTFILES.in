@@ -2,8 +2,26 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
 gconf/gnomint.schemas.in
-gui/gnomint.glade
+gui/certificate_popup_menu.ui
+gui/certificate_properties_dialog.ui
+gui/change_password_dialog.ui
+gui/creation_process_window.ui
+gui/csr_popup_menu.ui
+gui/csr_properties_dialog.ui
+gui/dh_parameters_dialog.ui
+gui/export_certificate_dialog.ui
+gui/get_db_password_dialog.ui
+gui/get_password_dialog.ui
+gui/get_pkey_dialog.ui
 gui/gnomint.desktop.in
+gui/import_file_or_directory_dialog.ui
+gui/import_password_dialog.ui
+gui/main_window.ui
+gui/new_ca_window.ui
+gui/new_cert_window.ui
+gui/new_crl_dialog.ui
+gui/new_req_window.ui
+gui/preferences_dialog.ui
 mime/gnomint.xml.in
 src/ca.c
 src/ca-cli.c

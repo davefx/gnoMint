@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <libintl.h>
@@ -29,27 +29,21 @@
 
 #include <glib/gi18n.h>
 
-GladeXML *preferences_window_xml = NULL;
+GtkBuilder *preferences_window_gtkb = NULL;
 
 void preferences_window_display()
 {
-	gchar     * xml_file = NULL;
         GtkWidget * widget = NULL;
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	// Workaround for libglade
-	tst = foo;
-	preferences_window_xml = glade_xml_new (xml_file, "preferences_dialog", NULL);
+	preferences_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (preferences_window_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "preferences_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (preferences_window_gtkb, NULL);
 	
-	g_free (xml_file);
-	
-	glade_xml_signal_autoconnect (preferences_window_xml); 	
-	
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(preferences_window_xml, "gnomekeyring_export_check")),
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_window_gtkb, "gnomekeyring_export_check")),
                                       preferences_get_gnome_keyring_export());
-	widget = glade_xml_get_widget (preferences_window_xml, "preferences_dialog");
+	widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
 
         gtk_widget_show (widget);
 
@@ -67,7 +61,7 @@ void preferences_window_gnomekeyring_export_toggled (GtkToggleButton *togglebutt
 
 void preferences_window_ok_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
-       	GtkWidget *widget = glade_xml_get_widget (preferences_window_xml, "preferences_dialog");
+       	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
 	gtk_widget_destroy (widget); 
 
 }

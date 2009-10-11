@@ -24,7 +24,7 @@
 #include <libintl.h>
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <glade/glade.h>
+
 
 void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data);
 gboolean on_main_window1_delete (GtkWidget *widget, GdkEvent *event, gpointer user_data);

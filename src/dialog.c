@@ -245,7 +245,7 @@ gchar * dialog_ask_for_string (gchar *message, gchar *default_answer)
 
 #else
 
-#include <glade/glade.h>
+
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
@@ -289,49 +289,49 @@ gchar * dialog_get_password (gchar *info_message,
 			     gchar *password_message, gchar *confirm_message, 
 			     gchar *distinct_error_message, guint minimum_length)
 {
-	GtkWidget * widget = NULL, * password_widget = NULL;
+	GObject * widget = NULL, * password_widget = NULL;
 	//GtkDialog * dialog = NULL;
-	GladeXML * dialog_xml = NULL;
-	gchar     * xml_file = NULL;
+	GtkBuilder * dialog_gtkb = NULL;
 	gint response = 0;
 	gchar *password = NULL;
 	const gchar *passwordagain = NULL;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	dialog_xml = glade_xml_new (xml_file, "get_password_dialog", NULL);
-	g_free (xml_file);
-	glade_xml_signal_autoconnect (dialog_xml); 	
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_password_dialog.ui", NULL ),
+				   NULL);
+	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 	
-	widget = glade_xml_get_widget (dialog_xml, "info_message");
+	widget = gtk_builder_get_object (dialog_gtkb, "info_message");
 	gtk_label_set_text (GTK_LABEL(widget), info_message);
-	widget = glade_xml_get_widget (dialog_xml, "password_message");
+	widget = gtk_builder_get_object (dialog_gtkb, "password_message");
 	gtk_label_set_text (GTK_LABEL(widget), password_message);
-	widget = glade_xml_get_widget (dialog_xml, "confirm_message");
+	widget = gtk_builder_get_object (dialog_gtkb, "confirm_message");
 	gtk_label_set_text (GTK_LABEL(widget), confirm_message);
 
-	password_widget = glade_xml_get_widget (dialog_xml, "password_entry");
-	widget = glade_xml_get_widget (dialog_xml, "password_dialog_ok_button");
+	password_widget = gtk_builder_get_object (dialog_gtkb, "password_entry");
+	widget = gtk_builder_get_object (dialog_gtkb, "password_dialog_ok_button");
 	g_object_set_data (G_OBJECT(password_widget), "minimum_length", 
                            GINT_TO_POINTER(minimum_length));
 	g_object_set_data (G_OBJECT(password_widget), "ok_button", widget);
 
 	do {
-		gtk_widget_grab_focus (password_widget);
+		gtk_widget_grab_focus (GTK_WIDGET(password_widget));
 
 		if (password)
 			g_free (password);
 
-		widget = glade_xml_get_widget (dialog_xml, "get_password_dialog");
+		widget = gtk_builder_get_object (dialog_gtkb, "get_password_dialog");
 		response = gtk_dialog_run(GTK_DIALOG(widget)); 
 	
 		if (!response) {
-			gtk_widget_destroy (widget);
-			g_object_unref (G_OBJECT(dialog_xml));
+			gtk_widget_destroy (GTK_WIDGET(widget));
+			g_object_unref (G_OBJECT(dialog_gtkb));
 			return NULL;
 		} else {
-			widget = glade_xml_get_widget (dialog_xml, "password_entry");
+			widget = gtk_builder_get_object (dialog_gtkb, "password_entry");
 			password = g_strdup(gtk_entry_get_text (GTK_ENTRY(widget)));
-			widget = glade_xml_get_widget (dialog_xml, "confirm_entry");
+			widget = gtk_builder_get_object (dialog_gtkb, "confirm_entry");
 			passwordagain = gtk_entry_get_text (GTK_ENTRY(widget));
 		}
 		
@@ -341,9 +341,9 @@ gchar * dialog_get_password (gchar *info_message,
 
 	} while (strcmp (password, passwordagain));
 
-	widget = glade_xml_get_widget (dialog_xml, "get_password_dialog");
-	gtk_widget_destroy (widget);
-	g_object_unref (G_OBJECT(dialog_xml));
+	widget = gtk_builder_get_object (dialog_gtkb, "get_password_dialog");
+	gtk_widget_destroy (GTK_WIDGET(widget));
+	g_object_unref (G_OBJECT(dialog_gtkb));
 	
 	return password;
 }

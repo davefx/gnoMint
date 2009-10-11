@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <libintl.h>
@@ -32,7 +32,7 @@
 #include "dialog.h"
 #include "creation_process_window.h"
 
-GladeXML * creation_process_window_xml = NULL;
+GtkBuilder * creation_process_window_gtkb = NULL;
 
 gint timer=0;
 GThread * creation_process_window_thread = NULL;
@@ -41,33 +41,35 @@ GThread * creation_process_window_thread = NULL;
 void creation_process_window_error_dialog (gchar *message) 
 {
 
-   GtkWidget *dialog, *widget;
+	GtkWidget *dialog;
+	GObject *widget;
    
-   widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
    
-   /* Create the widgets */
+	/* Create the widgets */
    
-   dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-				    GTK_DIALOG_DESTROY_WITH_PARENT,
-				    GTK_MESSAGE_ERROR,
-				    GTK_BUTTONS_CLOSE,
-				    "%s",
-				    message);
+	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+					 GTK_DIALOG_DESTROY_WITH_PARENT,
+					 GTK_MESSAGE_ERROR,
+					 GTK_BUTTONS_CLOSE,
+					 "%s",
+					 message);
    
-   gtk_dialog_run (GTK_DIALOG(dialog));
+	gtk_dialog_run (GTK_DIALOG(dialog));
    
-   gtk_widget_destroy (dialog);
+	gtk_widget_destroy (dialog);
 }
 
 void creation_process_window_ca_finish (void) 
 {
-	GtkWidget *widget = NULL, *dialog = NULL;
+	GObject *widget = NULL;
+	GtkWidget *dialog = NULL;
 	
 	g_thread_join (creation_process_window_thread);
 	gtk_timeout_remove (timer);	       
 	timer = 0;
 	
-	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
 	
         dialog_refresh_list();
 
@@ -80,7 +82,7 @@ void creation_process_window_ca_finish (void)
         gtk_dialog_run (GTK_DIALOG(dialog));
         
         gtk_widget_destroy (GTK_WIDGET(dialog));
-        gtk_widget_destroy (widget);
+        gtk_widget_destroy (GTK_WIDGET(widget));
 			
 
 }
@@ -89,14 +91,14 @@ void creation_process_window_ca_finish (void)
 
 gint creation_process_window_ca_pulse (gpointer data)
 {
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	gchar *error_message = NULL;
 	gint status = 0;
 
 	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
 
-	widget = glade_xml_get_widget (creation_process_window_xml, "status_message_label");
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "status_message_label");
 
 	ca_creation_lock_status_mutex();
 
@@ -120,8 +122,8 @@ gint creation_process_window_ca_pulse (gpointer data)
 			creation_process_window_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
-		widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
-		gtk_widget_destroy (widget);
+		widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+		gtk_widget_destroy (GTK_WIDGET(widget));
 	}
 
 
@@ -135,20 +137,18 @@ gint creation_process_window_ca_pulse (gpointer data)
 
 void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 {
-	gchar     * xml_file = NULL;
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
+		 
+	creation_process_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (creation_process_window_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "creation_process_window.ui", NULL ),
+				   NULL);
 	
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	creation_process_window_xml = glade_xml_new (xml_file, "creation_process_window", NULL);
-	
-	g_free (xml_file);
-	
-	glade_xml_signal_autoconnect (creation_process_window_xml); 	
+	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
 	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
-	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window_progressbar");
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
@@ -159,32 +159,32 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 
 
 void on_cancel_creation_process_clicked (GtkButton *button,
-			      gpointer user_data) 
+					 gpointer user_data) 
 {
 	
-   GtkWidget *dialog, *widget;
+	GtkWidget *dialog, *widget;
 
-   if (timer) {
-	   gtk_timeout_remove (timer);	       
-	   timer = 0;
-   }
+	if (timer) {
+		gtk_timeout_remove (timer);	       
+		timer = 0;
+	}
    
-   widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
+	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window"));
 
-   /* Create the widgets */
+	/* Create the widgets */
 
-   dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-				    GTK_DIALOG_DESTROY_WITH_PARENT,
-				    GTK_MESSAGE_INFO,
-				    GTK_BUTTONS_CLOSE,
-				    "%s",
-				    _("Creation process cancelled"));
+	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+					 GTK_DIALOG_DESTROY_WITH_PARENT,
+					 GTK_MESSAGE_INFO,
+					 GTK_BUTTONS_CLOSE,
+					 "%s",
+					 _("Creation process cancelled"));
    
-   gtk_dialog_run (GTK_DIALOG(dialog));
+	gtk_dialog_run (GTK_DIALOG(dialog));
 
-   gtk_widget_destroy (GTK_WIDGET(dialog));
+	gtk_widget_destroy (GTK_WIDGET(dialog));
 
-   gtk_widget_destroy (widget);
+	gtk_widget_destroy (widget);
 	
 }
 
@@ -199,7 +199,7 @@ void creation_process_window_csr_finish (void) {
 	gtk_timeout_remove (timer);	       
 	timer = 0;
 	
-	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
+	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window"));
 	
 	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -224,7 +224,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
 
-	widget = glade_xml_get_widget (creation_process_window_xml, "status_message_label");
+	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "status_message_label"));
 
 	csr_creation_lock_status_mutex();
 
@@ -248,7 +248,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 			creation_process_window_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
-		widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window");
+		widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window"));
 		gtk_widget_destroy (widget);
 	}
 
@@ -259,23 +259,21 @@ gint creation_process_window_csr_pulse (gpointer data)
 
 void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 {
-	gchar     * xml_file = NULL;
-	GtkWidget * widget = NULL;
+	GObject * widget = NULL;
 	
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	creation_process_window_xml = glade_xml_new (xml_file, "creation_process_window", NULL);
+	creation_process_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (creation_process_window_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "creation_process_window.ui", NULL),
+				   NULL);
 	
-	g_free (xml_file);
+	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
-	glade_xml_signal_autoconnect (creation_process_window_xml); 	
-	
-	widget = glade_xml_get_widget (creation_process_window_xml, "titleLabel");
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "titleLabel");
 	gtk_label_set_text (GTK_LABEL (widget), _("Creating Certificate Signing Request"));
 
 	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 
-	widget = glade_xml_get_widget (creation_process_window_xml, "creation_process_window_progressbar");
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 

@@ -21,7 +21,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <glade/glade.h>
+
 #include <stdlib.h>
 
 #include "main.h"
@@ -33,9 +33,9 @@
 
 #define GNOMINT_MIME_TYPE "application/x-gnomint"
 
-GladeXML * main_window_xml = NULL;
-GladeXML * csr_popup_menu_xml = NULL;
-GladeXML * cert_popup_menu_xml = NULL;
+GtkBuilder * main_window_gtkb = NULL;
+GtkBuilder * csr_popup_menu_gtkb = NULL;
+GtkBuilder * cert_popup_menu_gtkb = NULL;
 
 gchar * gnomint_current_opened_file = NULL;
 
@@ -53,7 +53,7 @@ void __disable_widget (gchar *widget_name)
 {
 	GtkWidget * widget = NULL;
 
-	widget = glade_xml_get_widget (main_window_xml, widget_name);
+	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, widget_name));
 
 	gtk_widget_set_sensitive (widget, FALSE);
 }
@@ -62,7 +62,7 @@ void __enable_widget (gchar *widget_name)
 {
 	GtkWidget * widget = NULL;
 
-	widget = glade_xml_get_widget (main_window_xml, widget_name);
+	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, widget_name));
 
 	gtk_widget_set_sensitive (widget, TRUE);
 }
@@ -100,7 +100,6 @@ int main (int   argc,
 		{ NULL }
 	};
 	
-	gchar     * xml_file = NULL;
 	GtkWidget * recent_menu = NULL;
         gchar     * size_str = NULL;
 
@@ -131,13 +130,21 @@ int main (int   argc,
 		return 1;
 	}
 	
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
+	main_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (main_window_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "main_window.ui", NULL),
+				   NULL);
 
-	main_window_xml = glade_xml_new (xml_file, "main_window1", NULL);
-	cert_popup_menu_xml = glade_xml_new (xml_file, "certificate_popup_menu", NULL);
-	csr_popup_menu_xml = glade_xml_new (xml_file, "csr_popup_menu", NULL);
+	csr_popup_menu_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (csr_popup_menu_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "csr_popup_menu.ui", NULL),
+				   NULL);
 
-	g_free (xml_file);
+	cert_popup_menu_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (cert_popup_menu_gtkb, 
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "cert_popup_menu.ui", NULL),
+				   NULL);
+
 
         size_str = preferences_get_size ();
         if (size_str) {
@@ -150,7 +157,7 @@ int main (int   argc,
                         width = atoi (result[1]);
                         if (result[2]) {
                                 height = atoi (result[2]);
-                                gtk_window_resize (GTK_WINDOW(glade_xml_get_widget(main_window_xml, "main_window1")), width, height);
+                                gtk_window_resize (GTK_WINDOW(gtk_builder_get_object(main_window_gtkb, "main_window1")), width, height);
                         }
 
                 }
@@ -161,16 +168,16 @@ int main (int   argc,
         ca_update_revoked_view (preferences_get_revoked_visible(), FALSE);
         ca_update_csr_view (preferences_get_crq_visible(), FALSE);
         
-        
-	glade_xml_signal_autoconnect (main_window_xml);	       	
-	glade_xml_signal_autoconnect (cert_popup_menu_xml);	       	
-	glade_xml_signal_autoconnect (csr_popup_menu_xml);	       	
+
+	gtk_builder_connect_signals (main_window_gtkb, NULL);	       	
+	gtk_builder_connect_signals (cert_popup_menu_gtkb, NULL);	       	
+	gtk_builder_connect_signals (csr_popup_menu_gtkb, NULL);	       	
 
 	recent_manager = gtk_recent_manager_get_default ();
 	recent_menu = __recent_create_menu();
 	g_signal_connect (G_OBJECT (recent_menu), "item-activated",
 			  G_CALLBACK (on_open_recent_activate), NULL);
-	gtk_menu_item_set_submenu (GTK_MENU_ITEM (glade_xml_get_widget (main_window_xml, "openrecentsmenuitem")), recent_menu);
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (gtk_builder_get_object (main_window_gtkb, "openrecentsmenuitem")), recent_menu);
 
 
 	__disable_widget ("new_certificate1");
@@ -280,7 +287,7 @@ void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data)
 
 	GtkWidget *dialog, *widget;
 	
-	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window"));
 	
 	dialog = gtk_file_chooser_dialog_new (_("Create new CA database"),
 					      GTK_WINDOW(widget),
@@ -352,7 +359,7 @@ void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 	GtkWidget *dialog, *widget;
 	
-	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window"));
 	
 	dialog = gtk_file_chooser_dialog_new (_("Open CA database"),
 					      GTK_WINDOW(widget),
@@ -440,7 +447,7 @@ void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 	GtkWidget *dialog, *widget;
 	
-	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window"));
 	
 	dialog = gtk_file_chooser_dialog_new (_("Save CA database as..."),
 					      GTK_WINDOW(widget),
@@ -486,7 +493,7 @@ void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 	GtkWidget *widget;
 	gchar *authors[2];
 	
-	widget = glade_xml_get_widget (main_window_xml, "main_window");
+	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window"));
 
 	authors[0] = PACKAGE_AUTHORS;
 	authors[1] = NULL;

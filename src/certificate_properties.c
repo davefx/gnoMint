@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <libintl.h>
@@ -119,7 +119,7 @@ const certificate_properties_oid_function_couple_t certificate_properties_oid_fu
 };
 
 
-GladeXML * certificate_properties_window_xml = NULL;
+GtkBuilder * certificate_properties_window_gtkb = NULL;
 
 void __certificate_properties_populate (const char *certificate_pem);
 void __certificate_details_populate (const char *certificate_pem);
@@ -127,42 +127,36 @@ void __certificate_details_populate (const char *certificate_pem);
 void certificate_properties_display(guint64 cert_id, const char *certificate_pem, gboolean privkey_in_db,
 				    gboolean is_ca)
 {
-	gchar     * xml_file = NULL;
-	GtkWidget * widget = NULL;
-	volatile GType foo = GTK_TYPE_FILE_CHOOSER_WIDGET, tst;
+	GObject * widget = NULL;
 
-	xml_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "gnomint.glade", NULL );
-	 
-	// Workaround for libglade
-	tst = foo;
-	certificate_properties_window_xml = glade_xml_new (xml_file, "certificate_properties_dialog", NULL);
-	
-	g_free (xml_file);
-	
-	glade_xml_signal_autoconnect (certificate_properties_window_xml); 	
+	certificate_properties_window_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (certificate_properties_window_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_properties_dialog.ui", NULL),
+				   NULL);
+	gtk_builder_connect_signals (certificate_properties_window_gtkb, NULL);
 	
 	__certificate_properties_populate (certificate_pem);
 	__certificate_details_populate (certificate_pem);
        
 	if (! is_ca) {
-		widget = glade_xml_get_widget (certificate_properties_window_xml, "notebook2");
+		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "notebook2");
 		gtk_notebook_remove_page (GTK_NOTEBOOK(widget), 2);
 	} else {
 		ca_policy_populate (cert_id);
 	}
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 
 	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT, 
                                                                         cert_id));
 
-	gtk_widget_show (widget);
+	gtk_widget_show (GTK_WIDGET(widget));
 }
 
 
 void __certificate_properties_populate (const char *certificate_pem)
 {
-	GtkWidget *widget = NULL;
+	GObject *widget = NULL;
 	struct tm tim;
 	TlsCert * cert = NULL;
 	gchar model_time_str[100];
@@ -173,43 +167,43 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 	serial_number = &cert->serial_number;
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certActivationDateLabel");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certActivationDateLabel");
 	gmtime_r (&cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certExpirationDateLabel");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certExpirationDateLabel");
 	gmtime_r (&cert->expiration_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSNLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");	
         aux = uint160_strdup_printf (&cert->serial_number);
 	gtk_label_set_text (GTK_LABEL(widget), aux);
         g_free (aux);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSubjectCNLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectCNLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->cn);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSubjectOLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->o);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certSubjectOULabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->ou);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certIssuerCNLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_cn);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certIssuerOLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_o);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "certIssuerOULabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOULabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_ou);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "sha1Label");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha1Label");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->sha1);
 
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "md5Label");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "md5Label");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->md5);
 
 
@@ -220,10 +214,10 @@ void __certificate_properties_populate (const char *certificate_pem)
 		g_value_init (valtrue, G_TYPE_BOOLEAN);
 		g_value_set_boolean (valtrue, TRUE);
 
-		widget = glade_xml_get_widget (certificate_properties_window_xml, "certPropSeparator");
-		gtk_widget_show (widget);
+		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certPropSeparator");
+		gtk_widget_show (GTK_WIDGET(widget));
 		
-		widget = glade_xml_get_widget (certificate_properties_window_xml, "vboxCertCapabilities");
+		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "vboxCertCapabilities");
 		
 		for (i = g_list_length(cert->uses) - 1; i >= 0; i--) {
 			GtkLabel *label = NULL;
@@ -231,7 +225,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 			gtk_misc_set_alignment (GTK_MISC(label), 0.0, 0.5);
 			gtk_box_pack_end (GTK_BOX(widget), GTK_WIDGET(label), 0, 0, 0);
 		}
-		gtk_widget_show_all (widget);
+		gtk_widget_show_all (GTK_WIDGET(widget));
 		
 		g_free (valtrue);
 	}
@@ -245,8 +239,8 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 void certificate_properties_close_clicked (const char *certificate_pem)
 {
-	GtkWidget *widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
-	gtk_widget_destroy (widget);
+	GObject *widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
+	gtk_widget_destroy (GTK_WIDGET(widget));
 }
 
 
@@ -1077,7 +1071,7 @@ __certificate_details_populate(const char *certificate_pem)
 	gnutls_datum_t pem_datum;
 	gnutls_x509_crt_t certificate;
 	GtkTreeStore *store = NULL;
-	GtkWidget *view = NULL;
+	GObject *view = NULL;
 	GtkCellRenderer *renderer = NULL;
 
 	pem_datum.data = (guchar *) certificate_pem;
@@ -1101,7 +1095,7 @@ __certificate_details_populate(const char *certificate_pem)
 	__certificate_properties_fill_certificate(store, &certificate);
 	gnutls_x509_crt_deinit(certificate);
 
-	view = glade_xml_get_widget(certificate_properties_window_xml, "certTreeView");
+	view = gtk_builder_get_object(certificate_properties_window_gtkb, "certTreeView");
 	renderer = gtk_cell_renderer_text_new();
 
 	g_object_set(renderer, "yalign", 0.0, NULL);

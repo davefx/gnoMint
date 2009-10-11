@@ -19,7 +19,7 @@
 
 #ifndef GNOMINTCLI
 
-#include <glade/glade.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
@@ -39,7 +39,7 @@
 
 #ifndef GNOMINTCLI
 
-extern GladeXML * certificate_properties_window_xml;
+extern GtkBuilder * certificate_properties_window_gtkb;
 
 gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **columnNames);
 
@@ -54,124 +54,124 @@ gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **column
 
 void ca_policy_populate (guint64 ca_id) 
 {
-	GtkWidget * widget;
+	GObject * widget;
 	gint value;
 	GHashTable *policy_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);	
 
 	ca_file_foreach_policy (__ca_policy_populate_step, ca_id, policy_table);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_INHERIT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "country_inherited_check");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "country_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton"), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_differ_radiobutton"), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_same_radiobutton")), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_differ_radiobutton")), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_INHERIT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "state_inherited_check");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "state_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton"), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_differ_radiobutton"), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_same_radiobutton")), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_differ_radiobutton")), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_INHERIT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "city_inherited_check");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "city_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton"), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_differ_radiobutton"), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_same_radiobutton")), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_differ_radiobutton")), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_INHERIT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "organization_inherited_check");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "organization_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton"), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_differ_radiobutton"), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_same_radiobutton")), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_differ_radiobutton")), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_INHERIT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "ou_inherited_check");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ou_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton"), value);
-        gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_differ_radiobutton"), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_same_radiobutton")), value);
+        gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_differ_radiobutton")), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_FORCE_SAME"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "country_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_FORCE_SAME"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "state_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_FORCE_SAME"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "city_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_FORCE_SAME"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "organization_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
         value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_FORCE_SAME"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ou_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "hours_between_crl_updates_spinbutton");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "hours_between_crl_updates_spinbutton");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "MONTHS_TO_EXPIRE"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "months_before_expiration_spinbutton2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "months_before_expiration_spinbutton2");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CA"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "ca_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ca_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CRL_SIGN"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "crl_signing_check1");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "crl_signing_check1");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "NON_REPUDIATION"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "non_repudiation_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "non_repudiation_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "DIGITAL_SIGNATURE"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "digital_signature_check4");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "digital_signature_check4");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "KEY_ENCIPHERMENT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "key_encipherment_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "key_encipherment_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "KEY_AGREEMENT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "key_agreement_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "key_agreement_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "DATA_ENCIPHERMENT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "data_encipherment_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "data_encipherment_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "TLS_WEB_SERVER"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "webserver_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "webserver_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "TLS_WEB_CLIENT"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "webclient_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "webclient_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "TIME_STAMPING"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "time_stamping_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "time_stamping_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CODE_SIGNING"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "code_signing_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "code_signing_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "EMAIL_PROTECTION"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "email_protection_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "email_protection_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 	
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OCSP_SIGNING"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "ocsp_signing_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ocsp_signing_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
 	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ANY_PURPOSE"));
-	widget = glade_xml_get_widget (certificate_properties_window_xml, "any_purpose_check2");
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "any_purpose_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 	
         g_hash_table_destroy (policy_table);
@@ -184,7 +184,7 @@ void ca_policy_populate (guint64 ca_id)
 
 void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata)
 {
-	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
 	guint64 cert_id;
  
@@ -202,7 +202,7 @@ void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer use
 
 void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer userdata)
 {
-	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
 	guint64 cert_id;
 
@@ -221,7 +221,7 @@ void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer use
 
 void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 {
-	GtkWidget * widget = glade_xml_get_widget (certificate_properties_window_xml, "certificate_properties_dialog");
+	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
 	guint64 cert_id;
 
@@ -238,80 +238,80 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 	
         is_active = gtk_toggle_button_get_active(button);
 
-	if (! strcmp(glade_get_widget_name (button), "country_inherited_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "country_inherited_check")) {
 		property_name = "C_INHERIT";
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_same_radiobutton"), is_active);
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "country_differ_radiobutton"), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_same_radiobutton")), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_differ_radiobutton")), is_active);
         }
         
-	if (! strcmp(glade_get_widget_name (button), "state_inherited_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "state_inherited_check")) {
 		property_name = "ST_INHERIT";        
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_same_radiobutton"), is_active);
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "state_differ_radiobutton"), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_same_radiobutton")), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_differ_radiobutton")), is_active);
         } 
 
-	if (! strcmp(glade_get_widget_name (button), "city_inherited_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "city_inherited_check")) {
 		property_name = "L_INHERIT";        
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_same_radiobutton"), is_active);
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "city_differ_radiobutton"), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_same_radiobutton")), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_differ_radiobutton")), is_active);
         }
 
-	if (! strcmp(glade_get_widget_name (button), "organization_inherited_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "organization_inherited_check")) {
 		property_name = "O_INHERIT";   
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_same_radiobutton"), is_active);
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "organization_differ_radiobutton"), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_same_radiobutton")), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_differ_radiobutton")), is_active);
         }
 
-	if (! strcmp(glade_get_widget_name (button), "ou_inherited_check")) {
+	if (! strcmp(gtk_widget_get_name (button), "ou_inherited_check")) {
 		property_name = "OU_INHERIT";        
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_same_radiobutton"), is_active);
-                gtk_widget_set_sensitive (glade_xml_get_widget (certificate_properties_window_xml, "ou_differ_radiobutton"), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_same_radiobutton")), is_active);
+                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_differ_radiobutton")), is_active);
         }
 
-	if (! strcmp(glade_get_widget_name (button), "country_same_radiobutton"))
+	if (! strcmp(gtk_widget_get_name (button), "country_same_radiobutton"))
 		property_name = "C_FORCE_SAME";        
         
 
-	if (! strcmp(glade_get_widget_name (button), "state_same_radiobutton"))
+	if (! strcmp(gtk_widget_get_name (button), "state_same_radiobutton"))
 		property_name = "ST_FORCE_SAME";        
 
-	if (! strcmp(glade_get_widget_name (button), "city_same_radiobutton"))
+	if (! strcmp(gtk_widget_get_name (button), "city_same_radiobutton"))
 		property_name = "L_FORCE_SAME";        
 
-	if (! strcmp(glade_get_widget_name (button), "organization_same_radiobutton"))
+	if (! strcmp(gtk_widget_get_name (button), "organization_same_radiobutton"))
 		property_name = "O_FORCE_SAME";        
 
-	if (! strcmp(glade_get_widget_name (button), "ou_same_radiobutton"))
+	if (! strcmp(gtk_widget_get_name (button), "ou_same_radiobutton"))
 		property_name = "OU_FORCE_SAME";        
 
 	
 
 
 
-	if (! strcmp(glade_get_widget_name (button), "ca_check2"))
+	if (! strcmp(gtk_widget_get_name (button), "ca_check2"))
 		property_name = "CA";
 
-	if (! strcmp(glade_get_widget_name (button), "crl_signing_check1"))
+	if (! strcmp(gtk_widget_get_name (button), "crl_signing_check1"))
 		property_name = "CRL_SIGN";
 		
-	if (! strcmp(glade_get_widget_name (button), "non_repudiation_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "non_repudiation_check2")) {
                 if (! is_active) {
                         // TIME_STAMPING cannot be inactive
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                               "time_stamping_check2")), FALSE);
                         // We must check if EMAIL_PROTECTION can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
                             ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
                             ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml,
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb,
                                                                                                       "email_protection_check2")), FALSE);
                         }
 
                         // We must check if OCSP_SIGNING can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
                                 // If is not active, we must deactivate OCSP_SIGNING
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml,
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb,
                                                                                                       "ocsp_signing_check2")), FALSE);
                         }
                         
@@ -319,28 +319,28 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "NON_REPUDIATION";
         }
 		
-	if (! strcmp(glade_get_widget_name (button), "digital_signature_check4")) {
+	if (! strcmp(gtk_widget_get_name (button), "digital_signature_check4")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
                         if (! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
                             ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "webserver_check2")), FALSE);
                         }
 
                         // We must check if TLS_WEB_CLIENT can be active
                         if (! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_CLIENT
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "webclient_check2")), FALSE);
                         }
 
                         // TIME_STAMPING and CODE_SIGNING cannot be active if digital signature is deactivated
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(certificate_properties_window_xml,
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(certificate_properties_window_gtkb,
                                                                                              "time_stamping_check2")), FALSE);
 
-                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget(certificate_properties_window_xml,
+                        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(certificate_properties_window_gtkb,
                                                                                              "code_signing_check2")), FALSE);
 
                         // We must check if EMAIL_PROTECTION can be active
@@ -348,14 +348,14 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                             ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
                             ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "email_protection_check2")), FALSE);
                         }
 
                         // We must check if OCSP_SIGNING can be active
                         if (! ca_file_policy_get (cert_id, "NON_REPUDIATION")) {
                                 // If none is active, we must deactivate OCSP_SIGNING
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "ocsp_signing_check2")), FALSE);
                         }
 
@@ -364,13 +364,13 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "DIGITAL_SIGNATURE";
         }
 		
-	if (! strcmp(glade_get_widget_name (button), "key_encipherment_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "key_encipherment_check2")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
                             ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "webserver_check2")), FALSE);
                         }
 
@@ -379,7 +379,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                             ! ca_file_policy_get (cert_id, "NON_REPUDIATION") &&
                             ! ca_file_policy_get (cert_id, "KEY_AGREEMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "email_protection_check2")), FALSE);
                         }
 
@@ -388,19 +388,19 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "KEY_ENCIPHERMENT";		
         }
 
-	if (! strcmp(glade_get_widget_name (button), "key_agreement_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "key_agreement_check2")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
                             ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
                                 // If none is active, we must deactivate TLS_WEB_SERVER
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "webserver_check2")), FALSE);
                         }
                         // We must check if TLS_WEB_CLIENT can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE")) {
                                 // If none is active, we must deactivate TLS_WEB_CLIENT
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "webclient_check2")), FALSE);
                         }
 
@@ -409,7 +409,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                             ! ca_file_policy_get (cert_id, "NON_REPUDIATION") &&
                             ! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT")) {
                                 // If none is active, we must deactivate EMAIL_PROTECTION
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "email_protection_check2")), FALSE);
                         }
                 }
@@ -418,7 +418,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
         }
 
 		
-	if (! strcmp(glade_get_widget_name (button), "data_encipherment_check2"))
+	if (! strcmp(gtk_widget_get_name (button), "data_encipherment_check2"))
 		property_name = "DATA_ENCIPHERMENT";
 
 
@@ -428,14 +428,14 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
         // Purposes
 
 
-	if (! strcmp(glade_get_widget_name (button), "webserver_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "webserver_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
                                ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") ||
                                ca_file_policy_get (cert_id, "KEY_AGREEMENT"))) {
                                 // If none is active, we activate key encipherment
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "key_encipherment_check2")), TRUE);
                         }
                                
@@ -443,13 +443,13 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                 property_name = "TLS_WEB_SERVER";
         }
 
-	if (! strcmp(glade_get_widget_name (button), "webclient_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "webclient_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
                                ca_file_policy_get (cert_id, "KEY_AGREEMENT"))) {
                                 // If none is active, we activate digital signature
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "digital_signature_check4")), TRUE);
                         }
                         
@@ -457,15 +457,15 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                 property_name = "TLS_WEB_CLIENT";
         }
 
-	if (! strcmp(glade_get_widget_name (button), "time_stamping_check2")){
+	if (! strcmp(gtk_widget_get_name (button), "time_stamping_check2")){
                 if (is_active) {
                         // We must check digitalSignature && nonRepudiation
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
                                ca_file_policy_get (cert_id, "NON_REPUDIATION"))) {
                                 // If none is active, we activate them both
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "digital_signature_check4")), TRUE);
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "non_repudiation_check2")), TRUE);
                         }
                                
@@ -473,12 +473,12 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "TIME_STAMPING";
         }
 
-	if (! strcmp(glade_get_widget_name (button), "code_signing_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "code_signing_check2")) {
                 if (is_active) {
                         // We must check digitalSignature
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE"))) {
                                 // If it is not active, we activate it
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "digital_signature_check4")), TRUE);
                         }
                         
@@ -486,7 +486,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "CODE_SIGNING";
         }
 
-	if (! strcmp(glade_get_widget_name (button), "email_protection_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "email_protection_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation || (keyEncipherment || keyAgreement)
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
@@ -494,9 +494,9 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
                                ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") ||
                                ca_file_policy_get (cert_id, "KEY_AGREEMENT"))) {
                                 // If none is active, we activate key encipherment
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "digital_signature_check4")), TRUE);
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "key_encipherment_check2")), TRUE);
                         }
                                
@@ -504,13 +504,13 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
   		property_name = "EMAIL_PROTECTION";
         }
 
-	if (! strcmp(glade_get_widget_name (button), "ocsp_signing_check2")) {
+	if (! strcmp(gtk_widget_get_name (button), "ocsp_signing_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
                                ca_file_policy_get (cert_id, "NON_REPUDIATION"))) {
                                 // If none is active, we activate digital signature
-                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(glade_xml_get_widget (certificate_properties_window_xml, 
+                                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
                                                                                                       "digital_signature_check4")), TRUE);
                         }
                                
@@ -518,7 +518,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "OCSP_SIGNING";
         }
 
-	if (! strcmp(glade_get_widget_name (button), "any_purpose_check2"))
+	if (! strcmp(gtk_widget_get_name (button), "any_purpose_check2"))
 		property_name = "ANY_PURPOSE";
 
 	if (property_name)
