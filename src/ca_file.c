@@ -1124,8 +1124,13 @@ void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 
 	row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='ca_last_assigned_serial' AND ca_id=%"
                                       G_GUINT64_FORMAT";", ca_id);
-        uint160_read_escaped (serial, row[0], strlen (row[0]));
-	g_strfreev (row);
+        if (row) {
+		uint160_read_escaped (serial, row[0], strlen (row[0]));
+		g_strfreev (row);
+	} else {
+		g_error (_("Cannot find last assigned serial number"));
+	}
+	
 
         row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE "
 				      "name='ca_must_check_serial_dups' AND ca_id=%"G_GUINT64_FORMAT";",
