@@ -2,6 +2,14 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkAdjustment" id="AdjustmentKeyLengthSpinButton1">
+    <property name="lower">1024</property>
+    <property name="upper">5120</property>
+    <property name="step-increment">1024</property>
+    <property name="page-increment">1024</property>
+    <property name="page-size">0</property>
+    <property name="value">2048</property>
+  </object>
   <object class="GtkWindow" id="new_req_window">
     <property name="visible">True</property>
     <property name="title" translatable="yes">New certificate request - gnoMint</property>
@@ -553,7 +561,7 @@ Common Name (CN):</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="adjustment"></property>
+                    <property name="adjustment">AdjustmentKeyLengthSpinButton1</property>
                     <property name="climb_rate">1024</property>
                     <property name="numeric">True</property>
                   </object>
