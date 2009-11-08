@@ -1,3 +1,53 @@
+2009-10-11 21:17  davefx
+
+	* [r336] configure.in, po/ca.po, po/cs.po, po/de.po, po/es.po,
+	  po/fi.po, po/fr.po, po/it.po, po/pt_BR.po, po/ru.po, po/sv.po:
+	  Adding Catalan translation. Updating translation from
+	  Launchpad.net
+
+2009-10-11 21:16  davefx
+
+	* [r335] src/main.c:
+	  Correcting loading of popup
+
+2009-10-11 11:04  davefx
+
+	* [r334] configure.in, gui/Makefile.am,
+	  gui/certificate_popup_menu.ui,
+	  gui/certificate_properties_dialog.ui,
+	  gui/change_password_dialog.ui, gui/creation_process_window.ui,
+	  gui/csr_popup_menu.ui, gui/csr_properties_dialog.ui,
+	  gui/dh_parameters_dialog.ui, gui/export_certificate_dialog.ui,
+	  gui/get_db_password_dialog.ui, gui/get_password_dialog.ui,
+	  gui/get_pkey_dialog.ui, gui/gnomint.glade,
+	  gui/import_file_or_directory_dialog.ui,
+	  gui/import_password_dialog.ui, gui/main_window.ui,
+	  gui/new_ca_window.ui, gui/new_cert_window.ui,
+	  gui/new_crl_dialog.ui, gui/new_req_window.ui,
+	  gui/preferences_dialog.ui, po/POTFILES.in, src/ca.c,
+	  src/ca_policy.c, src/certificate_properties.c,
+	  src/country_table.c, src/creation_process_window.c, src/crl.c,
+	  src/csr_properties.c, src/dialog.c, src/import.c, src/main.c,
+	  src/main.h, src/new_ca_window.c, src/new_cert.c,
+	  src/new_req_window.c, src/pkey_manage.c,
+	  src/preferences-window.c:
+	  Migrating from libglade to GtkBuilder
+
+2009-06-05 20:27  davefx
+
+	* [r333] configure.in:
+	  Fixing bug in configure.in that affected Slackware systems
+
+2009-06-03 21:23  davefx
+
+	* [r331] m4/intltool.m4:
+	  Updating intltool.m4
+
+2009-06-03 21:19  davefx
+
+	* [r330] ChangeLog:
+	  Uploading updated Changelog
+
 2009-06-03 21:17  davefx
 
 	* [r329] configure.in:

@@ -137,9 +137,11 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 {
 	GtkTreeIter iter;
 	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
-	GValue *last_dn_value = g_new0 (GValue, 1);
-	GValue *last_parent_dn_value = g_new0 (GValue, 1);
-        const gchar * string_value;
+	GValue *last_id_value = g_new0 (GValue, 1);
+	GValue *last_parent_route_value = g_new0 (GValue, 1);
+        guint64 uint64_value;
+	const gchar * string_value;
+	gchar * last_node_route = NULL;
 	
 	if (cert_title_inserted == FALSE) {
 		gtk_tree_store_append (new_model, &iter, NULL);
@@ -150,33 +152,43 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 		cert_title_inserted = TRUE;
 	}
 
-	if (! last_cert_iter || (! strcmp (argv[CA_FILE_CERT_COLUMN_DN], argv[CA_FILE_CERT_COLUMN_PARENT_DN]))) {
+	if (! last_cert_iter || (! strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],":"))) {
 		if (last_parent_iter)
 			gtk_tree_iter_free (last_parent_iter);
 		last_parent_iter = NULL;
 	} else {
 		// If not, then we must find the parent of the current node
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_DN, last_dn_value);
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_PARENT_DN, 
-					  last_parent_dn_value);
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_ID, last_id_value);
+		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_PARENT_ROUTE, 
+					  last_parent_route_value);
 		
-		string_value = g_value_get_string (last_dn_value);
+		uint64_value = g_value_get_uint64 (last_id_value);
+		string_value = g_value_get_string (last_parent_route_value);
                 g_assert (string_value);
-		
 
-		if (! strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_DN], string_value)) {
+		last_node_route = g_strdup_printf ("%s%"G_GUINT64_FORMAT":", string_value, uint64_value);
+
+		if (! strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE], last_node_route)) {
 			// Last node is parent of the current node
 			if (last_parent_iter)
 				gtk_tree_iter_free (last_parent_iter);
 			last_parent_iter = gtk_tree_iter_copy (last_cert_iter);
+			g_free (last_node_route);
+			last_node_route = NULL;
 		} else {
 			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
 			// current certificate.
 			
-			while (last_parent_iter && 
-                               g_value_get_string(last_parent_dn_value) && argv[CA_FILE_CERT_COLUMN_PARENT_DN] &&
-			       strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
+			if (last_parent_iter)
+                                gtk_tree_iter_free (last_parent_iter);
+                        last_parent_iter = gtk_tree_iter_copy (last_cert_iter);
+
+			while (last_node_route && 
+			       strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE], last_node_route)) {
 				
+				g_free (last_node_route);
+				last_node_route = NULL;
+
 				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
 					// Last ca iter is a top_level
 					if (last_parent_iter)
@@ -186,14 +198,25 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 					if (last_parent_iter)
 						gtk_tree_iter_free (last_parent_iter);
 					last_parent_iter = gtk_tree_iter_copy (&iter);
+
+					g_value_unset (last_parent_route_value);
+					g_value_unset (last_id_value);
+					
+					gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_parent_iter, CA_MODEL_COLUMN_ID, last_id_value);
+					gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_parent_iter, CA_MODEL_COLUMN_PARENT_ROUTE, 
+								  last_parent_route_value);
+					
+					uint64_value = g_value_get_uint64 (last_id_value);
+					string_value = g_value_get_string (last_parent_route_value);
+					g_assert (string_value);
+					
+					last_node_route = g_strdup_printf ("%s%"G_GUINT64_FORMAT":", string_value, uint64_value);
 				}
 
-				g_value_unset (last_parent_dn_value);
-				gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_parent_iter,
-							  CA_MODEL_COLUMN_DN, 
-							  last_parent_dn_value);
-				
 			}
+
+			if (last_node_route)
+				g_free (last_node_route);
 		}
 	
 	}
@@ -244,8 +267,8 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 		gtk_tree_iter_free (last_cert_iter);
 	last_cert_iter = gtk_tree_iter_copy (&iter);
  
-	g_free (last_dn_value);
-	g_free (last_parent_dn_value);      	
+	g_free (last_id_value);
+	g_free (last_parent_route_value);      	
 
 	return 0;
 }
