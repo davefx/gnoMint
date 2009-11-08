@@ -9,13 +9,13 @@ msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-06-03 23:09+0200\n"
-"PO-Revision-Date: 2009-08-08 12:04+0000\n"
-"Last-Translator: Sergio Oller <Unknown>\n"
+"PO-Revision-Date: 2009-10-23 17:30+0000\n"
+"Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-11 21:04+0000\n"
+"X-Launchpad-Export-Date: 2009-11-08 11:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -1595,11 +1595,11 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:153
 msgid "CertList PadIfSubject<16|\t"
-msgstr ""
+msgstr "CertList PadIfSubject<16|\t"
 
 #: ../src/ca-cli-callbacks.c:155
 msgid "CertList PadIfSubject<8|\t"
-msgstr ""
+msgstr "CertList PadIfSubject<8|\t"
 
 #: ../src/ca-cli-callbacks.c:158
 msgid "CertList PKeyInDB|Y\t\t"
@@ -1611,7 +1611,7 @@ msgstr "No\t\t"
 
 #: ../src/ca-cli-callbacks.c:164
 msgid "CertList Activation|\t"
-msgstr ""
+msgstr "Activación CertList|\t"
 
 #: ../src/ca-cli-callbacks.c:169
 #, c-format
@@ -1620,7 +1620,7 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:174
 msgid "CertList Expiration|\t"
-msgstr ""
+msgstr "Expiración CertList|\t"
 
 #: ../src/ca-cli-callbacks.c:179
 #, c-format
@@ -1629,7 +1629,7 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:185
 msgid "CertList Revocation|\n"
-msgstr ""
+msgstr "Revocación CertList|\n"
 
 #: ../src/ca-cli-callbacks.c:190
 #, c-format
@@ -1665,7 +1665,7 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:223
 msgid "CsrList ParentID|\t"
-msgstr ""
+msgstr "CsrList ParentID|\t"
 
 #: ../src/ca-cli-callbacks.c:228
 #, c-format
@@ -1674,11 +1674,11 @@ msgstr "%-24s\t"
 
 #: ../src/ca-cli-callbacks.c:231
 msgid "CsrList PadIfSubject<16|\t"
-msgstr ""
+msgstr "CsrList PadIfSubject<16|\t"
 
 #: ../src/ca-cli-callbacks.c:233
 msgid "CsrList PadIfSubject<8|\t"
-msgstr ""
+msgstr "CsrList PadIfSubject<8|\t"
 
 #: ../src/ca-cli-callbacks.c:236
 msgid "CsrList PKeyInDB|Y\n"
@@ -2662,7 +2662,9 @@ msgstr ""
 "\n"
 "Launchpad Contributions:\n"
 "  David Marín https://launchpad.net/~davefx\n"
-"  Sergio Oller https://launchpad.net/~zeehio"
+"  DiegoJ https://launchpad.net/~diegojromerolopez\n"
+"  Sergio Oller https://launchpad.net/~zeehio\n"
+"  Victor Herrero https://launchpad.net/~victorhera"
 
 #: ../src/ca-cli-callbacks.c:1425
 #, c-format

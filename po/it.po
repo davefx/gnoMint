@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-06-03 23:09+0200\n"
-"PO-Revision-Date: 2009-08-23 07:02+0000\n"
-"Last-Translator: Jeroen T. Vermeulen <Unknown>\n"
+"PO-Revision-Date: 2009-10-29 17:20+0000\n"
+"Last-Translator: Jecko Development <quintium@hotmail.it>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-11 21:04+0000\n"
+"X-Launchpad-Export-Date: 2009-11-08 11:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -115,7 +115,7 @@ msgstr "<b>Questo certificato è stato verificato per gli usi seguenti:</b>"
 
 #: ../gui/gnomint.glade.h:14
 msgid "<b>Uses of new generated certificates</b>"
-msgstr ""
+msgstr "<b>Uso di nuovi certificati generati</b>"
 
 #: ../gui/gnomint.glade.h:15
 msgid "<b>Validity</b>"
@@ -123,19 +123,19 @@ msgstr "<b>Validità</b>"
 
 #: ../gui/gnomint.glade.h:16
 msgid "<big><b>New Certificate Revocation List</b></big>"
-msgstr ""
+msgstr "<big><b>Nuova Lista di Revoca Certificati</b></big>"
 
 #: ../gui/gnomint.glade.h:17
 msgid "<big>CA Properties</big>\n"
-msgstr ""
+msgstr "<big>Proprietà CA</big>\n"
 
 #: ../gui/gnomint.glade.h:19
 msgid "<big>CA Root certificate properties</big>\n"
-msgstr ""
+msgstr "<big>Proprietà del certificato CA Root</big>\n"
 
 #: ../gui/gnomint.glade.h:21
 msgid "<big>Certificate Request Properties</big>\n"
-msgstr ""
+msgstr "<big>Richiedi proprietà Certificato</big>\n"
 
 #: ../gui/gnomint.glade.h:23
 msgid ""
@@ -144,14 +144,18 @@ msgid ""
 "For doing the selected operation, you must provide the file where resides "
 "the private key corresponding to the certificate:"
 msgstr ""
+"<big>Scegli il file della chiave privata</big>\n"
+"\n"
+"Per eseguire l'operazione, devi fornire il file dove risiede la chiave "
+"privata corrispondente al certificato:"
 
 #: ../gui/gnomint.glade.h:26
 msgid "<big>New Certificate Properties</big>\n"
-msgstr ""
+msgstr "Proprietà Nuovo Certificato\n"
 
 #: ../gui/gnomint.glade.h:28
 msgid "<big>Password protection</big>\n"
-msgstr ""
+msgstr "<big>Protezione Password</big>\n"
 
 #: ../gui/gnomint.glade.h:30
 msgid ""
@@ -159,28 +163,39 @@ msgid ""
 "file. This kind of file can be imported by other common programs, such as "
 "web or mail clients.</i>"
 msgstr ""
+"<i>Esporta entrambe le parti (privata e pubblica) in un file PKCS#12 "
+"protetto da password. Questo tipo di file può essere importato da altri "
+"programmi comuni, come client web o mail.</i>"
 
 #: ../gui/gnomint.glade.h:31
 msgid "<i>Export only the certificate to a public file, in PEM format.</i>"
 msgstr ""
+"<i>Esporta solo il certificato in un file pubblico, in formato PEM.</i>"
 
 #: ../gui/gnomint.glade.h:32
 msgid ""
 "<i>Export the saved private key to a PEM file. This option should only be "
 "used for exporting certificates that will be used in unattended servers.</i>"
 msgstr ""
+"<i>Esporta la chiave privata salvata in un file PEM. Quest'opzione dovrebbe "
+"essere utilizzata solo per esportare certificati che saranno utilizzati in "
+"server inutilizzati.</i>"
 
 #: ../gui/gnomint.glade.h:33
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the certificate.</i>"
 msgstr ""
+"<i>Esporta la chiave privata salvata in un file PKCS#8 protetto da password. "
+"Questo file può essere aperto solo dal soggetto del certificato.</i>"
 
 #: ../gui/gnomint.glade.h:34
 msgid ""
 "<i>Import a directory containing the structure of\n"
 "a whole CA made with OpenSSL .</i>"
 msgstr ""
+"<i>Importa una cartella contenete la struttura di\n"
+"un CA intatto fatto con OpenSSL.</i>"
 
 #: ../gui/gnomint.glade.h:36
 msgid ""
@@ -188,6 +203,9 @@ msgid ""
 "certificates, private keys (encrypted or plain), signing requests (CSRs), "
 "revocation lists (CRLs) or PKCS#12 packages.</i>"
 msgstr ""
+"<i>importa un singolo file, codificato in formato DER o PEM, contenente "
+"certificati, chiavi private (crittografate o libere), richieste di firma "
+"(CSRs), liste di revoca (CRLs) o pacchetti PKCS#12.</i>"
 
 #: ../gui/gnomint.glade.h:37
 msgid ""
@@ -204,7 +222,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:43
 msgid "<small><i>#Description#</i></small>"
-msgstr ""
+msgstr "<small><i>#Descrizione#</i></small>"
 
 #: ../gui/gnomint.glade.h:44
 msgid ""
@@ -2437,6 +2455,7 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  David Marín https://launchpad.net/~davefx\n"
+"  Jecko Development https://launchpad.net/~jecko\n"
 "  gnuckx https://launchpad.net/~gnuckx"
 
 #: ../src/ca-cli-callbacks.c:1425

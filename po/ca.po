@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-06-03 23:09+0200\n"
-"PO-Revision-Date: 2009-08-08 22:34+0000\n"
+"PO-Revision-Date: 2009-10-15 21:21+0000\n"
 "Last-Translator: Sergio Oller <Unknown>\n"
 "Language-Team: Catalan <ca@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-10-11 21:04+0000\n"
+"X-Launchpad-Export-Date: 2009-11-08 11:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -111,7 +111,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:13
 msgid "<b>This certificate has been verified for the following uses:</b>"
-msgstr "<b>Aquest certificat s'ha verificat per als usos següents:</b>"
+msgstr "<b>S'ha verificat el següent certificat per als següents usos:</b>"
 
 #: ../gui/gnomint.glade.h:14
 msgid "<b>Uses of new generated certificates</b>"
@@ -2655,6 +2655,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  David Marín https://launchpad.net/~davefx\n"
 "  Sergio Oller https://launchpad.net/~zeehio"
 
 #: ../src/ca-cli-callbacks.c:1425
