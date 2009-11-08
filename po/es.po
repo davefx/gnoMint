@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-06-03 23:09+0200\n"
-"PO-Revision-Date: 2009-10-23 17:30+0000\n"
+"PO-Revision-Date: 2009-11-08 12:35+0100\n"
 "Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -35,8 +35,8 @@ msgid ""
 "The (width,length) size gnoMint should take when started. This cannot be "
 "smaller than (320,200)."
 msgstr ""
-"El tamaño (anchura,altura) de gnoMint al iniciarse. No debe ser menor "
-"a(320,200)."
+"El tamaño (anchura,altura) de gnoMint al iniciarse. No debe ser menor a"
+"(320,200)."
 
 #: ../gconf/gnomint.schemas.in.h:5
 msgid "Whether the certificate requests should be visible."
@@ -170,8 +170,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:31
 msgid "<i>Export only the certificate to a public file, in PEM format.</i>"
-msgstr ""
-"<i>Exporta sólo el certificado a un fichero público en formato PEM</i>"
+msgstr "<i>Exporta sólo el certificado a un fichero público en formato PEM</i>"
 
 #: ../gui/gnomint.glade.h:32
 msgid ""
@@ -239,8 +238,8 @@ msgstr "<small><i>#Descripción#</i></small>"
 msgid ""
 "<small><i>PKCS#3 files containing Diffie&#xB7;Hellman parameters are used by "
 "some cryptographic \n"
-"applications for a secure interchange of their keys over insecure "
-"channels.</i></small>"
+"applications for a secure interchange of their keys over insecure channels.</"
+"i></small>"
 msgstr ""
 "<small><i>Los ficheros PKCS#3·con parámetros·Diffie Hellman·son usados por "
 "ciertas aplicaciones \n"
@@ -251,16 +250,16 @@ msgstr ""
 msgid ""
 "<small><i>The part that is being imported has the description:</i></small>"
 msgstr ""
-"<small><i>La parte a ser importada tiene la siguiente "
-"descripción:</i></small>"
+"<small><i>La parte a ser importada tiene la siguiente descripción:</i></"
+"small>"
 
 #: ../gui/gnomint.glade.h:47
 msgid ""
 "<small>The subject of the new certificate request can inherit information "
 "from one of the existing Certification Authorities. This is a must if the "
 "policy of the CA you are going to use is defined to force some fields of a "
-"certificate subject to be the same as the ones in the CA cert "
-"subject.</small>"
+"certificate subject to be the same as the ones in the CA cert subject.</"
+"small>"
 msgstr ""
 "<small>El titular de la nueva solicitud de certificado puede heredar "
 "información de una de las autoridades de certificación existentes. Esto es "
@@ -509,8 +508,7 @@ msgstr ""
 "cualquier otra aplicación"
 
 #: ../gui/gnomint.glade.h:106
-msgid ""
-"Exports the certificate so it can be imported by any other application"
+msgid "Exports the certificate so it can be imported by any other application"
 msgstr ""
 "Exporta el certificado de modo que pueda ser importado por cualquier otra "
 "aplicación"
@@ -525,13 +523,11 @@ msgstr "Extraer clave privada"
 
 #: ../gui/gnomint.glade.h:109
 msgid "Extract the private key of the selected item into a external file"
-msgstr ""
-"Extrae la clave privada del elemento seleccionado a un fichero externo"
+msgstr "Extrae la clave privada del elemento seleccionado a un fichero externo"
 
 #: ../gui/gnomint.glade.h:110
 msgid "Extract the saved private key to an external file or device"
-msgstr ""
-"Extrae la clave privada almacenada a un fichero o dispositivo externo"
+msgstr "Extrae la clave privada almacenada a un fichero o dispositivo externo"
 
 #: ../gui/gnomint.glade.h:111
 msgid ""
@@ -734,8 +730,7 @@ msgstr ""
 "Seleccione la opción más adecuada que represente lo que desea importar:"
 
 #: ../gui/gnomint.glade.h:161
-msgid ""
-"Please, choose which part of the saved certificate you want to export:"
+msgid "Please, choose which part of the saved certificate you want to export:"
 msgstr "Seleccione qué parte almacenada del certificado desea exportar:"
 
 #: ../gui/gnomint.glade.h:162
@@ -1120,8 +1115,8 @@ msgstr ""
 
 #: ../src/ca.c:1083
 msgid ""
-"<i>Export the Certificate Signing Request to a public file, in PEM "
-"format.</i>"
+"<i>Export the Certificate Signing Request to a public file, in PEM format.</"
+"i>"
 msgstr ""
 "<i>Exporta la solicitud de certificación a un fichero público en formato "
 "PEM</i>"
@@ -1244,8 +1239,7 @@ msgstr "Guarda el fichero actual con un nombre de fichero distinto"
 #. 2
 #: ../src/ca-cli.c:40
 msgid "Get current status (opened file, no. of certificates, etc...)"
-msgstr ""
-"Obtiene el estado actual (fichero abierto, nº de certificados, etc...)"
+msgstr "Obtiene el estado actual (fichero abierto, nº de certificados, etc...)"
 
 #. 3
 #: ../src/ca-cli.c:41
@@ -1259,8 +1253,7 @@ msgstr ""
 #. 4
 #: ../src/ca-cli.c:43
 msgid "List the CSRs in database"
-msgstr ""
-"Lista las solicitudes de certificación existentes en la base de datos"
+msgstr "Lista las solicitudes de certificación existentes en la base de datos"
 
 #. 5
 #: ../src/ca-cli.c:44
@@ -1337,8 +1330,7 @@ msgid "crlgen <ca-id> <filename>"
 msgstr "crlgen <id. de ca> <nombre de fichero>"
 
 #: ../src/ca-cli.c:55
-msgid ""
-"Generate a new CRL for the given CA, saving it into the file <filename>"
+msgid "Generate a new CRL for the given CA, saving it into the file <filename>"
 msgstr ""
 "Generar un nuevo CRL para la AC indicada, almacenándolo en el fichero "
 "<nombre de fichero>"
@@ -1595,11 +1587,11 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:153
 msgid "CertList PadIfSubject<16|\t"
-msgstr "CertList PadIfSubject<16|\t"
+msgstr "\t"
 
 #: ../src/ca-cli-callbacks.c:155
 msgid "CertList PadIfSubject<8|\t"
-msgstr "CertList PadIfSubject<8|\t"
+msgstr "\t"
 
 #: ../src/ca-cli-callbacks.c:158
 msgid "CertList PKeyInDB|Y\t\t"
@@ -1611,7 +1603,7 @@ msgstr "No\t\t"
 
 #: ../src/ca-cli-callbacks.c:164
 msgid "CertList Activation|\t"
-msgstr "Activación CertList|\t"
+msgstr " \t"
 
 #: ../src/ca-cli-callbacks.c:169
 #, c-format
@@ -1620,7 +1612,7 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:174
 msgid "CertList Expiration|\t"
-msgstr "Expiración CertList|\t"
+msgstr "\t"
 
 #: ../src/ca-cli-callbacks.c:179
 #, c-format
@@ -1629,7 +1621,7 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:185
 msgid "CertList Revocation|\n"
-msgstr "Revocación CertList|\n"
+msgstr " \n"
 
 #: ../src/ca-cli-callbacks.c:190
 #, c-format
@@ -1643,8 +1635,7 @@ msgstr "Certificados en base de datos:\n"
 
 #: ../src/ca-cli-callbacks.c:208
 #, c-format
-msgid ""
-"Id.\tIs CA?\tCertificate Subject\tKey in DB?\tActivation\t\tExpiration"
+msgid "Id.\tIs CA?\tCertificate Subject\tKey in DB?\tActivation\t\tExpiration"
 msgstr ""
 "Id.\t¿Es CA?\tTitular de certificado\t¿Clave en BD?\tActivación\t\tCaducidad"
 
@@ -1665,7 +1656,7 @@ msgstr "%s\t"
 
 #: ../src/ca-cli-callbacks.c:223
 msgid "CsrList ParentID|\t"
-msgstr "CsrList ParentID|\t"
+msgstr " \t"
 
 #: ../src/ca-cli-callbacks.c:228
 #, c-format
@@ -1674,11 +1665,11 @@ msgstr "%-24s\t"
 
 #: ../src/ca-cli-callbacks.c:231
 msgid "CsrList PadIfSubject<16|\t"
-msgstr "CsrList PadIfSubject<16|\t"
+msgstr " \t"
 
 #: ../src/ca-cli-callbacks.c:233
 msgid "CsrList PadIfSubject<8|\t"
-msgstr "CsrList PadIfSubject<8|\t"
+msgstr " \t"
 
 #: ../src/ca-cli-callbacks.c:236
 msgid "CsrList PKeyInDB|Y\n"
@@ -2217,13 +2208,11 @@ msgstr "CRL generada con éxito y guardada en fichero '%s'\n"
 
 #: ../src/ca-cli-callbacks.c:969
 msgid "The bit-length of the prime number must be whole multiple of 1024"
-msgstr ""
-"La longitud en bits del número primo debe ser múltiplo entero de 1024"
+msgstr "La longitud en bits del número primo debe ser múltiplo entero de 1024"
 
 #: ../src/ca-cli-callbacks.c:978
 #, c-format
-msgid ""
-"Diffie-Hellman parameters created and saved successfully in file '%s'\n"
+msgid "Diffie-Hellman parameters created and saved successfully in file '%s'\n"
 msgstr ""
 "Parámetros Diffie-Hellman creados y guardados correctamente en fichero '%s'\n"
 
@@ -2427,26 +2416,26 @@ msgstr ""
 #: ../src/ca-cli-callbacks.c:1276
 msgid "Generated certs inherit State from CA                             "
 msgstr ""
-"Los certificados generados heredan estado/provincia de la AC                 "
-"            "
+"Los certificados generados heredan estado/provincia de la "
+"AC                             "
 
 #: ../src/ca-cli-callbacks.c:1277
 msgid "Generated certs inherit Locality from CA                          "
 msgstr ""
-"Los certificados generados heredan localidad o ciudad de la AC               "
-"           "
+"Los certificados generados heredan localidad o ciudad de la "
+"AC                          "
 
 #: ../src/ca-cli-callbacks.c:1278
 msgid "Generated certs inherit Organization from CA                      "
 msgstr ""
-"Los certificados generados heredan Organización de la AC                     "
-" "
+"Los certificados generados heredan Organización de la "
+"AC                      "
 
 #: ../src/ca-cli-callbacks.c:1279
 msgid "Generated certs inherit Organizational Unit from CA               "
 msgstr ""
-"Los certificados generados heredan unidad organizacional de la AC            "
-"   "
+"Los certificados generados heredan unidad organizacional de la "
+"AC               "
 
 #: ../src/ca-cli-callbacks.c:1280
 msgid "Country in generated certs must be the same than in CA            "
@@ -2456,8 +2445,8 @@ msgstr ""
 #: ../src/ca-cli-callbacks.c:1281
 msgid "State in generated certs must be the same than in CA              "
 msgstr ""
-"Estado o provincia de certif. generados debe coincidir con la AC             "
-" "
+"Estado o provincia de certif. generados debe coincidir con la "
+"AC              "
 
 #: ../src/ca-cli-callbacks.c:1282
 msgid "Locality in generated certs must be the same than in CA           "
@@ -2486,14 +2475,14 @@ msgstr ""
 #: ../src/ca-cli-callbacks.c:1287
 msgid "CA use enabled in generated certs                                 "
 msgstr ""
-"Habilitar uso como AC en certificados generados                              "
-"   "
+"Habilitar uso como AC en certificados "
+"generados                                 "
 
 #: ../src/ca-cli-callbacks.c:1288
 msgid "CRL Sign use enabled in generated certs                           "
 msgstr ""
-"Habilitar uso para firma de CRLs en certificados generados                   "
-"        "
+"Habilitar uso para firma de CRLs en certificados "
+"generados                           "
 
 #: ../src/ca-cli-callbacks.c:1289
 msgid "Non reputation use enabled in generated certs                     "
@@ -2508,38 +2497,38 @@ msgstr ""
 #: ../src/ca-cli-callbacks.c:1291
 msgid "Key encipherment use enabled in generated certs                   "
 msgstr ""
-"Habilitar uso para cifrado de claves en certificados generados               "
-"    "
+"Habilitar uso para cifrado de claves en certificados "
+"generados                   "
 
 #: ../src/ca-cli-callbacks.c:1292
 msgid "Key agreement use enabled in generated certs                      "
 msgstr ""
-"Habilitar uso para negociación de claves en certificados generados           "
-"           "
+"Habilitar uso para negociación de claves en certificados "
+"generados                      "
 
 #: ../src/ca-cli-callbacks.c:1293
 msgid "Data encipherment use enabled in generated certs                  "
 msgstr ""
-"Habilitar uso para cifrado de datos en certificados generados                "
-"  "
+"Habilitar uso para cifrado de datos en certificados "
+"generados                  "
 
 #: ../src/ca-cli-callbacks.c:1294
 msgid "TLS web server purpose enabled in generated certs                 "
 msgstr ""
-"Habilitar finalidad de servidor web TLS para certific. generados             "
-"    "
+"Habilitar finalidad de servidor web TLS para certific. "
+"generados                 "
 
 #: ../src/ca-cli-callbacks.c:1295
 msgid "TLS web client purpose enabled in generated certs                 "
 msgstr ""
-"Habilitar finalidad para cliente web TLS en certific. generados              "
-"   "
+"Habilitar finalidad para cliente web TLS en certific. "
+"generados                 "
 
 #: ../src/ca-cli-callbacks.c:1296
 msgid "Time stamping purpose enabled in generated certs                  "
 msgstr ""
-"Habilitar finalidad para sellado de tiempo en certific. generados            "
-"      "
+"Habilitar finalidad para sellado de tiempo en certific. "
+"generados                  "
 
 #: ../src/ca-cli-callbacks.c:1297
 msgid "Code signing server purpose enabled in generated certs            "
@@ -2549,20 +2538,20 @@ msgstr ""
 #: ../src/ca-cli-callbacks.c:1298
 msgid "Email protection purpose enabled in generated certs               "
 msgstr ""
-"Habilitar finalidad para protección de correo-e en cert. generados           "
-"    "
+"Habilitar finalidad para protección de correo-e en cert. "
+"generados               "
 
 #: ../src/ca-cli-callbacks.c:1299
 msgid "OCSP signing purpose enabled in generated certs                   "
 msgstr ""
-"Habilitar finalidad de firma de OCSP en certificados generados               "
-"    "
+"Habilitar finalidad de firma de OCSP en certificados "
+"generados                   "
 
 #: ../src/ca-cli-callbacks.c:1300
 msgid "Any purpose enabled in generated certs                            "
 msgstr ""
-"Habilitar cualquier finalidad en certificados generados                      "
-"      "
+"Habilitar cualquier finalidad en certificados "
+"generados                            "
 
 #: ../src/ca-cli-callbacks.c:1314
 #, c-format
