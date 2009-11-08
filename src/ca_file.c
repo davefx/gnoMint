@@ -1311,7 +1311,7 @@ gchar * ca_file_insert_cert (gboolean is_ca,
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	parent_idstr = __ca_file_get_single_row (ca_db, "SELECT id, parent_route FROM certificates WHERE dn='%q';", tlscert->i_dn);
+	parent_idstr = __ca_file_get_single_row (ca_db, "SELECT id, parent_route FROM certificates WHERE subject_key_id='%q';", tlscert->issuer_key_id);
 	if (parent_idstr == NULL) {
                 error = _("Cannot find parent CA in database");
                 return error;
