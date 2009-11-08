@@ -71,6 +71,16 @@ PKG_CHECK_MODULES(SQLITE, sqlite3 >= $SQLITE_REQUIRED)
 AC_SUBST(SQLITE_CFLAGS)
 AC_SUBST(SQLITE_LIBS)
 
+# check for libgcrypt
+gcrypt=0
+AM_PATH_LIBGCRYPT(1.2.0, gcrypt=1)
+if test $gcrypt = 0
+then
+  AC_MSG_ERROR([gnoMint needs libgcrypt])
+fi
+
+
+
 PKG_CHECK_MODULES(GNOMINT, 
 	glib-2.0 >= $GLIB_REQUIRED \
 	gconf-2.0 >= $GCONF_REQUIRED \

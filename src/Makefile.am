@@ -7,6 +7,7 @@ gnomint_CFLAGS = \
 	-I$(top_builddir) \
 	$(GNOMINT_CFLAGS) \
 	$(LIBGNUTLS_CFLAGS) \
+        $(LIBGCRYPT_CFLAGS) \
 	$(SQLITE_CFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DCOMPILATION_DATE=`date +%s` \
@@ -39,6 +40,7 @@ gnomint_SOURCES = \
 
 gnomint_LDADD = \
 	$(GNOMINT_LIBS) \
+        $(LIBGCRYPT_LIBS) \
 	$(LIBGNUTLS_LIBS) \
 	$(SQLITE_LIBS) \
 	$(LTLIBINTL)
