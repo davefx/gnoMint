@@ -1306,7 +1306,7 @@ int ca_cli_callback_showpolicy (int argc, char **argv)
 	gint i;
 
 
-	if (! ca_file_check_if_is_csr_id (ca_id)) {
+	if (! ca_file_check_if_is_ca_id (ca_id)) {
 		dialog_error (_("The given CA id. is not valid"));
 		return -1;
 	}
