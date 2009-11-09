@@ -288,28 +288,28 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 
                 tlscert = tls_parse_cert_pem (pem);
 
-                if (ca_file_policy_get (ca_id, "C_INHERIT")) {
-                        c_force_same = ca_file_policy_get (ca_id, "C_FORCE_SAME");
+                if (ca_file_policy_get_int (ca_id, "C_INHERIT")) {
+                        c_force_same = ca_file_policy_get_int (ca_id, "C_FORCE_SAME");
 			csr_creation_data->country = g_strdup (tlscert->c);
                 } 
 		
-		if (ca_file_policy_get (ca_id, "ST_INHERIT")) {
-			st_force_same = ca_file_policy_get (ca_id, "ST_FORCE_SAME");
+		if (ca_file_policy_get_int (ca_id, "ST_INHERIT")) {
+			st_force_same = ca_file_policy_get_int (ca_id, "ST_FORCE_SAME");
 			csr_creation_data->state = g_strdup (tlscert->st);
 		}
 
-		if (ca_file_policy_get (ca_id, "L_INHERIT")) {
-			l_force_same = ca_file_policy_get (ca_id, "L_FORCE_SAME");
+		if (ca_file_policy_get_int (ca_id, "L_INHERIT")) {
+			l_force_same = ca_file_policy_get_int (ca_id, "L_FORCE_SAME");
 			csr_creation_data->city = g_strdup (tlscert->l);
 		}
 
-		if (ca_file_policy_get (ca_id, "O_INHERIT")) {
-			o_force_same = ca_file_policy_get (ca_id, "O_FORCE_SAME");
+		if (ca_file_policy_get_int (ca_id, "O_INHERIT")) {
+			o_force_same = ca_file_policy_get_int (ca_id, "O_FORCE_SAME");
 			csr_creation_data->org = g_strdup (tlscert->o);
 		}
 
-		if (ca_file_policy_get (ca_id, "OU_INHERIT")) {
-			ou_force_same = ca_file_policy_get (ca_id, "OU_FORCE_SAME");
+		if (ca_file_policy_get_int (ca_id, "OU_INHERIT")) {
+			ou_force_same = ca_file_policy_get_int (ca_id, "OU_FORCE_SAME");
 			csr_creation_data->ou = g_strdup (tlscert->ou);
 		}
 
@@ -771,115 +771,113 @@ int ca_cli_callback_sign (int argc, char **argv)
 
 	cert_creation_data->key_months_before_expiration = dialog_ask_for_number (_("Introduce number of months before expiration of the new certificate (0 to cancel)"),
 									      0,
-									      ca_file_policy_get (ca_id, "MONTHS_TO_EXPIRE"), 
-									      ca_file_policy_get (ca_id, "MONTHS_TO_EXPIRE"));
+									      ca_file_policy_get_int (ca_id, "MONTHS_TO_EXPIRE"), 
+									      ca_file_policy_get_int (ca_id, "MONTHS_TO_EXPIRE"));
 	
 	if (cert_creation_data->key_months_before_expiration == 0) {
 		g_free (cert_creation_data);
 		printf (_("Operation cancelled.\n"));
 	}
 
-	printf (_("The certificate will be generated with the following uses and purposes:\n"));
+	cert_creation_data->ca = ca_file_policy_get_int (ca_id, "CA");
+	cert_creation_data->crl_signing = ca_file_policy_get_int (ca_id, "CRL_SIGN");
+	cert_creation_data->digital_signature = ca_file_policy_get_int (ca_id, "DIGITAL_SIGNATURE");
+	cert_creation_data->data_encipherment =  ca_file_policy_get_int (ca_id, "DATA_ENCIPHERMENT");
+	cert_creation_data->key_encipherment = ca_file_policy_get_int (ca_id, "KEY_ENCIPHERMENT");
+	cert_creation_data->non_repudiation = ca_file_policy_get_int (ca_id, "NON_REPUDIATION");
+	cert_creation_data->key_agreement = ca_file_policy_get_int (ca_id, "KEY_AGREEMENT");
 
-	cert_creation_data->ca = ca_file_policy_get (ca_id, "CA");
-	cert_creation_data->crl_signing = ca_file_policy_get (ca_id, "CRL_SIGN");
-	cert_creation_data->digital_signature = ca_file_policy_get (ca_id, "DIGITAL_SIGNATURE");
-	cert_creation_data->data_encipherment =  ca_file_policy_get (ca_id, "DATA_ENCIPHERMENT");
-	cert_creation_data->key_encipherment = ca_file_policy_get (ca_id, "KEY_ENCIPHERMENT");
-	cert_creation_data->non_repudiation = ca_file_policy_get (ca_id, "NON_REPUDIATION");
-	cert_creation_data->key_agreement = ca_file_policy_get (ca_id, "KEY_AGREEMENT");
-
-	cert_creation_data->email_protection = ca_file_policy_get (ca_id, "EMAIL_PROTECTION");
-	cert_creation_data->code_signing = ca_file_policy_get (ca_id, "CODE_SIGNING");
-	cert_creation_data->web_client =  ca_file_policy_get (ca_id, "TLS_WEB_CLIENT");
-	cert_creation_data->web_server = ca_file_policy_get (ca_id, "TLS_WEB_SERVER");
-	cert_creation_data->time_stamping = ca_file_policy_get (ca_id, "TIME_STAMPING");
-	cert_creation_data->ocsp_signing = ca_file_policy_get (ca_id, "OCSP_SIGNING");
-	cert_creation_data->any_purpose = ca_file_policy_get (ca_id, "ANY_PURPOSE");
+	cert_creation_data->email_protection = ca_file_policy_get_int (ca_id, "EMAIL_PROTECTION");
+	cert_creation_data->code_signing = ca_file_policy_get_int (ca_id, "CODE_SIGNING");
+	cert_creation_data->web_client =  ca_file_policy_get_int (ca_id, "TLS_WEB_CLIENT");
+	cert_creation_data->web_server = ca_file_policy_get_int (ca_id, "TLS_WEB_SERVER");
+	cert_creation_data->time_stamping = ca_file_policy_get_int (ca_id, "TIME_STAMPING");
+	cert_creation_data->ocsp_signing = ca_file_policy_get_int (ca_id, "OCSP_SIGNING");
+	cert_creation_data->any_purpose = ca_file_policy_get_int (ca_id, "ANY_PURPOSE");
 
 	printf (_("The new certificate will be created with the following uses and purposes:\n"));
 	__ca_cli_callback_show_uses_and_purposes (cert_creation_data);
 	
 	while (dialog_ask_for_confirmation (NULL, _("Do you want to change any property of the new certificate? Yes/[No] "), FALSE)) {
 
-		if (ca_file_policy_get (ca_id, "CA")) {
+		if (ca_file_policy_get_int (ca_id, "CA")) {
 			cert_creation_data->ca = dialog_ask_for_confirmation (NULL, _("* Enable Certification Authority use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Certification Authority use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "CRL_SIGN")) {
+		if (ca_file_policy_get_int (ca_id, "CRL_SIGN")) {
 			cert_creation_data->crl_signing = dialog_ask_for_confirmation (NULL, _("* Enable CRL Signing? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* CRL signing use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "DIGITAL_SIGNATURE")) {
+		if (ca_file_policy_get_int (ca_id, "DIGITAL_SIGNATURE")) {
 			cert_creation_data->digital_signature = dialog_ask_for_confirmation (NULL, _("* Enable Digital Signature use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Digital Signature use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "DATA_ENCIPHERMENT")) {
+		if (ca_file_policy_get_int (ca_id, "DATA_ENCIPHERMENT")) {
 			cert_creation_data->data_encipherment = dialog_ask_for_confirmation (NULL, _("Enable Data Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Data Encipherment use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "KEY_ENCIPHERMENT")) {
+		if (ca_file_policy_get_int (ca_id, "KEY_ENCIPHERMENT")) {
 			cert_creation_data->key_encipherment = dialog_ask_for_confirmation (NULL, _("Enable Key Encipherment use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Encipherment use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "NON_REPUDIATION")) {
+		if (ca_file_policy_get_int (ca_id, "NON_REPUDIATION")) {
 			cert_creation_data->non_repudiation = dialog_ask_for_confirmation (NULL, _("Enable Non Repudiation use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Non Repudiation use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "KEY_AGREEMENT")) {
+		if (ca_file_policy_get_int (ca_id, "KEY_AGREEMENT")) {
 			cert_creation_data->key_agreement = dialog_ask_for_confirmation (NULL, _("Enable Key Agreement use? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Key Agreement use disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "EMAIL_PROTECTION")) {
+		if (ca_file_policy_get_int (ca_id, "EMAIL_PROTECTION")) {
 			cert_creation_data->email_protection = dialog_ask_for_confirmation (NULL, _("Enable Email Protection purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Email Protection purpose disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "CODE_SIGNING")) {
+		if (ca_file_policy_get_int (ca_id, "CODE_SIGNING")) {
 			cert_creation_data->code_signing = dialog_ask_for_confirmation (NULL, _("Enable Code Signing purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Code Signing purpose disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "TLS_WEB_CLIENT")) {
+		if (ca_file_policy_get_int (ca_id, "TLS_WEB_CLIENT")) {
 			cert_creation_data->web_client = dialog_ask_for_confirmation (NULL, _("Enable TLS Web Client purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Client purpose disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "TLS_WEB_SERVER")) {
+		if (ca_file_policy_get_int (ca_id, "TLS_WEB_SERVER")) {
 			cert_creation_data->web_server = dialog_ask_for_confirmation (NULL, _("Enable TLS Web Server purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* TLS Web Server purpose disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "TIME_STAMPING")) {
+		if (ca_file_policy_get_int (ca_id, "TIME_STAMPING")) {
 			cert_creation_data->time_stamping = dialog_ask_for_confirmation (NULL, _("Enable Time Stamping purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Time Stamping purpose disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "OCSP_SIGNING")) {
+		if (ca_file_policy_get_int (ca_id, "OCSP_SIGNING")) {
 			cert_creation_data->ocsp_signing = dialog_ask_for_confirmation (NULL, _("Enable OCSP Signing purpose? [Yes]/No "), TRUE);		} else {
 			printf (_("* OCSP Signing purpose disabled by policy\n"));
 		}
 
-		if (ca_file_policy_get (ca_id, "ANY_PURPOSE")) {
+		if (ca_file_policy_get_int (ca_id, "ANY_PURPOSE")) {
 			cert_creation_data->any_purpose = dialog_ask_for_confirmation (NULL, _("Enable any purpose? [Yes]/No "), TRUE);
 		} else {
 			printf (_("* Any purpose disabled by policy\n"));
@@ -1224,22 +1222,23 @@ typedef enum {
 	CA_CLI_CALLBACK_POLICY_O_FORCE_SAME = 8,
 	CA_CLI_CALLBACK_POLICY_OU_FORCE_SAME = 9,
 	CA_CLI_CALLBACK_POLICY_HOURS_BETWEEN_CRL_UPDATES = 10,
-	CA_CLI_CALLBACK_POLICY_MONTHS_TO_EXPIRE = 11,
-	CA_CLI_CALLBACK_POLICY_CA = 12,
-	CA_CLI_CALLBACK_POLICY_CRL_SIGN = 13,
-	CA_CLI_CALLBACK_POLICY_NON_REPUTATION = 14,
-	CA_CLI_CALLBACK_POLICY_DIGITAL_SIGNATURE = 15,
-	CA_CLI_CALLBACK_POLICY_KEY_ENCIPHERMENT = 16,
-	CA_CLI_CALLBACK_POLICY_KEY_AGREEMENT = 17,
-	CA_CLI_CALLBACK_POLICY_DATA_ENCIPHERMENT = 18,
-	CA_CLI_CALLBACK_POLICY_TLS_WEB_SERVER = 19,
-	CA_CLI_CALLBACK_POLICY_TLS_WEB_CLIENT = 20,
-	CA_CLI_CALLBACK_POLICY_TIME_STAMPING = 21,
-	CA_CLI_CALLBACK_POLICY_CODE_SIGNING = 22,
-	CA_CLI_CALLBACK_POLICY_EMAIL_PROTECTION = 23,
-	CA_CLI_CALLBACK_POLICY_OCSP_SIGNING = 24,
-	CA_CLI_CALLBACK_POLICY_ANY_PURPOSE = 25,
-	CA_CLI_CALLBACK_POLICY_NUMBER = 26
+	CA_CLI_CALLBACK_POLICY_CRL_DISTRIBUTION_POINT = 11,
+	CA_CLI_CALLBACK_POLICY_MONTHS_TO_EXPIRE = 12,
+	CA_CLI_CALLBACK_POLICY_CA = 13,
+	CA_CLI_CALLBACK_POLICY_CRL_SIGN = 14,
+	CA_CLI_CALLBACK_POLICY_NON_REPUTATION = 15,
+	CA_CLI_CALLBACK_POLICY_DIGITAL_SIGNATURE = 16,
+	CA_CLI_CALLBACK_POLICY_KEY_ENCIPHERMENT = 17,
+	CA_CLI_CALLBACK_POLICY_KEY_AGREEMENT = 18,
+	CA_CLI_CALLBACK_POLICY_DATA_ENCIPHERMENT = 19,
+	CA_CLI_CALLBACK_POLICY_TLS_WEB_SERVER = 20,
+	CA_CLI_CALLBACK_POLICY_TLS_WEB_CLIENT = 21,
+	CA_CLI_CALLBACK_POLICY_TIME_STAMPING = 22,
+	CA_CLI_CALLBACK_POLICY_CODE_SIGNING = 23,
+	CA_CLI_CALLBACK_POLICY_EMAIL_PROTECTION = 24,
+	CA_CLI_CALLBACK_POLICY_OCSP_SIGNING = 25,
+	CA_CLI_CALLBACK_POLICY_ANY_PURPOSE = 26,
+	CA_CLI_CALLBACK_POLICY_NUMBER = 27
 } CaCallbackPolicy;
 
 static gchar *CaCallbackPolicyName[CA_CLI_CALLBACK_POLICY_NUMBER] = {
@@ -1254,6 +1253,7 @@ static gchar *CaCallbackPolicyName[CA_CLI_CALLBACK_POLICY_NUMBER] = {
 	"O_FORCE_SAME",
 	"OU_FORCE_SAME",
 	"HOURS_BETWEEN_CRL_UPDATES",
+	"CRL_DISTRIBUTION_POINT",
 	"MONTHS_TO_EXPIRE",
 	"CA",
 	"CRL_SIGN",
@@ -1283,6 +1283,7 @@ static gchar *CaCallbackPolicyDescriptions[CA_CLI_CALLBACK_POLICY_NUMBER] = {
 	N_("Organization in generated certs must be the same than in CA       "),
 	N_("Organizational Unit in generated certs must be the same than in CA"),
 	N_("Maximum number of hours between CRL updates                       "),
+	N_("CRL distribution point (URL where CRL is published)               "),
 	N_("Maximum number of months before expiration of new certs           "),
 	N_("CA use enabled in generated certs                                 "),
 	N_("CRL Sign use enabled in generated certs                           "),
@@ -1318,7 +1319,7 @@ int ca_cli_callback_showpolicy (int argc, char **argv)
 	printf (_("Id.\tDescription\t\t\t\t\t\t\t\tValue\n"));
 	for (i = 0; i < CA_CLI_CALLBACK_POLICY_NUMBER; i++) {
 
-		printf ("%d\t%s\t%d\n", i, CaCallbackPolicyDescriptions[i], ca_file_policy_get(ca_id, CaCallbackPolicyName[i]));
+		printf ("%d\t%s\t%s\n", i, CaCallbackPolicyDescriptions[i], ca_file_policy_get(ca_id, CaCallbackPolicyName[i]));
 
 	}
 
@@ -1330,7 +1331,7 @@ int ca_cli_callback_setpolicy (int argc, char **argv)
 {
 	guint64 ca_id = atoll(argv[1]);
 	gint policy_id = atoi (argv[2]);
-	gint value = atoi (argv[3]);
+	gchar *value = argv[3];
 	gchar *message = NULL;
 	gchar *description = NULL;
 	gint i;
@@ -1353,7 +1354,7 @@ int ca_cli_callback_setpolicy (int argc, char **argv)
 		}
 	}
 
-	message = g_strdup_printf (_("You are about to assign to the policy\n'%s' the new value '%d'."), description, value);
+	message = g_strdup_printf (_("You are about to assign to the policy\n'%s' the new value '%s'."), description, value);
 	g_free (description);
 
 
@@ -1362,7 +1363,7 @@ int ca_cli_callback_setpolicy (int argc, char **argv)
 			g_free (message);
 			return -1;
 		} else
-			printf (_("Policy set correctly to '%d'.\n"), value);
+			printf (_("Policy set correctly to '%s'.\n"), value);
 			
 		
 	} else {

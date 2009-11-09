@@ -46,12 +46,8 @@ typedef struct {
 	time_t activation;
 	time_t expiration;
 
-	/* Now, as the DB is not related to CAs anymore, the field is_pwd_protected has no sense
-	   in CA creation process */
+	gchar * crl_distribution_point;
 
-	/* gboolean is_pwd_protected; */
-
-	/* However, the password is needed */
 	gchar * password; 
 
         gchar * parent_ca_id_str;
@@ -79,6 +75,8 @@ typedef struct {
 	gboolean time_stamping;
 	gboolean ocsp_signing;
 	gboolean any_purpose;
+
+	gchar * crl_distribution_point;
 
 	gchar * cadb_password;
 
@@ -110,6 +108,8 @@ typedef struct __TlsCert {
 
         gchar * subject_key_id;
         gchar * issuer_key_id;
+
+	gchar * crl_distribution_point;
 
 	GList * uses;
 

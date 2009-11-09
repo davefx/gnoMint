@@ -47,7 +47,7 @@ gint __ca_policy_populate_step (void *pArg, int argc, char **argv, char **column
 {
 	GHashTable * policy_table = (GHashTable *) pArg;
 
-	g_hash_table_insert (policy_table, g_strdup (argv[1]), GINT_TO_POINTER(atoi(argv[2])));
+	g_hash_table_insert (policy_table, g_strdup (argv[1]), g_strdup(argv[2]));
 
 	return 0;
 }
@@ -56,121 +56,153 @@ void ca_policy_populate (guint64 ca_id)
 {
 	GObject * widget;
 	gint value;
-	GHashTable *policy_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);	
+	gchar * strvalue;
+	GHashTable *policy_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);	
 
 	ca_file_foreach_policy (__ca_policy_populate_step, ca_id, policy_table);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_INHERIT"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "C_INHERIT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "country_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_same_radiobutton")), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_differ_radiobutton")), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_INHERIT"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "ST_INHERIT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "state_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_same_radiobutton")), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_differ_radiobutton")), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_INHERIT"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "L_INHERIT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "city_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_same_radiobutton")), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_differ_radiobutton")), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_INHERIT"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "O_INHERIT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "organization_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_same_radiobutton")), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_differ_radiobutton")), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_INHERIT"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "OU_INHERIT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ou_inherited_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_same_radiobutton")), value);
         gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_differ_radiobutton")), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "C_FORCE_SAME"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "C_FORCE_SAME");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "country_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ST_FORCE_SAME"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "ST_FORCE_SAME");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "state_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "L_FORCE_SAME"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "L_FORCE_SAME");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "city_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "O_FORCE_SAME"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "O_FORCE_SAME");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "organization_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-        value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OU_FORCE_SAME"));
+        strvalue = (gchar *) g_hash_table_lookup (policy_table, "OU_FORCE_SAME");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ou_same_radiobutton");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "HOURS_BETWEEN_CRL_UPDATES");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "hours_between_crl_updates_spinbutton");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "MONTHS_TO_EXPIRE"));
+	strvalue = ((gchar *) g_hash_table_lookup (policy_table, "CRL_DISTRIBUTION_POINT"));
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "crl_distribution_point_entry");
+	if (strvalue)
+		gtk_entry_set_text (GTK_ENTRY(widget), strvalue);
+
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "MONTHS_TO_EXPIRE");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "months_before_expiration_spinbutton2");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CA"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "CA");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ca_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CRL_SIGN"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "CRL_SIGN");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "crl_signing_check1");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "NON_REPUDIATION"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "NON_REPUDIATION");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "non_repudiation_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "DIGITAL_SIGNATURE"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "DIGITAL_SIGNATURE");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "digital_signature_check4");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "KEY_ENCIPHERMENT"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "KEY_ENCIPHERMENT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "key_encipherment_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "KEY_AGREEMENT"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "KEY_AGREEMENT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "key_agreement_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "DATA_ENCIPHERMENT"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "DATA_ENCIPHERMENT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "data_encipherment_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "TLS_WEB_SERVER"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "TLS_WEB_SERVER");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "webserver_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "TLS_WEB_CLIENT"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "TLS_WEB_CLIENT");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "webclient_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "TIME_STAMPING"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "TIME_STAMPING");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "time_stamping_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "CODE_SIGNING"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "CODE_SIGNING");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "code_signing_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "EMAIL_PROTECTION"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "EMAIL_PROTECTION");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "email_protection_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 	
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "OCSP_SIGNING"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "OCSP_SIGNING");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "ocsp_signing_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 
-	value = GPOINTER_TO_INT (g_hash_table_lookup (policy_table, "ANY_PURPOSE"));
+	strvalue = (gchar *) g_hash_table_lookup (policy_table, "ANY_PURPOSE");
+	value = strvalue ? atoi(strvalue) : 0;
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "any_purpose_check2");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), value);
 	
@@ -196,7 +228,7 @@ void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer use
 
 	cert_id = atoll(cert_id_str);
 
-	ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
+	ca_file_policy_set_int (cert_id, "MONTHS_TO_EXPIRE", gtk_spin_button_get_value(spin_button));
 
 }
 
@@ -214,10 +246,27 @@ void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer use
 
 	cert_id = atoll(cert_id_str);
 
-	ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
+	ca_file_policy_set_int (cert_id, "HOURS_BETWEEN_CRL_UPDATES", gtk_spin_button_get_value(spin_button));
 
 }
 
+void ca_policy_crl_distribution_point_change(gpointer gtkentry, gpointer userdata)
+{
+	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
+	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
+	guint64 cert_id;
+
+	if (! cert_id_str)
+		return;
+
+	if (! gtkentry)
+		return;
+
+	cert_id = atoll(cert_id_str);
+
+	ca_file_policy_set (cert_id, "CRL_DISTRIBUTION_POINT", gtk_entry_get_text(gtkentry));
+
+}
 
 void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 {
@@ -522,7 +571,7 @@ void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 		property_name = "ANY_PURPOSE";
 
 	if (property_name)
-		ca_file_policy_set (cert_id, property_name, is_active);
+		ca_file_policy_set_int (cert_id, property_name, is_active);
 
 }
 

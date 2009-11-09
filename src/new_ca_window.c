@@ -249,18 +249,12 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	g_free (expiration_time);
 
 
-	/* widget = gtk_builder_get_object (new_ca_window_gtkb, "new_ca_pwd_protect_yes_radiobutton"); */
-	/* active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget)); */
-	/* ca_creation_data->is_pwd_protected = active; */
-
-	/* if (active) { */
-	/* 	widget = gtk_builder_get_object (new_ca_window_gtkb, "new_ca_pwd_entry_1"); */
-	/* 	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget)); */
-	/* 	if (strlen (text)) */
-	/* 		ca_creation_data->password = g_strdup (text); */
-	/* 	else */
-	/* 		ca_creation_data->password = NULL; */
-	/* } */
+	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "crl_distribution_point_entry"));
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->crl_distribution_point = g_strdup (text);
+	else
+		ca_creation_data->crl_distribution_point = NULL;
 
 
 	if (ca_file_is_password_protected()) {
@@ -268,6 +262,7 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 
                 if (! ca_creation_data->password) {
                         /* The user hasn't provided a valid password */
+			tls_creation_data_free (ca_creation_data);
                         return;
                 }
 

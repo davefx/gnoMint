@@ -121,8 +121,10 @@ gint ca_file_begin_new_crl_transaction (guint64 ca_id, time_t timestamp);
 void ca_file_commit_new_crl_transaction (guint64 ca_id, const GList *revoked_certs);
 void ca_file_rollback_new_crl_transaction (void);
 
-guint ca_file_policy_get (guint64 ca_id, gchar *property_name);
-gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value);
+gchar * ca_file_policy_get (guint64 ca_id, gchar *property_name);
+gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, const gchar *value);
+gint  ca_file_policy_get_int (guint64 ca_id, gchar *property_name);
+gboolean ca_file_policy_set_int (guint64 ca_id, gchar *property_name, gint value);
 
 gboolean ca_file_is_password_protected(void);
 gboolean ca_file_check_password (const gchar *password);

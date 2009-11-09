@@ -319,31 +319,31 @@ void on_new_cert_next2_clicked (GtkButton *button,
         g_free (value);
 	
         /* Check for differences in fields that must be equal according to the CA policy */
-        if (ca_file_policy_get (ca_id, "C_FORCE_SAME") && 
+        if (ca_file_policy_get_int (ca_id, "C_FORCE_SAME") && 
             (tls_ca_cert->c != tls_csr->c) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->c == NULL || tls_csr->c == NULL || strcmp(tls_ca_cert->c, tls_csr->c))) {
                 dialog_error (_("The policy of this CA obligue the country field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_file_policy_get (ca_id, "ST_FORCE_SAME") && 
+        if (ca_file_policy_get_int (ca_id, "ST_FORCE_SAME") && 
             (tls_ca_cert->st != tls_csr->st) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->st == NULL || tls_csr->st == NULL || strcmp(tls_ca_cert->st, tls_csr->st))) {
                 dialog_error (_("The policy of this CA obligue the state/province field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_file_policy_get (ca_id, "L_FORCE_SAME") && 
+        if (ca_file_policy_get_int (ca_id, "L_FORCE_SAME") && 
             (tls_ca_cert->l != tls_csr->l) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->l == NULL || tls_csr->st == NULL || strcmp(tls_ca_cert->l, tls_csr->l))) {
                 dialog_error (_("The policy of this CA obligue the locality/city field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_file_policy_get (ca_id, "O_FORCE_SAME") && 
+        if (ca_file_policy_get_int (ca_id, "O_FORCE_SAME") && 
             (tls_ca_cert->o != tls_csr->o) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->o == NULL || tls_csr->o == NULL || strcmp(tls_ca_cert->o, tls_csr->o))) {
                 dialog_error (_("The policy of this CA obligue the organization field of the certificates to be the same as the one in the CA cert."));
                 return;
         }
-        if (ca_file_policy_get (ca_id, "OU_FORCE_SAME") && 
+        if (ca_file_policy_get_int (ca_id, "OU_FORCE_SAME") && 
             (tls_ca_cert->ou != tls_csr->ou) && // If they are the same, they both are NULL, so it is OK
             (tls_ca_cert->ou == NULL || tls_csr->ou == NULL || strcmp(tls_ca_cert->ou, tls_csr->ou))) {
                 dialog_error (_("The policy of this CA obligue the organizational unit field of the certificates to be the same as the one in the CA cert."));
@@ -354,79 +354,79 @@ void on_new_cert_next2_clicked (GtkButton *button,
 
         tls_cert_free (tls_ca_cert);
 
-	i_value = ca_file_policy_get (ca_id, "MONTHS_TO_EXPIRE");
+	i_value = ca_file_policy_get_int (ca_id, "MONTHS_TO_EXPIRE");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "months_before_expiration_spinbutton1");
 	gtk_spin_button_set_range (GTK_SPIN_BUTTON(object), 1, i_value);
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "CA");
+	i_value = ca_file_policy_get_int (ca_id, "CA");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "ca_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 
-/* 	i_value = ca_file_policy_get (ca_id, "CERT_SIGN")); */
+/* 	i_value = ca_file_policy_get_int (ca_id, "CERT_SIGN")); */
 /* 	object = gtk_builder_get_object (new_cert_window_gtkb, "cert_signing_check2"); */
 /* 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value); */
 
-	i_value = ca_file_policy_get (ca_id, "CRL_SIGN");
+	i_value = ca_file_policy_get_int (ca_id, "CRL_SIGN");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "crl_signing_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "NON_REPUDIATION");
+	i_value = ca_file_policy_get_int (ca_id, "NON_REPUDIATION");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "non_repudiation_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "DIGITAL_SIGNATURE");
+	i_value = ca_file_policy_get_int (ca_id, "DIGITAL_SIGNATURE");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "digital_signature_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "KEY_ENCIPHERMENT");
+	i_value = ca_file_policy_get_int (ca_id, "KEY_ENCIPHERMENT");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "key_encipherment_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "KEY_AGREEMENT");
+	i_value = ca_file_policy_get_int (ca_id, "KEY_AGREEMENT");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "key_agreement_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "DATA_ENCIPHERMENT");
+	i_value = ca_file_policy_get_int (ca_id, "DATA_ENCIPHERMENT");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "data_encipherment_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "TLS_WEB_SERVER");
+	i_value = ca_file_policy_get_int (ca_id, "TLS_WEB_SERVER");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "webserver_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "TLS_WEB_CLIENT");
+	i_value = ca_file_policy_get_int (ca_id, "TLS_WEB_CLIENT");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "webclient_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "TIME_STAMPING");
+	i_value = ca_file_policy_get_int (ca_id, "TIME_STAMPING");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "time_stamping_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "CODE_SIGNING");
+	i_value = ca_file_policy_get_int (ca_id, "CODE_SIGNING");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "code_signing_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "EMAIL_PROTECTION");
+	i_value = ca_file_policy_get_int (ca_id, "EMAIL_PROTECTION");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "email_protection_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 	
-	i_value = ca_file_policy_get (ca_id, "OCSP_SIGNING");
+	i_value = ca_file_policy_get_int (ca_id, "OCSP_SIGNING");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "ocsp_signing_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
 
-	i_value = ca_file_policy_get (ca_id, "ANY_PURPOSE");
+	i_value = ca_file_policy_get_int (ca_id, "ANY_PURPOSE");
 	object = gtk_builder_get_object (new_cert_window_gtkb, "any_purpose_check");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(object), i_value);
 	gtk_widget_set_sensitive (GTK_WIDGET(object), i_value);
@@ -735,6 +735,8 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->ocsp_signing = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	widget = gtk_builder_get_object (new_cert_window_gtkb, "any_purpose_check");
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
+
+	cert_creation_data->crl_distribution_point = ca_file_policy_get (ca_id, "CRL_DISTRIBUTION_POINT");
 
 	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
 

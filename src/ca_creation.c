@@ -138,8 +138,6 @@ gpointer ca_creation_thread (gpointer data)
 		return ca_creation_message;
 	}
 
-	printf ("\n\n%s\n\n", root_certificate);
-
 	g_static_mutex_lock (&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("CA generated successfully");
 	ca_creation_thread_status = 1;
@@ -193,7 +191,7 @@ gchar * ca_creation_database_save (TlsCreationData * creation_data,
 				   gchar * root_certificate)
 {
 	return ca_file_insert_self_signed_ca (private_key,
-                                              root_certificate);
+					      root_certificate);
 }
 
 

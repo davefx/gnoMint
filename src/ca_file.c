@@ -1254,15 +1254,19 @@ gchar * ca_file_insert_self_signed_ca (gchar *pem_ca_private_key,
 		return error;
 	sqlite3_free (sql);
 
-	ca_file_policy_set (rootca_id, "MONTHS_TO_EXPIRE", 60);
-	ca_file_policy_set (rootca_id, "HOURS_BETWEEN_CRL_UPDATES", 24);
-	ca_file_policy_set (rootca_id, "DIGITAL_SIGNATURE", 1);
-	ca_file_policy_set (rootca_id, "KEY_ENCIPHERMENT", 1);
-	ca_file_policy_set (rootca_id, "KEY_AGREEMENT", 1);
-	ca_file_policy_set (rootca_id, "DATA_ENCIPHERMENT", 1);
-	ca_file_policy_set (rootca_id, "TLS_WEB_SERVER", 1);
-	ca_file_policy_set (rootca_id, "TLS_WEB_CLIENT", 1);
-	ca_file_policy_set (rootca_id, "EMAIL_PROTECTION", 1);
+	ca_file_policy_set (rootca_id, "MONTHS_TO_EXPIRE", "60");
+	ca_file_policy_set (rootca_id, "HOURS_BETWEEN_CRL_UPDATES", "24");
+	ca_file_policy_set (rootca_id, "DIGITAL_SIGNATURE", "1");
+	ca_file_policy_set (rootca_id, "KEY_ENCIPHERMENT", "1");
+	ca_file_policy_set (rootca_id, "KEY_AGREEMENT", "1");
+	ca_file_policy_set (rootca_id, "DATA_ENCIPHERMENT", "1");
+	ca_file_policy_set (rootca_id, "TLS_WEB_SERVER", "1");
+	ca_file_policy_set (rootca_id, "TLS_WEB_CLIENT", "1");
+	ca_file_policy_set (rootca_id, "EMAIL_PROTECTION", "1");
+
+	if (tls_cert->crl_distribution_point) {
+		ca_file_policy_set (rootca_id, "CRL_DISTRIBUTION_POINT", tls_cert->crl_distribution_point);
+	}
 
 	if (sqlite3_exec (ca_db, "COMMIT;", NULL, NULL, &error))
 		return error;
@@ -1419,15 +1423,15 @@ gchar * ca_file_insert_cert (gboolean is_ca,
 		sqlite3_free (sql);
                 g_free (serialstr);
 
-		if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) || 
-		    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)||
-		    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)||
-		    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1) ||
-		    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1)) {
+		if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", "60") || 
+		    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", "24")||
+		    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", "1")||
+		    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", "1") ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", "1")) {
 			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 			sqlite3_free (sql);
 			return g_strdup ("Error while establishing policies.");
@@ -1682,15 +1686,15 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
 		sqlite3_free (sql);
 
 
-		if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", 60) || 
-		    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", 24)||
-		    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", 1)||
-		    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", 1) ||
-		    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", 1) ||
-		    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", 1)) {
+		if (! ca_file_policy_set (cert_id, "MONTHS_TO_EXPIRE", "60") || 
+		    ! ca_file_policy_set (cert_id, "HOURS_BETWEEN_CRL_UPDATES", "24")||
+		    ! ca_file_policy_set (cert_id, "DIGITAL_SIGNATURE", "1")||
+		    ! ca_file_policy_set (cert_id, "KEY_ENCIPHERMENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "KEY_AGREEMENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "DATA_ENCIPHERMENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_SERVER", "1") ||
+		    ! ca_file_policy_set (cert_id, "TLS_WEB_CLIENT", "1") ||
+		    ! ca_file_policy_set (cert_id, "EMAIL_PROTECTION", "1")) {
 			sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
 			sqlite3_free (sql);
 			return g_strdup ("Error while establishing policies.");
@@ -2629,12 +2633,64 @@ gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gc
 	return (! error);
 }
 
-guint ca_file_policy_get (guint64 ca_id, gchar *property_name)
+gchar * ca_file_policy_get (guint64 ca_id, gchar *property_name)
 {
 	gchar **row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
 					      property_name, ca_id);
 
-	guint res;
+	gchar * res;
+
+	if (!row)
+		return NULL;
+
+	res = g_strdup(row[0]);
+
+	g_strfreev (row);
+
+	return res;
+}
+
+
+gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, const gchar * value)
+{
+	gchar **aux;
+	gchar *error = NULL;
+	gchar *sql = NULL;
+
+	aux = __ca_file_get_single_row (ca_db, "SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
+				      property_name, ca_id);
+
+	if (! aux) {
+		sql = sqlite3_mprintf ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%"G_GUINT64_FORMAT", '%q', '%q');",
+				       ca_id, property_name, value);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			fprintf (stderr, "%s\n", error);
+			sqlite3_free (sql);
+			return FALSE;
+		}
+	} else {
+		g_strfreev (aux);
+		sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%q' WHERE ca_id=%"G_GUINT64_FORMAT" AND name='%s';",
+				       value, ca_id, property_name);
+		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
+			fprintf (stderr, "%s\n", error);
+			sqlite3_free (sql);
+			return FALSE;
+		}
+	}
+
+        sqlite3_free (sql);
+
+	return TRUE;
+		
+}
+
+gint ca_file_policy_get_int (guint64 ca_id, gchar *property_name)
+{
+	gchar **row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"G_GUINT64_FORMAT" ;", 
+					      property_name, ca_id);
+
+	gint res;
 
 	if (!row)
 		return 0;
@@ -2646,8 +2702,7 @@ guint ca_file_policy_get (guint64 ca_id, gchar *property_name)
 	return res;
 }
 
-
-gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
+gboolean ca_file_policy_set_int (guint64 ca_id, gchar *property_name, gint value)
 {
 	gchar **aux;
 	gchar *error = NULL;
@@ -2657,7 +2712,7 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
 				      property_name, ca_id);
 
 	if (! aux) {
-		sql = sqlite3_mprintf ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%"G_GUINT64_FORMAT", '%q', %d);",
+		sql = sqlite3_mprintf ("INSERT INTO ca_policies(ca_id, name, value) VALUES (%"G_GUINT64_FORMAT", '%q', '%d');",
 				       ca_id, property_name, value);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			fprintf (stderr, "%s\n", error);
@@ -2666,7 +2721,7 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, guint value)
 		}
 	} else {
 		g_strfreev (aux);
-		sql = sqlite3_mprintf ("UPDATE ca_policies SET value=%d WHERE ca_id=%"G_GUINT64_FORMAT" AND name='%s';",
+		sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%d' WHERE ca_id=%"G_GUINT64_FORMAT" AND name='%s';",
 				       value, ca_id, property_name);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			fprintf (stderr, "%s\n", error);
