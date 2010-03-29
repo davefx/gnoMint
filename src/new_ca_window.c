@@ -63,7 +63,7 @@ void new_ca_tab_activate (int tab_number)
 
 }
 
-void on_cn_entry_changed (GtkEditable *editable,
+G_MODULE_EXPORT void on_cn_entry_changed (GtkEditable *editable,
 			 gpointer user_data) 
 {
 	GtkButton *button = GTK_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_next1"));
@@ -75,13 +75,13 @@ void on_cn_entry_changed (GtkEditable *editable,
 		
 }
 
-void on_new_ca_next1_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_ca_next1_clicked (GtkButton *widget,
 			      gpointer user_data) 
 {
 	new_ca_tab_activate (1);
 }
 
-void on_new_ca_previous2_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_ca_previous2_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
 	new_ca_tab_activate (0);
@@ -93,13 +93,13 @@ void on_new_ca_next2_clicked (GtkButton *widget,
 	new_ca_tab_activate (2);
 }
 
-void on_new_ca_previous3_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_ca_previous3_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
 	new_ca_tab_activate (1);
 }
 
-void on_new_ca_cancel_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_ca_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	
@@ -110,7 +110,7 @@ void on_new_ca_cancel_clicked (GtkButton *widget,
 }
 
 
-void on_new_ca_pwd_entry_changed (GtkEntry *entry,
+G_MODULE_EXPORT void on_new_ca_pwd_entry_changed (GtkEntry *entry,
 				       gpointer user_data)
 {
 	const gchar *text1;
@@ -132,7 +132,7 @@ void on_new_ca_pwd_entry_changed (GtkEntry *entry,
 }
 
 
-void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton, 
+G_MODULE_EXPORT void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton, 
 						     gpointer user_data)
 {
 	GtkRadioButton *yes = GTK_RADIO_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, 
@@ -160,7 +160,7 @@ void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton,
 }
 
 
-void on_new_ca_commit_clicked (GtkButton *widg,
+G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data) 
 {
 	TlsCreationData *ca_creation_data = NULL;
@@ -241,12 +241,18 @@ void on_new_ca_commit_clicked (GtkButton *widg,
 	ca_creation_data->activation = tmp;
 	
 	expiration_time = g_new (struct tm,1);
-	localtime_r (&tmp, expiration_time);      
+#ifndef WIN32
+	localtime_r (&tmp, expiration_time);
+#else
+	expiration_time = localtime(&tmp);
+#endif
 	expiration_time->tm_mon = expiration_time->tm_mon + ca_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
 	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
 	ca_creation_data->expiration = mktime(expiration_time);
+#ifndef WIN32
 	g_free (expiration_time);
+#endif
 
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "crl_distribution_point_entry"));

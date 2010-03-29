@@ -214,7 +214,7 @@ void ca_policy_populate (guint64 ca_id)
 
 #ifndef GNOMINTCLI
 
-void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata)
+G_MODULE_EXPORT void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer userdata)
 {
 	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
@@ -232,7 +232,7 @@ void ca_policy_expiration_spin_button_change (gpointer spin_button, gpointer use
 
 }
 
-void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer userdata)
+G_MODULE_EXPORT void ca_policy_crl_update_spin_button_change (gpointer spin_button, gpointer userdata)
 {
 	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");
@@ -268,7 +268,7 @@ void ca_policy_crl_distribution_point_change(gpointer gtkentry, gpointer userdat
 
 }
 
-void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
+G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer userdata)
 {
 	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");

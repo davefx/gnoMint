@@ -157,7 +157,11 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 void __certificate_properties_populate (const char *certificate_pem)
 {
 	GObject *widget = NULL;
+#ifndef WIN32
 	struct tm tim;
+#else
+	struct tm* tim = NULL;
+#endif
 	TlsCert * cert = NULL;
 	gchar model_time_str[100];
         gchar * aux;
@@ -168,13 +172,23 @@ void __certificate_properties_populate (const char *certificate_pem)
 	serial_number = &cert->serial_number;
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certActivationDateLabel");
+#ifndef WIN32
 	gmtime_r (&cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
+#else
+	tim = gmtime (&cert->activation_time);
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);	
+#endif
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certExpirationDateLabel");
+#ifndef WIN32
 	gmtime_r (&cert->expiration_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
+#else
+	tim = gmtime (&cert->expiration_time);
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);
+#endif
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");	
@@ -237,7 +251,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 	return;
 }
 
-void certificate_properties_close_clicked (const char *certificate_pem)
+G_MODULE_EXPORT void certificate_properties_close_clicked (const char *certificate_pem)
 {
 	GObject *widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gtk_widget_destroy (GTK_WIDGET(widget));
@@ -464,24 +478,45 @@ void __certificate_properties_fill_cert_issuer(GtkTreeStore *store, GtkTreeIter 
 void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
 {
 	time_t not_before;
+#ifndef WIN32
 	struct tm not_before_broken_down_time;
+#else
+	struct tm *not_before_broken_down_time = NULL;
+#endif
 	gchar not_before_asctime[32];
 	time_t not_after;
+#ifndef WIN32
 	struct tm not_after_broken_down_time;
+#else
+	struct tm *not_after_broken_down_time = NULL;
+#endif
 	gchar not_after_asctime[32];
 	GtkTreeIter j;
 	GtkTreeIter k;
 
+#ifndef WIN32
 	not_before = gnutls_x509_crt_get_activation_time(*certificate);
-	gmtime_r(&not_before, &not_before_broken_down_time);
+	gmtime_r (&not_before, &not_before_broken_down_time);
 	asctime_r(&not_before_broken_down_time, not_before_asctime);
-
 	not_before_asctime[strlen(not_before_asctime) - 1] = 0;
+#else
+	not_before = gnutls_x509_crt_get_activation_time(*certificate);
+	not_before_broken_down_time = gmtime(&not_before);
+	snprintf(not_before_asctime, sizeof(not_before_asctime), "%s", asctime(not_before_broken_down_time));
+	// not_before_asctime[strlen(not_before_asctime) - 1] = 0; // ???
+#endif
+
+#ifndef WIN32
 	not_after = gnutls_x509_crt_get_expiration_time(*certificate);
 	gmtime_r(&not_after, &not_after_broken_down_time);
-
 	asctime_r(&not_after_broken_down_time, not_after_asctime);
 	not_after_asctime[strlen(not_after_asctime) - 1] = 0;
+#else
+	not_after = gnutls_x509_crt_get_expiration_time(*certificate);
+	not_after_broken_down_time = gmtime(&not_after);
+	snprintf(not_after_asctime, sizeof(not_after_asctime), "%s", asctime(not_after_broken_down_time));
+	// not_after_asctime[strlen(not_after_asctime) - 1] = 0; // ???
+#endif
 
 	gtk_tree_store_append(store, &j, parent);
 	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Validity"), -1);

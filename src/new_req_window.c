@@ -189,7 +189,7 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 }
 
-void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data)
+G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data)
 {
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
@@ -240,7 +240,7 @@ void new_req_tab_activate (int tab_number)
 
 }
 
-void on_new_req_cn_entry_changed (GtkEditable *editable,
+G_MODULE_EXPORT void on_new_req_cn_entry_changed (GtkEditable *editable,
 			 gpointer user_data) 
 {
 	GtkButton *button = GTK_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "new_req_next2"));
@@ -273,7 +273,7 @@ gboolean __new_req_window_lookup_country (GtkTreeModel *model,
 
 }
 
-void on_new_req_next1_clicked (GtkButton *button,
+G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
@@ -365,25 +365,25 @@ void on_new_req_next1_clicked (GtkButton *button,
 	new_req_tab_activate (1);
 }
 
-void on_new_req_previous2_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_req_previous2_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
 	new_req_tab_activate (0);
 }
 
-void on_new_req_next2_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_req_next2_clicked (GtkButton *widget,
 			      gpointer user_data) 
 {
 	new_req_tab_activate (2);
 }
 
-void on_new_req_previous3_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_req_previous3_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
 	new_req_tab_activate (1);
 }
 
-void on_new_req_cancel_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_req_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	
@@ -393,7 +393,7 @@ void on_new_req_cancel_clicked (GtkButton *widget,
 	
 }
 
-void on_new_req_commit_clicked (GtkButton *widg,
+G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 			       gpointer user_data) 
 {
 	TlsCreationData *csr_creation_data = NULL;

@@ -76,7 +76,7 @@ void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 	tls_csr_free (csr);
 }
 
-void csr_properties_close_clicked (const char *csr_pem)
+G_MODULE_EXPORT void csr_properties_close_clicked (const char *csr_pem)
 {
         GObject *widget = NULL;
 	widget = gtk_builder_get_object (csr_properties_window_gtkb, "csr_properties_dialog");

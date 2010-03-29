@@ -158,7 +158,7 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 }
 
 
-void on_cancel_creation_process_clicked (GtkButton *button,
+G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 					 gpointer user_data) 
 {
 	

@@ -46,6 +46,10 @@ void dialog_password_entry_changed_cb (GtkEditable *password_entry, gpointer use
 
 #else
 
+#ifdef WIN32
+char *getpass(const char *prompt);
+#endif
+
 gboolean dialog_ask_for_confirmation (gchar *message, gchar *prompt, gboolean default_answer);
 
 gint dialog_ask_for_number (gchar *message, gint minimum, gint maximum, gint default_value);

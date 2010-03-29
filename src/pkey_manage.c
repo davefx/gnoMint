@@ -54,7 +54,7 @@ gchar * __pkey_manage_aes_decrypt_aux (const gchar *string, const gchar *passwor
 #ifndef GNOMINTCLI
 
 // CALLBACKS
-gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data);
+G_MODULE_EXPORT gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data);
 
 gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 {
@@ -634,9 +634,15 @@ gchar *pkey_manage_encrypt_password (const gchar *pwd)
 
 	gchar salt[3];
 
+#ifndef WIN32
 	salt[0]= 32 + (random() % 140);
 	salt[1]= 32 + (random() % 140);
 	salt[2]=0;
+#else
+	salt[0]= 32 + (rand() % 140);
+	salt[1]= 32 + (rand() % 140);
+	salt[2]=0;
+#endif
 
 	password = g_strdup_printf ("%sgnoMintPassword%s", salt, pwd);
 

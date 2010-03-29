@@ -27,6 +27,29 @@
 #include <string.h>
 #include "dialog.h"
 
+
+#ifdef WIN32
+#include <conio.h>
+char *getpass(const char *prompt)
+{
+	static char buf[128];
+        size_t i;
+
+        fputs(prompt, stderr);
+        fflush(stderr);
+	for (i = 0; i < sizeof(buf) - 1; i++)
+       	{
+		buf[i] = _getch();
+                if (buf[i] == '\r')
+			break;
+	}
+	buf[i] = 0;
+	fputs("\n", stderr);
+	return buf;
+}
+#endif
+
+
 DialogRefreshCallback dialog_refresh_callback = NULL;
 
 void dialog_establish_refresh_function (DialogRefreshCallback callback)
@@ -349,7 +372,7 @@ gchar * dialog_get_password (gchar *info_message,
 	return password;
 }
 
-void dialog_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data)
+G_MODULE_EXPORT void dialog_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data)
 {
 	GtkWidget * button = GTK_WIDGET(g_object_get_data (G_OBJECT(password_entry), "ok_button"));
 	guint minimum_length = GPOINTER_TO_INT (g_object_get_data (G_OBJECT(password_entry), 

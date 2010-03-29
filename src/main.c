@@ -205,7 +205,7 @@ int main (int   argc,
 
 
 
-gboolean on_main_window1_delete (GtkWidget *widget,
+G_MODULE_EXPORT gboolean on_main_window1_delete (GtkWidget *widget,
 				  GdkEvent *event,
 				  gpointer user_data)
 {
@@ -280,7 +280,7 @@ void __recent_add_utf8_filename (const gchar *utf8_filename)
 
 }
 
-void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	gchar *filename;
         gchar *error = NULL;
@@ -353,7 +353,7 @@ void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data)
 
 }
 
-void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	gchar *filename;
 
@@ -441,7 +441,7 @@ void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data)
 }
 
 
-void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	gchar *filename;
 
@@ -472,7 +472,7 @@ void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 
 
-void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	on_main_window1_delete(NULL, NULL, NULL);
 }
@@ -487,7 +487,7 @@ void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
  *
  */ 
 
-void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	
 	GtkWidget *widget;

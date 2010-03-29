@@ -50,7 +50,7 @@ void preferences_window_display()
 }
 
 
-void preferences_window_gnomekeyring_export_toggled (GtkToggleButton *togglebutton, gpointer user_data)
+G_MODULE_EXPORT void preferences_window_gnomekeyring_export_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 {
         gboolean new_status = gtk_toggle_button_get_active (togglebutton);
         gboolean current_status = preferences_get_gnome_keyring_export();
@@ -59,7 +59,7 @@ void preferences_window_gnomekeyring_export_toggled (GtkToggleButton *togglebutt
                 preferences_set_gnome_keyring_export (new_status);
 }
 
-void preferences_window_ok_button_clicked_cb (GtkButton *button, gpointer user_data)
+G_MODULE_EXPORT void preferences_window_ok_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
        	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
 	gtk_widget_destroy (widget); 

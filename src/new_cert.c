@@ -191,7 +191,7 @@ void __new_cert_populate_ca_treeview (GtkTreeView *treeview)
 
 }
 
-void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointer userdata)
+G_MODULE_EXPORT void new_cert_signing_ca_treeview_cursor_changed (GtkTreeView *treeview, gpointer userdata)
 {
         GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         if (gtk_tree_selection_count_selected_rows(selection) == 0)
@@ -288,7 +288,7 @@ void new_cert_tab_activate (int tab_number)
 
 }
 
-void on_new_cert_next2_clicked (GtkButton *button,
+G_MODULE_EXPORT void on_new_cert_next2_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
 	// Whenever gnoMint support more than one CA, here we will
@@ -435,26 +435,26 @@ void on_new_cert_next2_clicked (GtkButton *button,
 	new_cert_tab_activate (2);
 }
 
-void on_new_cert_previous2_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_cert_previous2_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
 	new_cert_tab_activate (0);
 }
 
-void on_new_cert_next1_clicked (GtkButton *button,
+G_MODULE_EXPORT void on_new_cert_next1_clicked (GtkButton *button,
 			      gpointer user_data) 
 {
 
 	new_cert_tab_activate (1);
 }
 
-void on_new_cert_previous3_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_cert_previous3_clicked (GtkButton *widget,
 				  gpointer user_data) 
 {
 	new_cert_tab_activate (1);
 }
 
-void on_new_cert_cancel_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_cert_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
@@ -462,7 +462,7 @@ void on_new_cert_cancel_clicked (GtkButton *widget,
 	
 }
 
-void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
+G_MODULE_EXPORT void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
 {
         gboolean is_active;
 	
@@ -677,7 +677,7 @@ void on_new_cert_property_toggled (GtkWidget *button, gpointer user_data)
         
 }
 
-void on_new_cert_commit_clicked (GtkButton *widg,
+G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data) 
 {
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_cert_window_gtkb, "signing_ca_treeview"));
@@ -770,13 +770,19 @@ const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationDa
 	tmp = time (NULL);	
 	cert_creation_data->activation = tmp;
 	
+#ifndef WIN32
 	expiration_time = g_new (struct tm,1);
-	localtime_r (&tmp, expiration_time);      
+	localtime_r (&tmp, expiration_time);
+#else
+	expiration_time = localtime(&tmp);
+#endif
 	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
 	expiration_time->tm_mon = expiration_time->tm_mon % 12;		
 	cert_creation_data->expiration = mktime(expiration_time);
+#ifndef WIN32
 	g_free (expiration_time);
+#endif
 
         ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
 

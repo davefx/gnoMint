@@ -183,7 +183,7 @@ void __crl_populate_ca_treeview (GtkTreeView *treeview)
 
 }
 
-void crl_treeview_cursor_changed_cb (GtkTreeView *treeview, gpointer userdata)
+G_MODULE_EXPORT void crl_treeview_cursor_changed_cb (GtkTreeView *treeview, gpointer userdata)
 {
         GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
         if (gtk_tree_selection_count_selected_rows(selection) == 0)
@@ -212,14 +212,14 @@ void crl_window_display (void)
 }
 
 
-void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata)
+G_MODULE_EXPORT void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata)
 {
 	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_object_destroy(GTK_OBJECT(window));	
 
 }
 
-void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
+G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 {
 	GtkWidget *widget = NULL;
 	gchar * filename = NULL;

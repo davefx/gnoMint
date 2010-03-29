@@ -310,7 +310,11 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 				   gpointer data)
 {
 	time_t model_time = 0;
+#ifndef WIN32
 	struct tm model_time_tm;
+#else
+	struct tm *model_time_tm = NULL;
+#endif
 	gchar model_time_str[100];
 	gchar *result = NULL;
 	size_t size = 0;       	
@@ -321,10 +325,14 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 		g_object_set (G_OBJECT(cell), "text", "", NULL);
 		return;
 	}
-	
+#ifndef WIN32	
 	gmtime_r (&model_time, &model_time_tm);
-	
 	size = strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
+#else
+	model_time_tm = gmtime(&model_time);
+	size = strftime(model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), model_time_tm);
+#endif
+
 	result = g_strdup (model_time_str);
 
 	g_object_set(G_OBJECT(cell), "text", result, NULL);
@@ -593,7 +601,7 @@ void __ca_csr_activated (GtkTreeView *tree_view,
 
 
 
-gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
+G_MODULE_EXPORT gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 				    GtkTreePath *path,
 				    GtkTreeViewColumn *column,
 				    gpointer user_data)
@@ -777,7 +785,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	return -1;
 }
 
-gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
+G_MODULE_EXPORT gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data)
 {
 	GtkTreeIter *selection_iter;
@@ -1069,7 +1077,7 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 }
 
 
-void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GObject * widget = NULL;
 	//GtkDialog * dialog = NULL;
@@ -1169,7 +1177,7 @@ void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	dialog_error (_("Unexpected error"));
 }
 
-void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GtkTreeIter *iter;	
 	gint type;
@@ -1197,7 +1205,7 @@ void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_dat
 }
 
 
-void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
@@ -1237,7 +1245,7 @@ void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 }
 
 
-void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
@@ -1270,7 +1278,7 @@ void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
 	dialog_refresh_list();
 }
 
-void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	GtkTreeIter *iter;
 
@@ -1341,7 +1349,7 @@ void ca_update_csr_view (gboolean new_value, gboolean refresh)
                 dialog_refresh_list();
 }
 
-gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
 {
         ca_update_csr_view (gtk_check_menu_item_get_active (button), TRUE);
         if (view_csr != preferences_get_crq_visible())
@@ -1358,7 +1366,7 @@ void ca_update_revoked_view (gboolean new_value, gboolean refresh)
                 dialog_refresh_list();
 }
 
-gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
 {
         ca_update_revoked_view (gtk_check_menu_item_get_active (button), TRUE);
         if (view_rcrt != preferences_get_revoked_visible())
@@ -1367,7 +1375,7 @@ gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
         return TRUE;
 }
 
-void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data)
+G_MODULE_EXPORT void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data)
 {
         crl_window_display ();
 }
@@ -1432,7 +1440,7 @@ void ca_treeview_popup_timeout_program (GdkEventButton *event)
 }
 					
 
-gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
+G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 				    GdkEvent *event, gpointer user_data)
 {
 	GdkEventButton *event_button;
@@ -1450,7 +1458,7 @@ gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 	return FALSE;
 }
 
-void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data) 
+G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data) 
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
@@ -1633,7 +1641,7 @@ void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_da
 }
 
 
-gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data)
 {
 	GtkBuilder * dialog_gtkb = g_object_get_data (G_OBJECT(entry), "dialog_gtkb");
 	GObject *widget;
@@ -1672,7 +1680,7 @@ gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data
 	return FALSE;
 }
 
-gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data)
 {
 	GtkBuilder * dialog_gtkb;
 	GObject * widget = NULL;
@@ -1722,7 +1730,7 @@ gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpoint
 }
 
 
-void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL, * dialog2 = NULL;
@@ -1798,20 +1806,20 @@ void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
  */ 
 
 
-void on_add_self_signed_ca_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_add_self_signed_ca_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	new_ca_window_display();
 	
 }
 
-void on_add_csr_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_add_csr_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	new_req_window_display();
 	
 }
 
 
-void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 
 	gchar *filename;
@@ -1924,12 +1932,12 @@ void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 
 
 
-void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
         preferences_window_display ();
 }
 
-void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
 {
 	ca_treeview_row_activated (NULL, NULL, NULL, NULL);
 }

@@ -82,6 +82,7 @@ fi
 
 PKG_CHECK_MODULES(GNOMINT, 
 	glib-2.0 >= $GLIB_REQUIRED \
+	gthread-2.0 >= $GLIB_REQUIRED \
 	gconf-2.0 >= $GCONF_REQUIRED \
 	gtk+-2.0 >= $GTK_REQUIRED \
 	gdk-pixbuf-2.0 \
