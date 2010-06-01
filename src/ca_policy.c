@@ -283,67 +283,70 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 	if (! button)
 		return;
 
+	const gchar * widget_name = gtk_buildable_get_name(GTK_BUILDABLE(button));
+
+
 	cert_id = atoll(cert_id_str);
 	
         is_active = gtk_toggle_button_get_active(button);
 
-	if (! strcmp(gtk_widget_get_name (button), "country_inherited_check")) {
+	if (! strcmp(widget_name, "country_inherited_check")) {
 		property_name = "C_INHERIT";
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_same_radiobutton")), is_active);
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "country_differ_radiobutton")), is_active);
         }
         
-	if (! strcmp(gtk_widget_get_name (button), "state_inherited_check")) {
+	if (! strcmp(widget_name, "state_inherited_check")) {
 		property_name = "ST_INHERIT";        
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_same_radiobutton")), is_active);
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "state_differ_radiobutton")), is_active);
         } 
 
-	if (! strcmp(gtk_widget_get_name (button), "city_inherited_check")) {
+	if (! strcmp(widget_name, "city_inherited_check")) {
 		property_name = "L_INHERIT";        
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_same_radiobutton")), is_active);
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "city_differ_radiobutton")), is_active);
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "organization_inherited_check")) {
+	if (! strcmp(widget_name, "organization_inherited_check")) {
 		property_name = "O_INHERIT";   
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_same_radiobutton")), is_active);
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "organization_differ_radiobutton")), is_active);
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "ou_inherited_check")) {
+	if (! strcmp(widget_name, "ou_inherited_check")) {
 		property_name = "OU_INHERIT";        
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_same_radiobutton")), is_active);
                 gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (certificate_properties_window_gtkb, "ou_differ_radiobutton")), is_active);
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "country_same_radiobutton"))
+	if (! strcmp(widget_name, "country_same_radiobutton"))
 		property_name = "C_FORCE_SAME";        
         
 
-	if (! strcmp(gtk_widget_get_name (button), "state_same_radiobutton"))
+	if (! strcmp(widget_name, "state_same_radiobutton"))
 		property_name = "ST_FORCE_SAME";        
 
-	if (! strcmp(gtk_widget_get_name (button), "city_same_radiobutton"))
+	if (! strcmp(widget_name, "city_same_radiobutton"))
 		property_name = "L_FORCE_SAME";        
 
-	if (! strcmp(gtk_widget_get_name (button), "organization_same_radiobutton"))
+	if (! strcmp(widget_name, "organization_same_radiobutton"))
 		property_name = "O_FORCE_SAME";        
 
-	if (! strcmp(gtk_widget_get_name (button), "ou_same_radiobutton"))
+	if (! strcmp(widget_name, "ou_same_radiobutton"))
 		property_name = "OU_FORCE_SAME";        
 
 	
 
 
 
-	if (! strcmp(gtk_widget_get_name (button), "ca_check2"))
+	if (! strcmp(widget_name, "ca_check2"))
 		property_name = "CA";
 
-	if (! strcmp(gtk_widget_get_name (button), "crl_signing_check1"))
+	if (! strcmp(widget_name, "crl_signing_check1"))
 		property_name = "CRL_SIGN";
 		
-	if (! strcmp(gtk_widget_get_name (button), "non_repudiation_check2")) {
+	if (! strcmp(widget_name, "non_repudiation_check2")) {
                 if (! is_active) {
                         // TIME_STAMPING cannot be inactive
                         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (certificate_properties_window_gtkb, 
@@ -368,7 +371,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 		property_name = "NON_REPUDIATION";
         }
 		
-	if (! strcmp(gtk_widget_get_name (button), "digital_signature_check4")) {
+	if (! strcmp(widget_name, "digital_signature_check4")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
                         if (! ca_file_policy_get (cert_id, "KEY_ENCIPHERMENT") &&
@@ -413,7 +416,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 		property_name = "DIGITAL_SIGNATURE";
         }
 		
-	if (! strcmp(gtk_widget_get_name (button), "key_encipherment_check2")) {
+	if (! strcmp(widget_name, "key_encipherment_check2")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
@@ -437,7 +440,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 		property_name = "KEY_ENCIPHERMENT";		
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "key_agreement_check2")) {
+	if (! strcmp(widget_name, "key_agreement_check2")) {
                 if (! is_active) {
                         // We must check if TLS_WEB_SERVER can be active
                         if (! ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
@@ -467,7 +470,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
         }
 
 		
-	if (! strcmp(gtk_widget_get_name (button), "data_encipherment_check2"))
+	if (! strcmp(widget_name, "data_encipherment_check2"))
 		property_name = "DATA_ENCIPHERMENT";
 
 
@@ -477,7 +480,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
         // Purposes
 
 
-	if (! strcmp(gtk_widget_get_name (button), "webserver_check2")) {
+	if (! strcmp(widget_name, "webserver_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
@@ -492,7 +495,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
                 property_name = "TLS_WEB_SERVER";
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "webclient_check2")) {
+	if (! strcmp(widget_name, "webclient_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || keyEncipherment || keyAgreement
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
@@ -506,7 +509,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
                 property_name = "TLS_WEB_CLIENT";
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "time_stamping_check2")){
+	if (! strcmp(widget_name, "time_stamping_check2")){
                 if (is_active) {
                         // We must check digitalSignature && nonRepudiation
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") &&
@@ -522,7 +525,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 		property_name = "TIME_STAMPING";
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "code_signing_check2")) {
+	if (! strcmp(widget_name, "code_signing_check2")) {
                 if (is_active) {
                         // We must check digitalSignature
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE"))) {
@@ -535,7 +538,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 		property_name = "CODE_SIGNING";
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "email_protection_check2")) {
+	if (! strcmp(widget_name, "email_protection_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation || (keyEncipherment || keyAgreement)
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
@@ -553,7 +556,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
   		property_name = "EMAIL_PROTECTION";
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "ocsp_signing_check2")) {
+	if (! strcmp(widget_name, "ocsp_signing_check2")) {
                 if (is_active) {
                         // We must check digitalSignature || nonRepudiation
                         if (!( ca_file_policy_get (cert_id, "DIGITAL_SIGNATURE") ||
@@ -567,7 +570,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 		property_name = "OCSP_SIGNING";
         }
 
-	if (! strcmp(gtk_widget_get_name (button), "any_purpose_check2"))
+	if (! strcmp(widget_name, "any_purpose_check2"))
 		property_name = "ANY_PURPOSE";
 
 	if (property_name)
