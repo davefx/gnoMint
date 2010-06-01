@@ -250,7 +250,7 @@ G_MODULE_EXPORT void ca_policy_crl_update_spin_button_change (gpointer spin_butt
 
 }
 
-void ca_policy_crl_distribution_point_change(gpointer gtkentry, gpointer userdata)
+G_MODULE_EXPORT void ca_policy_crl_distribution_point_change(gpointer gtkentry, gpointer userdata)
 {
 	GObject * widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 	gchar * cert_id_str = (gchar *) g_object_get_data (G_OBJECT(widget), "cert_id");

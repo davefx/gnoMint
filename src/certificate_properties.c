@@ -813,7 +813,7 @@ void __certificate_properties_fill_cert_ext_BasicConstraints (GtkTreeStore *stor
 
 	ca_as_string = ca ? _("TRUE") : _("FALSE");
 	
-	g_strdup_printf (pathlen_as_string, "%d", path_len_constraint);
+	pathlen_as_string = g_strdup_printf ("%d", path_len_constraint);
 
 	gtk_tree_store_append(store, &l, parent);
 	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("CA"), 

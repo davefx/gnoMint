@@ -1,0 +1,8 @@
+po/*.gmo
+.deps/
+Makefile
+Makefile.in
+gnomint
+gnomint-cli
+*.o
+

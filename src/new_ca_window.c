@@ -87,7 +87,7 @@ G_MODULE_EXPORT void on_new_ca_previous2_clicked (GtkButton *widget,
 	new_ca_tab_activate (0);
 }
 
-void on_new_ca_next2_clicked (GtkButton *widget,
+G_MODULE_EXPORT void on_new_ca_next2_clicked (GtkButton *widget,
 			      gpointer user_data) 
 {
 	new_ca_tab_activate (2);
