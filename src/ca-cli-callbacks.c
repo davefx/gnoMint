@@ -1387,7 +1387,7 @@ int ca_cli_callback_setpolicy (int argc, char **argv)
 	gchar *description = NULL;
 	gint i;
 
-	if (! ca_file_check_if_is_csr_id (ca_id)) {
+	if (! ca_file_check_if_is_ca_id (ca_id)) {
 		dialog_error (_("The given CA id. is not valid"));
 		return -1;
 	}
@@ -1410,7 +1410,7 @@ int ca_cli_callback_setpolicy (int argc, char **argv)
 
 
 	if (dialog_ask_for_confirmation (message, _("Are you sure? Yes/[No] : "), FALSE)) {
-		if (! ca_file_policy_set (ca_id, CaCallbackPolicyName[i], value)) {
+		if (! ca_file_policy_set (ca_id, CaCallbackPolicyName[policy_id], value)) {
 			g_free (message);
 			return -1;
 		} else
