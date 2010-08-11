@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-11 10:40+0200\n"
+"POT-Creation-Date: 2010-08-11 12:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,7 +84,7 @@ msgstr ""
 msgid "%m/%d/%Y %H:%M GMT"
 msgstr ""
 
-#: ../src/ca.c:480 ../src/certificate_properties.c:560 ../src/crl.c:173
+#: ../src/ca.c:480 ../src/certificate_properties.c:563 ../src/crl.c:173
 #: ../src/new_cert.c:181 ../src/new_req_window.c:179
 msgid "Subject"
 msgstr ""
@@ -712,7 +712,7 @@ msgid "Id.\tParent Id.\tCSR Subject\t\tKey in DB?\n"
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:291 ../src/ca-cli-callbacks.c:980
-#: ../src/ca-cli-callbacks.c:1362 ../src/ca-cli-callbacks.c:1391
+#: ../src/ca-cli-callbacks.c:1363 ../src/ca-cli-callbacks.c:1392
 msgid "The given CA id. is not valid"
 msgstr ""
 
@@ -761,7 +761,7 @@ msgid "These are the provided CSR properties:\n"
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:404 ../src/ca-cli-callbacks.c:553
-#: ../src/ca-cli-callbacks.c:1191 ../src/ca-cli-callbacks.c:1253
+#: ../src/ca-cli-callbacks.c:1191 ../src/ca-cli-callbacks.c:1254
 #, c-format
 msgid "Subject:\n"
 msgstr ""
@@ -804,7 +804,7 @@ msgstr ""
 #: ../src/ca-cli-callbacks.c:937 ../src/ca-cli-callbacks.c:966
 #: ../src/ca-cli-callbacks.c:1032 ../src/ca-cli-callbacks.c:1059
 #: ../src/ca-cli-callbacks.c:1087 ../src/ca-cli-callbacks.c:1102
-#: ../src/ca-cli-callbacks.c:1421 ../src/ca-cli-callbacks.c:1464
+#: ../src/ca-cli-callbacks.c:1422 ../src/ca-cli-callbacks.c:1465
 #, c-format
 msgid "Operation cancelled.\n"
 msgstr ""
@@ -863,7 +863,7 @@ msgid "Private key extracted successfully into file '%s'\n"
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:645 ../src/ca-cli-callbacks.c:797
-#: ../src/ca-cli-callbacks.c:950 ../src/ca-cli-callbacks.c:1242
+#: ../src/ca-cli-callbacks.c:950 ../src/ca-cli-callbacks.c:1243
 msgid "The given CSR id. is not valid"
 msgstr ""
 
@@ -876,7 +876,7 @@ msgstr ""
 msgid "Certificate revoked.\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:695 ../src/ca-cli-callbacks.c:1223
+#: ../src/ca-cli-callbacks.c:695 ../src/ca-cli-callbacks.c:1224
 #, c-format
 msgid "Certificate uses:\n"
 msgstr ""
@@ -1345,7 +1345,7 @@ msgid "\tSerial number: %s\n"
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:1192 ../src/ca-cli-callbacks.c:1196
-#: ../src/ca-cli-callbacks.c:1254
+#: ../src/ca-cli-callbacks.c:1255
 #, c-format
 msgid "\tDistinguished Name: %s\n"
 msgstr ""
@@ -1356,7 +1356,7 @@ msgid "None."
 msgstr ""
 
 #: ../src/ca-cli-callbacks.c:1193 ../src/ca-cli-callbacks.c:1197
-#: ../src/ca-cli-callbacks.c:1256
+#: ../src/ca-cli-callbacks.c:1257
 #, c-format
 msgid "\tUnique ID: %s\n"
 msgstr ""
@@ -1381,190 +1381,195 @@ msgstr ""
 msgid "\tMD5 fingerprint: %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1251
+#: ../src/ca-cli-callbacks.c:1221
+#, c-format
+msgid "\tSHA256 fingerprint: %s\n"
+msgstr ""
+
+#: ../src/ca-cli-callbacks.c:1252
 #, c-format
 msgid "Certificate Signing Request:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1326
+#: ../src/ca-cli-callbacks.c:1327
 msgid "Generated certs inherit Country from CA                           "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1327
+#: ../src/ca-cli-callbacks.c:1328
 msgid "Generated certs inherit State from CA                             "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1328
+#: ../src/ca-cli-callbacks.c:1329
 msgid "Generated certs inherit Locality from CA                          "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1329
+#: ../src/ca-cli-callbacks.c:1330
 msgid "Generated certs inherit Organization from CA                      "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1330
+#: ../src/ca-cli-callbacks.c:1331
 msgid "Generated certs inherit Organizational Unit from CA               "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1331
+#: ../src/ca-cli-callbacks.c:1332
 msgid "Country in generated certs must be the same than in CA            "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1332
+#: ../src/ca-cli-callbacks.c:1333
 msgid "State in generated certs must be the same than in CA              "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1333
+#: ../src/ca-cli-callbacks.c:1334
 msgid "Locality in generated certs must be the same than in CA           "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1334
+#: ../src/ca-cli-callbacks.c:1335
 msgid "Organization in generated certs must be the same than in CA       "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1335
+#: ../src/ca-cli-callbacks.c:1336
 msgid "Organizational Unit in generated certs must be the same than in CA"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1336
+#: ../src/ca-cli-callbacks.c:1337
 msgid "Maximum number of hours between CRL updates                       "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1337
+#: ../src/ca-cli-callbacks.c:1338
 msgid "CRL distribution point (URL where CRL is published)               "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1338
+#: ../src/ca-cli-callbacks.c:1339
 msgid "Maximum number of months before expiration of new certs           "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1339
+#: ../src/ca-cli-callbacks.c:1340
 msgid "CA use enabled in generated certs                                 "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1340
+#: ../src/ca-cli-callbacks.c:1341
 msgid "CRL Sign use enabled in generated certs                           "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1341
+#: ../src/ca-cli-callbacks.c:1342
 msgid "Non reputation use enabled in generated certs                     "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1342
+#: ../src/ca-cli-callbacks.c:1343
 msgid "Digital signature use enabled in generated certs                  "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1343
+#: ../src/ca-cli-callbacks.c:1344
 msgid "Key encipherment use enabled in generated certs                   "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1344
+#: ../src/ca-cli-callbacks.c:1345
 msgid "Key agreement use enabled in generated certs                      "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1345
+#: ../src/ca-cli-callbacks.c:1346
 msgid "Data encipherment use enabled in generated certs                  "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1346
+#: ../src/ca-cli-callbacks.c:1347
 msgid "TLS web server purpose enabled in generated certs                 "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1347
+#: ../src/ca-cli-callbacks.c:1348
 msgid "TLS web client purpose enabled in generated certs                 "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1348
+#: ../src/ca-cli-callbacks.c:1349
 msgid "Time stamping purpose enabled in generated certs                  "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1349
+#: ../src/ca-cli-callbacks.c:1350
 msgid "Code signing server purpose enabled in generated certs            "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1350
+#: ../src/ca-cli-callbacks.c:1351
 msgid "Email protection purpose enabled in generated certs               "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1351
+#: ../src/ca-cli-callbacks.c:1352
 msgid "OCSP signing purpose enabled in generated certs                   "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1352
+#: ../src/ca-cli-callbacks.c:1353
 msgid "Any purpose enabled in generated certs                            "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1366
+#: ../src/ca-cli-callbacks.c:1367
 #, c-format
 msgid "Showing policies of the following certificate:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1368
+#: ../src/ca-cli-callbacks.c:1369
 #, c-format
 msgid ""
 "\n"
 "Policies:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1370
+#: ../src/ca-cli-callbacks.c:1371
 #, c-format
 msgid "Id.\tDescription\t\t\t\t\t\t\t\tValue\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1396
+#: ../src/ca-cli-callbacks.c:1397
 msgid "The given policy id is not valid"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1408
+#: ../src/ca-cli-callbacks.c:1409
 #, c-format
 msgid ""
 "You are about to assign to the policy\n"
 "'%s' the new value '%s'."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1412 ../src/ca-cli-callbacks.c:1456
+#: ../src/ca-cli-callbacks.c:1413 ../src/ca-cli-callbacks.c:1457
 msgid "Are you sure? Yes/[No] : "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1417
+#: ../src/ca-cli-callbacks.c:1418
 #, c-format
 msgid "Policy set correctly to '%s'.\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1431
+#: ../src/ca-cli-callbacks.c:1432
 #, c-format
 msgid "gnoMint-cli current preferences:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1433
+#: ../src/ca-cli-callbacks.c:1434
 #, c-format
 msgid "Id.\tName\t\t\tValue\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1434
+#: ../src/ca-cli-callbacks.c:1435
 #, c-format
 msgid "0\tGnome keyring support\t%d\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1446
+#: ../src/ca-cli-callbacks.c:1447
 msgid "The given preference id is not valid"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1452
+#: ../src/ca-cli-callbacks.c:1453
 #, c-format
 msgid ""
 "You are about to assign to the preference 'Gnome keyring support' the new "
 "value '%d'."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1474
+#: ../src/ca-cli-callbacks.c:1475
 #, c-format
 msgid ""
 "%s version %s\n"
 "%s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1475
+#: ../src/ca-cli-callbacks.c:1476
 #, c-format
 msgid ""
 "\n"
@@ -1573,19 +1578,19 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1476 ../src/ca-cli-callbacks.c:1477
+#: ../src/ca-cli-callbacks.c:1477 ../src/ca-cli-callbacks.c:1478
 #: ../src/main.c:509
 msgid "translator-credits"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1477
+#: ../src/ca-cli-callbacks.c:1478
 #, c-format
 msgid ""
 "Translators:\n"
 "%s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1484
+#: ../src/ca-cli-callbacks.c:1485
 msgid ""
 "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
 "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
@@ -1603,7 +1608,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1502
+#: ../src/ca-cli-callbacks.c:1503
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -1620,22 +1625,22 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1517
+#: ../src/ca-cli-callbacks.c:1518
 #, c-format
 msgid "%s version %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1526
+#: ../src/ca-cli-callbacks.c:1527
 #, c-format
 msgid "Available commands:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1527
+#: ../src/ca-cli-callbacks.c:1528
 #, c-format
 msgid "===================\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1537
+#: ../src/ca-cli-callbacks.c:1538
 #, c-format
 msgid "Exiting gnomint-cli...\n"
 msgstr ""
@@ -1711,272 +1716,272 @@ msgid ""
 "in the database."
 msgstr ""
 
-#: ../src/certificate_properties.c:354 ../src/tls.c:1055
+#: ../src/certificate_properties.c:357 ../src/tls.c:1068
 msgid "Digital signature"
 msgstr ""
 
-#: ../src/certificate_properties.c:356 ../src/tls.c:1057
+#: ../src/certificate_properties.c:359 ../src/tls.c:1070
 msgid "Non repudiation"
 msgstr ""
 
-#: ../src/certificate_properties.c:358 ../src/tls.c:1059
+#: ../src/certificate_properties.c:361 ../src/tls.c:1072
 msgid "Key encipherment"
 msgstr ""
 
-#: ../src/certificate_properties.c:360 ../src/tls.c:1061
+#: ../src/certificate_properties.c:363 ../src/tls.c:1074
 msgid "Data encipherment"
 msgstr ""
 
-#: ../src/certificate_properties.c:362 ../src/tls.c:1063
+#: ../src/certificate_properties.c:365 ../src/tls.c:1076
 msgid "Key agreement"
 msgstr ""
 
-#: ../src/certificate_properties.c:364 ../src/tls.c:1065
+#: ../src/certificate_properties.c:367 ../src/tls.c:1078
 msgid "Certificate signing"
 msgstr ""
 
-#: ../src/certificate_properties.c:366 ../src/tls.c:1067
+#: ../src/certificate_properties.c:369 ../src/tls.c:1080
 msgid "CRL signing"
 msgstr ""
 
-#: ../src/certificate_properties.c:368
+#: ../src/certificate_properties.c:371
 msgid "Key encipherment only"
 msgstr ""
 
-#: ../src/certificate_properties.c:370
+#: ../src/certificate_properties.c:373
 msgid "Key decipherment only"
 msgstr ""
 
-#: ../src/certificate_properties.c:384
+#: ../src/certificate_properties.c:387
 msgid "Version"
 msgstr ""
 
-#: ../src/certificate_properties.c:419
+#: ../src/certificate_properties.c:422
 msgid "Serial Number"
 msgstr ""
 
-#: ../src/certificate_properties.c:435 ../src/certificate_properties.c:1089
+#: ../src/certificate_properties.c:438 ../src/certificate_properties.c:1092
 msgid "Signature"
 msgstr ""
 
-#: ../src/certificate_properties.c:438 ../src/certificate_properties.c:587
-#: ../src/certificate_properties.c:590 ../src/certificate_properties.c:1056
+#: ../src/certificate_properties.c:441 ../src/certificate_properties.c:590
+#: ../src/certificate_properties.c:593 ../src/certificate_properties.c:1059
 msgid "Algorithm"
 msgstr ""
 
-#: ../src/certificate_properties.c:441 ../src/certificate_properties.c:595
-#: ../src/certificate_properties.c:623 ../src/certificate_properties.c:651
-#: ../src/certificate_properties.c:1059
+#: ../src/certificate_properties.c:444 ../src/certificate_properties.c:598
+#: ../src/certificate_properties.c:626 ../src/certificate_properties.c:654
+#: ../src/certificate_properties.c:1062
 msgid "Parameters"
 msgstr ""
 
-#: ../src/certificate_properties.c:441 ../src/certificate_properties.c:595
-#: ../src/certificate_properties.c:651 ../src/certificate_properties.c:653
-#: ../src/certificate_properties.c:664 ../src/certificate_properties.c:673
-#: ../src/certificate_properties.c:1060
+#: ../src/certificate_properties.c:444 ../src/certificate_properties.c:598
+#: ../src/certificate_properties.c:654 ../src/certificate_properties.c:656
+#: ../src/certificate_properties.c:667 ../src/certificate_properties.c:676
+#: ../src/certificate_properties.c:1063
 msgid "(unknown)"
 msgstr ""
 
-#: ../src/certificate_properties.c:473
+#: ../src/certificate_properties.c:476
 msgid "Issuer"
 msgstr ""
 
-#: ../src/certificate_properties.c:522
+#: ../src/certificate_properties.c:525
 msgid "Validity"
 msgstr ""
 
-#: ../src/certificate_properties.c:525
+#: ../src/certificate_properties.c:528
 msgid "Not Before"
 msgstr ""
 
-#: ../src/certificate_properties.c:528
+#: ../src/certificate_properties.c:531
 msgid "Not After"
 msgstr ""
 
-#: ../src/certificate_properties.c:584
+#: ../src/certificate_properties.c:587
 msgid "Subject Public Key Info"
 msgstr ""
 
-#: ../src/certificate_properties.c:597
+#: ../src/certificate_properties.c:600
 msgid "RSA PublicKey"
 msgstr ""
 
-#: ../src/certificate_properties.c:607
+#: ../src/certificate_properties.c:610
 msgid "Modulus"
 msgstr ""
 
-#: ../src/certificate_properties.c:613
+#: ../src/certificate_properties.c:616
 msgid "Public Exponent"
 msgstr ""
 
-#: ../src/certificate_properties.c:646
+#: ../src/certificate_properties.c:649
 msgid "DSA PublicKey"
 msgstr ""
 
-#: ../src/certificate_properties.c:653
+#: ../src/certificate_properties.c:656
 msgid "Subject Public Key"
 msgstr ""
 
-#: ../src/certificate_properties.c:664
+#: ../src/certificate_properties.c:667
 msgid "Issuer Unique ID"
 msgstr ""
 
-#: ../src/certificate_properties.c:673
+#: ../src/certificate_properties.c:676
 msgid "Subject Unique ID"
 msgstr ""
 
-#: ../src/certificate_properties.c:695 ../src/certificate_properties.c:718
-#: ../src/certificate_properties.c:787 ../src/certificate_properties.c:891
-#: ../src/certificate_properties.c:919 ../src/certificate_properties.c:959
-#: ../src/certificate_properties.c:1016 ../src/certificate_properties.c:1141
+#: ../src/certificate_properties.c:698 ../src/certificate_properties.c:721
+#: ../src/certificate_properties.c:790 ../src/certificate_properties.c:894
+#: ../src/certificate_properties.c:922 ../src/certificate_properties.c:962
+#: ../src/certificate_properties.c:1019 ../src/certificate_properties.c:1144
 msgid "Value"
 msgstr ""
 
-#: ../src/certificate_properties.c:757 ../src/certificate_properties.c:861
+#: ../src/certificate_properties.c:760 ../src/certificate_properties.c:864
 msgid "DNS Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:762 ../src/certificate_properties.c:866
+#: ../src/certificate_properties.c:765 ../src/certificate_properties.c:869
 msgid "RFC822 Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:767 ../src/certificate_properties.c:871
+#: ../src/certificate_properties.c:770 ../src/certificate_properties.c:874
 msgid "URI"
 msgstr ""
 
-#: ../src/certificate_properties.c:773
+#: ../src/certificate_properties.c:776
 msgid "IP"
 msgstr ""
 
-#: ../src/certificate_properties.c:780 ../src/certificate_properties.c:884
+#: ../src/certificate_properties.c:783 ../src/certificate_properties.c:887
 msgid "Directory Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:814 ../src/certificate_properties.c:999
+#: ../src/certificate_properties.c:817 ../src/certificate_properties.c:1002
 msgid "TRUE"
 msgstr ""
 
-#: ../src/certificate_properties.c:814 ../src/certificate_properties.c:999
+#: ../src/certificate_properties.c:817 ../src/certificate_properties.c:1002
 msgid "FALSE"
 msgstr ""
 
-#: ../src/certificate_properties.c:819
+#: ../src/certificate_properties.c:822
 msgid "CA"
 msgstr ""
 
-#: ../src/certificate_properties.c:823
+#: ../src/certificate_properties.c:826
 msgid "Path Length Constraint"
 msgstr ""
 
-#: ../src/certificate_properties.c:877
+#: ../src/certificate_properties.c:880
 msgid "IP Address"
 msgstr ""
 
-#: ../src/certificate_properties.c:992
+#: ../src/certificate_properties.c:995
 msgid "Extensions"
 msgstr ""
 
-#: ../src/certificate_properties.c:1001
+#: ../src/certificate_properties.c:1004
 msgid "Critical"
 msgstr ""
 
-#: ../src/certificate_properties.c:1029
+#: ../src/certificate_properties.c:1032
 msgid "Certificate"
 msgstr ""
 
-#: ../src/certificate_properties.c:1054
+#: ../src/certificate_properties.c:1057
 msgid "Signature Algorithm"
 msgstr ""
 
-#: ../src/certificate_properties.c:1137
+#: ../src/certificate_properties.c:1140
 msgid "Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:1153 ../src/tls.c:1081
+#: ../src/certificate_properties.c:1156 ../src/tls.c:1094
 msgid "TLS WWW Server"
 msgstr ""
 
-#: ../src/certificate_properties.c:1154
+#: ../src/certificate_properties.c:1157
 msgid "TLS WWW Client"
 msgstr ""
 
-#: ../src/certificate_properties.c:1155 ../src/tls.c:1085
+#: ../src/certificate_properties.c:1158 ../src/tls.c:1098
 msgid "Code signing"
 msgstr ""
 
-#: ../src/certificate_properties.c:1156 ../src/tls.c:1087
+#: ../src/certificate_properties.c:1159 ../src/tls.c:1100
 msgid "Email protection"
 msgstr ""
 
-#: ../src/certificate_properties.c:1157 ../src/tls.c:1089
+#: ../src/certificate_properties.c:1160 ../src/tls.c:1102
 msgid "Time stamping"
 msgstr ""
 
-#: ../src/certificate_properties.c:1158 ../src/tls.c:1091
+#: ../src/certificate_properties.c:1161 ../src/tls.c:1104
 msgid "OCSP signing"
 msgstr ""
 
-#: ../src/certificate_properties.c:1159 ../src/tls.c:1093
+#: ../src/certificate_properties.c:1162 ../src/tls.c:1106
 msgid "Any purpose"
 msgstr ""
 
-#: ../src/certificate_properties.c:1160
+#: ../src/certificate_properties.c:1163
 msgid "Subject Directory Attributes"
 msgstr ""
 
-#: ../src/certificate_properties.c:1161
+#: ../src/certificate_properties.c:1164
 msgid "Subject Key Identifier"
 msgstr ""
 
-#: ../src/certificate_properties.c:1162
+#: ../src/certificate_properties.c:1165
 msgid "Key Usage"
 msgstr ""
 
-#: ../src/certificate_properties.c:1163
+#: ../src/certificate_properties.c:1166
 msgid "Private Key Usage Period"
 msgstr ""
 
-#: ../src/certificate_properties.c:1164
+#: ../src/certificate_properties.c:1167
 msgid "Subject Alternative Name"
 msgstr ""
 
-#: ../src/certificate_properties.c:1165
+#: ../src/certificate_properties.c:1168
 msgid "Basic Constraints"
 msgstr ""
 
-#: ../src/certificate_properties.c:1166
+#: ../src/certificate_properties.c:1169
 msgid "Name Constraints"
 msgstr ""
 
-#: ../src/certificate_properties.c:1167
+#: ../src/certificate_properties.c:1170
 msgid "CRL Distribution Points"
 msgstr ""
 
-#: ../src/certificate_properties.c:1168
+#: ../src/certificate_properties.c:1171
 msgid "Certificate Policies"
 msgstr ""
 
-#: ../src/certificate_properties.c:1169
+#: ../src/certificate_properties.c:1172
 msgid "Policy Mappings"
 msgstr ""
 
-#: ../src/certificate_properties.c:1170
+#: ../src/certificate_properties.c:1173
 msgid "Authority Key Identifier"
 msgstr ""
 
-#: ../src/certificate_properties.c:1171
+#: ../src/certificate_properties.c:1174
 msgid "Policy Constraints"
 msgstr ""
 
-#: ../src/certificate_properties.c:1172
+#: ../src/certificate_properties.c:1175
 msgid "Extended Key Usage"
 msgstr ""
 
-#: ../src/certificate_properties.c:1173
+#: ../src/certificate_properties.c:1176
 msgid "Delta CRL Distribution Point"
 msgstr ""
 
-#: ../src/certificate_properties.c:1174
+#: ../src/certificate_properties.c:1177
 msgid "Inhibit Any-Policy"
 msgstr ""
 
@@ -2530,18 +2535,18 @@ msgstr ""
 msgid "Error when signing certificate"
 msgstr ""
 
-#: ../src/tls.c:1050
+#: ../src/tls.c:1063
 msgid "Certification Authority"
 msgstr ""
 
-#: ../src/tls.c:1069
+#: ../src/tls.c:1082
 msgid "Key encipher only"
 msgstr ""
 
-#: ../src/tls.c:1071
+#: ../src/tls.c:1084
 msgid "Key decipher only"
 msgstr ""
 
-#: ../src/tls.c:1083
+#: ../src/tls.c:1096
 msgid "TLS WWW Client."
 msgstr ""
