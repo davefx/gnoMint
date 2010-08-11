@@ -1219,13 +1219,30 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	if (type == CA_FILE_ELEMENT_TYPE_CSR)
 		return;
 	
+
+
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
+
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_QUESTION,
-						    GTK_BUTTONS_YES_NO,
-						    "%s",
-						    _("Are you sure you want to revoke this certificate?")));
+	if (! ca_file_check_if_is_ca_id (id)) {
+
+		dialog = GTK_DIALOG(gtk_message_dialog_new_with_markup (GTK_WINDOW(widget),
+							    GTK_DIALOG_DESTROY_WITH_PARENT,
+							    GTK_MESSAGE_QUESTION,
+							    GTK_BUTTONS_YES_NO,
+							    "<b>%s</b>\n\n<span font_size='small'>%s</span>",
+							    _("Are you sure you want to revoke this certificate?"),
+							    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked).")));
+	} else {
+
+		dialog = GTK_DIALOG(gtk_message_dialog_new_with_markup (GTK_WINDOW(widget),
+							    GTK_DIALOG_DESTROY_WITH_PARENT,
+							    GTK_MESSAGE_QUESTION,
+							    GTK_BUTTONS_YES_NO,
+							    "<b>%s</b>\n\n<span font_size='small'>%s</span>",		
+							    _("Are you sure you want to revoke this CA certificate?"),
+							    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked). \n\nMoreover, revoking a CA certificate can invalidate all the certificates generated with it, so all them should be regenerated with a new CA certificate.")));
+	}
 
 	response = gtk_dialog_run(dialog);
 	gtk_widget_destroy (GTK_WIDGET(dialog));
@@ -1234,7 +1251,6 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 		return;
 	}
 
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
         errmsg = ca_file_revoke_crt (id);
 	if (errmsg) {
                 dialog_error (_(errmsg));
