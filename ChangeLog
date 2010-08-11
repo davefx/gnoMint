@@ -1,4831 +1,1798 @@
-2009-11-08 11:43  davefx
-
-	* [r347]
-	  ChangeLog:
-	  Updating
-	  changelog
-
-2009-11-08 11:42  davefx
-
-	* [r346]
-	  ChangeLog,
-	  configure.in:
-	  Releasing
-	  version
-	  1.1.0
-
-2009-11-08 11:36  davefx
-
-	* [r345]
-	  po/es.po:
-	  Fixing
-	  problems
-	  in
-	  Spanish
-	  translation.
-	  Please,
-	  translators:
-	  don't
-	  translate
-	  gettext
-	  comments
-
-2009-11-08 11:22  davefx
-
-	* [r344]
-	  po/ca.po,
-	  po/cs.po,
-	  po/es.po,
-	  po/fr.po,
-	  po/it.po:
-	  Updating
-	  translations
-	  from
-	  Launchpad.
-	  Thanks
-	  to
-	  all
-	  the
-	  translators
-
-2009-11-08 11:12  davefx
-
-	* [r343]
-	  src/ca-cli-callbacks.c:
-	  Fixing
-	  gnoMint
-	  bug
-	  #2890061:
-	  gnomint-cli
-	  showpolicy
-	  command
-	  was
-	  failing
-	  with
-	  invalid
-	  ca-id
-	  message.
-
-2009-11-08 10:57  davefx
-
-	* [r342]
-	  configure.in,
-	  src/Makefile.am:
-	  Adding
-	  libgcrypt
-	  in
-	  configure,
-	  resolving
-	  Debian
-	  bug
-	  #554669
-
-2009-11-08 08:10  davefx
-
-	* [r341]
-	  ChangeLog,
-	  src/ca.c:
-	  Building
-	  hierarchical
-	  tree
-	  using
-	  node
-	  routes
-	  instead
-	  of
-	  names
-
-2009-11-08 07:16  davefx
-
-	* [r340]
-	  src/ca_file.c:
-	  Fixing
-	  problem
-	  when
-	  there's
-	  a
-	  duplicate
-	  in
-	  common
-	  name.
-
-2009-11-07 07:51  davefx
-
-	* [r339]
-	  gui/certificate_properties_dialog.ui,
-	  gui/dh_parameters_dialog.ui,
-	  gui/new_ca_window.ui,
-	  gui/new_cert_window.ui,
-	  gui/new_req_window.ui:
-	  Fixed
-	  problems
-	  about
-	  spinbuttons
-	  generated
-	  in
-	  gtk-ui-manager
-	  conversion
-
-2009-11-07 07:51  davefx
-
-	* [r338]
-	  src/ca_file.c:
-	  Avoiding
-	  SIGSEGV
-	  whenever
-	  there's
-	  a
-	  problem
-	  obtaining
-	  last
-	  assigned
-	  serial
-	  number
-
-2009-11-07 06:34  davefx
-
-	* [r337]
-	  src/dialog.c:
-	  Adding
-	  string.h
-	  include
-	  for
-	  allow
-	  compiling
-	  in
-	  CentOS
-	  5
-
-2009-10-11 21:17  davefx
-
-	* [r336]
-	  configure.in,
-	  po/ca.po,
-	  po/cs.po,
-	  po/de.po,
-	  po/es.po,
-	  po/fi.po,
-	  po/fr.po,
-	  po/it.po,
-	  po/pt_BR.po,
-	  po/ru.po,
-	  po/sv.po:
-	  Adding
-	  Catalan
-	  translation.
-	  Updating
-	  translation
-	  from
-	  Launchpad.net
-
-2009-10-11 21:16  davefx
-
-	* [r335]
-	  src/main.c:
-	  Correcting
-	  loading
-	  of
-	  popup
-
-2009-10-11 11:04  davefx
-
-	* [r334]
-	  configure.in,
-	  gui/Makefile.am,
-	  gui/certificate_popup_menu.ui,
-	  gui/certificate_properties_dialog.ui,
-	  gui/change_password_dialog.ui,
-	  gui/creation_process_window.ui,
-	  gui/csr_popup_menu.ui,
-	  gui/csr_properties_dialog.ui,
-	  gui/dh_parameters_dialog.ui,
-	  gui/export_certificate_dialog.ui,
-	  gui/get_db_password_dialog.ui,
-	  gui/get_password_dialog.ui,
-	  gui/get_pkey_dialog.ui,
-	  gui/gnomint.glade,
-	  gui/import_file_or_directory_dialog.ui,
-	  gui/import_password_dialog.ui,
-	  gui/main_window.ui,
-	  gui/new_ca_window.ui,
-	  gui/new_cert_window.ui,
-	  gui/new_crl_dialog.ui,
-	  gui/new_req_window.ui,
-	  gui/preferences_dialog.ui,
-	  po/POTFILES.in,
-	  src/ca.c,
-	  src/ca_policy.c,
-	  src/certificate_properties.c,
-	  src/country_table.c,
-	  src/creation_process_window.c,
-	  src/crl.c,
-	  src/csr_properties.c,
-	  src/dialog.c,
-	  src/import.c,
-	  src/main.c,
-	  src/main.h,
-	  src/new_ca_window.c,
-	  src/new_cert.c,
-	  src/new_req_window.c,
-	  src/pkey_manage.c,
-	  src/preferences-window.c:
-	  Migrating
-	  from
-	  libglade
-	  to
-	  GtkBuilder
-
-2009-06-05 20:27  davefx
-
-	* [r333]
-	  configure.in:
-	  Fixing
-	  bug
-	  in
-	  configure.in
-	  that
-	  affected
-	  Slackware
-	  systems
-
-2009-06-03 21:23  davefx
-
-	* [r331]
-	  m4/intltool.m4:
-	  Updating
-	  intltool.m4
-
-2009-06-03 21:19  davefx
-
-	* [r330]
-	  ChangeLog:
-	  Uploading
-	  updated
-	  Changelog
-
-2009-06-03 21:17  davefx
-
-	* [r329]
-	  configure.in:
-	  Uploading
-	  change
-	  to
-	  version
-	  1.0.0
-
-2009-06-03 21:15  davefx
-
-	* [r328]
-	  po/ru.po:
-	  Committing
-	  last
-	  Russian
-	  translation,
-	  by
-	  aquanaut
-
-2009-06-03 21:11  davefx
-
-	* [r327]
-	  po/es.po,
-	  po/gnoMint.pot:
-	  Updating
-	  template
-	  and
-	  Spanish
-	  translation
-
-2009-06-03 21:06  davefx
-
-	* [r326]
-	  src/new_cert.c:
-	  Checking
-	  if
-	  new
-	  cert
-	  expiration
-	  date
-	  is
-	  after
-	  the
-	  CA
-	  expiration
-	  date.
-	  In
-	  that
-	  case,
-	  show
-	  an
-	  info
-	  message
-	  and
-	  set
-	  the
-	  new
-	  cert
-	  expiration
-	  date
-	  to
-	  the
-	  CA
-	  expiration
-	  date.
-
-2009-06-03 21:04  davefx
-
-	* [r325]
-	  src/tls.c:
-	  Fixing
-	  compile
-	  error
-	  if
-	  GNUTLS_VERSION
-	  <
-	  2.8
-
-2009-06-03 21:04  davefx
-
-	* [r324]
-	  src/dialog.c,
-	  src/dialog.h:
-	  Adding
-	  new
-	  function
-	  dialog_info
-	  for
-	  showing
-	  information
-	  messages
-
-2009-06-03 20:30  davefx
-
-	* [r323]
-	  src/ca-cli-callbacks.c,
-	  src/tls.c:
-	  Enabling
-	  compilation
-	  with
-	  GnuTLS
-	  2.8.0
-	  (Fix
-	  provided
-	  by
-	  anonymous
-	  contributor
-	  in
-	  Sourceforge)
-
-2009-05-05 18:51  davefx
-
-	* [r322]
-	  src/ca-cli.c:
-	  Adding
-	  forgotten
-	  crlgen
-	  function
-	  to
-	  gnomint-cli
-
-2009-05-05 18:42  davefx
-
-	* [r321]
-	  po/es.po:
-	  Correcting
-	  some
-	  Spanish
-	  .po
-	  file
-	  bugs
-
-2009-05-05 18:10  davefx
-
-	* [r320]
-	  ChangeLog,
-	  po/es.po,
-	  po/gnoMint.pot,
-	  src/csr_properties.c:
-	  Making
-	  a
-	  string
-	  translatable
-
-2009-05-04 18:45  davefx
-
-	* [r319]
-	  TODO:
-	  Updating
-	  TODO
-	  list
-
-2009-04-18 06:50  davefx
-
-	* [r318]
-	  po/cs.po,
-	  po/de.po,
-	  po/es.po,
-	  po/fi.po,
-	  po/fr.po,
-	  po/gnoMint.pot,
-	  po/it.po,
-	  po/pt_BR.po,
-	  po/ru.po,
-	  po/sv.po:
-	  Updating
-	  pot
-	  file
-	  and
-	  merging
-	  with
-	  all
-	  translations
-	  before
-	  uploading
-	  to
-	  Launchpad
-
-2009-04-18 06:36  davefx
-
-	* [r317]
-	  po/es.po,
-	  po/sv.po:
-	  Updating
-	  Slovak
-	  and
-	  Spanish
-	  translations
-
-2009-04-18 06:35  davefx
-
-	* [r316]
-	  configure.in,
-	  po/fi.po,
-	  po/ru.po:
-	  Adding
-	  new
-	  Russian
-	  and
-	  Finnish
-	  translations
-
-2009-03-23 19:09  davefx
-
-	* [r314]
-	  gui/gnomint.glade:
-	  Correcting
-	  error
-	  while
-	  adding
-	  a
-	  csr
-
-2009-03-20 15:48  davefx
-
-	* [r313]
-	  gui/gnomint.glade,
-	  po/POTFILES.in,
-	  po/es.po,
-	  po/gnoMint.pot:
-	  Upgrading
-	  Spanish
-	  translation
-
-2009-03-20 10:07  davefx
-
-	* [r312]
-	  configure.in,
-	  gui/gnomint.glade:
-	  Preparing
-	  0.9.9
-	  version.
-	  Making
-	  Glade
-	  file
-	  fully
-	  GTK+-2.10
-	  compliant
-
-2009-03-17 18:50  davefx
-
-	* [r311]
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/main.c:
-	  Correcting
-	  behaviour
-	  when
-	  problems
-	  while
-	  opening,
-	  saving
-	  or
-	  creating
-	  file.
-	  Now
-	  the
-	  last
-	  open
-	  file
-	  is
-	  always
-	  reopened
-
-2009-03-16 18:25  davefx
-
-	* [r310]
-	  doc/gnomint-db.dia,
-	  src/ca.c,
-	  src/pkey_manage.h:
-	  Disabling
-	  Properties
-	  option
-	  when
-	  there
-	  is
-	  no
-	  item
-	  selected
-
-2009-03-10 19:14  davefx
-
-	* [r309]
-	  ChangeLog,
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/gnomint-cli.c,
-	  src/main.c:
-	  Moving
-	  some
-	  callbacks
-	  from
-	  main.c
-	  to
-	  ca.c
-
-2009-03-07 12:23  davefx
-
-	* [r308]
-	  gui/Makefile.am,
-	  gui/addca.png,
-	  gui/addcsr.png,
-	  gui/extractpkey.png,
-	  gui/gnomint.glade,
-	  gui/sign.png,
-	  po/POTFILES.in,
-	  src/ca.c:
-	  Adding
-	  functional
-	  toolbar.
-	  Fixing
-	  bug:
-	  extract
-	  private
-	  key
-	  action
-	  was
-	  enabled
-	  and
-	  never
-	  disabled
-	  afterwards
-	  (while
-	  a
-	  selected
-	  element
-	  exists)
-
-2009-03-01 09:07  davefx
-
-	* [r307]
-	  src/Makefile.am,
-	  src/ca-cli-callbacks.c,
-	  src/ca.c,
-	  src/main.c,
-	  src/new_cert.c,
-	  src/new_cert.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h:
-	  Renaming
-	  new_cert_window
-	  by
-	  new_cert
-
-2009-03-01 09:01  davefx
-
-	* [r306]
-	  src/export.c:
-	  Fixing
-	  compile
-	  error
-
-2009-03-01 08:01  davefx
-
-	* [r305]
-	  src/export.c:
-	  Adding
-	  protection:
-	  export_pkcs12
-	  shouldn't
-	  be
-	  called
-	  for
-	  exporting
-	  CSR
-	  information.
-
-2009-03-01 07:38  davefx
-
-	* [r304]
-	  src/export.c:
-	  Fixing
-	  error
-	  while
-	  exporting
-	  private
-	  key
-	  of
-	  CSRs
-	  to
-	  PKCS#8
-	  format:
-	  we
-	  were
-	  exporting
-	  a
-	  certificate
-	  private
-	  key
-	  instead
-	  of
-	  the
-	  CSR
-	  private
-	  key.
-
-2009-02-28 11:51  davefx
-
-	* [r303]
-	  src/ca_file.c:
-	  Correcting
-	  bug:
-	  while
-	  importing
-	  a
-	  CA
-	  certificate,
-	  if
-	  it
-	  has
-	  children
-	  in
-	  the
-	  database,
-	  its grand-children
-	  get
-	  also
-	  the
-	  correct
-	  parent-route.
-	  In
-	  that
-	  case
-	  too,
-	  corrected
-	  a
-	  possible
-	  segv
-	  in
-	  the
-	  parent-route
-	  assignation
-	  to
-	  children.
-
-2009-02-28 07:42  davefx
-
-	* [r302]
-	  src/ca.c:
-	  If
-	  the
-	  private
-	  key
-	  is
-	  not
-	  known
-	  by
-	  the
-	  application,
-	  you
-	  cannot
-	  export
-	  it
-	  into
-	  a
-	  PKCS#12
-
-2009-02-23 21:34  davefx
-
-	* [r301]
-	  src/uint160.c,
-	  src/uint160.h:
-	  Making
-	  uint160_write
-	  a
-	  platform_independent
-	  function.
-	  Correcting
-	  uint160_strdup_printf.
-
-2009-02-23 18:30  davefx
-
-	* [r300]
-	  src/export.c:
-	  Resolving
-	  bug
-	  about
-	  cyphered
-	  private
-	  key
-	  exports
-
-2009-02-23 18:28  davefx
-
-	* [r299]
-	  src/ca.c:
-	  Resolving
-	  bug
-	  about
-	  cyphered
-	  private
-	  key
-	  exports
-
-2009-02-21 16:26  davefx
-
-	* [r298]
-	  src/pkey_manage.c:
-	  New
-	  method
-	  for
-	  ciphering
-	  passwords
-	  and
-	  private
-	  keys.
-	  More
-	  secure,
-	  it
-	  does
-	  not
-	  reutilize
-	  the
-	  same
-	  initial
-	  vector
-	  nor
-	  initial
-	  counter.
-	  Keeping
-	  compatibility
-	  with
-	  old
-	  method.
-	  New
-	  passwords
-	  and
-	  keys
-	  will
-	  be
-	  ciphered
-	  using
-	  the
-	  new
-	  method.
-	  It
-	  is
-	  recommended
-	  change
-	  database
-	  password,
-	  so
-	  all
-	  the
-	  private
-	  keys
-	  are
-	  reciphered
-	  using
-	  the
-	  new
-	  method.
-	  (Dummy
-	  upload.
-	  The
-	  actual
-	  change
-	  was
-	  in
-	  the
-	  previous
-	  commit)
-
-2009-02-21 16:23  davefx
-
-	* [r297]
-	  src/ca_file.c,
-	  src/pkey_manage.c:
-	  Now,
-	  when
-	  a
-	  db
-	  is
-	  password-unprotected,
-	  the
-	  password
-	  entry
-	  is
-	  reset
-	  and
-	  it
-	  is
-	  not
-	  removed
-
-2009-02-21 14:29  davefx
-
-	* [r296]
-	  src/ca_file.c:
-	  Removing
-	  SQL
-	  syntax
-	  error
-
-2009-02-14 11:01  davefx
-
-	* [r295]
-	  configure.in:
-	  Removing
-	  libgnomeui
-	  dependence
-
-2009-02-10 19:22  davefx
-
-	* [r294]
-	  src/ca-cli-callbacks.c,
-	  src/ca_policy.c,
-	  src/ca_policy.h,
-	  src/crl.c,
-	  src/new_ca_window.c,
-	  src/new_cert_window.c,
-	  src/new_req_window.c:
-	  Replacing
-	  ca_policy_[sg]et
-	  with
-	  ca_file_policy_[sg]et,
-	  and
-	  removing
-	  extra
-	  dependences
-
-2009-02-04 19:33  davefx
-
-	* [r293]
-	  src/ca_file.c:
-	  When
-	  the
-	  DB
-	  is
-	  password-unprotected,
-	  delete
-	  the
-	  property
-	  with
-	  the
-	  old
-	  password
-	  from
-	  the
-	  DB
-
-2009-02-03 18:55  davefx
-
-	* [r292]
-	  src/ca_file.c:
-	  Fixing
-	  bug
-	  while
-	  upgrading
-	  password-protected
-	  database
-
-2009-01-31 15:56  davefx
-
-	* [r291]
-	  src/ca_file.c:
-	  Removing
-	  table
-	  ca_properties.
-	  Adding
-	  new
-	  table
-	  db_properties,
-	  and
-	  view
-	  ca_properties
-	  for
-	  keeping
-	  backward/forward
-	  compatibility
-
-2009-01-17 12:30  davefx
-
-	* [r290]
-	  src/Makefile.am,
-	  src/country_table.c,
-	  src/country_table.h,
-	  src/main.c,
-	  src/new_ca_window.c,
-	  src/new_ca_window.h,
-	  src/new_req_window.c,
-	  src/preferences-gui.c,
-	  src/preferences-gui.h:
-	  Advancing
-	  in
-	  cleaning
-	  of
-	  dependences
-
-2009-01-16 20:31  davefx
-
-	* [r289]
-	  src/ca-cli-callbacks.c,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/creation_process_window.c,
-	  src/creation_process_window.h,
-	  src/csr_creation.c,
-	  src/csr_creation.h,
-	  src/import.c,
-	  src/new_ca_window.c,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.c,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h,
-	  src/tls.c,
-	  src/tls.h:
-	  Cleaning
-	  up
-	  the
-	  code
-	  a
-	  little
-	  more
-
-2009-01-14 19:44  davefx
-
-	* [r288]
-	  src/new_cert_window.c:
-	  Removing
-	  unneeded
-	  dependences
-
-2009-01-14 19:34  davefx
-
-	* [r287]
-	  src/ca.c,
-	  src/creation_process_window.c,
-	  src/export.c,
-	  src/export.h,
-	  src/new_ca_window.c,
-	  src/new_req_window.c:
-	  Removing
-	  dependences
-	  from
-	  ca.c
-
-2009-01-13 20:14  davefx
-
-	* [r286]
-	  configure.in,
-	  src/ca-cli-callbacks.c,
-	  src/ca-cli-callbacks.h,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/ca_policy.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/creation_process_window.c,
-	  src/creation_process_window.h,
-	  src/crl.c,
-	  src/crl.h,
-	  src/csr_creation.c,
-	  src/csr_creation.h,
-	  src/csr_properties.c,
-	  src/csr_properties.h,
-	  src/dialog.c,
-	  src/dialog.h,
-	  src/gnomint-cli.c,
-	  src/import.c,
-	  src/import.h,
-	  src/main.c,
-	  src/main.h,
-	  src/new_ca_window.c,
-	  src/new_ca_window.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.c,
-	  src/new_req_window.h,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h,
-	  src/preferences-gui.c,
-	  src/preferences-gui.h,
-	  src/preferences-window.c,
-	  src/preferences-window.h,
-	  src/preferences.c,
-	  src/preferences.h,
-	  src/tls.c,
-	  src/tls.h,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Updating
-	  Copyright
-	  date.
-	  Removing
-	  dependence
-	  of
-	  ca.[ch]
-	  because
-	  of
-	  only
-	  ca_refresh_list.
-
-2009-01-12 21:18  davefx
-
-	* [r285]
-	  src/creation_process_window.c,
-	  src/creation_process_window.h:
-	  Tidying
-	  up
-	  the
-	  code
-	  a
-	  litte
-	  bit
-
-2009-01-12 21:15  davefx
-
-	* [r284]
-	  gui/gnomint.glade,
-	  po/POTFILES.in,
-	  src/Makefile.am,
-	  src/new_ca_window.c,
-	  src/new_cert_window.c,
-	  src/new_req_window.c:
-	  Tidying
-	  up
-	  the
-	  code
-	  a
-	  litte
-	  bit
-
-2009-01-12 20:41  davefx
-
-	* [r283]
-	  src/creation_process_window.h,
-	  src/new_cert_creation_process.h:
-	  Renaming
-	  source
-	  file...
-
-2009-01-12 20:39  davefx
-
-	* [r282]
-	  src/creation_process_window.c,
-	  src/new_cert_creation_process.c:
-	  Renaming
-	  source
-	  file...
-
-2009-01-04 20:56  davefx
-
-	* [r281]
-	  configure.in,
-	  po/cs.po,
-	  po/de.po,
-	  po/fr.po,
-	  po/it.po,
-	  po/pt_BR.po,
-	  po/sv.po:
-	  Uploading
-	  new
-	  translations
-	  from
-	  Launchpad
-
-2009-01-02 17:21  davefx
-
-	* [r280]
-	  src/Makefile.am,
-	  src/ca-callbacks.c,
-	  src/ca-callbacks.h,
-	  src/ca-cli-callbacks.c,
-	  src/ca-cli-callbacks.h,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/crl.c,
-	  src/dialog.c,
-	  src/dialog.h,
-	  src/export.c,
-	  src/export.h,
-	  src/import.c,
-	  src/new_cert_window.c,
-	  src/pkey_manage.c:
-	  Refactoring
-	  some
-	  functions
-
-2008-12-25 22:16  davefx
-
-	* [r279]
-	  AUTHORS,
-	  m4/intltool.m4:
-	  Reverting
-	  error
-
-2008-12-25 22:13  davefx
-
-	* [r278]
-	  AUTHORS,
-	  m4/intltool.m4,
-	  m4/libtool.m4,
-	  m4/ltoptions.m4,
-	  m4/ltsugar.m4,
-	  m4/ltversion.m4,
-	  m4/lt~obsolete.m4:
-	  Removing
-	  files
-	  problematic
-	  while
-	  compiling
-	  in
-	  Ubuntu
-	  8.04
-
-2008-12-22 10:29  davefx
-
-	* [r277]
-	  src/import.c:
-	  Improving
-	  OpenSSL
-	  import.
-	  Now,
-	  it
-	  is
-	  less
-	  restrictive.
-
-2008-12-18 06:39  davefx
-
-	* [r275]
-	  ChangeLog:
-	  Updating
-	  to
-	  version
-	  0.9.1
-
-2008-12-18 06:38  davefx
-
-	* [r274]
-	  configure.in:
-	  Updating
-	  to
-	  version
-	  0.9.1
-
-2008-12-18 06:37  davefx
-
-	* [r273]
-	  src/ca-callbacks.c:
-	  Fixing
-	  a
-	  missing
-	  include
-	  that
-	  made
-	  gnoMint
-	  to
-	  not
-	  compile
-	  over
-	  OpenSUSE.
-
-2008-12-16 06:46  davefx
-
-	* [r271]
-	  ChangeLog:
-	  Updating
-	  changelog
-	  for
-	  0.9.0
-
-2008-12-16 06:45  davefx
-
-	* [r270]
-	  AUTHORS,
-	  ChangeLog,
-	  configure.in,
-	  po/es.po,
-	  po/gnoMint.pot,
-	  src/ca-cli.c,
-	  src/main.c:
-	  Getting
-	  ready
-	  for
-	  version
-	  0.9.0.
-	  Spanish
-	  translation
-	  updated.
-	  Adding
-	  Ahmed
-	  Bazid
-	  and
-	  Staněk
-	  Luboš
-	  as
-	  authors.
-	  Changing
-	  method
-	  for
-	  showing
-	  AUTHORS
-	  (it
-	  was
-	  wrong).
-
-2008-12-14 20:36  davefx
-
-	* [r269]
-	  src/Makefile.am,
-	  src/ca-callbacks.c:
-	  gnoMint-cli
-	  commands
-	  completed
-
-2008-12-14 10:04  davefx
-
-	* [r268]
-	  src/Makefile.am,
-	  src/ca-callbacks.c,
-	  src/ca-cli.c,
-	  src/ca-cli.h:
-	  Implemented
-	  gnomint-cli
-	  addcsr
-	  function.
-	  Only
-	  addca
-	  left\!
-
-2008-12-13 07:55  davefx
-
-	* [r267]
-	  src/Makefile.am,
-	  src/ca-callbacks.c,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/import.c,
-	  src/tls.c,
-	  src/tls.h:
-	  Completing
-	  gnomint
-	  command
-	  line
-	  interface.
-	  Missing
-	  only
-	  addca
-	  and
-	  addcsr
-
-2008-12-12 07:59  davefx
-
-	* [r266]
-	  src/main.c:
-	  Correcting
-	  string
-	  while
-	  importing
-	  whole
-	  directory.
-
-2008-12-12 00:01  davefx
-
-	* [r265]
-	  gui/gnomint.glade,
-	  po/es.po,
-	  po/gnoMint.pot,
-	  src/Makefile.am,
-	  src/ca-callbacks.c,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/ca.c,
-	  src/ca.h,
-	  src/crl.c,
-	  src/crl.h,
-	  src/new_ca_window.h,
-	  src/new_cert_creation_process.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.h:
-	  Adding
-	  delete,
-	  crlgen,
-	  dhgen,
-	  and
-	  changepassword
-
-2008-12-11 13:49  davefx
-
-	* [r264]
-	  po/es.po,
-	  src/Makefile.am,
-	  src/ca-callbacks.c,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/main.c,
-	  src/pkey_manage.c:
-	  Implementing
-	  more
-	  features
-	  in
-	  Command-Line
-	  Interface
-
-2008-12-10 18:17  davefx
-
-	* [r263]
-	  configure.in:
-	  Upgrading
-	  GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION
-	  to
-	  2.7.4
-
-2008-12-05 07:46  davefx
-
-	* [r262]
-	  src/ca-callbacks.c,
-	  src/ca-cli.c:
-	  Uploading
-	  support
-	  for
-	  basic
-	  file-operations
-	  in
-	  gnomint-cli
-
-2008-12-04 19:22  davefx
-
-	* [r261]
-	  po/es.po,
-	  po/gnoMint.pot:
-	  Uploading
-	  Spanish
-	  translation.
-
-2008-12-04 19:22  davefx
-
-	* [r260]
-	  configure.in,
-	  src/ca-callbacks.c,
-	  src/ca-cli.c,
-	  src/gnomint-cli.c:
-	  Completing
-	  textual
-	  informative
-	  commands
-
-2008-12-03 23:44  davefx
-
-	* [r259]
-	  po/POTFILES.in,
-	  po/es.po,
-	  po/gnoMint.pot,
-	  src/Makefile.am,
-	  src/ca-callbacks.c,
-	  src/ca-callbacks.h,
-	  src/ca-cli.c,
-	  src/ca-cli.h:
-	  Completing
-	  command-line
-	  parser.
-	  Help
-	  implemented.
-
-2008-12-03 19:49  davefx
-
-	* [r258]
-	  src/ca-cli.c:
-	  Improving
-	  the
-	  (buggy)
-	  parser
-	  a
-	  little
-	  bit
-
-2008-12-03 19:44  davefx
-
-	* [r257]
-	  src/ca-cli.c:
-	  Uploading
-	  initial
-	  (buggy)
-	  parser
-
-2008-12-03 07:27  davefx
-
-	* [r256]
-	  src/ca-cli.c:
-	  Completing
-	  callbacks
-
-2008-12-02 22:09  davefx
-
-	* [r255]
-	  doc/gnomint-cli.txt,
-	  m4/libtool.m4,
-	  m4/ltoptions.m4,
-	  m4/ltsugar.m4,
-	  m4/ltversion.m4,
-	  m4/lt~obsolete.m4,
-	  src/ca-cli.c:
-	  Adding
-	  callbacks
-
-2008-12-02 19:37  davefx
-
-	* [r254]
-	  ChangeLog,
-	  TODO,
-	  certs/example-ca-web-gnomint.gnomint,
-	  configure.in,
-	  doc/gnomint-cli.txt,
-	  src/Makefile.am,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/gnomint-cli.c:
-	  Added
-	  readline
-	  support
-
-2008-12-02 08:05  davefx
-
-	* [r253]
-	  src/Makefile.am,
-	  src/ca-cli.c,
-	  src/ca-cli.h,
-	  src/ca.h,
-	  src/gnomint-cli.c,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h,
-	  src/preferences-gui.c,
-	  src/preferences.c:
-	  Starting
-	  command-line
-	  CA
-	  manager
-
-2008-11-19 18:29  davefx
-
-	* [r251]
-	  certs/example-ca-web-gnomint.gnomint:
-	  Adding
-	  a
-	  web
-	  tutorial
-	  example
-
-2008-11-18 18:23  davefx
-
-	* [r250]
-	  ChangeLog,
-	  configure.in,
-	  m4/intltool.m4:
-	  Upgrading
-	  to
-	  version
-	  0.6.0
-
-2008-11-18 18:22  davefx
-
-	* [r249]
-	  src/ca_file.c,
-	  src/tls.c,
-	  src/tls.h:
-	  Changing
-	  define
-	  for
-	  advanced
-	  gnutls
-	  (post
-	  2.7.3)
-	  features
-
-2008-11-18 18:20  davefx
-
-	* [r248]
-	  src/import.c:
-	  Added
-	  message
-	  for
-	  failure
-	  after
-	  trying
-	  to
-	  import
-	  unsupported
-	  directory
-
-2008-11-18 17:57  davefx
-
-	* [r247]
-	  src/uint160.c:
-	  Fixed
-	  buffer
-	  overrun
-	  while
-	  reading
-	  in
-	  uint160_read_escaped
-
-2008-11-18 17:34  davefx
-
-	* [r246]
-	  certs/example-ca.7.gnomint,
-	  certs/example-ca.gnomint:
-	  Upgrading
-	  example
-	  database
-
-2008-11-18 07:42  davefx
-
-	* [r245]
-	  configure.in,
-	  po/cs.po,
-	  po/de.po,
-	  po/es.po,
-	  po/fr.po,
-	  po/gnoMint.pot,
-	  po/it.po,
-	  po/sv.po:
-	  Updating
-	  translations.
-	  Added
-	  new
-	  German
-	  translation.
-
-2008-11-17 19:42  davefx
-
-	* [r244]
-	  TODO,
-	  src/uint160.c:
-	  Fixed
-	  problem
-	  while
-	  showing
-	  serial
-	  from
-	  certificates
-
-2008-11-17 19:10  davefx
-
-	* [r243]
-	  src/main.c:
-	  Fixing
-	  error
-	  while
-	  loading
-	  from
-	  recent-file
-	  menu
-
-2008-11-17 19:08  davefx
-
-	* [r242]
-	  src/ca_file.c,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Fixing
-	  potential
-	  future
-	  problem:
-	  a
-	  architecture-depending
-	  value
-	  was
-	  been
-	  saved
-	  in
-	  the
-	  database.
-	  Now
-	  this
-	  value
-	  is
-	  saved
-	  correctly
-	  serialized.
-
-2008-11-12 19:27  davefx
-
-	* [r241]
-	  TODO,
-	  src/ca_file.c,
-	  src/import.c,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Adding
-	  next
-	  serial
-	  import
-	  from
-	  OpenSSL
-
-2008-11-10 19:40  davefx
-
-	* [r240]
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Adding
-	  new
-	  function
-	  ca_file_set_next_serial
-	  (needed
-	  while
-	  importing
-	  OpenSSL
-	  CA)
-
-2008-11-10 19:22  davefx
-
-	* [r239]
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/csr_creation.c,
-	  src/import.c,
-	  src/import.h,
-	  src/main.c:
-	  Now,
-	  a
-	  minimal
-	  CA
-	  configuration
-	  is
-	  inserted
-	  while
-	  importing
-	  a
-	  CA
-	  certificate.
-	  The
-	  just-inserted
-	  cert-id
-	  or
-	  csr-id
-	  is
-	  returned
-	  while
-	  importing
-	  a
-	  cert
-	  or
-	  csr
-
-2008-11-10 18:40  davefx
-
-	* [r238]
-	  TODO,
-	  src/import.c,
-	  src/import.h,
-	  src/main.c:
-	  While
-	  importing
-	  a
-	  private
-	  key,
-	  if
-	  a
-	  password
-	  is
-	  needed,
-	  ask
-	  for
-	  it
-	  using
-	  a
-	  appropiate
-	  description
-
-2008-11-09 10:25  davefx
-
-	* [r237]
-	  TODO:
-	  Uploading
-	  a
-	  new
-	  TODO
-	  file
-	  with
-	  release
-	  and
-	  develop
-	  planning
-
-2008-11-08 23:36  davefx
-
-	* [r236]
-	  configure.in,
-	  src/ca_file.c,
-	  src/tls.c,
-	  src/tls.h:
-	  Adding
-	  new
-	  functionality
-	  for
-	  importing
-	  private
-	  keys
-	  for
-	  CSRs
-	  (depends
-	  on
-	  currently
-	  missing
-	  functionality
-	  of
-	  gnutls:
-	  patch
-	  sent
-	  to
-	  upstream)
-
-2008-11-08 14:32  davefx
-
-	* [r235]
-	  src/ca_creation.c,
-	  src/ca_file.c,
-	  src/ca_policy.c,
-	  src/certificate_properties.c,
-	  src/crl.c,
-	  src/csr_creation.c,
-	  src/csr_properties.c,
-	  src/new_ca_window.c,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_window.c,
-	  src/new_req_window.c,
-	  src/pkey_manage.c,
-	  src/preferences-gui.c,
-	  src/preferences-window.c,
-	  src/preferences.c,
-	  src/tls.c:
-	  Removing
-	  all
-	  definitions
-	  of
-	  gettext
-	  macros.
-	  Using
-	  the
-	  definition
-	  in
-	  <glib/gi18n.h>
-
-2008-11-08 09:36  davefx
-
-	* [r234]
-	  src/import.c:
-	  OpenSSL
-	  CA
-	  importing
-	  almost
-	  complete.
-	  Now
-	  fully
-	  functional,
-	  only
-	  lacks
-	  a
-	  few
-	  checks,
-	  last
-	  serial
-	  and
-	  CSR
-	  private
-	  key
-	  importing
-
-2008-11-08 09:35  davefx
-
-	* [r233]
-	  src/ca_file.c:
-	  Avoiding
-	  multiple
-	  import
-	  of
-	  the
-	  same
-	  certificate
-
-2008-11-08 09:05  davefx
-
-	* [r232]
-	  configure.in:
-	  Adding
-	  -O0
-	  -g when
-	  --enable-debug
-	  is
-	  supplied
-
-2008-11-07 18:46  davefx
-
-	* [r231]
-	  src/import.c:
-	  Advancing
-	  in
-	  OpenSSL
-	  CA
-	  importing:
-	  CA
-	  cert
-	  and
-	  private
-	  key
-	  (latter
-	  not
-	  working
-	  yet)
-
-2008-11-07 18:45  davefx
-
-	* [r230]
-	  po/es.po,
-	  po/gnoMint.pot:
-	  Updating
-	  translations
-
-2008-11-04 19:24  davefx
-
-	* [r229]
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca.h,
-	  src/import.c,
-	  src/import.h,
-	  src/main.c:
-	  Starting
-	  slow
-	  progress
-	  to
-	  version
-	  0.6.0.
-	  Distinction
-	  made
-	  between
-	  importing
-	  single
-	  files
-	  and
-	  CA
-	  directories
-
-2008-11-03 19:15  davefx
-
-	* [r228]
-	  src/import.c:
-	  Finished
-	  importing
-	  of
-	  PKCS#12
-	  structures
-
-2008-10-30 19:11  davefx
-
-	* [r227]
-	  src/import.c:
-	  Advancing
-	  in
-	  PKCS#12
-	  import
-
-2008-10-30 19:10  davefx
-
-	* [r226]
-	  src/pkey_manage.c:
-	  Fixing
-	  problem
-	  while
-	  export
-	  PKCS#12
-	  files
-	  from
-	  an
-	  password-less
-	  database
-
-2008-10-28 19:07  davefx
-
-	* [r225]
-	  ChangeLog,
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/import.c,
-	  src/import.h:
-	  Finished
-	  PKCS#8
-	  importing
-
-2008-10-24 06:25  davefx
-
-	* [r224]
-	  certs/test-gnutls.c:
-	  Adding
-	  gnutls
-	  test
-	  for
-	  getting
-	  errors
-
-2008-10-21 17:48  davefx
-
-	* [r223]
-	  certs/openssl-example,
-	  certs/openssl-example/cacert.key,
-	  certs/openssl-example/cacert.pem,
-	  certs/openssl-example/certs,
-	  certs/openssl-example/certs/VGVzdDE6U3VKZVRvVW5POlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
-	  certs/openssl-example/certs/VGVzdDI6U3VKZVRvRG9TOlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
-	  certs/openssl-example/certs/VGVzdDM6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
-	  certs/openssl-example/crl,
-	  certs/openssl-example/crl/crl.pem,
-	  certs/openssl-example/index.txt,
-	  certs/openssl-example/index.txt.attr,
-	  certs/openssl-example/keys,
-	  certs/openssl-example/keys/VGVzdDE6U3VKZVRvVW5POlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
-	  certs/openssl-example/keys/VGVzdDI6U3VKZVRvRG9TOlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
-	  certs/openssl-example/keys/VGVzdDM6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
-	  certs/openssl-example/keys/VGVzdDQ6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
-	  certs/openssl-example/newcerts,
-	  certs/openssl-example/newcerts/01.pem,
-	  certs/openssl-example/newcerts/02.pem,
-	  certs/openssl-example/newcerts/03.pem,
-	  certs/openssl-example/openssl.cnf,
-	  certs/openssl-example/req,
-	  certs/openssl-example/req/VGVzdDE6U3VKZVRvVW5POlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
-	  certs/openssl-example/req/VGVzdDI6U3VKZVRvRG9TOlVuSWRBZE9yR2FOaVphVGlWYTpPckdhTmlaYUNpT246Q2lVZEFkOlByT3ZJbkNpQTpFUw==.pem,
-	  certs/openssl-example/req/VGVzdDM6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
-	  certs/openssl-example/req/VGVzdDQ6IDpVbklkQWRPckdhTmlaYVRpVmE6T3JHYU5pWmFDaU9uOkNpVWRBZDpQck92SW5DaUE6RVM=.pem,
-	  certs/openssl-example/serial:
-	  Adding
-	  an
-	  example
-	  of
-	  an
-	  openssl-built
-	  certification
-	  authority
-
-2008-10-20 17:11  davefx
-
-	* [r222]
-	  configure.in:
-	  Added
-	  Italian
-	  translation
-
-2008-10-20 17:11  davefx
-
-	* [r221]
-	  po/fr.po,
-	  po/it.po,
-	  po/sv.po:
-	  Updating
-	  changes
-	  from
-	  Launchpad
-
-2008-10-08 08:43  davefx
-
-	* [r220]
-	  debian/changelog,
-	  debian/conffiles.ex,
-	  debian/control,
-	  debian/copyright,
-	  debian/cron.d.ex,
-	  debian/emacsen-install.ex,
-	  debian/emacsen-remove.ex,
-	  debian/emacsen-startup.ex,
-	  debian/gnomint.doc-base.EX,
-	  debian/init.d.ex,
-	  debian/manpage.1,
-	  debian/manpage.1.ex,
-	  debian/manpage.sgml.ex,
-	  debian/manpage.xml.ex,
-	  debian/menu.ex,
-	  debian/postinst.ex,
-	  debian/postrm.ex,
-	  debian/preinst.ex,
-	  debian/prerm.ex,
-	  debian/rules,
-	  debian/watch.ex:
-	  Updating
-	  files
-	  for
-	  building
-	  Debian
-	  packages
-
-2008-10-02 18:06  davefx
-
-	* [r219]
-	  src/import.c:
-	  Implemented
-	  PKCS7
-	  importing.
-	  Cannot
-	  test,
-	  as
-	  I
-	  haven't
-	  found
-	  yet
-	  any
-	  PKCS7
-	  file
-	  in
-	  the
-	  internet
-
-2008-10-02 17:12  davefx
-
-	* [r218]
-	  src/import.c,
-	  src/pkey_manage.c:
-	  Fixing
-	  bug
-	  that
-	  made
-	  CRL
-	  importing
-	  not
-	  work.
-
-2008-10-01 18:17  davefx
-
-	* [r216]
-	  ChangeLog,
-	  configure.in,
-	  m4/intltool.m4:
-	  Updating
-	  to
-	  version
-	  0.5.4
-
-2008-10-01 18:04  davefx
-
-	* [r215]
-	  po,
-	  po/es.po,
-	  po/gnoMint.pot,
-	  src/ca_creation.c,
-	  src/new_cert_creation_process.c,
-	  src/tls.c:
-	  Beeing
-	  more
-	  verbose
-	  when
-	  having
-	  a
-	  failure
-	  when
-	  creating
-	  a
-	  CA
-	  certificate
-
-2008-10-01 18:02  davefx
-
-	* [r214]
-	  src/new_ca_window.c,
-	  src/new_cert_window.c:
-	  Fixing
-	  problem
-	  with
-	  expiration
-	  time,
-	  related
-	  to
-	  UTC-localtime
-	  difference
-
-2008-10-01 17:31  davefx
-
-	* [r213]
-	  src/ca_file.c:
-	  Fixing
-	  segmentation
-	  fault
-	  in
-	  some
-	  architectures,
-	  and
-	  modern
-	  compilers
-
-2008-10-01 17:29  davefx
-
-	* [r212]
-	  src/certificate_properties.c:
-	  Reducing
-	  function
-	  names.
-	  Fixing
-	  warning
-
-2008-09-30 17:56  davefx
-
-	* [r211]
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/import.c:
-	  Advancing
-	  in
-	  CRL
-	  importing
-
-2008-09-30 06:37  davefx
-
-	* [r210]
-	  src/ca_file.c:
-	  Finished
-	  import
-	  of
-	  uncrypted
-	  private
-	  keys
-
-2008-09-29 17:43  davefx
-
-	* [r209]
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/import.c,
-	  src/tls.c,
-	  src/tls.h:
-	  Advancing
-	  in
-	  private
-	  key
-	  import
-
-2008-09-29 16:47  davefx
-
-	* [r208]
-	  gui,
-	  gui/gnomint14x14.png,
-	  gui/gnomint192x192.png,
-	  gui/gnomint64x64.png:
-	  Adding
-	  graphic
-	  files.
-	  Completing
-	  svnignore
-
-2008-09-26 14:51  davefx
-
-	* [r207]
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/import.c:
-	  Certificate
-	  import
-	  finished
-
-2008-09-26 06:11  davefx
-
-	* [r206]
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/import.c,
-	  src/tls.c,
-	  src/tls.h,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Advancing
-	  in
-	  certificate
-	  import
-
-2008-09-25 06:30  davefx
-
-	* [r205]
-	  src/tls.c:
-	  If
-	  the
-	  signing
-	  CA
-	  has
-	  not
-	  subject
-	  key
-	  identifier
-	  extension,
-	  don't
-	  generate
-	  issuer
-	  key
-	  identifier
-	  extension.
-	  If
-	  it
-	  has,
-	  use
-	  it
-	  to
-	  generate
-	  issuer
-	  key
-	  identifier
-	  extension,
-	  instead
-	  of
-	  forging
-	  a
-	  new
-	  issuer
-	  key
-	  id
-	  with
-	  the
-	  gnutls
-	  method
-	  (that
-	  could
-	  be
-	  distinct
-	  from
-	  the
-	  one
-	  in
-	  the
-	  extension)
-
-2008-09-24 18:19  davefx
-
-	* [r204]
-	  src/ca_file.c,
-	  src/ca_file.h:
-	  Database
-	  now
-	  ready
-	  for
-	  importing
-	  hierarchies
-	  of
-	  certificates
-
-2008-09-24 06:56  davefx
-
-	* [r203]
-	  po/gnoMint.pot:
-	  Adding
-	  po
-	  template
-
-2008-09-24 06:54  davefx
-
-	* [r202]
-	  configure.in,
-	  po/cs.po,
-	  po/es.po,
-	  po/fr.po,
-	  po/sv.po:
-	  Upgrading
-	  translations
-	  from
-	  Launchpad.
-	  Added
-	  language
-	  sv.
-
-2008-09-23 18:25  davefx
-
-	* [r201]
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/import.c,
-	  src/import.h,
-	  src/tls.c,
-	  src/tls.h:
-	  Keeping
-	  subject_key_id
-	  in
-	  certificate
-	  database.
-	  Some
-	  errors
-	  with
-	  NULL
-	  values:
-	  still
-	  not
-	  finished.
-
-2008-09-19 17:58  davefx
-
-	* [r200]
-	  src/new_cert_window.c:
-	  Fixing
-	  error:
-	  only
-	  the
-	  first
-	  certificate
-	  in
-	  database
-	  could
-	  sign
-	  CSRs
-	  in
-	  password-protected
-	  databases.
-
-2008-09-19 06:27  davefx
-
-	* [r199]
-	  Makefile.am,
-	  configure.in,
-	  gconf/Makefile.am,
-	  src/Makefile.am:
-	  Another
-	  batch
-	  of
-	  configure
-	  changes,
-	  thanks
-	  to
-	  Staněk
-	  Luboš
-
-2008-09-19 06:23  davefx
-
-	* [r198]
-	  po/POTFILES.in,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/import.c,
-	  src/import.h:
-	  Starting
-	  support
-	  for
-	  importing
-	  certificates
-
-2008-09-19 06:06  davefx
-
-	* [r197]
-	  src/new_cert_window.c:
-	  Fixing
-	  segmentation
-	  fault
-	  when
-	  the
-	  CSR
-	  or
-	  the
-	  CA
-	  cert
-	  have
-	  NULL
-	  fields
-
-2008-09-18 18:27  davefx
-
-	* [r196]
-	  src/tls.c:
-	  Making
-	  compliant
-	  to
-	  RFC5280:
-	  now
-	  authority
-	  key
-	  identifier
-	  and
-	  subject
-	  key
-	  identifiers
-	  are
-	  set
-	  properly
-
-2008-09-17 06:46  davefx
-
-	* [r195]
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/new_cert_window.c:
-	  Now
-	  the
-	  CA
-	  used
-	  when
-	  inheriting
-	  fields
-	  for
-	  a
-	  CSR
-	  is
-	  remembered,
-	  and
-	  used
-	  as
-	  default
-	  when
-	  signing
-	  it.
-
-2008-09-16 18:18  davefx
-
-	* [r194]
-	  src/ca.c,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.c:
-	  First
-	  steps
-	  for
-	  saving
-	  the
-	  CA
-	  used
-	  for
-	  generating
-	  CSRs,
-	  so
-	  it
-	  will
-	  be
-	  the
-	  default
-	  while
-	  signing
-	  the
-	  CSRs
-
-2008-09-16 18:17  davefx
-
-	* [r193]
-	  gui/gnomint.glade:
-	  Finishing
-	  implementation
-	  of
-	  dependences
-	  between
-	  certificate
-	  uses
-	  and
-	  certificate
-	  purposes
-
-2008-09-16 18:08  davefx
-
-	* [r192]
-	  configure.in,
-	  src/Makefile.am:
-	  Fixing
-	  configure.in
-	  and
-	  src/Makefile.am:
-	  *
-	  fixes
-	  AM_INIT_AUTOMAKE
-	  *
-	  adds
-	  some
-	  test
-	  discovered
-	  by
-	  autoscan
-	  *
-	  removes
-	  wrong
-	  gnutls
-	  and
-	  libsqlite
-	  test
-	  *
-	  defines
-	  required
-	  versions
-	  of
-	  particular
-	  libraries
-	  *
-	  adds
-	  proper
-	  gnutls
-	  and
-	  sqlite
-	  test
-	  including
-	  appropriate
-	  CFLAGS
-	  and
-	  LIBS,
-	  exports
-	  this
-	  info
-	  for
-	  use
-	  in
-	  Makefile
-	  *
-	  removes
-	  installations
-	  dirs,
-	  they
-	  are
-	  defined
-	  the
-	  standard
-	  way
-	  *
-	  modifies
-	  the
-	  summary
-	  output
-	  *
-	  removes
-	  second
-	  compiler
-	  flags
-	  from
-	  Makefile.am
-	  Thanks
-	  to
-	  Staněk
-	  Luboš
-	  <lubek@users.sourceforge.net>
-	  for
-	  the
-	  patch
-
-2008-09-16 16:53  davefx
-
-	* [r191]
-	  src/new_cert_window.c,
-	  src/new_cert_window.h:
-	  Finishing
-	  implementation
-	  of
-	  dependences
-	  between
-	  certificate
-	  uses
-	  and
-	  certificate
-	  purposes
-
-2008-09-16 06:45  davefx
-
-	* [r190]
-	  src/ca_policy.c:
-	  Progress
-	  in
-	  uses-purposes
-	  dependencies.
-	  CA
-	  properties
-	  window
-	  finished.
-	  New
-	  cert
-	  window
-	  pending.
-
-2008-09-15 18:20  davefx
-
-	* [r189]
-	  src/ca_policy.c:
-	  Starting
-	  to
-	  implement
-	  dependences
-	  between
-	  certificate
-	  purposes
-	  and
-	  uses
-
-2008-09-15 17:50  davefx
-
-	* [r188]
-	  gui/gnomint.glade,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/crl.c,
-	  src/crl.h:
-	  Fixing
-	  bug
-	  #2100270.
-	  Now
-	  it
-	  is
-	  possible
-	  to
-	  generate
-	  CRLs
-	  for
-	  all
-	  the
-	  CAs
-	  in
-	  the
-	  hierarchy
-
-2008-09-12 10:23  davefx
-
-	* [r187]
-	  src/Makefile.am:
-	  Uploading
-	  forgotten
-	  main.h
-
-2008-09-12 10:22  davefx
-
-	* [r186]
-	  src/main.h:
-	  Uploading
-	  forgotten
-	  main.h
-
-2008-09-11 17:31  davefx
-
-	* [r185]
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_policy.c,
-	  src/ca_policy.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/csr_creation.h,
-	  src/csr_properties.c,
-	  src/csr_properties.h,
-	  src/main.c,
-	  src/new_ca_window.c,
-	  src/new_ca_window.h,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_creation_process.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.c,
-	  src/new_req_window.h,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h,
-	  src/preferences-gui.h,
-	  src/preferences-window.c,
-	  src/preferences-window.h:
-	  Updating
-	  src/,
-	  so
-	  now
-	  it
-	  compiles
-	  with
-	  the
-	  new
-	  default
-	  compilation
-	  options
-
-2008-09-11 16:24  davefx
-
-	* [r184]
-	  README,
-	  TODO,
-	  autogen.sh:
-	  Standarizing
-	  name
-	  of
-	  the
-	  project:
-	  it's
-	  gnoMint,
-	  not
-	  Gnomint
-
-2008-09-11 16:20  davefx
-
-	* [r183]
-	  src/ca.h,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/certificate_properties.c,
-	  src/csr_creation.h,
-	  src/csr_properties.c,
-	  src/new_ca_window.h,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_window.c,
-	  src/new_req_window.c,
-	  src/new_req_window.h,
-	  src/pkey_manage.h,
-	  src/preferences-gui.c,
-	  src/preferences-gui.h,
-	  src/preferences-window.c,
-	  src/preferences-window.h,
-	  src/preferences.c,
-	  src/preferences.h,
-	  src/tls.h,
-	  src/uint160.h:
-	  Patch
-	  for
-	  improving
-	  standard
-	  compliance
-
-2008-09-11 06:33  davefx
-
-	* [r182]
-	  src/ca_file.c:
-	  Fixing
-	  problem
-	  with
-	  permissions
-	  of
-	  a
-	  just
-	  created
-	  file.
-	  Now
-	  created
-	  in
-	  0600
-	  mode.
-	  Fixing
-	  problem
-	  with
-	  certificates
-	  insertion
-	  into
-	  the
-	  database
-	  inserted
-	  in
-	  last
-	  commit
-
-2008-09-11 06:30  davefx
-
-	* [r181]
-	  src/ca_policy.c:
-	  Removing
-	  deprecated
-	  functions.
-	  Patch
-	  by
-	  Staněk
-	  Luboš
-
-2008-09-09 07:14  davefx
-
-	* [r180]
-	  certs/example-ca.6.gnomint,
-	  certs/example-ca.gnomint,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h:
-	  Fixing
-	  CRL
-	  problem:
-	  now,
-	  expired
-	  certificates
-	  appear
-	  only
-	  in
-	  the
-	  first
-	  CRL
-	  released
-	  after
-	  the
-	  expiration
-	  date,
-	  according
-	  to
-	  RFC
-	  5280
-	  (page
-	  13)
-
-2008-09-09 06:58  davefx
-
-	* [r178]
-	  m4/Makefile.am:
-	  Adding
-	  missing
-	  file
-	  in
-	  subversion
-	  repository
-
-2008-09-08 15:31  davefx
-
-	* [r176]
-	  ChangeLog,
-	  configure.in:
-	  Updating
-	  version
-	  to
-	  0.5.3
-
-2008-09-08 14:41  davefx
-
-	* [r175]
-	  certs/example-ca.gnomint,
-	  src/ca.c,
-	  src/ca_file.c:
-	  Now
-	  exporting
-	  full
-	  certificate
-	  path
-	  when
-	  exporting
-	  public
-	  PEM
-
-2008-09-06 16:34  davefx
-
-	* [r174]
-	  Makefile.am,
-	  configure.in,
-	  m4/codeset.m4,
-	  m4/gettext.m4,
-	  m4/glibc21.m4,
-	  m4/iconv.m4,
-	  m4/intltool.m4,
-	  m4/isc-posix.m4,
-	  m4/lcmessage.m4,
-	  m4/progtest.m4:
-	  Fixing
-	  problem
-	  with
-	  m4
-	  macros.
-	  Patch
-	  by
-	  Staněk
-	  Luboš.
-
-2008-09-06 16:31  davefx
-
-	* [r173]
-	  gui/gnomint.glade:
-	  Enabling
-	  the
-	  generation
-	  of
-	  DH
-	  parameters
-	  from
-	  gnoMint
-
-2008-09-06 10:20  davefx
-
-	* [r172]
-	  po/POTFILES.in,
-	  po/es.po:
-	  Updating
-	  Spanish
-	  translation
-
-2008-09-06 10:04  davefx
-
-	* [r171]
-	  src/ca.c,
-	  src/tls.c,
-	  src/tls.h:
-	  Enabling
-	  the
-	  generation
-	  of
-	  DH
-	  parameters
-	  from
-	  gnoMint
-
-2008-09-06 06:50  davefx
-
-	* [r170]
-	  src/ca_file.c:
-	  Fixing
-	  segmentation
-	  fault
-	  introduced
-	  in
-	  revision
-	  165
-
-2008-09-02 18:27  davefx
-
-	* [r169]
-	  po/es.po:
-	  Updating
-	  Spanish
-	  translation
-
-2008-09-02 18:21  davefx
-
-	* [r168]
-	  mime/Makefile.am:
-	  Correcting
-	  little
-	  problem
-	  with
-	  previous
-	  patch.
-	  Thanks
-	  again
-	  to
-	  Staněk
-	  Luboš
-	  <lubek@users.sourceforge.net>
-
-2008-09-02 18:19  davefx
-
-	* [r167]
-	  INSTALL,
-	  Makefile.am,
-	  configure.in,
-	  gconf/Makefile.am,
-	  gconf/gnomint.schema,
-	  gconf/gnomint.schemas.in,
-	  gui/Makefile.am,
-	  gui/gnomint.desktop,
-	  gui/gnomint.desktop.in,
-	  m4,
-	  mime/Makefile.am,
-	  mime/gnomint.xml,
-	  mime/gnomint.xml.in,
-	  po/POTFILES.in,
-	  po/cs.po,
-	  src/ca_file.c:
-	  Applying
-	  patch
-	  for
-	  fixing
-	  i18n,
-	  and
-	  Czech
-	  translation.
-	  Thanks
-	  to
-	  Staněk
-	  Luboš
-	  <lubek@users.sourceforge.net>
-
-2008-09-02 18:08  davefx
-
-	* [r166]
-	  gui/gnomint.glade:
-	  Fixing
-	  problem
-	  while
-	  generating
-	  DSA-keyed
-	  CSRs
-
-2008-09-02 17:33  davefx
-
-	* [r165]
-	  src/ca_file.c:
-	  Fixing
-	  tracker
-	  request
-	  #2075599.
-	  Now
-	  the
-	  order
-	  of
-	  lists
-	  and
-	  trees
-	  is
-	  OK
-	  when
-	  more
-	  than
-	  10
-	  certs
-
-2008-09-01 16:43  davefx
-
-	* [r163]
-	  ChangeLog,
-	  configure.in:
-	  Updating
-	  version
-	  to
-	  0.5.2
-
-2008-08-28 17:47  davefx
-
-	* [r162]
-	  gconf/Makefile.am,
-	  gui/gnomint.glade,
-	  src/Makefile.am,
-	  src/main.c,
-	  src/new_cert_window.c,
-	  src/preferences-window.c,
-	  src/preferences-window.h:
-	  New
-	  preference
-	  for
-	  exporting
-	  just
-	  created
-	  certificates
-	  to
-	  gnome-keyring-manager.
-	  Closes
-	  bug
-	  #1842705
-
-2008-08-27 18:07  davefx
-
-	* [r161]
-	  Makefile.am,
-	  configure.in,
-	  gconf,
-	  gconf/Makefile.am,
-	  gconf/gnomint.schema,
-	  gui/gnomint.glade,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca.h,
-	  src/main.c,
-	  src/preferences-gui.c,
-	  src/preferences-gui.h,
-	  src/preferences.c,
-	  src/preferences.h:
-	  Adding
-	  gconf
-	  support
-	  for
-	  saving
-	  some
-	  preferences,
-	  as
-	  view
-	  preferences,
-	  window
-	  size.
-	  Adding
-	  preferences
-	  window
-
-2008-08-23 13:23  davefx
-
-	* [r160]
-	  po/es.po:
-	  Updating
-	  Spanish
-	  translation
-
-2008-08-23 13:09  davefx
-
-	* [r158]
-	  ChangeLog,
-	  update-svncl.sh:
-	  Updating
-	  changelog
-	  and
-	  adding
-	  update-svncl.sh
-	  for
-	  version
-	  0.5.1
-
-2008-08-23 13:01  davefx
-
-	* [r157]
-	  configure.in:
-	  Upgrading
-	  to
-	  version
-	  0.5.1
-
-2008-08-23 13:00  davefx
-
-	* [r156]
-	  certs/example-ca.gnomint:
-	  Updating
-	  example
-	  CA
-	  for
-	  being
-	  valid
-	  against
-	  version
-	  0.5.x
-
-2008-08-23 11:09  davefx
-
-	* [r155]
-	  src/new_req_window.c:
-	  Fixing
-	  problem
-	  when
-	  creating
-	  a
-	  new
-	  CSR
-	  that
-	  must
-	  import
-	  field
-	  values
-	  from
-	  CA
-
-2008-08-23 10:59  davefx
-
-	* [r154]
-	  src/ca_policy.c:
-	  Fixing
-	  bug
-	  that
-	  made
-	  impossible
-	  to
-	  change
-	  the
-	  policy
-	  of
-	  a
-	  CA
-
-2008-08-23 10:59  davefx
-
-	* [r153]
-	  src/ca.c:
-	  Removing
-	  some
-	  warnings
-	  due
-	  to
-	  gui
-	  changes
-
-2008-08-23 10:13  davefx
-
-	* [r152]
-	  configure.in,
-	  gui/gnomint.glade,
-	  src/main.c:
-	  Adding
-	  support
-	  for
-	  recent
-	  files
-
-2008-08-21 16:26  davefx
-
-	* [r151]
-	  configure.in:
-	  Correcting
-	  date
-	  in
-	  version
-	  0.5.0
-
-2008-08-21 16:13  davefx
-
-	* [r150]
-	  ChangeLog,
-	  configure.in:
-	  Updating
-	  to
-	  version
-	  0.5.0
-
-2008-08-21 15:46  davefx
-
-	* [r149]
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/new_cert_window.c,
-	  src/pkey_manage.c:
-	  Fixing
-	  problem
-	  while
-	  signing
-	  CSRs
-	  which
-	  private
-	  key
-	  resides
-	  in
-	  an
-	  external
-	  file.
-	  The
-	  file
-	  was
-	  lost.
-	  Now
-	  the
-	  file
-	  info
-	  is
-	  kept
-	  while
-	  moving
-	  info
-	  from
-	  CSR
-	  to
-	  Certificate
-
-2008-08-20 18:12  davefx
-
-	* [r148]
-	  gui/gnomint.glade,
-	  po/es.po,
-	  src/main.c,
-	  src/new_ca_window.c,
-	  src/new_req_window.c:
-	  Allowing
-	  the
-	  creation
-	  of
-	  new
-	  databases.
-	  Fixing
-	  problems
-	  while
-	  creating
-	  CSRs
-	  or
-	  s-s
-	  CAs,
-	  if
-	  the
-	  DB
-	  is
-	  pwd-protected,
-	  and
-	  the
-	  user
-	  cancels
-	  the
-	  password-entry
-	  window.
-	  Fixing
-	  some
-	  minor
-	  problems
-	  in
-	  Spanish
-	  translation.
-
-2008-08-20 16:40  davefx
-
-	* [r147]
-	  src/ca_creation.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/tls.c:
-	  Fixed
-	  problem
-	  with
-	  serial
-	  number
-	  assignation
-	  when
-	  creating
-	  a
-	  new
-	  database
-	  (not
-	  importing
-	  an
-	  old
-	  one)
-
-2008-08-19 18:39  davefx
-
-	* [r146]
-	  gui/gnomint.glade,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/new_ca_window.c,
-	  src/new_cert_creation_process.c,
-	  src/pkey_manage.c,
-	  src/uint160.c:
-	  Fixed
-	  problems
-	  related
-	  with
-	  DB
-	  password
-	  protection
-
-2008-08-18 18:08  davefx
-
-	* [r145]
-	  configure.in,
-	  gui/gnomint.glade,
-	  po/es.po,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/main.c,
-	  src/new_cert_creation_process.c:
-	  Making
-	  possible
-	  to
-	  generate
-	  multiple
-	  rooted
-	  files,
-	  so
-	  now
-	  a
-	  file
-	  is
-	  not
-	  tied
-	  to
-	  a
-	  self-signed
-	  certificate.
-	  Now,
-	  gnoMint
-	  open
-	  ~/.gnomint/default.gnomint
-	  by
-	  default.
-	  Some
-	  problems
-	  need
-	  to
-	  be
-	  fixed
-	  yet.
-
-2008-08-18 17:14  davefx
-
-	* [r144]
-	  Makefile.am,
-	  gui/Makefile.am,
-	  gui/gnomint.desktop,
-	  mime,
-	  mime/Makefile.am,
-	  mime/gnomint.xml:
-	  Adding
-	  mimetype
-	  and
-	  desktop
-	  file
-
-2008-08-07 21:53  davefx
-
-	* [r143]
-	  src/Makefile.am,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/new_cert_window.c,
-	  src/tls.c,
-	  src/uint160.c:
-	  Fixing
-	  problems
-	  with
-	  the
-	  new
-	  20-byte
-	  serial
-	  numbers.
-	  Now
-	  it
-	  seems
-	  OK,
-	  but
-	  more
-	  test
-	  must
-	  be
-	  taken
-
-2008-08-07 18:17  davefx
-
-	* [r142]
-	  src/uint160.c:
-	  Fixing
-	  uint160_read
-	  function
-
-2008-08-07 18:13  davefx
-
-	* [r141]
-	  certs/example-ca.gnomint,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/new_cert_window.c,
-	  src/new_req_window.c,
-	  src/tls.c,
-	  src/tls.h,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Highly
-	  unstable
-	  commit:
-	  working
-	  in
-	  natively
-	  support
-	  20byte-serials
-
-2008-08-06 16:44  davefx
-
-	* [r140]
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/ca_policy.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/csr_creation.c,
-	  src/csr_creation.h,
-	  src/csr_properties.c,
-	  src/csr_properties.h,
-	  src/main.c,
-	  src/new_ca_window.c,
-	  src/new_ca_window.h,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_creation_process.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.c,
-	  src/new_req_window.h,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h,
-	  src/tls.c,
-	  src/tls.h,
-	  src/uint160.c,
-	  src/uint160.h:
-	  Fixing
-	  date
-	  in
-	  header
-	  of
-	  files
-
-2008-08-06 15:50  davefx
-
-	* [r139]
-	  src/uint160.c,
-	  src/uint160.h:
-	  Adding
-	  new
-	  class
-	  for
-	  managing
-	  160-bit
-	  (20
-	  octets)
-
-2008-08-05 17:54  davefx
-
-	* [r138]
-	  src/ca_file.c:
-	  Fixing
-	  problems
-	  with
-	  assigned
-	  serial
-	  numbers
-	  if
-	  there
-	  are
-	  multiple
-	  CAs
-
-2008-08-05 16:23  davefx
-
-	* [r137]
-	  certs/example-ca.gnomint,
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/new_cert_window.c,
-	  src/new_req_window.c:
-	  Now
-	  you
-	  can
-	  create
-	  a
-	  full
-	  hierarchy
-	  of
-	  Certification
-	  Authorities
-	  and
-	  their
-	  certificates
-
-2008-08-04 21:13  davefx
-
-	* [r136]
-	  certs/example-ca.gnomint,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/new_req_window.c:
-	  Autofilling
-	  of
-	  CSR
-	  fields.
-	  And
-	  now
-	  showing
-	  a
-	  full
-	  hierarchy
-	  of
-	  certificates.
-
-2008-08-04 18:17  davefx
-
-	* [r135]
-	  certs/example-ca.gnomint,
-	  configure.in,
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/new_cert_window.c,
-	  src/new_req_window.c:
-	  Progressing
-	  in
-	  changes
-	  for
-	  inheriting
-	  values
-	  from
-	  CA
-	  subject
-
-2008-08-04 04:33  davefx
-
-	* [r134]
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_file.c,
-	  src/new_req_window.c:
-	  Committing
-	  changes,
-	  so
-	  now
-	  the
-	  CA
-	  tree
-	  is
-	  shown
-	  correctly
-	  while
-	  creating
-	  a
-	  CSR
-
-2008-08-02 12:01  davefx
-
-	* [r133]
-	  certs/example-ca.gnomint,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/new_req_window.c,
-	  src/tls.c:
-	  Completing
-	  data
-	  model
-	  of
-	  the
-	  CA
-	  view
-
-2008-08-01 15:23  davefx
-
-	* [r132]
-	  src/ca_file.c:
-	  Adding
-	  new
-	  sqlite
-	  function
-	  for
-	  concatening
-	  values,
-	  so
-	  we
-	  can
-	  get
-	  a
-	  tree-ordered
-	  list
-	  of
-	  certificates
-	  directly
-	  from
-	  a
-	  SQL
-	  sentence
-
-2008-08-01 15:22  davefx
-
-	* [r131]
-	  src/new_req_window.c:
-	  Commenting
-	  unfinished
-	  code,
-	  so
-	  it
-	  now
-	  compiles
-	  again
-
-2008-08-01 04:34  davefx
-
-	* [r130]
-	  gui/gnomint.glade,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/main.c,
-	  src/new_ca_window.c,
-	  src/new_ca_window.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/new_req_window.c,
-	  src/new_req_window.h:
-	  Commiting
-	  yesterday
-	  changes.
-	  Working
-	  on
-	  showing
-	  a
-	  hierarchical
-	  view
-	  of
-	  the
-	  CAs
-	  in
-	  DB
-
-2008-07-30 21:00  davefx
-
-	* [r129]
-	  certs/example-ca.5.gnomint,
-	  certs/example-ca.gnomint,
-	  src/ca_file.c,
-	  src/certificate_properties.c:
-	  Updating
-	  today's
-	  changes:
-	  improving
-	  translations
-	  and
-	  fixing
-	  the
-	  database
-	  version
-	  leap
-
-2008-07-30 17:55  davefx
-
-	* [r128]
-	  po/es.po:
-	  Updating
-	  Spanish
-	  translation
-
-2008-07-30 17:14  davefx
-
-	* [r127]
-	  certs/example-ca.gnomint,
-	  src/certificate_properties.c:
-	  Adding
-	  example
-	  ca
-	  file
-
-2008-07-29 18:19  davefx
-
-	* [r126]
-	  gui/gnomint.glade,
-	  src/ca.h,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/csr_properties.c,
-	  src/new_cert_window.c,
-	  src/tls.c:
-	  Updating:
-	  now
-	  is
-	  possible
-	  to
-	  create
-	  more
-	  than
-	  a
-	  CA
-	  in
-	  one
-	  DB.
-	  Only
-	  the
-	  first
-	  one
-	  is
-	  usable
-	  yet,
-	  though.
-
-2008-07-28 18:03  davefx
-
-	* [r125]
-	  gui/gnomint.glade,
-	  po/es.po,
-	  src/ca_policy.c,
-	  src/new_cert_window.c:
-	  Committing
-	  today's
-	  changes:
-	  adding
-	  support
-	  for
-	  inherit
-	  subject
-	  fields
-	  from
-	  certification
-	  authorities.
-	  Adding
-	  interface
-	  for
-	  selecting
-	  from
-	  multiple
-	  CAs
-
-2008-07-28 16:18  davefx
-
-	* [r124]
-	  gui/gnomint.glade:
-	  First
-	  version
-	  of
-	  interface
-	  for
-	  new
-	  features
-
-2008-07-28 14:12  davefx
-
-	* [r123]
-	  configure.in,
-	  po/fr.po:
-	  Adding
-	  French
-	  language
-	  (thanks
-	  to
-	  Ahmed
-	  Baizid
-	  <ahmed@baizid.org>)
-
-2008-01-06 01:47  davefx
-
-	* [r122]
-	  configure.in:
-	  Fixing
-	  compiler
-	  optimization
-
-2008-01-06 01:41  davefx
-
-	* [r121]
-	  configure.in:
-	  Checking
-	  for
-	  libgnutls
-	  >=
-	  v2.0
-
-2008-01-06 00:54  davefx
-
-	* [r120]
-	  gui/gnomint.glade,
-	  po/es.po:
-	  Fixing
-	  typo
-	  in
-	  organizational
-	  word,
-	  patch
-	  by
-	  aluminium@users.sourceforge.net
-
-2008-01-06 00:53  davefx
-
-	* [r119]
-	  gui/gnomint.glade,
-	  src/certificate_properties.c:
-	  Including
-	  detailed
-	  certificate
-	  view,
-	  patch
-	  by
-	  aluminium@users.sourceforge.net
-
-2008-01-06 00:42  davefx
-
-	* [r118]
-	  po/gnomint.pot:
-	  Deleting
-	  gnomint.pot
-	  from
-	  subversion
-	  repository,
-	  as
-	  it's
-	  automatically
-	  generated
-
-2008-01-06 00:39  davefx
-
-	* [r117]
-	  po/POTFILES.in:
-	  Adding
-	  pkey_manage.c
-	  to
-	  POTFILES.in
-
-2008-01-05 14:17  davefx
-
-	* [r116]
-	  configure.in:
-	  Allowing
-	  -O2
-	  optimization
-
-2007-12-16 17:45  davefx
-
-	* [r115]
-	  ChangeLog,
-	  src/ca.c,
-	  src/pkey_manage.c:
-	  Applying
-	  patch
-	  from
-	  sf.net,
-	  fixing
-	  some
-	  uninitialized
-	  variables
-	  warnings
-
-2007-11-19 18:22  davefx
-
-	* [r110]
-	  doc/test_plan.txt:
-	  Actualizado
-	  plan
-	  de
-	  pruebas
-
-2007-11-19 17:53  davefx
-
-	* [r109]
-	  ChangeLog:
-	  Updating
-	  changelog
-	  for
-	  version
-	  0.4
-
-2007-11-19 17:50  davefx
-
-	* [r108]
-	  configure.in,
-	  doc/test_plan.txt,
-	  po/es.po,
-	  po/gnomint.pot:
-	  Preparing
-	  for
-	  gnoMint
-	  version
-	  0.4.0
-
-2007-11-19 17:10  davefx
-
-	* [r107]
-	  doc/test_plan.txt,
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/new_cert_window.c,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h,
-	  src/tls.c,
-	  src/tls.h:
-	  Allowing
-	  to
-	  extract
-	  private
-	  keys
-	  from
-	  database.
-	  Retrieving
-	  external
-	  private
-	  keys
-	  when
-	  needed
-
-2007-11-16 16:35  davefx
-
-	* [r106]
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca_creation.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/csr_creation.c,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_window.c,
-	  src/pkey_cipher.c,
-	  src/pkey_cipher.h,
-	  src/pkey_manage.c,
-	  src/pkey_manage.h:
-	  Tidying
-	  up
-	  a
-	  bit.
-
-2007-11-14 17:20  davefx
-
-	* [r105]
-	  po/es.po,
-	  po/gnomint.pot,
-	  src/ca.c,
-	  src/ca_file.c:
-	  Actualizando
-	  traducción.
-	  Solucionados
-	  algunos
-	  fallos
-
-2007-11-14 13:55  davefx
-
-	* [r104]
-	  TEST,
-	  doc,
-	  doc/ca-db-password-protection.txt,
-	  doc/ca-properties.txt,
-	  doc/gnomint-db.dia,
-	  doc/test_plan.txt,
-	  gui/gnomint.glade,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/csr_creation.c,
-	  src/main.c,
-	  src/new_cert_window.c,
-	  src/pkey_cipher.c,
-	  src/pkey_cipher.h,
-	  src/tls.c:
-	  Allowing
-	  whole
-	  database
-	  password
-	  protection
-	  that
-	  affects
-	  to
-	  private
-	  keys
-
-2007-11-13 09:27  davefx
-
-	* [r103]
-	  TEST:
-	  Adding
-	  new
-	  tests
-	  for
-	  new
-	  features
-
-2007-11-13 09:16  davefx
-
-	* [r102]
-	  TEST:
-	  Committing
-	  test
-	  plan
-
-2007-11-12 15:47  davefx
-
-	* [r101]
-	  src/ca.c:
-	  Disabling
-	  non-available
-	  pop-up
-	  options
-
-2007-11-12 15:33  davefx
-
-	* [r100]
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca.h,
-	  src/main.c:
-	  Adding
-	  pop-up
-	  menu
-	  support
-	  for
-	  managing
-	  CSRs
-	  and
-	  Certs
-
-2007-11-03 08:19  davefx
-
-	* [r99]
-	  ChangeLog,
-	  NEWS,
-	  configure.in,
-	  po/gnomint.pot:
-	  Preparing
-	  for
-	  version
-	  0.3.2
-
-2007-11-03 08:02  davefx
-
-	* [r98]
-	  src/ca_file.c:
-	  Fixing
-	  DB
-	  upgrading
-	  from
-	  version
-	  3
-	  to
-	  4
-
-2007-11-01 22:07  davefx
-
-	* [r97]
-	  po/es.po:
-	  Updating
-	  Spanish
-	  translation
-
-2007-11-01 22:00  davefx
-
-	* [r96]
-	  ChangeLog,
-	  NEWS,
-	  configure.in:
-	  Updating
-	  to
-	  version
-	  0.3.1,
-	  prior
-	  to
-	  official
-	  release
-
-2007-11-01 21:07  davefx
-
-	* [r95]
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_window.c:
-	  *
-	  Fixing
-	  problem
-	  with
-	  certificates
-	  serial
-	  number:
-	  all
-	  the
-	  certs were
-	  being
-	  created
-	  with
-	  serial
-	  0.
-	  *
-	  Allowing
-	  the
-	  definition
-	  of
-	  time
-	  between
-	  two
-	  CRL
-	  updates.
-
-2007-11-01 17:32  davefx
-
-	* [r94]
-	  ChangeLog,
-	  src/tls.c:
-	  Fixing
-	  CRL
-	  generation
-	  problems.
-	  Currently,
-	  the
-	  CRL
-	  expiration
-	  time
-	  is
-	  1
-	  day
-
-2007-07-30 18:38  davefx
-
-	* [r93]
-	  gui/gnomint.glade,
-	  po/es.po,
-	  po/gnomint.pot,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/ca_policy.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/csr_creation.c,
-	  src/csr_creation.h,
-	  src/csr_properties.c,
-	  src/csr_properties.h,
-	  src/main.c,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_creation_process.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/tls.c,
-	  src/tls.h:
-	  Changing
-	  license
-	  messages
-	  in
-	  all
-	  files.
-	  Starting
-	  support
-	  for
-	  generating
-	  CRLs
-	  (not
-	  working
-	  yet)
-
-2007-07-30 14:28  davefx
-
-	* [r92]
-	  COPYING,
-	  configure.in,
-	  gui/gnomint.glade,
-	  po/es.po,
-	  po/gnomint.pot,
-	  src/ca.c,
-	  src/csr_properties.c,
-	  src/tls.c,
-	  src/tls.h:
-	  Preparing
-	  version
-	  0.1.6.
-	  Now
-	  gnoMint
-	  can
-	  export
-	  PKCS#12
-	  structures
-
-2007-05-22 23:19  davefx
-
-	* [r91]
-	  src/ca_policy.c,
-	  src/certificate_properties.c:
-	  Fixing
-	  compilation
-	  bugs
-	  in
-	  x86-64
-
-2007-05-21 20:15  davefx
-
-	* [r90]
-	  src/tls.c:
-	  Fixing
-	  one
-	  problem
-	  introduced
-	  in
-	  last
-	  correction
-	  for
-	  x86-64
-	  arch
-
-2007-05-18 18:12  davefx
-
-	* [r89]
-	  src/tls.c:
-	  Using
-	  size_t
-	  where
-	  it
-	  is
-	  needed
-	  (in
-	  Fedora
-	  amd64
-	  arch,
-	  it
-	  seems
-	  to
-	  be
-	  a
-	  problem)
-
-2007-05-17 18:55  davefx
-
-	* [r88]
-	  src/ca.c:
-	  Perhaps
-	  fixing
-	  another
-	  compilation
-	  problem
-	  in
-	  amd64
-	  arch
-
-2007-05-16 17:42  davefx
-
-	* [r87]
-	  src/ca.c,
-	  src/tls.c:
-	  Possibly
-	  fixing
-	  compilation
-	  errors
-	  in
-	  amd64
-	  arch
-
-2007-05-15 15:17  davefx
-
-	* [r85]
-	  ChangeLog,
-	  configure.in:
-	  Updating
-	  to
-	  version
-	  0.1.5
-	  prior
-	  to
-	  official
-	  release
-
-2007-05-15 14:37  davefx
-
-	* [r84]
-	  po/POTFILES.in,
-	  po/es.po,
-	  po/gnomint.pot:
-	  Updating
-	  Spanish
-	  translation
-
-2007-05-15 11:03  davefx
-
-	* [r83]
-	  src/ca_file.c:
-	  Commiting
-	  database
-	  version
-	  3,
-	  with
-	  certs
-	  and
-	  csr's
-	  containing
-	  their
-	  DNs
-	  and
-	  parent's
-	  DNs
-	  in
-	  the
-	  database
-
-2007-05-15 11:01  davefx
-
-	* [r82]
-	  src/ca.c:
-	  Showing
-	  database
-	  errors
-	  when
-	  creating
-	  or
-	  importing
-	  CSRs
-
-2007-05-15 10:51  davefx
-
-	* [r81]
-	  src/tls.c,
-	  src/tls.h:
-	  Saving
-	  DN
-	  in
-	  tlscsr
-	  structure
-
-2007-05-15 10:10  davefx
-
-	* [r80]
-	  src/new_cert_creation_process.c:
-	  Showing
-	  progress
-	  when
-	  creating
-	  CSR's
-	  key
-	  pair
-
-2007-05-15 10:08  davefx
-
-	* [r79]
-	  src/tls.c,
-	  src/tls.h:
-	  Adding
-	  support
-	  for
-	  retrieving
-	  DN
-	  from
-	  PEMs
-
-2007-05-14 21:34  davefx
-
-	* [r78]
-	  src/ca.c,
-	  src/ca_file.c:
-	  Allowing
-	  the
-	  save
-	  of
-	  CSR
-	  without
-	  private
-	  key.
-	  Adding
-	  support
-	  for
-	  importing
-	  CSRs
-	  in
-	  PEM
-	  and
-	  DER
-	  formats
-
-2007-05-14 21:33  davefx
-
-	* [r77]
-	  src/csr_properties.c:
-	  Fixing
-	  visualizing
-	  error
-
-2007-05-14 21:32  davefx
-
-	* [r76]
-	  gui/gnomint.glade:
-	  Fixing
-	  aligning
-	  errors
-
-2007-05-14 19:13  davefx
-
-	* [r75]
-	  src/ca_file.c:
-	  Improving
-	  code
-	  safety
-
-2007-05-14 19:12  davefx
-
-	* [r74]
-	  src/new_cert_creation_process.c:
-	  Reverting
-	  old
-	  behaviour:
-	  CA
-	  are
-	  created
-	  with
-	  a
-	  minimal
-	  set
-	  of
-	  correct
-	  properties
-	  for
-	  creating
-	  useful
-	  certificates
-
-2007-05-14 16:36  davefx
-
-	* [r73]
-	  gui/gnomint.glade,
-	  src/ca.c,
-	  src/ca.h,
-	  src/main.c:
-	  Starting
-	  CSR
-	  importing
-	  support
-
-2007-05-14 15:21  davefx
-
-	* [r72]
-	  src/ca.c:
-	  Fixing
-	  problem
-	  when
-	  exporting
-	  private
-	  key
-	  of
-	  CSRs
-
-2007-05-14 13:09  davefx
-
-	* [r67]
-	  ChangeLog:
-	  Updating
-	  changelog
-
-2007-05-14 12:58  davefx
-
-	* [r66]
-	  src/Makefile.am:
-	  Fixing
-	  compilation
-	  error
-	  for
-	  release
-	  0.1.4
-
-2007-05-14 12:53  davefx
-
-	* [r65]
-	  ChangeLog:
-	  Updating
-	  changelog
-	  for
-	  0.1.4
-	  version
-
-2007-05-14 12:27  davefx
-
-	* [r64]
-	  configure.in,
-	  gui/gnomint.glade,
-	  po/es.po,
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca.h,
-	  src/ca_creation.c,
-	  src/ca_creation.h,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/ca_policy.c,
-	  src/ca_policy.h,
-	  src/certificate_properties.c,
-	  src/certificate_properties.h,
-	  src/csr_creation.c,
-	  src/csr_creation.h,
-	  src/csr_properties.c,
-	  src/csr_properties.h,
-	  src/main.c,
-	  src/new_cert_creation_process.c,
-	  src/new_cert_creation_process.h,
-	  src/new_cert_window.c,
-	  src/new_cert_window.h,
-	  src/tls.c,
-	  src/tls.h:
-	  Adding
-	  support
-	  for
-	  stablishing
-	  a
-	  set
-	  of
-	  policies
-	  for
-	  certificate
-	  generation
-
-2006-11-19 22:55  davefx
-
-	* [r63]
-	  src/new_cert_window.c:
-	  Fixing
-	  some
-	  typo
-	  problems
-	  in
-	  country
-	  names
-
-2006-11-19 22:40  davefx
-
-	* [r62]
-	  configure.in,
-	  gui/gnomint.glade,
-	  po/es.po,
-	  po/gnomint.pot,
-	  src/new_cert_window.c:
-	  Updating
-	  country
-	  list,
-	  so
-	  now
-	  it
-	  uses
-	  iso_3166
-	  translation.
-	  Bug
-	  reported
-	  by
-	  Florian
-	  K.
-	  Steinel
-
-2006-11-19 22:18  davefx
-
-	* [r61]
-	  src/Makefile.am,
-	  src/ca.c,
-	  src/ca_creation.c,
-	  src/ca_file.c,
-	  src/ca_file.h,
-	  src/csr_creation.c,
-	  src/gnomint-upgrade-db:
-	  Supporting
-	  SQLite
-	  3
-	  now,
-	  as
-	  SQLite
-	  2
-	  is
-	  deprecated.
-	  Adding
-	  tool-script
-	  for
-	  converting
-	  existing
-	  databases
-
-2006-11-11 10:45  davefx
-
-	* [r60]
-	  src/ca_file.c,
-	  src/ca_file.h:
-	  Updating
-	  DB
-	  version
-	  to
-	  2,
-	  with
-	  support
-	  for
-	  CA
-	  policies.
-	  Adding
-	  support
-	  for
-	  upgrading
-	  from
-	  earlier
-	  DB
-	  versions.
-
-2006-11-10 13:26  davefx
-
-	* [r58]
-	  configure.in:
-	  Releasing
-	  0.1.3
-	  version
-
-2006-11-10 13:19  davefx
-
-	* [r57]
-	  gui/gnomint.glade,
-	  po/es.po,
-	  po/gnomint.pot,
-	  src/ca.c:
-	  *
-	  Allowing
-	  uncrypted
-	  private
-	  key
-	  export.
-	  *
-	  Requiring
-	  minimum
-	  length
-	  for
-	  private-key
-	  export
-	  passphrase
-	  *
-	  Checking
-	  confirmation
-	  for
-	  private-key
-	  export
-	  passphrase
-	  *
-	  Fixing
-	  focus
-	  grab
-	  when
-	  asking
-	  for
-	  passphrase
-	  *
-	  Updated
-	  Spanish
-	  translation
-
-2006-11-10 10:40  davefx
-
-	* [r56]
-	  autogen.sh:
-	  Replacing
-	  /bin/sh
-	  by
-	  /bin/bash,
-	  fixing
-	  Ubuntu/Debian
-	  error
-	  as
-	  they
-	  link
-	  /bin/sh
-	  to
-	  /bin/dash
-	  instead
-	  of
-	  /bin/bash
-
-2006-10-15 08:30  davefx
-
-	* [r55]
-	  AUTHORS,
-	  BUGS,
-	  COPYING,
-	  ChangeLog,
-	  INSTALL,
-	  MAINTAINERS,
-	  Makefile.am,
-	  NEWS,
-	  README,
-	  TODO,
-	  autogen.sh,
-	  certs,
-	  configure.in,
-	  debian,
-	  gnomint.spec.in,
-	  gui,
-	  po,
-	  src:
-	  Moving
-	  everything
-	  to
-	  trunk
-	  directory
-
-2006-10-15 08:22  davefx
-
-	* [r53]
-	  .:
-	  Adding
-	  directory
-	  for
-	  main
-	  gnomint
-	  trunk
+commit 2dd2afe85c99637871113f4fa8d579fc2ccf18c7
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 11:14:29 2010 +0200
 
+    Release 1.2.1 (aka 'All you need is a giant pacifier')
+
+commit 6e1fb1cbb9f9416176a12a914e2ddd05a3f3e70d
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 11:11:29 2010 +0200
+
+    Updating translations for all languages from Launchpad
+
+commit 9aa80baf5a9293440479eff7d6cf0911268399af
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 10:50:13 2010 +0200
+
+    Completing Spanish translation
+
+commit 57b4c6c40ed700598465efa93502446fbfcc0b92
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 10:49:03 2010 +0200
+
+    Improving warning message while revoking certificates. Adding a different message while revoking a CA certificate
+
+commit 79729c74f82a1f69452ab5e350d1f4f6dc16800e
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 10:06:31 2010 +0200
+
+    Fixing crash when revoking a CA certificate, if revoked certificates were not visible
+
+commit b0fa891567a40d2c6d1a9cb7450de5ee6a79e91f
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 09:32:33 2010 +0200
+
+    Fixing use of an already freed string in ca-cli-callbacks.c. Fixes RedHat Bugzilla #584069
+
+commit 3dd98ca24287ddda9c4802cc8397c9e82b449ac2
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Aug 10 18:58:54 2010 +0200
+
+    Version 1.2.0
+
+commit edbbbbfd3d50b93a220e035e027d98992c2a07ad
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Aug 10 17:11:07 2010 +0200
+
+    Fixing bug #3006946
+
+commit 6f5aef2d748f55c3d1c89a9eae3601f66c5ecc34
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Jun 1 22:13:22 2010 +0200
+
+    Completing .gitignore file
+
+commit ea6d09dc9556b98cba6dc68225b3c7621530d0c5
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Jun 1 21:53:51 2010 +0200
+
+    Uploading changes by Jaroslav Imrich, for Windows migration
+
+commit f9e9789ead5d49caa144f0556c7c340cf50f1aea
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Jun 1 21:41:19 2010 +0200
+
+    Commiting new patch for windows migration, by Jaroslav Imrich
+
+commit 66fed0ee8c132546f03072112693feac5088422c
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Jun 1 20:10:22 2010 +0200
+
+    Fixing bug #3006946. Now CA policies can be established again
+
+commit 1041015c248f05622311e3dde2b394c4c3e1ed33
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Jun 1 19:28:06 2010 +0200
+
+    Adding execute permissions
+
+commit 7ebea2e4d9923d7ab0b442b1c4134af659b76662
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Apr 1 22:35:21 2010 +0000
+
+    Updating translations from Launchpad. Added new Slovak translation (thanks to Jaroslav Imrich)
+
+commit 4f4c95e3024481267af5440f2d815986afc877b1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Mar 29 09:06:18 2010 +0000
+
+    Adding Microsoft Windows support (patch contributed by Jaroslav Imrich)
+
+commit 9c332963d9225eff9a5117e20b06d4690bde9227
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Feb 16 22:27:13 2010 +0000
+
+    Fixing bug in export from menu
+
+commit 5e362e2f9efdbb86468734ab2a2c29b97fcc951c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 9 21:11:22 2009 +0000
+
+    Committing support for CRL distribution points
+
+commit bfc3255bfd6ce76bdd10dd54cc7dc8629b123178
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 11:43:43 2009 +0000
+
+    Updating changelog
+
+commit 0e29b1f7810c0282e14833df74c720e0ab997e1d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 11:42:49 2009 +0000
+
+    Releasing version 1.1.0
+
+commit c8d447c6b9becc0104b74d4625d1c3b90d0759a0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 11:36:50 2009 +0000
+
+    Fixing problems in Spanish translation. Please, translators: don't translate gettext comments
+
+commit b6ccb3db0817f632dd79a886e116f6f9587ec273
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 11:22:26 2009 +0000
+
+    Updating translations from Launchpad. Thanks to all the translators
+
+commit d1f022af20e465d4333c00e24273c15a01e394b2
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 11:12:56 2009 +0000
+
+    Fixing gnoMint bug #2890061: gnomint-cli showpolicy command was
+    failing with invalid ca-id message.
+
+commit deef20d29975141b47a144ae435302cf1b26a16f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 10:57:15 2009 +0000
+
+    Adding libgcrypt in configure, resolving Debian bug #554669
+
+commit 7491d9884b46299e2afca7fdab5724c59e22c83d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 08:10:30 2009 +0000
+
+    Building hierarchical tree using node routes instead of names
+
+commit eedd45c73f359bd7a5b2e35596629f047f63ab1d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 8 07:16:44 2009 +0000
+
+    Fixing problem when there's a duplicate in common name.
+
+commit c5b96361044ec82b7f3c2f7ec790afe2cd057e25
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 7 07:51:44 2009 +0000
+
+    Fixed problems about spinbuttons generated in gtk-ui-manager conversion
+
+commit b3c3fa506bccd885c446d012df72377352145990
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 7 07:51:03 2009 +0000
+
+    Avoiding SIGSEGV whenever there's a problem obtaining last assigned serial number
+
+commit 16c1d04431eb64c9b3ff1b16e7ba418f79cfa730
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 7 06:34:13 2009 +0000
+
+    Adding string.h include for allow compiling in CentOS 5
+
+commit 4a59653b60cb0d5d6252454b7a98689e330fc144
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Oct 11 21:17:32 2009 +0000
+
+    Adding Catalan translation. Updating translation from Launchpad.net
+
+commit 593b4ca0cdc47e6988ac2283524863a9577eec90
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Oct 11 21:16:21 2009 +0000
+
+    Correcting loading of popup
+
+commit d8c18580303626551d3d57e5a492954ead4a0e22
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Oct 11 11:04:59 2009 +0000
+
+    Migrating from libglade to GtkBuilder
+
+commit 06b3c4b887ef3e4da1fdebf141aa0cb510b89303
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Jun 5 20:27:15 2009 +0000
+
+    Fixing bug in configure.in that affected Slackware systems
+
+commit 4bb32e14a26a844e594cace35b13e3a7cb8ae223
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:23:19 2009 +0000
+
+    Updating intltool.m4
+
+commit 9692ccd102531b44ad8a9044f16f7e2c57a98018
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:19:38 2009 +0000
+
+    Uploading updated Changelog
+
+commit bf7aa2fd43aab517d860236c5e765f6f203befe0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:17:18 2009 +0000
+
+    Uploading change to version 1.0.0
+
+commit 12d55fae850e62a040a67f180e95a516920b2884
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:15:04 2009 +0000
+
+    Committing last Russian translation, by aquanaut
+
+commit 9a9ccf85fe678f5f66261325c9e33e2c0dfca426
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:11:37 2009 +0000
+
+    Updating template and Spanish translation
+
+commit ec8260c497fd1f36f6aefd25c069c53c4ec5f3db
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:06:17 2009 +0000
+
+    Checking if new cert expiration date is after the CA expiration date. In that case, show an info message and set the new cert expiration date to the CA expiration date.
+
+commit c5a7b452c160ef3a6d5f30fdd5bda102dac7d22f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:04:55 2009 +0000
+
+    Fixing compile error if GNUTLS_VERSION < 2.8
+
+commit ee17efc672d350eaf52c63ed07eff4ea7c0718d6
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 21:04:15 2009 +0000
+
+    Adding new function dialog_info for showing information messages
+
+commit 7abbb8192fbe7dd98b6a0dc9df7254739c33ba81
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jun 3 20:30:21 2009 +0000
+
+    Enabling compilation with GnuTLS 2.8.0 (Fix provided by anonymous contributor in Sourceforge)
+
+commit c866228a8d79ce1b8844eddaebed155685942fb2
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 5 18:51:55 2009 +0000
+
+    Adding forgotten crlgen function to gnomint-cli
+
+commit c6b07378637b93438812705c30eed2ec96db27ef
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 5 18:42:53 2009 +0000
+
+    Correcting some Spanish .po file bugs
+
+commit 0ba6df3d6541ef9a14a4f1f0f5758bf609d62b96
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 5 18:10:10 2009 +0000
+
+    Making a string translatable
+
+commit e1c18519af09d7d83ca84de6b6548f32135b8655
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 4 18:45:41 2009 +0000
+
+    Updating TODO list
+
+commit 769136c6c693581549f8f89504717f28c1bb19d7
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Apr 18 06:50:43 2009 +0000
+
+    Updating pot file and merging with all translations before uploading to Launchpad
+
+commit 102f24799e3f85c9227013d54bad938a30e29f68
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Apr 18 06:36:50 2009 +0000
+
+    Updating Slovak and Spanish translations
+
+commit 464fecf7189472f5e2bc5c99cc47526dc9a82bd5
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Apr 18 06:35:14 2009 +0000
+
+    Adding new Russian and Finnish translations
+
+commit b4fb91de645f7cbb73423b0bcb9ae96cbd012068
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Mar 23 19:09:58 2009 +0000
+
+    Correcting error while adding a csr
+
+commit 817e99945cad1af844f2853cec2e9218fed8deb6
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Mar 20 15:48:40 2009 +0000
+
+    Upgrading Spanish translation
+
+commit ca5646e7c95c409499920d6357d8e66c6d78d3f4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Mar 20 10:07:17 2009 +0000
+
+    Preparing 0.9.9 version. Making Glade file fully GTK+-2.10 compliant
+
+commit 6554fbc5778cf5ebd7ce71689a11d61a096497c9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Mar 17 18:50:30 2009 +0000
+
+    Correcting behaviour when problems while opening, saving or creating file. Now the last open file is always reopened
+
+commit d40685bd44ba39b5e631b31d2039f707a74699b1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Mar 16 18:25:56 2009 +0000
+
+    Disabling Properties option when there is no item selected
+
+commit 233273d89e03bbf902eb7bd1dc4cb18559d8ff7d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Mar 10 19:14:26 2009 +0000
+
+    Moving some callbacks from main.c to ca.c
+
+commit b6d5ca92db1be139143d08d3a8464a47adcb2839
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Mar 7 12:23:13 2009 +0000
+
+    Adding functional toolbar.
+    Fixing bug: extract private key action was enabled and never disabled afterwards (while a selected element exists)
+
+commit 4e5a48320d0e0aaa9b320fa2099ceaa09c4c4362
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Mar 1 09:07:29 2009 +0000
+
+    Renaming new_cert_window by new_cert
+
+commit 47848b6d087ce9ea9a855092bb739db0e708ee13
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Mar 1 09:01:02 2009 +0000
+
+    Fixing compile error
+
+commit a740a936768e4d6566f72892ae9789153646a0bc
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Mar 1 08:01:16 2009 +0000
+
+    Adding protection: export_pkcs12 shouldn't be called for exporting
+    CSR information.
+
+commit 2a1122fa9e7da6bc52478177f29309dffe85b192
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Mar 1 07:38:39 2009 +0000
+
+    Fixing error while exporting private key of CSRs to PKCS#8 format: we
+    were exporting a certificate private key instead of the CSR private
+    key.
+
+commit e204f6871a0879a82e80d8b7b981a9bcf8878e2e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Feb 28 11:51:47 2009 +0000
+
+    Correcting bug: while importing a CA certificate, if it has children
+    in the database, its  grand-children get also the correct
+    parent-route.
+    
+    In that case too, corrected a possible segv in the parent-route
+    assignation to children.
+
+commit a0166fd20b790ec93da214c623a23d2cad4abddb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Feb 28 07:42:34 2009 +0000
+
+    If the private key is not known by the application, you cannot export
+    it into a PKCS#12
+
+commit 5be26fe2a561d28a4e83bd4c2859060648403cc9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Feb 23 21:34:32 2009 +0000
+
+    Making uint160_write a platform_independent function. Correcting uint160_strdup_printf.
+
+commit 23b75ab8a12d483f4b08e2404c758cdbb185fce3
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Feb 23 18:30:45 2009 +0000
+
+    Resolving bug about cyphered private key exports
+
+commit e4fb4f57384641662496e7a8209f86b7b2b2541d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Feb 23 18:28:04 2009 +0000
+
+    Resolving bug about cyphered private key exports
+
+commit bcdd77074911387645d99780d1e3b923465d3406
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Feb 21 16:26:48 2009 +0000
+
+    New method for ciphering passwords and private keys. More secure, it does not
+    reutilize the same initial vector nor initial counter.
+    
+    Keeping compatibility with old method. New passwords and keys will be
+    ciphered using the new method. It is recommended change database password,
+    so all the private keys are reciphered using the new method.
+    
+    (Dummy upload. The actual change was in the previous commit)
+
+commit c4a3f87bd9453c0b6163e40003426eaae7617d86
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Feb 21 16:23:13 2009 +0000
+
+    Now, when a db is password-unprotected, the password entry is reset and it is not removed
+
+commit c52055394d58d140724888c31fbb68f6cfd9bbba
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Feb 21 14:29:05 2009 +0000
+
+    Removing SQL syntax error
+
+commit b61643272282d893303ffbb0458e8cc3e1af6a2e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Feb 14 11:01:01 2009 +0000
+
+    Removing libgnomeui dependence
+
+commit 8075f5cf5ff8ff81fc4334f219ec9bd853d8e9e4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Feb 10 19:22:31 2009 +0000
+
+    Replacing ca_policy_[sg]et with ca_file_policy_[sg]et, and removing extra dependences
+
+commit 5c1908e02033cb550f78f3ecad53766d0703d330
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Feb 4 19:33:25 2009 +0000
+
+    When the DB is password-unprotected, delete the property with the old password from the DB
+
+commit e6a5326139652d1704b654ae8ed7a61da78f3548
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Feb 3 18:55:18 2009 +0000
+
+    Fixing bug while upgrading password-protected database
+
+commit bacb2b41690f6f77824ccbffa9d59700e32bb0c1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Jan 31 15:56:51 2009 +0000
+
+    Removing table ca_properties. Adding new table db_properties, and view ca_properties for keeping backward/forward compatibility
+
+commit 397ef8b335286cc871bf00c32ac18792bf888183
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Jan 17 12:30:26 2009 +0000
+
+    Advancing in cleaning of dependences
+
+commit 7c0a8bd995b889e9fc587940f1302e93bb0a3eb4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Jan 16 20:31:22 2009 +0000
+
+    Cleaning up the code a little more
+
+commit 84ed0e29dd8eb273fb4a1799e6506daba752397d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jan 14 19:44:27 2009 +0000
+
+    Removing unneeded dependences
+
+commit 79eb88ee2d3802a9f4e916d8d9bbcfaaddfb7e14
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jan 14 19:34:35 2009 +0000
+
+    Removing dependences from ca.c
+
+commit 916c1f7ec3b542c289927fb2f1f821598b3881b5
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Jan 13 20:14:05 2009 +0000
+
+    Updating Copyright date.
+    Removing dependence of ca.[ch] because of only ca_refresh_list.
+
+commit aa87cdefc5ae04c8232d835dbd1d5e502885b2e6
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jan 12 21:18:48 2009 +0000
+
+    Tidying up the code a litte bit
+
+commit 5eccbb32db4c31fad6c58aa2307ea7ae12539215
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jan 12 21:15:08 2009 +0000
+
+    Tidying up the code a litte bit
+
+commit a5b89ae98d616489838be8ba77e996580f9426a3
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jan 12 20:41:11 2009 +0000
+
+    Renaming source file...
+
+commit 2be80dbf1a92dff873e59dd6fd96662ae6900417
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jan 12 20:39:18 2009 +0000
+
+    Renaming source file...
+
+commit 0afc49fd87c250c72a42fe1039bb82605f67565f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 4 20:56:54 2009 +0000
+
+    Uploading new translations from Launchpad
+
+commit 49c2d5da78359385d48b1bcc594c66932051bc76
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Jan 2 17:21:02 2009 +0000
+
+    Refactoring some functions
+
+commit db93d07babe808df5f39684839e306b84fed1e45
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 25 22:16:57 2008 +0000
+
+    Reverting error
+
+commit 889ffd69e371bbd45242449bb420e8d0414a6b44
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 25 22:13:02 2008 +0000
+
+    Removing files problematic while compiling in Ubuntu 8.04
+
+commit 547047afd4d4a024bb8baa889cb97e588f3969d9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Dec 22 10:29:02 2008 +0000
+
+    Improving OpenSSL import. Now, it is less restrictive.
+
+commit 35a9f061d81bd56c6d5c47bc7c558bc2fc036e4f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 18 06:39:08 2008 +0000
+
+    Updating to version 0.9.1
+
+commit b38471aeb99db976859ae5c648779f8da27785ad
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 18 06:38:31 2008 +0000
+
+    Updating to version 0.9.1
+
+commit 46c63bfd7c96fbab5cc73e4eaa98bcab3aa82cb7
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 18 06:37:36 2008 +0000
+
+    Fixing a missing include that made gnoMint to not compile over OpenSUSE.
+
+commit f5e273aa2a65a0c492fa75ae42d0694d136b1c51
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Dec 16 06:46:30 2008 +0000
+
+    Updating changelog for 0.9.0
+
+commit eaac52e7851f2c13926a2d829f047d47bb0c12c9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Dec 16 06:45:04 2008 +0000
+
+    Getting ready for version 0.9.0.
+    Spanish translation updated.
+    Adding Ahmed Bazid and Staněk Luboš as authors.
+    Changing method for showing AUTHORS (it was wrong).
+
+commit fce608f2d2be6f33c5a723585426c92511531553
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Dec 14 20:36:13 2008 +0000
+
+    gnoMint-cli commands completed
+
+commit ecbbd0ba5631d64b49211204e430a441cef85308
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Dec 14 10:04:49 2008 +0000
+
+    Implemented gnomint-cli addcsr function. Only addca left\!
+
+commit 54027084d900da1f6cfe19168fff0123ad6a2c97
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Dec 13 07:55:37 2008 +0000
+
+    Completing gnomint command line interface. Missing only addca and addcsr
+
+commit 5055924c275800c6772602a1ca077eb100edb6ed
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Dec 12 07:59:00 2008 +0000
+
+    Correcting string while importing whole directory.
+
+commit d71b0bcf65a439af69c78885aec668463332632a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Dec 12 00:01:18 2008 +0000
+
+    Adding delete, crlgen, dhgen, and changepassword
+
+commit a6b9f67f656bd81d896e1f03aa286726b57593b9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 11 13:49:37 2008 +0000
+
+    Implementing more features in Command-Line Interface
+
+commit 5e38f33b3580e4f41c7baed7d9cf017c89c68998
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Dec 10 18:17:43 2008 +0000
+
+    Upgrading GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION to 2.7.4
+
+commit 4693a08557191a9c2695b81332f840f036e78a69
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Dec 5 07:46:39 2008 +0000
+
+    Uploading support for basic file-operations in gnomint-cli
+
+commit ca25fea6bef16fc4b06436344fc1ebc96c50036e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 4 19:22:54 2008 +0000
+
+    Uploading Spanish translation.
+
+commit a14baa17dde95b60b99dc2b66468d963ccbbf392
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Dec 4 19:22:23 2008 +0000
+
+    Completing textual informative commands
+
+commit 4c2f78f9484e9e7eb355f1819b92bb951aa008cb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Dec 3 23:44:31 2008 +0000
+
+    Completing command-line parser. Help implemented.
+
+commit 7558ec2755cf68f529197aa5dc39af353809f54f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Dec 3 19:49:07 2008 +0000
+
+    Improving the (buggy) parser a little bit
+
+commit 0dc98b5d78422636cdf7f925cd0d8741193f8fda
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Dec 3 19:44:08 2008 +0000
+
+    Uploading initial (buggy) parser
+
+commit 8a19876e64fae01910391c18230704ef830b1063
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Dec 3 07:27:54 2008 +0000
+
+    Completing callbacks
+
+commit 87d1b89bafb9b66abeb817d6a5160500caef70e0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Dec 2 22:09:51 2008 +0000
+
+    Adding callbacks
+
+commit c52e2a9fa2c0d49b7d76cb08ef19101f02f3b653
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Dec 2 19:37:07 2008 +0000
+
+    Added readline support
+
+commit 24712f5c26ebd0a36b609ac3d9cdb74a171748ce
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Dec 2 08:05:22 2008 +0000
+
+    Starting command-line CA manager
+
+commit 6871ee614750fef8c80b74fdf46d6cf3bc3345ed
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Nov 19 18:29:22 2008 +0000
+
+    Adding a web tutorial example
+
+commit f78def00e34171ad1d2c99117ce6caa2860f146e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 18 18:23:31 2008 +0000
+
+    Upgrading to version 0.6.0
+
+commit 28b66e0561fc802a8b3e675ddb6e65646cd6a9fb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 18 18:22:01 2008 +0000
+
+    Changing define for advanced gnutls (post 2.7.3) features
+
+commit e6ed34c7b3e7dd1a385dc071febb0f47e63c70e9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 18 18:20:19 2008 +0000
+
+    Added message for failure after trying to import unsupported directory
+
+commit 617454de74b631392bf8c28a0f5567a6e2561f22
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 18 17:57:05 2008 +0000
+
+    Fixed buffer overrun while reading in uint160_read_escaped
+
+commit 48dd1d28ee2f653d766092868d669d23e39265aa
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 18 17:34:39 2008 +0000
+
+    Upgrading example database
+
+commit 103e01653afa8b14985c7acf53d924951719a11c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 18 07:42:10 2008 +0000
+
+    Updating translations. Added new German translation.
+
+commit ee99ef31a2393213ccbbb7118063dece6c5bdb4b
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 17 19:42:20 2008 +0000
+
+    Fixed problem while showing serial from certificates
+
+commit de86b705f83f079ee0ab5d7ed88214dc46e127e0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 17 19:10:07 2008 +0000
+
+    Fixing error while loading from recent-file menu
+
+commit ac28b277e1f70a5dbb936b1bbf0038ecf928138d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 17 19:08:57 2008 +0000
+
+    Fixing potential future problem: a architecture-depending value was been saved in the database. Now this value is saved correctly serialized.
+
+commit ad5d35a2b93537050e848a9dcb14bb15d91a7ee1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Nov 12 19:27:36 2008 +0000
+
+    Adding next serial import from OpenSSL
+
+commit aec3de5f377a3a1606956b52238432688f1ef52e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 10 19:40:44 2008 +0000
+
+    Adding new function ca_file_set_next_serial (needed while importing OpenSSL CA)
+
+commit c183b1e3a4a37998812de75508e8f8b272a809ed
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 10 19:22:23 2008 +0000
+
+    Now, a minimal CA configuration is inserted while importing a CA certificate. The just-inserted cert-id or csr-id is returned while importing a cert or csr
+
+commit 62056c9fc7e771f13b6951ba5f4030db897e4c67
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 10 18:40:23 2008 +0000
+
+    While importing a private key, if a password is needed, ask for it using a appropiate description
+
+commit c806c685bb390237a6fb7d4a65c2568cf849a075
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 9 10:25:25 2008 +0000
+
+    Uploading a new TODO file with release and develop planning
+
+commit 9cda87232f204d37531bd8347657bb5f70c8958f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 8 23:36:56 2008 +0000
+
+    Adding new functionality for importing private keys for CSRs (depends on currently missing functionality of gnutls: patch sent to upstream)
+
+commit de3387d3010f7fe0164a682ba8fac4e0b9902bbb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 8 14:32:49 2008 +0000
+
+    Removing all definitions of gettext macros. Using the definition in <glib/gi18n.h>
+
+commit 947de734ead8db35cc3297057477f103bf758600
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 8 09:36:19 2008 +0000
+
+    OpenSSL CA importing almost complete. Now fully functional, only lacks a few checks, last serial and CSR private key importing
+
+commit 39c91f7719d51509a0e63104bdb918fd73684f1f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 8 09:35:13 2008 +0000
+
+    Avoiding multiple import of the same certificate
+
+commit a895b027d7a07ee034271871eeafabe282e6af6f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 8 09:05:30 2008 +0000
+
+    Adding -O0 -g  when --enable-debug is supplied
+
+commit 1652a34533980b9c8efbc880440dac0c18c6b390
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Nov 7 18:46:45 2008 +0000
+
+    Advancing in OpenSSL CA importing: CA cert and private key (latter not working yet)
+
+commit 422ac763a31cc1efd6e7365dd74808754096ea37
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Nov 7 18:45:35 2008 +0000
+
+    Updating translations
+
+commit ed11d998ed969d6635f0fe8790965305008c3666
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 4 19:24:39 2008 +0000
+
+    Starting slow progress to version 0.6.0. Distinction made between importing single files and CA directories
+
+commit 8a880796068246a6a029639c743fb2ff65d174cb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 3 19:15:19 2008 +0000
+
+    Finished importing of PKCS#12 structures
+
+commit 01530a7bdab4e7f4405cb21843436ab6e8f41b3a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Oct 30 19:11:02 2008 +0000
+
+    Advancing in PKCS#12 import
+
+commit d2f695d0bdba8d5eb05849b31c3f8059bc0f3c27
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Oct 30 19:10:36 2008 +0000
+
+    Fixing problem while export PKCS#12 files from an password-less database
+
+commit f09487c80cf1672c0fe3bda008807c077bf7bda9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Oct 28 19:07:58 2008 +0000
+
+    Finished PKCS#8 importing
+
+commit 3828d0550601798527c25cbe85fee159be0d8bf0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Oct 24 06:25:56 2008 +0000
+
+    Adding gnutls test for getting errors
+
+commit 9af8aaf5aba042db587ddc202e093e19f66f5bad
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Oct 21 17:48:33 2008 +0000
+
+    Adding an example of an openssl-built certification authority
+
+commit c2d6205232489e070304832486683a10ab3bd7c1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Oct 20 17:11:46 2008 +0000
+
+    Added Italian translation
+
+commit c3727237331616c4efe07d61322e3110509214f4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Oct 20 17:11:06 2008 +0000
+
+    Updating changes from Launchpad
+
+commit 5ac91ffa324b429969451bae1d3c0b470cd19470
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Oct 8 08:43:25 2008 +0000
+
+    Updating files for building Debian packages
+
+commit 7f815c46ee32424390bed02b3f7dbe5875df50eb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Oct 2 18:06:10 2008 +0000
+
+    Implemented PKCS7 importing. Cannot test, as I haven't found yet any PKCS7 file in the internet
+
+commit bcef3d1575e6dcf879fdaf2d9e78657f90b9ba04
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Oct 2 17:12:59 2008 +0000
+
+    Fixing bug that made CRL importing not work.
+
+commit 7ab7c169e70bca0db4caa109a9c6734285cc86ee
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Oct 1 18:17:56 2008 +0000
+
+    Updating to version 0.5.4
+
+commit 15d7cc7d00557623d19b2b53b549112c2eb52c16
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Oct 1 18:04:34 2008 +0000
+
+    Beeing more verbose when having a failure when creating a CA certificate
+
+commit a79b53b424263cb466d701292045020969089942
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Oct 1 18:02:28 2008 +0000
+
+    Fixing problem with expiration time, related to UTC-localtime difference
+
+commit 58601239eb0c2d9d14185474e902de1e0d0b0cad
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Oct 1 17:31:44 2008 +0000
+
+    Fixing segmentation fault in some architectures, and modern compilers
+
+commit 4f067e4b7caefaa346b51e10f373fd2cfb0202c2
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Oct 1 17:29:26 2008 +0000
+
+    Reducing function names. Fixing warning
+
+commit bdbab6a1199267e3f7efcab6bb9b3ff00ac3f72c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 30 17:56:50 2008 +0000
+
+    Advancing in CRL importing
+
+commit 42b0e5bb54fbb2d1dd2c14f87ada9271d80744ed
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 30 06:37:57 2008 +0000
+
+    Finished import of uncrypted private keys
+
+commit c301c2272d920688dc0d2ee73a0fdb7d51192939
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 29 17:43:41 2008 +0000
+
+    Advancing in private key import
+
+commit 2ef86211fc96e19cb5c11cb3169156b63ba90eb5
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 29 16:47:29 2008 +0000
+
+    Adding graphic files. Completing svnignore
+
+commit 1695491d4c74f139b63625a145c2cd3f87a88bc4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 26 14:51:52 2008 +0000
+
+    Certificate import finished
+
+commit 56135514c79733127ffe7ccb73b09b790369ac54
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 26 06:11:59 2008 +0000
+
+    Advancing in certificate import
+
+commit 82f4d32b49debef308be205a1a50adea5b72711a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 25 06:30:01 2008 +0000
+
+    If the signing CA has not subject key identifier extension, don't
+    generate issuer key identifier extension. If it has, use it to
+    generate issuer key identifier extension, instead of forging a new
+    issuer key id with the gnutls method (that could be distinct from the
+    one in the extension)
+
+commit 4f9c9ac354a9eed0bebdfaca2a3c823682673803
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Sep 24 18:19:14 2008 +0000
+
+    Database now ready for importing hierarchies of certificates
+
+commit fbdbcc981fe561ee4d4f293a0cf002ccef8c51ad
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Sep 24 06:56:27 2008 +0000
+
+    Adding po template
+
+commit f5f8c486a5f5a6aaabed52cf865b20f16d3c2282
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Sep 24 06:54:46 2008 +0000
+
+    Upgrading translations from Launchpad. Added language sv.
+
+commit e999c01cd75ac269e9e73daa77cab629bc91906a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 23 18:25:34 2008 +0000
+
+    Keeping subject_key_id in certificate database. Some errors with NULL values: still not finished.
+
+commit 08e74d7e643dfc4896ec9f30d27aff4784789d15
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 19 17:58:27 2008 +0000
+
+    Fixing error: only the first certificate in database could sign CSRs
+    in password-protected databases.
+
+commit 923d8bc57e49e6d33014c28d73164764a7b165a7
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 19 06:27:00 2008 +0000
+
+    Another batch of configure changes, thanks to Staněk Luboš
+
+commit d27e92bd61af0ea97d1691f6664e5c796ecb1fda
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 19 06:23:10 2008 +0000
+
+    Starting support for importing certificates
+
+commit 3f88ad541b8adfd6c3cfa0e124067719084a6628
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 19 06:06:17 2008 +0000
+
+    Fixing segmentation fault when the CSR or the CA cert have NULL fields
+
+commit 6a620be4c0a1587f0519ebf30e8b5d15d69b650b
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 18 18:27:44 2008 +0000
+
+    Making compliant to RFC5280: now authority key identifier and subject
+    key identifiers are set properly
+
+commit a40ff401c54347d17f8aa71da98b47bb45ad573f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Sep 17 06:46:34 2008 +0000
+
+    Now the CA used when inheriting fields for a CSR is remembered, and used as default when signing it.
+
+commit 6d7860078071b2879ff0e9c53e68f9239ec800bc
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 16 18:18:10 2008 +0000
+
+    First steps for saving the CA used for generating CSRs, so it will be the default while signing the CSRs
+
+commit d4aafb5828d1386517234615716c4eb9b7a1af40
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 16 18:17:01 2008 +0000
+
+    Finishing implementation of dependences between certificate uses and certificate purposes
+
+commit 612839e0f90c1b9e933b0c24eb96a2fe7128bee0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 16 18:08:18 2008 +0000
+
+    Fixing configure.in and src/Makefile.am:
+    * fixes AM_INIT_AUTOMAKE
+    * adds some test discovered by autoscan
+    * removes wrong gnutls and libsqlite test
+    * defines required versions of particular libraries
+    * adds proper gnutls and sqlite test including appropriate CFLAGS and LIBS, exports this info for use in Makefile
+    * removes installations dirs, they are defined the standard way
+    * modifies the summary output
+    * removes second compiler flags from Makefile.am
+    
+    Thanks to Staněk Luboš <lubek@users.sourceforge.net> for the patch
+
+commit 10c303b2f74e81d13c294f954eea2b80e9a4ed7e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 16 16:53:28 2008 +0000
+
+    Finishing implementation of dependences between certificate uses and certificate purposes
+
+commit a6483184d94307d0a6a0b16c1efcc6113c74f113
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 16 06:45:44 2008 +0000
+
+    Progress in uses-purposes dependencies. CA properties window finished. New cert window pending.
+
+commit 9082f32524f84da17f4c62fa3782409bb810a11e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 15 18:20:05 2008 +0000
+
+    Starting to implement dependences between certificate purposes and uses
+
+commit 8d1133db8c28d73b53718b4f2a9994d5476373ff
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 15 17:50:43 2008 +0000
+
+    Fixing bug #2100270. Now it is possible to generate CRLs for all the CAs in the hierarchy
+
+commit 6eadf5c7e399f496b65ba6c6cd1c05fac9a83e5d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 12 10:23:35 2008 +0000
+
+    Uploading forgotten main.h
+
+commit f75d5a62c6ed5bae867545213019e01337bbf404
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Sep 12 10:22:23 2008 +0000
+
+    Uploading forgotten main.h
+
+commit 3f25c7bf0abcf90a7c306501ac70cd3c9615e245
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 11 17:31:05 2008 +0000
+
+    Updating src/, so now it compiles with the new default compilation options
+
+commit 6f77664d57b1cb223a687a428471e519c7c1cf5a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 11 16:24:30 2008 +0000
+
+    Standarizing name of the project: it's gnoMint, not Gnomint
+
+commit cfa61731712d9c7836b024a1d3e05cf659b68eac
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 11 16:20:07 2008 +0000
+
+    Patch for improving standard compliance
+
+commit 07e7bea6e254832492d4ec3197a3b1e25b19b508
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 11 06:33:02 2008 +0000
+
+    Fixing problem with permissions of a just created file. Now created in 0600 mode.
+    Fixing problem with certificates insertion into the database inserted in last commit
+
+commit 449712edf4594b6bea35fbd3cb7e9c1b54565194
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Sep 11 06:30:56 2008 +0000
+
+    Removing deprecated functions. Patch by Staněk Luboš
+
+commit 3250a6e2138793a1878eeb11af6effb7150723ef
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 9 07:14:57 2008 +0000
+
+    Fixing CRL problem: now, expired certificates appear only in the first CRL released after the expiration date, according to RFC 5280 (page 13)
+
+commit 119fdbb6f61bb1bcdc27aa6a13eb1f9d8e6ca3f4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 9 06:58:49 2008 +0000
+
+    Adding missing file in subversion repository
+
+commit ca5def738929fbfc4e3f6f3fe2932b906d88828b
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 8 15:31:15 2008 +0000
+
+    Updating version to 0.5.3
+
+commit beba303b6a7f4a364561783200236e3ee7b29fb1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 8 14:41:27 2008 +0000
+
+    Now exporting full certificate path when exporting public PEM
+
+commit 09d413ea69202dce06676820ca5df37a2c13cd23
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Sep 6 16:34:00 2008 +0000
+
+    Fixing problem with m4 macros. Patch by Staněk Luboš.
+
+commit b7e5acbba152b4352a5764914e6e5e6d3efbe71a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Sep 6 16:31:32 2008 +0000
+
+    Enabling the generation of DH parameters from gnoMint
+
+commit 5f73a9f2429aa06c863c1572dbb9f54910a00370
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Sep 6 10:20:19 2008 +0000
+
+    Updating Spanish translation
+
+commit c8752d0f67837a677c77d64910723e21577e87a9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Sep 6 10:04:11 2008 +0000
+
+    Enabling the generation of DH parameters from gnoMint
+
+commit fc0d983e05d14ffcf392bb4a0c6469fa6386bcf8
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Sep 6 06:50:55 2008 +0000
+
+    Fixing segmentation fault introduced in revision 165
+
+commit 3f8c86c6fc6baf3f8ce2310936c3fe7d83f1f715
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 2 18:27:14 2008 +0000
+
+    Updating Spanish translation
+
+commit b0344169cdabc37747229fafc8e99779ac75559d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 2 18:21:26 2008 +0000
+
+    Correcting little problem with previous patch. Thanks again to Staněk Luboš <lubek@users.sourceforge.net>
+
+commit 3e6f92e7478c6aa8bd581610df83e6a4ab351ce1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 2 18:19:26 2008 +0000
+
+    Applying patch for fixing i18n, and Czech translation. Thanks to Staněk Luboš <lubek@users.sourceforge.net>
+
+commit cc4ecca5fa571f7b35bfc0fcc2930adb1f849f5e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 2 18:08:10 2008 +0000
+
+    Fixing problem while generating DSA-keyed CSRs
+
+commit 04d8f9dc281d33642e79474fcefddd54959e84ec
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Sep 2 17:33:47 2008 +0000
+
+    Fixing tracker request #2075599. Now the order of lists and trees is OK when more than 10 certs
+
+commit b07f5851596e8d0f356bc78b7edae9308d281950
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Sep 1 16:43:20 2008 +0000
+
+    Updating version to 0.5.2
+
+commit c82186a08152c55257220a11fe546f01b6eb9cd9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 28 17:47:32 2008 +0000
+
+    New preference for exporting just created certificates to gnome-keyring-manager. Closes bug #1842705
+
+commit 37d7504842f4be9329eedd886c973e505e989600
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Aug 27 18:07:17 2008 +0000
+
+    Adding gconf support for saving some preferences, as view preferences, window size. Adding preferences window
+
+commit 7a7fef2bf5b033dcd638e09b9b788bcd8846c943
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 13:23:49 2008 +0000
+
+    Updating Spanish translation
+
+commit 7745d27dd783a5f69efabcf3289ce3e18ce40ba3
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 13:09:21 2008 +0000
+
+    Updating changelog and adding update-svncl.sh for version 0.5.1
+
+commit 218bf5862a9db77794dbd092f6b795101f48d5f7
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 13:01:27 2008 +0000
+
+    Upgrading to version 0.5.1
+
+commit 7fbe6416ef2ad8bcd26f0b97709b09fe77b10620
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 13:00:37 2008 +0000
+
+    Updating example CA for being valid against version 0.5.x
+
+commit 7f5995c14aadb39561d076f3321e10a46e32b197
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 11:09:36 2008 +0000
+
+    Fixing problem when creating a new CSR that must import field values from CA
+
+commit 5f7e75abf099d6f7c6fa55cb2dbe486807dbdb31
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 10:59:49 2008 +0000
+
+    Fixing bug that made impossible to change the policy of a CA
+
+commit e343ead451fabda42db4ec9dd4789f9c533fb1cb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 10:59:09 2008 +0000
+
+    Removing some warnings due to gui changes
+
+commit 7a816031e019222aebf2e306c92041bf7adbd16f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 23 10:13:07 2008 +0000
+
+    Adding support for recent files
+
+commit c2f983db661b664300ad8645d63d80e3dcf96656
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 21 16:26:01 2008 +0000
+
+    Correcting date in version 0.5.0
+
+commit 1bcc7c4fa231febf02d7f9865a2de53a329079a1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 21 16:13:36 2008 +0000
+
+    Updating to version 0.5.0
+
+commit 0538b4ed567b9cffe2d9515370e05b5e2a60b612
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 21 15:46:47 2008 +0000
+
+    Fixing problem while signing CSRs which private key resides in an external file. The file was lost. Now the file info is kept while moving info from CSR to Certificate
+
+commit 1e3f63177309fb14b8666c0886d4e0a8b92fc0a5
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Aug 20 18:12:32 2008 +0000
+
+    Allowing the creation of new databases.
+    Fixing problems while creating CSRs or s-s CAs, if the DB is pwd-protected, and the user cancels the password-entry window.
+    Fixing some minor problems in Spanish translation.
+
+commit 8b8f3f7628eccb977a0aa67e078df8695c9d2d3a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Aug 20 16:40:52 2008 +0000
+
+    Fixed problem with serial number assignation when creating a new database (not importing an old one)
+
+commit 886760b2bbeed07cb949c746ed1b56eaaf79c010
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Aug 19 18:39:08 2008 +0000
+
+    Fixed problems related with DB password protection
+
+commit c28d5173580632c2d053ae828b8957359b8d9136
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Aug 18 18:08:16 2008 +0000
+
+    Making possible to generate multiple rooted files, so now a file is not tied to a self-signed certificate.
+    Now, gnoMint open ~/.gnomint/default.gnomint by default.
+    Some problems need to be fixed yet.
+
+commit 5cfd57b2011aa7280f4da66d417c318083ecf845
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Aug 18 17:14:10 2008 +0000
+
+    Adding mimetype and desktop file
+
+commit 45b78dc26128ca87c5edb493bca6fac1e760be43
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 7 21:53:37 2008 +0000
+
+    Fixing problems with the new 20-byte serial numbers. Now it seems OK, but more test must be taken
+
+commit c4961b993e1737b3812b5497f4e84c0ca0db3a38
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 7 18:17:41 2008 +0000
+
+    Fixing uint160_read function
+
+commit 82941de785fc685cdf30ed65c3cd6a03d1bb877b
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Aug 7 18:13:20 2008 +0000
+
+    Highly unstable commit: working in natively support 20byte-serials
+
+commit 2970fe3b3c438d951af67b08ca589acf02429ad8
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Aug 6 16:44:06 2008 +0000
+
+    Fixing date in header of files
+
+commit c322bb8d59bc355f5c8acb5cd0d92af4eeb55a63
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Aug 6 15:50:23 2008 +0000
+
+    Adding new class for managing 160-bit (20 octets)
+
+commit 60c9565de45ec5fc29ff246fb4d5448f8559e169
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Aug 5 17:54:01 2008 +0000
+
+    Fixing problems with assigned serial numbers if there are multiple CAs
+
+commit a621ea6270d5d35b2d6ac35ee7508af7fe4580a0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Aug 5 16:23:14 2008 +0000
+
+    Now you can create a full hierarchy of Certification Authorities and their certificates
+
+commit 8c08b9cabdce8238a523cec13e89b1b67ca2a7e2
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Aug 4 21:13:58 2008 +0000
+
+    Autofilling of CSR fields. And now showing a full hierarchy of certificates.
+
+commit 958c704435e972bd7994948b5d18a8b06601234f
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Aug 4 18:17:40 2008 +0000
+
+    Progressing in changes for inheriting values from CA subject
+
+commit 64d36e4a3c46fa2b617ff7013b6a112593dd6307
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Aug 4 04:33:59 2008 +0000
+
+    Committing changes, so now the CA tree is shown correctly while creating a CSR
+
+commit 2c5c4cf754a0de6a9a6600e7fdb2e75e27020e12
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Aug 2 12:01:49 2008 +0000
+
+    Completing data model of the CA view
+
+commit c580c89b7b54dd3c579c16d8e8ac1b358671c286
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Aug 1 15:23:28 2008 +0000
+
+    Adding new sqlite function for concatening values, so we can get a tree-ordered list of certificates directly from a SQL sentence
+
+commit a23e42c41a6a1e2a0c28e3f54152ffdc58c5f1ce
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Aug 1 15:22:29 2008 +0000
+
+    Commenting unfinished code, so it now compiles again
+
+commit 564a51c4c3cb56fe08e877a0e84a34c5b6af547d
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Aug 1 04:34:00 2008 +0000
+
+    Commiting yesterday changes. Working on showing a hierarchical view of the CAs in DB
+
+commit 4bc36cfa34343544cc22654a51afb0a1186edbe4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jul 30 21:00:49 2008 +0000
+
+    Updating today's changes: improving translations and fixing the database version leap
+
+commit eac64093f4ba72f2f010cf150b08ca7490ed6e9e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jul 30 17:55:55 2008 +0000
+
+    Updating Spanish translation
+
+commit 030ac2da9c9a818f5deaf396e86f3261f8063ce3
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Jul 30 17:14:02 2008 +0000
+
+    Adding example ca file
+
+commit 700c48a36bbab0c7dfece4079c365684a202f1b1
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Jul 29 18:19:18 2008 +0000
+
+    Updating: now is possible to create more than a CA in one DB. Only the first one is usable yet, though.
+
+commit 8223e19bf06c59e515d5469e040bc501219f0c2e
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jul 28 18:03:12 2008 +0000
+
+    Committing today's changes: adding support for inherit subject fields from certification authorities. Adding interface for selecting from multiple CAs
+
+commit 510dfb79c94516471ef66ad6454548cf550372d9
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jul 28 16:18:57 2008 +0000
+
+    First version of interface for new features
+
+commit 6232fd0321b9e989b25c7ce55d535c6077a37b51
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jul 28 14:12:01 2008 +0000
+
+    Adding French language (thanks to Ahmed Baizid <ahmed@baizid.org>)
+
+commit d7f15c83f69ce8989530bd1dca4a4b38a90b1321
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 6 01:47:08 2008 +0000
+
+    Fixing compiler optimization
+
+commit fe963876775ae5107b6c8e6097c7c3992e7e8b5b
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 6 01:41:37 2008 +0000
+
+    Checking for libgnutls >= v2.0
+
+commit e65f9ed16ab8df1d971eca19f50f6dc36a9dca36
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 6 00:54:01 2008 +0000
+
+    Fixing typo in organizational word, patch by aluminium@users.sourceforge.net
+
+commit e7daa1a6aebc7d69548e7a3bb612d1bf16600890
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 6 00:53:14 2008 +0000
+
+    Including detailed certificate view, patch by aluminium@users.sourceforge.net
+
+commit 07ab00947c636f60dde67bb92a412cec3e28f0cf
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 6 00:42:39 2008 +0000
+
+    Deleting gnomint.pot from subversion repository, as it's automatically generated
+
+commit 75fc40be98b23242ac87877dacaebe3af7a0bc48
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Jan 6 00:39:53 2008 +0000
+
+    Adding pkey_manage.c to POTFILES.in
+
+commit 335ce4a4bdcf2767c1f87924743a6eba0461718c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Jan 5 14:17:29 2008 +0000
+
+    Allowing -O2 optimization
+
+commit 7a55da99106749e44b87f16bf12d304d4a79d392
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Dec 16 17:45:22 2007 +0000
+
+    Applying patch from sf.net, fixing some uninitialized variables warnings
+
+commit 317cccf7bb921dea96af0c270488a59b26e89b35
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 19 18:22:32 2007 +0000
+
+    Actualizado plan de pruebas
+
+commit 9e64ab786b061557d0005ffc13f492337dc56c71
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 19 17:53:11 2007 +0000
+
+    Updating changelog for version 0.4
+
+commit e4c040764bf90534f9b055107e5ffa4796cd661c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 19 17:50:29 2007 +0000
+
+    Preparing for gnoMint version 0.4.0
+
+commit 51fde23fbc128c692f891fa996698e8e1e23a8d7
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 19 17:10:02 2007 +0000
+
+    Allowing to extract private keys from database. Retrieving external private keys when needed
+
+commit 6c4fe2eb448b03188208a85cc81820f588a6fa80
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Nov 16 16:35:50 2007 +0000
+
+    Tidying up a bit.
+
+commit 8cad98f4b3b449584ea8605ec93b2060cc121127
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Nov 14 17:20:02 2007 +0000
+
+    Actualizando traducción.
+    Solucionados algunos fallos
+
+commit 6ffb5a7a9d72b48e7f1d3ebdc99c81654a990057
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed Nov 14 13:55:45 2007 +0000
+
+    Allowing whole database password protection that affects to private keys
+
+commit 5d9349318502b741de6a32108724bb5aa35b36dd
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 13 09:27:45 2007 +0000
+
+    Adding new tests for new features
+
+commit ddc090c10d08d683afa0c573f1da1ad642e416bd
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue Nov 13 09:16:39 2007 +0000
+
+    Committing test plan
+
+commit 29f7fbd66da62664ad77d29f3deacf30571813a4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 12 15:47:35 2007 +0000
+
+    Disabling non-available pop-up options
+
+commit e94174eef86e8a8c62a33b6d31bc980fd25b8877
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Nov 12 15:33:09 2007 +0000
+
+    Adding pop-up menu support for managing CSRs and Certs
+
+commit cc5e28c3e5e50c720e0b6770396e5e14bec6a6e4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 3 08:19:17 2007 +0000
+
+    Preparing for version 0.3.2
+
+commit cc8a683633207bc8dbd83853d665a1b7d94dfed3
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 3 08:02:17 2007 +0000
+
+    Fixing DB upgrading from version 3 to 4
+
+commit f22557ea00e5a7134a71d7022e3b5828ce58ee87
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Nov 1 22:07:03 2007 +0000
+
+    Updating Spanish translation
+
+commit 0dd2b8ca0865053e417781398d27125d46b89b41
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Nov 1 22:00:43 2007 +0000
+
+    Updating to version 0.3.1, prior to official release
+
+commit 5210efa1de6d3f4f2357ab5f72473825fd6cd774
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Nov 1 21:07:06 2007 +0000
+
+    * Fixing problem with certificates serial number: all the certs
+      were being created with serial 0.
+    
+    * Allowing the definition of time between two CRL updates.
+
+commit 6e1cdce679267c432de5f502d2fd60bc8ad9f8fd
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu Nov 1 17:32:39 2007 +0000
+
+    Fixing CRL generation problems. Currently, the CRL expiration time is 1 day
+
+commit aa6e20d0cbf5180b29ef4c579523dd94d079123c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jul 30 18:38:00 2007 +0000
+
+    Changing license messages in all files. Starting support for generating CRLs (not working yet)
+
+commit 12e9ca3e0bf71d2740c53e713cde7026658f75f4
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon Jul 30 14:28:55 2007 +0000
+
+    Preparing version 0.1.6. Now gnoMint can export PKCS#12 structures
+
+commit ee031d1cd1af05755217e5617670b85ad1967090
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 22 23:19:31 2007 +0000
+
+    Fixing compilation bugs in x86-64
+
+commit c546f4a5873dccccd7a4ffb19d5f6a64a003ff3a
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 21 20:15:47 2007 +0000
+
+    Fixing one problem introduced in last correction for x86-64 arch
+
+commit f3301217615e77569b2a6da466749ff2a84c2d11
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri May 18 18:12:43 2007 +0000
+
+    Using size_t where it is needed (in Fedora amd64 arch, it seems to be
+    a problem)
+
+commit 2ab6471378c61a5faafeb02cfb987076946d2e16
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Thu May 17 18:55:26 2007 +0000
+
+    Perhaps fixing another compilation problem in amd64 arch
+
+commit 2c9614c288fe37e11e2a647455faf4dfb08e4c99
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Wed May 16 17:42:23 2007 +0000
+
+    Possibly fixing compilation errors in amd64 arch
+
+commit 4c76b6c2e22e00e4a5b375c3f5b522bd618ca466
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 15:17:02 2007 +0000
+
+    Updating to version 0.1.5 prior to official release
+
+commit 1423ae321bbc0c9a9328169a95f7d1e576d492a0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 14:37:33 2007 +0000
+
+    Updating Spanish translation
+
+commit 961439cf396a77e1237de7044db137b59e07e558
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 11:03:03 2007 +0000
+
+    Commiting database version 3, with certs and csr's containing their DNs and parent's DNs in the database
+
+commit 688f1f7b21581be6a34b6dc59a95382b52e3b0fb
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 11:01:50 2007 +0000
+
+    Showing database errors when creating or importing CSRs
+
+commit 4696cf32237011c8cfcd8ccc21d79721dff6d889
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 10:51:49 2007 +0000
+
+    Saving DN in tlscsr structure
+
+commit 58bf80810242c6d621c90dd7180bfd544a651027
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 10:10:27 2007 +0000
+
+    Showing progress when creating CSR's key pair
+
+commit 2f1df470115c855daa0ae3b0f46aeb31f4b593b2
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Tue May 15 10:08:09 2007 +0000
+
+    Adding support for retrieving DN from PEMs
+
+commit 610794d4b603ab805bab7c19ae6b0db439505eda
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 21:34:17 2007 +0000
+
+    Allowing the save of CSR without private key. Adding support for importing CSRs in PEM and DER formats
+
+commit 64ea272c77e809a51caf6a0f02863c8aebe639a3
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 21:33:16 2007 +0000
+
+    Fixing visualizing error
+
+commit e9fd213f0470fe0110802bd3a6ec16cb131a2022
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 21:32:21 2007 +0000
+
+    Fixing aligning errors
+
+commit d630166ef5c6edebbeb21e3ceb7ff8e850334400
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 19:13:53 2007 +0000
+
+    Improving code safety
+
+commit 873388e5e1349863e3abb439381361931b2d1359
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 19:12:57 2007 +0000
+
+    Reverting old behaviour: CA are created with a minimal set of correct properties for creating useful certificates
+
+commit 2c38cd031138049245de470591b9607405a0d37b
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 16:36:15 2007 +0000
+
+    Starting CSR importing support
+
+commit f23d6e0465f8f003e6760b3b454db7d2604aea28
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 15:21:13 2007 +0000
+
+    Fixing problem when exporting private key of CSRs
+
+commit 37d7773335fb7cacf26950a1271eda1804959f31
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 13:09:24 2007 +0000
+
+    Updating changelog
+
+commit d2f739faae6e600ddcd52d4d8a6dcb59a34e8881
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 12:58:13 2007 +0000
+
+    Fixing compilation error for release 0.1.4
+
+commit a90b20825c01e03ee905014ec74ce5cd5636ce9c
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 12:53:03 2007 +0000
+
+    Updating changelog for 0.1.4 version
+
+commit b4aa8a321aa55cda9ff60243ee2630c58bb1e4af
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Mon May 14 12:27:51 2007 +0000
+
+    Adding support for stablishing a set of policies for certificate generation
+
+commit 6a54be835d55c0bcd285ad2bbc8544aae345af61
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 19 22:55:57 2006 +0000
+
+    Fixing some typo problems in country names
+
+commit 9b5a4f32f8cba744c40ac5e4a43206259e45bf45
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 19 22:40:20 2006 +0000
+
+    Updating country list, so now it uses iso_3166 translation. Bug reported by Florian K. Steinel
+
+commit 97cc0c5b7b912fead5ba5f87621e94e0dd3fc530
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Nov 19 22:18:34 2006 +0000
+
+    Supporting SQLite 3 now, as SQLite 2 is deprecated. Adding tool-script for converting existing databases
+
+commit 03296de44c66ba26edf91b03511558e7460e57f8
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sat Nov 11 10:45:15 2006 +0000
+
+    Updating DB version to 2, with support for CA policies.
+    Adding support for upgrading from earlier DB versions.
+
+commit 6744f83f127f4cdddfadb0d2bb9793945502a135
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Nov 10 13:26:54 2006 +0000
+
+    Releasing 0.1.3 version
+
+commit f5d622777ee93064d8404c8acc161781f53d9d71
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Nov 10 13:19:28 2006 +0000
+
+    * Allowing uncrypted private key export.
+    * Requiring minimum length for private-key export passphrase
+    * Checking confirmation for private-key export passphrase
+    * Fixing focus grab when asking for passphrase
+    * Updated Spanish translation
+
+commit f092d0774ab041634621f4d380c3c4169693d278
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Fri Nov 10 10:40:10 2006 +0000
+
+    Replacing /bin/sh by /bin/bash, fixing Ubuntu/Debian error as they link /bin/sh to /bin/dash instead of /bin/bash
+
+commit 6330f352c7db2f194eaee05ddde33743b08463d0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Oct 15 08:30:57 2006 +0000
+
+    Moving everything to trunk directory
+
+commit f9cdaf2b2ae8b56a445be8a602baea8a853fb3f0
+Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
+Date:   Sun Oct 15 08:22:29 2006 +0000
+
+    Adding directory for main gnomint trunk
