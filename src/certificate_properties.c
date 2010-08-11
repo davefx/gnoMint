@@ -220,6 +220,9 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "md5Label");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->md5);
 
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha256Label");	
+	gtk_label_set_text (GTK_LABEL(widget), cert->sha256);
+
 
 	if (g_list_length (cert->uses)) {
 		GValue * valtrue = g_new0 (GValue, 1);

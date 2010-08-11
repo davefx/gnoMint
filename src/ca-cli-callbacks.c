@@ -1218,6 +1218,7 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	printf (_("Fingerprints:\n"));
 	printf (_("\tSHA1 fingerprint: %s\n"), cert->sha1);
 	printf (_("\tMD5 fingerprint: %s\n"), cert->md5);
+	printf (_("\tSHA256 fingerprint: %s\n"), cert->sha256);
 
 	if (g_list_length (cert->uses)) {
 		printf (_("Certificate uses:\n"));

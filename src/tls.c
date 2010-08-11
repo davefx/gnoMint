@@ -1046,6 +1046,19 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	g_free (uaux);
 	uaux = NULL;
 
+	size = 0;
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA256, uaux, &size);
+	uaux = g_new0(guchar, size);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA256, uaux, &size);
+	res->sha256 = g_new0(gchar, size*3);
+	for (i=0; i<size; i++) {
+		snprintf (&res->sha256[i*3], 3, "%02X", uaux[i]);
+		if (i != size - 1)
+			res->sha256[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+	uaux = NULL;
+
 	if (gnutls_x509_crt_get_ca_status (*cert, &critical)) {
 		res->uses = g_list_append (res->uses, _("Certification Authority"));
 	}
@@ -1200,6 +1213,7 @@ void tls_cert_free (TlsCert *tlscert)
 	g_free (tlscert->i_l);
 	g_free (tlscert->i_dn);
 	g_free (tlscert->sha1);
+	g_free (tlscert->sha256);
 	g_free (tlscert->md5);
 	g_free (tlscert->key_id);
         g_free (tlscert->crl_distribution_point);
