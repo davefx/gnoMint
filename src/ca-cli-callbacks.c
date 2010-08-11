@@ -283,6 +283,8 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 	gboolean change_data = FALSE;
 
 	TlsCreationData *csr_creation_data = NULL;
+	guint max_key_length;
+
 
 	if (argc == 2) {
 		ca_id = atoll (argv[1]);
@@ -388,15 +390,18 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 
 		if (! g_ascii_strcasecmp (aux, "RSA")) {
 			csr_creation_data->key_type = 0;
+			max_key_length = 10240;
 		} else if (! g_ascii_strcasecmp (aux, "DSA")) {
 			csr_creation_data->key_type = 1;
+			max_key_length = 3072;
 		}
 		g_free (aux);
 		aux = NULL;
 		
 		do {
-			csr_creation_data->key_bitlength = dialog_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
-									      1024,10240,csr_creation_data->key_bitlength);
+				csr_creation_data->key_bitlength = dialog_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+											  1024, max_key_length, csr_creation_data->key_bitlength);
+				
 		} while (csr_creation_data->key_bitlength % 1024);
 
 		printf (_("These are the provided CSR properties:\n"));

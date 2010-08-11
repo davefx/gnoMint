@@ -32,7 +32,6 @@
         <child>
           <object class="GtkVBox" id="vbox2">
             <property name="visible">True</property>
-            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <object class="GtkHBox" id="hbox1">
@@ -329,7 +328,6 @@ Common Name (CN):</property>
         <child>
           <object class="GtkVBox" id="vbox20">
             <property name="visible">True</property>
-            <property name="orientation">vertical</property>
             <child>
               <object class="GtkHBox" id="hbox21">
                 <property name="visible">True</property>
@@ -437,6 +435,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_new_ca_privkey_type_toggle"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -593,7 +592,6 @@ Common Name (CN):</property>
         <child>
           <object class="GtkVBox" id="vbox3">
             <property name="visible">True</property>
-            <property name="orientation">vertical</property>
             <child>
               <object class="GtkHBox" id="hbox2">
                 <property name="visible">True</property>
@@ -634,7 +632,6 @@ Common Name (CN):</property>
             <child>
               <object class="GtkVBox" id="vbox1">
                 <property name="visible">True</property>
-                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkLabel" id="label1">
                     <property name="visible">True</property>

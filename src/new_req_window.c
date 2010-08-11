@@ -230,6 +230,10 @@ void new_req_window_display()
 
 	new_req_inherit_fields_toggled (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
 
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "rsa_radiobutton1")), TRUE);
+
+	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")), 2048);
+
 }
 
 void new_req_tab_activate (int tab_number)
@@ -238,6 +242,25 @@ void new_req_tab_activate (int tab_number)
 	
 	gtk_notebook_set_current_page (notebook, tab_number);
 
+}
+
+G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
+						     gpointer        user_data)
+{
+	GtkToggleButton *rsatoggle = GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "rsa_radiobutton1"));
+	GtkAdjustment *adj = GTK_ADJUSTMENT(gtk_builder_get_object (new_req_window_gtkb, "AdjustmentKeyLengthSpinButton1"));
+	gdouble value = gtk_spin_button_get_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")));
+
+	if (gtk_toggle_button_get_active(rsatoggle)) {
+		// RSA is active
+		gtk_adjustment_set_upper (adj, 10240);
+	} else {
+		// DSA is active
+		gtk_adjustment_set_upper (adj, 3072);
+		if (value > 3072)
+			gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")), 
+						   3072);
+	}
 }
 
 G_MODULE_EXPORT void on_new_req_cn_entry_changed (GtkEditable *editable,

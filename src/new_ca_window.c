@@ -49,6 +49,10 @@ void new_ca_window_display()
 	
 	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_ca_window_gtkb, "country_combobox")));
 
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "rsa_radiobutton")), TRUE);
+
+	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_ca_window_gtkb, "keylength_spinbutton")), 2048);
+
 }
 
 
@@ -62,6 +66,26 @@ void new_ca_tab_activate (int tab_number)
 	gtk_notebook_set_current_page (notebook, tab_number);
 
 }
+
+G_MODULE_EXPORT void on_new_ca_privkey_type_toggle (GtkToggleButton *button,
+						     gpointer        user_data)
+{
+	GtkToggleButton *rsatoggle = GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "rsa_radiobutton"));
+	GtkAdjustment *adj = GTK_ADJUSTMENT(gtk_builder_get_object (new_ca_window_gtkb, "adjustmentCAKeyLength"));
+	gdouble value = gtk_spin_button_get_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_ca_window_gtkb, "keylength_spinbutton")));
+
+	if (gtk_toggle_button_get_active(rsatoggle)) {
+		// RSA is active
+		gtk_adjustment_set_upper (adj, 10240);
+	} else {
+		// DSA is active
+		gtk_adjustment_set_upper (adj, 3072);
+		if (value > 3072)
+			gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_ca_window_gtkb, "keylength_spinbutton")), 
+						   3072);
+	}
+}
+
 
 G_MODULE_EXPORT void on_cn_entry_changed (GtkEditable *editable,
 			 gpointer user_data) 
