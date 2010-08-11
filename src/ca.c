@@ -208,9 +208,10 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 					
 					uint64_value = g_value_get_uint64 (last_id_value);
 					string_value = g_value_get_string (last_parent_route_value);
-					g_assert (string_value);
-					
-					last_node_route = g_strdup_printf ("%s%"G_GUINT64_FORMAT":", string_value, uint64_value);
+					if (string_value != NULL)
+						last_node_route = g_strdup_printf ("%s%"G_GUINT64_FORMAT":", string_value, uint64_value);
+					else 
+						last_node_route = NULL;
 				}
 
 			}
