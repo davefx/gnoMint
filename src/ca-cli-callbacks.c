@@ -981,7 +981,7 @@ int ca_cli_callback_crlgen (int argc, char **argv)
 		return -1;
 	}
 
-	error = crl_generate (id_ca, filename);
+	error = crl_generate (id_ca, g_strdup(filename));
 
 	if (! error) {
 		printf (_("CRL generated successfully into file '%s'\n"), filename);
