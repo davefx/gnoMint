@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-06-03 23:09+0200\n"
-"PO-Revision-Date: 2010-03-06 12:46+0000\n"
-"Last-Translator: gnuckx <gnuckx@gmail.com>\n"
+"PO-Revision-Date: 2010-07-09 11:50+0000\n"
+"Last-Translator: David Marín <Unknown>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-01 22:24+0000\n"
+"X-Launchpad-Export-Date: 2010-08-11 09:00+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../gconf/gnomint.schemas.in.h:1
@@ -63,7 +63,7 @@ msgstr " "
 
 #: ../gui/gnomint.glade.h:2
 msgid "<b>CSR subject</b>"
-msgstr "<b>CSR subject</b>"
+msgstr "<b>Soggetto CSR</b>"
 
 #: ../gui/gnomint.glade.h:3
 msgid "<b>Certificate fields</b>"
@@ -240,6 +240,10 @@ msgid ""
 "applications for a secure interchange of their keys over insecure "
 "channels.</i></small>"
 msgstr ""
+"<small><i>I file PKCS#3 contenenti parametri Diffie&#xB7;Hellman vengono "
+"utilizzati da alcune applicazioni \n"
+"crittografiche per uno scambio sicuro delle chiavi su canali insicuri.</ "
+"i></ small>"
 
 #: ../gui/gnomint.glade.h:46
 msgid ""
@@ -254,6 +258,11 @@ msgid ""
 "certificate subject to be the same as the ones in the CA cert "
 "subject.</small>"
 msgstr ""
+"<small>L'oggetto della nuova richiesta di certificato può ereditare le "
+"informazioni da una delle autorità di certificazione esistenti. Questo è "
+"obbligatorio se la politica del CA, che si intende utilizzare, è definita "
+"per forzare alcuni campi di un soggetto certificato in modo da essere gli "
+"stessi di quelli del soggetto certificato CA.</small>"
 
 #: ../gui/gnomint.glade.h:48
 msgid "Activated on"
@@ -359,7 +368,7 @@ msgstr "Certificato DN"
 
 #: ../gui/gnomint.glade.h:73
 msgid "Certificate _Signing Requests"
-msgstr "Certificate _Signing Requests"
+msgstr "Richiesta di _firma di certificato (CSR)"
 
 #: ../gui/gnomint.glade.h:74
 msgid "Certificate properties"
@@ -383,7 +392,7 @@ msgstr "Scegliere CA per firmare il CSR"
 
 #: ../gui/gnomint.glade.h:79
 msgid "Choose private key file. gnoMint"
-msgstr ""
+msgstr "Scegliere un file con chiave privata. gnoMint"
 
 #: ../gui/gnomint.glade.h:80
 msgid "City"
@@ -646,7 +655,7 @@ msgstr "Nuova richiesta di certificato - gnoMint"
 #: ../gui/gnomint.glade.h:143 ../src/certificate_properties.c:348
 #: ../src/tls.c:1046
 msgid "Non repudiation"
-msgstr ""
+msgstr "Non rifiutato"
 
 #: ../gui/gnomint.glade.h:144 ../src/certificate_properties.c:1129
 #: ../src/tls.c:1080
@@ -663,11 +672,11 @@ msgstr "Solo la chiave privata (non criptata)."
 
 #: ../gui/gnomint.glade.h:147
 msgid "Only the pu_blic part."
-msgstr ""
+msgstr "Solo la parte pu_bblica."
 
 #: ../gui/gnomint.glade.h:148
 msgid "Open _recents"
-msgstr ""
+msgstr "Apri _recenti"
 
 #: ../gui/gnomint.glade.h:149
 msgid "Open an existing database"
@@ -683,7 +692,7 @@ msgstr "Organizzazione (O)"
 
 #: ../gui/gnomint.glade.h:152
 msgid "Organization Unit:"
-msgstr "Unità Organizzazionale"
+msgstr "Unità organizzativa"
 
 #: ../gui/gnomint.glade.h:153
 msgid "Organization:"
@@ -730,6 +739,8 @@ msgid ""
 "Please, enter current\n"
 "password:"
 msgstr ""
+"Si prega di inserire\n"
+"la password corrente:"
 
 #: ../gui/gnomint.glade.h:164
 msgid ""
@@ -749,7 +760,7 @@ msgstr "Si prega di inserire la password:"
 
 #: ../gui/gnomint.glade.h:168
 msgid "Please, enter the prime size, in bits:"
-msgstr ""
+msgstr "Si prega di inserire la dimensione primaria, in bit:"
 
 #: ../gui/gnomint.glade.h:169
 msgid ""
@@ -2558,6 +2569,7 @@ msgstr ""
 "  David Marín https://launchpad.net/~davefx\n"
 "  Federico Pontelli https://launchpad.net/~federico\n"
 "  Jecko Development https://launchpad.net/~jecko\n"
+"  Vincenzo Reale https://launchpad.net/~smart2128\n"
 "  gnuckx https://launchpad.net/~gnuckx"
 
 #: ../src/ca-cli-callbacks.c:1425
