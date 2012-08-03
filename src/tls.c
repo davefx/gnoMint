@@ -2049,8 +2049,6 @@ void tls_creation_data_free (TlsCreationData *cd)
 		g_free (cd->emailAddress);
 	if (cd->password)
 		g_free (cd->password);
-        if (cd->crl_distribution_point)
-                g_free (cd->crl_distribution_point);
         if (cd->parent_ca_id_str)
                 g_free (cd->parent_ca_id_str);
 	if (cd->subject_alt_name)
