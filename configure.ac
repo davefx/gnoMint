@@ -199,7 +199,7 @@ Makefile
 src/Makefile
 m4/Makefile
 gui/Makefile
-po/Makefile.in
+po/Makefile
 mime/Makefile
 gconf/Makefile
 gnomint.spec

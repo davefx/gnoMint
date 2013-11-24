@@ -1,10 +1,8 @@
-po/*.gmo
+*.o
+*.swp
 .deps/
 Makefile
 Makefile.in
-gnomint
-gnomint-cli
-*.o
 aclocal.m4
 autom4te.cache/
 compile
@@ -15,6 +13,8 @@ config.sub
 configure
 depcomp
 gconf/gnomint.schemas
+gnomint
+gnomint-cli
 gnomint.spec
 gui/gnomint.desktop
 install-sh
@@ -31,7 +31,7 @@ m4/lt~obsolete.m4
 mime/gnomint.xml
 missing
 mkinstalldirs
+po/*.gmo
 po/.intltool-merge-cache
-po/Makefile.in.in
 po/POTFILES
 po/stamp-it

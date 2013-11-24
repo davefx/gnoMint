@@ -2,7 +2,7 @@ SUBDIRS = m4 src po gui mime gconf
 
 ACLOCAL_AMFLAGS = -I m4
 
-INCLUDES = \
+AM_CPPFLAGS = \
     -I$(top_srcdir)
 
 EXTRA_DIST = \
