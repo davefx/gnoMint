@@ -1082,12 +1082,12 @@ gboolean ca_file_save_as (gchar *new_file_name)
 				   g_mapped_file_get_contents (map),
 				   g_mapped_file_get_length (map),
 				   NULL)) {
-		g_mapped_file_free (map);
+		g_mapped_file_unref(map);
                 ca_file_open (gnomint_current_opened_file, FALSE);
 		return FALSE;
 	}
 
-	g_mapped_file_free (map);
+	g_mapped_file_unref(map);
 
 	g_free (initial_file);
 
@@ -1802,7 +1802,7 @@ gchar * ca_file_revoke_crt (guint64 id)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-        fprintf (stderr, "%ld\n", time(NULL));
+        fprintf (stderr, "%d\n", time(NULL));
 
 	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %"GNOMINT_GUINT64_FORMAT" ;", 
 			       time(NULL),

@@ -29,7 +29,7 @@
 
 gint csr_creation_is_launched = -1;
 
-static GStaticMutex csr_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
+static GMutex csr_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
 gint csr_creation_thread_status = 0;
 gchar * csr_creation_message = "";
 
@@ -51,20 +51,20 @@ gpointer csr_creation_thread (gpointer data)
 
 	switch (creation_data->key_type){
 	case 0: /* RSA */
-		g_static_mutex_lock (&csr_creation_thread_status_mutex);
+		g_mutex_lock (&csr_creation_thread_status_mutex);
 		csr_creation_message =  _("Generating new RSA key pair");
-		g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+		g_mutex_unlock (&csr_creation_thread_status_mutex);
 
 		error_message = tls_generate_rsa_keys (creation_data, &private_key, &csr_key);		
 		if (error_message) {
 			printf ("%s\n\n", error_message);
 
-			g_static_mutex_lock (&csr_creation_thread_status_mutex);
+			g_mutex_lock (&csr_creation_thread_status_mutex);
 
 			csr_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
 			csr_creation_thread_status = -1;
 
-			g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+			g_mutex_unlock (&csr_creation_thread_status_mutex);
 
 			return NULL;
 			// return error_message;
@@ -73,21 +73,21 @@ gpointer csr_creation_thread (gpointer data)
 		break;
 
 	case 1: /* DSA */
-		g_static_mutex_lock (&csr_creation_thread_status_mutex);
+		g_mutex_lock (&csr_creation_thread_status_mutex);
 		csr_creation_message =  _("Generating new DSA key pair");
-		g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+		g_mutex_unlock (&csr_creation_thread_status_mutex);
 
  		error_message = tls_generate_dsa_keys (creation_data, &private_key, &csr_key);
 
 		if (error_message) { 
 			printf ("%s\n\n", error_message);
 
- 			g_static_mutex_lock (&csr_creation_thread_status_mutex); 
+ 			g_mutex_lock (&csr_creation_thread_status_mutex); 
 
 			csr_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
  			csr_creation_thread_status = -1; 
 
- 			g_static_mutex_unlock (&csr_creation_thread_status_mutex); 
+ 			g_mutex_unlock (&csr_creation_thread_status_mutex); 
 
 
  			//return error_message; 
@@ -97,29 +97,29 @@ gpointer csr_creation_thread (gpointer data)
 		break;
 	}
 
-	g_static_mutex_lock (&csr_creation_thread_status_mutex);
+	g_mutex_lock (&csr_creation_thread_status_mutex);
 	csr_creation_message =  _("Generating CSR");
-	g_static_mutex_unlock (&csr_creation_thread_status_mutex);	
+	g_mutex_unlock (&csr_creation_thread_status_mutex);	
 
 	error_message = tls_generate_csr (creation_data, csr_key, &certificate_sign_request);
 	
  	if (error_message) {
 		printf ("%s\n\n", error_message);
- 		g_static_mutex_lock (&csr_creation_thread_status_mutex); 
+ 		g_mutex_lock (&csr_creation_thread_status_mutex); 
 		
  		csr_creation_message = g_strdup_printf ("%s:\n%s",_("CSR generation failed"), error_message); 
  		csr_creation_thread_status = -1; 
 		
- 		g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+ 		g_mutex_unlock (&csr_creation_thread_status_mutex);
 
 		g_free (error_message);
  		//return error_message; 
 		return NULL;
  	} 
 
-	g_static_mutex_lock (&csr_creation_thread_status_mutex);
+	g_mutex_lock (&csr_creation_thread_status_mutex);
 	csr_creation_message =  _("Saving CSR in database");
-	g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+	g_mutex_unlock (&csr_creation_thread_status_mutex);
 	
 	tlscsr = tls_parse_csr_pem (certificate_sign_request);
 
@@ -134,22 +134,22 @@ gpointer csr_creation_thread (gpointer data)
 
 	error_message = csr_creation_database_save (creation_data, pkey, certificate_sign_request);
 	if (error_message) {
-		g_static_mutex_lock (&csr_creation_thread_status_mutex);
+		g_mutex_lock (&csr_creation_thread_status_mutex);
 		
  		csr_creation_message = g_strdup_printf ("%s:\n%s",_("CSR couldn't be saved"), error_message); 
 		csr_creation_thread_status = -1;
 		
-		g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+		g_mutex_unlock (&csr_creation_thread_status_mutex);
 		
 		g_free (error_message);
 
 		return NULL;
 	}
 
-	g_static_mutex_lock (&csr_creation_thread_status_mutex);
+	g_mutex_lock (&csr_creation_thread_status_mutex);
 	csr_creation_message =  _("CSR generated successfully");
 	csr_creation_thread_status = 1;
-	g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+	g_mutex_unlock (&csr_creation_thread_status_mutex);
 	
 	if (csr_key) {
 		gnutls_x509_privkey_deinit ((* csr_key));
@@ -165,20 +165,17 @@ gpointer csr_creation_thread (gpointer data)
 
 GThread * csr_creation_launch_thread (TlsCreationData *creation_data)
 {
-	return g_thread_create (csr_creation_thread,
-				creation_data,
-				TRUE,
-				NULL);
+	return g_thread_new("csr_creation", csr_creation_thread, creation_data);
 }
 
 void csr_creation_lock_status_mutex ()
 {
-	g_static_mutex_lock(&csr_creation_thread_status_mutex);
+	g_mutex_lock(&csr_creation_thread_status_mutex);
 }
 
 void csr_creation_unlock_status_mutex ()
 {
-	g_static_mutex_unlock (&csr_creation_thread_status_mutex);
+	g_mutex_unlock (&csr_creation_thread_status_mutex);
 }
 
 

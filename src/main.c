@@ -114,7 +114,6 @@ int main (int   argc,
 
 	tls_init ();
 
-	g_thread_init (NULL);
 	gtk_init (&argc, &argv);
 	
 	preferences_gui_set_csr_visible_callback (ca_update_csr_view);

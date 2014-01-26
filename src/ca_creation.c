@@ -29,7 +29,7 @@
 
 gint ca_creation_is_launched = -1;
 
-static GStaticMutex ca_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
+static GMutex ca_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
 gint ca_creation_thread_status = 0;
 gchar * ca_creation_message = "";
 
@@ -49,20 +49,20 @@ gpointer ca_creation_thread (gpointer data)
 
 	switch (creation_data->key_type){
 	case 0: /* RSA */
-		g_static_mutex_lock (&ca_creation_thread_status_mutex);
+		g_mutex_lock(&ca_creation_thread_status_mutex);
 		ca_creation_message =  _("Generating new RSA key pair");
-		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+		g_mutex_unlock (&ca_creation_thread_status_mutex);
 
 		error_message = tls_generate_rsa_keys (creation_data, &private_key, &ca_key);		
 		if (error_message) {
 			printf ("%s\n\n", error_message);
 
-			g_static_mutex_lock (&ca_creation_thread_status_mutex);
+			g_mutex_lock(&ca_creation_thread_status_mutex);
 
 			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
 			ca_creation_thread_status = -1;
 
-			g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+			g_mutex_unlock (&ca_creation_thread_status_mutex);
 
 			tls_creation_data_free (creation_data);
 			return ca_creation_message;
@@ -72,21 +72,21 @@ gpointer ca_creation_thread (gpointer data)
 		break;
 
 	case 1: /* DSA */
-		g_static_mutex_lock (&ca_creation_thread_status_mutex);
+		g_mutex_lock(&ca_creation_thread_status_mutex);
 		ca_creation_message =  _("Generating new DSA key pair");
-		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+		g_mutex_unlock (&ca_creation_thread_status_mutex);
 
  		error_message = tls_generate_dsa_keys (creation_data, &private_key, &ca_key);
 
 		if (error_message) { 
 			printf ("%s\n\n", error_message);
 
- 			g_static_mutex_lock (&ca_creation_thread_status_mutex); 
+ 			g_mutex_lock(&ca_creation_thread_status_mutex); 
 
 			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
  			ca_creation_thread_status = -1; 
 
- 			g_static_mutex_unlock (&ca_creation_thread_status_mutex); 
+ 			g_mutex_unlock (&ca_creation_thread_status_mutex); 
 
 
  			//return error_message; 
@@ -97,19 +97,19 @@ gpointer ca_creation_thread (gpointer data)
 		break;
 	}
 
-	g_static_mutex_lock (&ca_creation_thread_status_mutex);
+	g_mutex_lock(&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Generating self-signed CA-Root cert");
-	g_static_mutex_unlock (&ca_creation_thread_status_mutex);	
+	g_mutex_unlock (&ca_creation_thread_status_mutex);	
 
 	error_message = tls_generate_self_signed_certificate (creation_data, ca_key, &root_certificate);	
  	if (error_message) {
 		printf ("%s\n\n", error_message);
- 		g_static_mutex_lock (&ca_creation_thread_status_mutex); 
+ 		g_mutex_lock(&ca_creation_thread_status_mutex); 
 		
  		ca_creation_message = g_strdup_printf ("%s:\n%s",_("Certificate generation failed"), error_message); 
  		ca_creation_thread_status = -1; 
 		
- 		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+ 		g_mutex_unlock (&ca_creation_thread_status_mutex);
 
 		g_free (error_message);
  		//return error_message; 
@@ -117,20 +117,20 @@ gpointer ca_creation_thread (gpointer data)
 		return ca_creation_message;
  	} 
 
-	g_static_mutex_lock (&ca_creation_thread_status_mutex);
+	g_mutex_lock(&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("Creating CA database");
-	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+	g_mutex_unlock (&ca_creation_thread_status_mutex);
 
 	pkey_manage_crypt_auto (creation_data->password, &private_key, root_certificate);
 
 	error_message = ca_creation_database_save (creation_data, private_key, root_certificate);
 	if (error_message) {
-		g_static_mutex_lock (&ca_creation_thread_status_mutex);
+		g_mutex_lock(&ca_creation_thread_status_mutex);
 		
  		ca_creation_message = g_strdup_printf ("%s:\n%s",_("CA database creation failed"), error_message); 
 		ca_creation_thread_status = -1;
 		
-		g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+		g_mutex_unlock (&ca_creation_thread_status_mutex);
 		
 		g_free (error_message);
 		tls_creation_data_free (creation_data);
@@ -138,10 +138,10 @@ gpointer ca_creation_thread (gpointer data)
 		return ca_creation_message;
 	}
 
-	g_static_mutex_lock (&ca_creation_thread_status_mutex);
+	g_mutex_lock(&ca_creation_thread_status_mutex);
 	ca_creation_message =  _("CA generated successfully");
 	ca_creation_thread_status = 1;
-	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+	g_mutex_unlock (&ca_creation_thread_status_mutex);
 	
 	if (ca_key) {
 		gnutls_x509_privkey_deinit ((* ca_key));
@@ -159,20 +159,17 @@ gpointer ca_creation_thread (gpointer data)
 
 GThread * ca_creation_launch_thread (TlsCreationData *creation_data)
 {
-	return g_thread_create (ca_creation_thread,
-				creation_data,
-				TRUE,
-				NULL);
+	return g_thread_new("ca_creation", ca_creation_thread, creation_data);
 }
 
 void ca_creation_lock_status_mutex ()
 {
-	g_static_mutex_lock(&ca_creation_thread_status_mutex);
+	g_mutex_lock(&ca_creation_thread_status_mutex);
 }
 
 void ca_creation_unlock_status_mutex ()
 {
-	g_static_mutex_unlock (&ca_creation_thread_status_mutex);
+	g_mutex_unlock (&ca_creation_thread_status_mutex);
 }
 
 

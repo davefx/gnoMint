@@ -852,7 +852,7 @@ gboolean import_single_file (gchar *filename, gchar **dn, guint64 *id)
 	file_contents = g_new0 (guchar, file_contents_size);
 	memcpy (file_contents, g_mapped_file_get_contents (mapped_file), file_contents_size);
 	
-	g_mapped_file_free (mapped_file);
+	g_mapped_file_unref(mapped_file);
 
 
 	// We start to check each type of file, in PEM and DER
