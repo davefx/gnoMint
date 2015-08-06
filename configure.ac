@@ -1,4 +1,4 @@
-AC_PREREQ(2.52)
+AC_PREREQ([2.64])
 
 AC_INIT(gnoMint, [1.2.1], [<davefx@gmail.com>], gnomint)
 
@@ -9,14 +9,15 @@ AC_DEFINE_UNQUOTED(PACKAGE_COPYRIGHT, "$PACKAGE_COPYRIGHT")
 AC_DEFINE_UNQUOTED(PACKAGE_WEBSITE, "$PACKAGE_WEBSITE")
 AC_DEFINE_UNQUOTED(PACKAGE_AUTHORS, "$PACKAGE_AUTHORS")
 
-AM_INIT_AUTOMAKE([1.9 foreign])
+AM_INIT_AUTOMAKE([1.12 -Wall -Wno-portability subdir-objects])
 
 AC_CONFIG_MACRO_DIR([m4])
 dnl Put the ACLOCAL flags in the Makefile
 AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \${ACLOCAL_FLAGS}"])
 
 dnl Initialize maintainer mode
-AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE([enable])
+AM_SILENT_RULES([yes])
 
 # Check for programs
 AC_ISC_POSIX
@@ -181,7 +182,7 @@ dnl
 
 dnl
 if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall"
+	CFLAGS="-Wall -Werror -Wno-error=unused-but-set-variable"
 	if test "x$use_debug" = "xYes"; then
    	   CFLAGS="$CFLAGS -g -O0"
 	fi
@@ -194,12 +195,12 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
-AC_OUTPUT([
+AC_OUTPUT([ po/Makefile
 Makefile
 src/Makefile
 m4/Makefile
 gui/Makefile
-po/Makefile
+po/Makefile.in
 mime/Makefile
 gconf/Makefile
 gnomint.spec

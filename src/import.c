@@ -695,13 +695,13 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
 
                 // After having all the parts unencrypted, we import all certificates first.
                 for (i=0; i<n_bags; i++) {
-                        gnutls_pkcs12_bag * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
+                        gnutls_pkcs12_bag_t * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
                         guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (*pkcs12_bag);
                         
                         for (i=0; i < num_elements_in_bag; i++) {
-                                gnutls_datum data;
+                                gnutls_datum_t data;
                                 if (gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_CERTIFICATE) {
-                                        gnutls_x509_crt cert;
+                                        gnutls_x509_crt_t cert;
                                         
                                         gnutls_x509_crt_init (&cert);
                                         if (gnutls_pkcs12_bag_get_data(*pkcs12_bag, i, &data) < 0) {
@@ -722,14 +722,14 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                 
                 // Then, we import all PKCS8 private keys.
                 for (i=0; i<n_bags; i++) {
-                        gnutls_pkcs12_bag * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
+                        gnutls_pkcs12_bag_t * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
                         guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (*pkcs12_bag);
                         
                         for (i=0; i < num_elements_in_bag; i++) {
-                                gnutls_datum data;
+                                gnutls_datum_t data;
                                 if (gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_PKCS8_KEY ||
                                     gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY) {
-                                        gnutls_x509_privkey pkey;
+                                        gnutls_x509_privkey_t pkey;
                                         gint result_decryption;
                                         
                                         gnutls_x509_privkey_init (&pkey);
@@ -796,13 +796,13 @@ gint import_pkcs12 (guchar *file_contents, gsize file_contents_size)
                 // Then we import the CRLs
 
                 for (i=0; i<n_bags; i++) {
-                        gnutls_pkcs12_bag * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
+                        gnutls_pkcs12_bag_t * pkcs12_bag = g_array_index (pkcs_bag_array, gnutls_pkcs12_bag_t *, i);
                         guint num_elements_in_bag = gnutls_pkcs12_bag_get_count (*pkcs12_bag);
                         
                         for (i=0; i < num_elements_in_bag; i++) {
-                                gnutls_datum data;
+                                gnutls_datum_t data;
                                 if (gnutls_pkcs12_bag_get_type (*pkcs12_bag, i) == GNUTLS_BAG_CRL) {
-                                        gnutls_x509_crl crl;
+                                        gnutls_x509_crl_t crl;
                                         
                                         gnutls_x509_crl_init (&crl);
                                         if (gnutls_pkcs12_bag_get_data(*pkcs12_bag, i, &data) < 0) {

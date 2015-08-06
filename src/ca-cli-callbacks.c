@@ -345,35 +345,46 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 
 		printf (_("Please enter data corresponding to subject of the Certificate Signing Request:\n"));
 
-		aux = dialog_ask_for_string (_("Enter country (C)"), csr_creation_data->country);
-		if (csr_creation_data->country)
-			g_free (csr_creation_data->country);
-		csr_creation_data->country = aux;
+		if (! c_force_same) {
+			aux = dialog_ask_for_string (_("Enter country (C)"), csr_creation_data->country);
+			if (csr_creation_data->country)
+				g_free (csr_creation_data->country);
+			csr_creation_data->country = aux;
+		}
 		aux = NULL;
 
-		aux = dialog_ask_for_string (_("Enter state or province (ST)"), csr_creation_data->state);
-		if (csr_creation_data->state)
-			g_free (csr_creation_data->state);
-		csr_creation_data->state = aux;
-		aux = NULL;
+		if (! st_force_same) {
+			aux = dialog_ask_for_string (_("Enter state or province (ST)"), csr_creation_data->state);
+			if (csr_creation_data->state)
+				g_free (csr_creation_data->state);
+			csr_creation_data->state = aux;
+			aux = NULL;
+		}
 
-		aux = dialog_ask_for_string (_("Enter locality or city (L)"), csr_creation_data->city);
-		if (csr_creation_data->city)
-			g_free (csr_creation_data->city);
-		csr_creation_data->city = aux;
-		aux = NULL;
+		
+		if (! l_force_same) {
+			aux = dialog_ask_for_string (_("Enter locality or city (L)"), csr_creation_data->city);
+			if (csr_creation_data->city)
+				g_free (csr_creation_data->city);
+			csr_creation_data->city = aux;
+			aux = NULL;
+		}
+		
+		if (! o_force_same) {
+			aux = dialog_ask_for_string (_("Enter organization (O)"), csr_creation_data->org);
+			if (csr_creation_data->org)
+				g_free (csr_creation_data->org);
+			csr_creation_data->org = aux;
+			aux = NULL;
+		}
 
-		aux = dialog_ask_for_string (_("Enter organization (O)"), csr_creation_data->org);
-		if (csr_creation_data->org)
-			g_free (csr_creation_data->org);
-		csr_creation_data->org = aux;
-		aux = NULL;
-
-		aux = dialog_ask_for_string (_("Enter organizational unit (OU)"), csr_creation_data->ou);
-		if (csr_creation_data->ou)
-			g_free (csr_creation_data->ou);
-		csr_creation_data->ou = aux;
-		aux = NULL;
+		if (! ou_force_same) {
+			aux = dialog_ask_for_string (_("Enter organizational unit (OU)"), csr_creation_data->ou);
+			if (csr_creation_data->ou)
+				g_free (csr_creation_data->ou);
+			csr_creation_data->ou = aux;
+			aux = NULL;
+		}
 
 		aux = dialog_ask_for_string (_("Enter common name (CN)"), csr_creation_data->cn);
 		if (csr_creation_data->cn)

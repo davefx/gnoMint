@@ -1802,8 +1802,6 @@ gchar * ca_file_revoke_crt (guint64 id)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-        fprintf (stderr, "%d\n", time(NULL));
-
 	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %"GNOMINT_GUINT64_FORMAT" ;", 
 			       time(NULL),
                                id);

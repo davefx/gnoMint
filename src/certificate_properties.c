@@ -192,7 +192,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");	
-        aux = uint160_strdup_printf (&cert->serial_number);
+        aux = uint160_strdup_printf (serial_number);
 	gtk_label_set_text (GTK_LABEL(widget), aux);
         g_free (aux);
 
@@ -801,7 +801,7 @@ void __certificate_properties_fill_cert_ext_BasicConstraints (GtkTreeStore *stor
 {
 	guint critical;
 	gint result;
-	gint ca;
+	guint ca;
 	gint path_len_constraint;
 	gchar *pathlen_as_string = NULL;
 	GtkTreeIter l;
@@ -971,7 +971,7 @@ void __certificate_properties_fill_cert_ext (GtkTreeStore *store,
 	const gint OID_SIZE_MAX = 128;
 	gchar oid[OID_SIZE_MAX];
 	gsize oid_size = OID_SIZE_MAX;
-	gint critical;
+	guint critical;
 	guint i;
 	GtkTreeIter j;
 	GtkTreeIter k;

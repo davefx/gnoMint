@@ -162,7 +162,7 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 			GIOChannel *gc = g_io_channel_new_file (file_name, "r", &error);
 			if (gc) {
 				g_io_channel_read_to_end (gc, &file_contents, &file_length, &error);
-				g_io_channel_close (gc);
+				g_io_channel_shutdown (gc, TRUE, NULL);
 				
 				do {
 					pem_pkey = tls_load_pkcs8_private_key (file_contents, password, cert->key_id, &tls_error);
