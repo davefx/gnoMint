@@ -195,7 +195,7 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
-AC_OUTPUT([ po/Makefile
+AC_OUTPUT([
 Makefile
 src/Makefile
 m4/Makefile

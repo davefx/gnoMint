@@ -1,3 +1,4 @@
+*~
 *.o
 *.swp
 .deps/
@@ -8,6 +9,7 @@ autom4te.cache/
 compile
 config.guess
 config.log
+config.rpath
 config.status
 config.sub
 configure
@@ -23,11 +25,7 @@ intltool-merge.in
 intltool-update.in
 libtool
 ltmain.sh
-m4/libtool.m4
-m4/ltoptions.m4
-m4/ltsugar.m4
-m4/ltversion.m4
-m4/lt~obsolete.m4
+m4/*.m4
 mime/gnomint.xml
 missing
 mkinstalldirs
