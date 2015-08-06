@@ -1,13 +1,14 @@
-SUBDIRS = m4 src po gui mime gconf
-
-DIST_SUBDIRS = po src gconf
-
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+
+SUBDIRS = src po gui mime gconf
+
+DIST_SUBDIRS = src po gui mime gconf
+
 
 AM_CPPFLAGS = \
     -I$(top_srcdir)
 
-EXTRA_DIST = config.rpath  \
+EXTRA_DIST =  \
 	AUTHORS \
 	BUGS \
 	MAINTAINERS \
@@ -16,16 +17,15 @@ EXTRA_DIST = config.rpath  \
 	TODO \
 	intltool-extract.in \
 	intltool-merge.in \
-	intltool-update.in \
-	mkinstalldirs
+	intltool-update.in 
 
 pkgconfigdir=$(libdir)/pkgconfig
 pkgconfig_DATA = 
 
 # to include gnomint.spec in the distro
 dist-hook: gnomint.spec
-	cp gnomint.spec $(distdir) ; \
-	@if test -d "$(srcdir)/.git"; \
+	@cp gnomint.spec $(distdir) ; \
+	if test -d "$(srcdir)/.git"; \
 	then \
 		echo Creating ChangeLog && \
 		( cd "$(top_srcdir)" && \
@@ -37,6 +37,7 @@ dist-hook: gnomint.spec
 	else \
 		echo A git clone is required to generate a ChangeLog >&2; \
 	fi
+
 DISTCLEANFILES = \
 	intltool-extract \
 	intltool-merge \

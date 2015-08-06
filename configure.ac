@@ -2,14 +2,14 @@ AC_PREREQ([2.64])
 
 AC_INIT(gnoMint, [1.2.1], [<davefx@gmail.com>], gnomint)
 
-PACKAGE_COPYRIGHT="(c) 2006-2009 David Marín Carreño <davefx@gmail.com>"
+PACKAGE_COPYRIGHT="(c) 2006-2015 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
 PACKAGE_AUTHORS=$(cat AUTHORS | tr '\n' ',' | sed 's/,/\\n/g')
 AC_DEFINE_UNQUOTED(PACKAGE_COPYRIGHT, "$PACKAGE_COPYRIGHT")
 AC_DEFINE_UNQUOTED(PACKAGE_WEBSITE, "$PACKAGE_WEBSITE")
 AC_DEFINE_UNQUOTED(PACKAGE_AUTHORS, "$PACKAGE_AUTHORS")
 
-AM_INIT_AUTOMAKE([1.12 -Wall -Wno-portability subdir-objects])
+AM_INIT_AUTOMAKE([1.12 foreign])
 
 AC_CONFIG_MACRO_DIR([m4])
 dnl Put the ACLOCAL flags in the Makefile
