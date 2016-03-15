@@ -538,7 +538,7 @@ gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data,
 	//
 	//__add_ext (certificate, NID_netscape_comment, "gnoMint Generated Certificate");
 
-	if (gnutls_x509_crt_sign(crt, crt, (* key))) {
+	if (gnutls_x509_crt_sign2(crt, crt, (* key), GNUTLS_DIG_SHA512, 0)) {
 		gnutls_x509_crt_deinit (crt);
 		return g_strdup_printf(_("Error when signing self-signed certificate"));
 	}
@@ -606,7 +606,7 @@ gchar * tls_generate_csr (TlsCreationData * creation_data,
 	}
 	
 
-	if (gnutls_x509_crq_sign2(crq, (* key), GNUTLS_DIG_SHA256, 0)) {
+	if (gnutls_x509_crq_sign2(crq, (* key), GNUTLS_DIG_SHA512, 0)) {
 		return g_strdup_printf(_("Error when signing self-signed csr"));
 	}
 	
@@ -840,7 +840,7 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 		gnutls_x509_crt_cpy_crl_dist_points (crt, ca_crt);
 		
 
-	if (gnutls_x509_crt_sign(crt, ca_crt, ca_pkey)) {
+	if (gnutls_x509_crt_sign2(crt, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0)) {
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (crt);
 		gnutls_x509_crt_deinit (ca_crt);
@@ -1057,6 +1057,19 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	g_free (uaux);
 	uaux = NULL;
 
+	size = 0;
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA512, uaux, &size);
+	uaux = g_new0(guchar, size);
+	gnutls_x509_crt_get_fingerprint (*cert, GNUTLS_DIG_SHA512, uaux, &size);
+	res->sha512 = g_new0(gchar, size*3);
+	for (i=0; i<size; i++) {
+		snprintf (&res->sha512[i*3], 3, "%02X", uaux[i]);
+		if (i != size - 1)
+			res->sha512[(i*3) + 2] = ':';
+	}
+	g_free (uaux);
+	uaux = NULL;
+
 	if (gnutls_x509_crt_get_ca_status (*cert, &critical)) {
 		res->uses = g_list_append (res->uses, _("Certification Authority"));
 	}
@@ -1212,6 +1225,7 @@ void tls_cert_free (TlsCert *tlscert)
 	g_free (tlscert->i_dn);
 	g_free (tlscert->sha1);
 	g_free (tlscert->sha256);
+	g_free (tlscert->sha512);
 	g_free (tlscert->md5);
 	g_free (tlscert->key_id);
         g_free (tlscert->crl_distribution_point);
@@ -1453,8 +1467,8 @@ gchar * tls_generate_crl (GList * revoked_certs,
                 return NULL;
 	}
         
-        if (gnutls_x509_crl_sign2 (crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA256, 0)) {
-		fprintf (stderr, "Error signing CRL: %d\n", gnutls_x509_crl_sign2 (crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA256, 0));
+        if (gnutls_x509_crl_sign2 (crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0)) {
+		fprintf (stderr, "Error signing CRL: %d\n", gnutls_x509_crl_sign2 (crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0));
                 return NULL;
         }
 

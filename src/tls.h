@@ -104,6 +104,7 @@ typedef struct __TlsCert {
 	gchar * sha1;
 	gchar * md5;
 	gchar * sha256;
+	gchar * sha512;
 
 	gchar * key_id;
 
