@@ -105,7 +105,6 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 	gchar *pkcs8_private_key = NULL;
 	size_t pkcs8_private_key_len = 0;
 	gnutls_x509_privkey_t key;
-	gint errorcode;
 
 	pem_datum.data = (unsigned char *) pem_private_key;
 	pem_datum.size = strlen(pem_private_key);
@@ -122,7 +121,7 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 
 	/* Calculate pkcs8 length */
 	pkcs8_private_key = g_new0 (gchar, 1);
-	errorcode = gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
+	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
 	g_free (pkcs8_private_key);
 
 	/* Save the private key to a PEM format */
@@ -224,7 +223,6 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
         gnutls_x509_crt_t crt;
         gnutls_pkcs12_t pkcs12;
         gnutls_pkcs12_bag_t bag, key_bag;
-	gint errorcode;
 
         gchar *friendly_name;
         size_t friendly_name_size = 0;
@@ -256,7 +254,7 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
 
 	/* Calculate pkcs8 length */
 	pkcs8_private_key = g_new0 (gchar, 1);
-	errorcode = gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
+	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
 	g_free (pkcs8_private_key);
 
 	/* Save the private key to a DER format */
@@ -283,7 +281,7 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
 
 	/* Calculate DER cert length */
 	cert_der = g_new0 (gchar, 1);
-	errorcode = gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_DER, cert_der, &cert_der_len);
+	gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_DER, cert_der, &cert_der_len);
 	g_free (cert_der);
 
 	/* Save the private key to a DER format */
@@ -300,7 +298,7 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
         /* We obtain a unique ID, from the key_id from the certificate private key.
          */
         key_id = g_new0 (guchar, 1);
-        errorcode = gnutls_x509_privkey_get_key_id(key, 0, key_id, &key_id_size);
+        gnutls_x509_privkey_get_key_id(key, 0, key_id, &key_id_size);
         g_free (key_id);
 
         key_id = g_new0 (guchar, key_id_size);

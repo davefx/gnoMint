@@ -1007,13 +1007,12 @@ void __certificate_properties_fill_cert_ext (GtkTreeStore *store,
 		if (function)
 			function(store, &k, certificate);
 		else {
-			gint result;
 			const gint BUFFER_SIZE_MAX = 1024;
 			gchar buffer[BUFFER_SIZE_MAX];
 			gsize buffer_size = BUFFER_SIZE_MAX;
                         gchar *hex_buffer = NULL;
 
-			result = gnutls_x509_crt_get_extension_data(*certificate, i, buffer, &buffer_size);
+			gnutls_x509_crt_get_extension_data(*certificate, i, buffer, &buffer_size);
 			hex_buffer = __certificate_properties_dump_raw_data((unsigned char *) buffer, buffer_size);
 			gtk_tree_store_append(store, &l, &k);
 			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 

@@ -182,7 +182,7 @@ dnl
 
 dnl
 if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall -Werror -Wno-error=unused-but-set-variable"
+	CFLAGS="-Wall -Werror "
 	if test "x$use_debug" = "xYes"; then
    	   CFLAGS="$CFLAGS -g -O0"
 	fi

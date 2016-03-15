@@ -148,8 +148,6 @@ void __crl_populate_ca_treeview (GtkTreeView *treeview)
 	GtkCellRenderer * renderer = NULL;
         __CrlRefreshModelAddCaUserData pdata;
 
-	guint column_number;
-
 	crl_ca_list_model = gtk_tree_store_new (CRL_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT, G_TYPE_UINT64, G_TYPE_STRING,
                                                 G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
@@ -169,10 +167,10 @@ void __crl_populate_ca_treeview (GtkTreeView *treeview)
 
 	renderer = GTK_CELL_RENDERER (gtk_cell_renderer_text_new());
 
-	column_number = gtk_tree_view_insert_column_with_attributes (treeview,
-								     -1, _("Subject"), renderer,
-								     "markup", CRL_CA_MODEL_COLUMN_SUBJECT,
-								     NULL);
+	gtk_tree_view_insert_column_with_attributes (treeview,
+						     -1, _("Subject"), renderer,
+						     "markup", CRL_CA_MODEL_COLUMN_SUBJECT,
+						     NULL);
 
 	
 	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(crl_ca_list_model));

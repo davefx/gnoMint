@@ -318,7 +318,6 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 #endif
 	gchar model_time_str[100];
 	gchar *result = NULL;
-	size_t size = 0;       	
 
 	gtk_tree_model_get(tree_model, iter, GPOINTER_TO_INT(data), &model_time, -1);
 
@@ -328,10 +327,10 @@ void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
 	}
 #ifndef WIN32	
 	gmtime_r (&model_time, &model_time_tm);
-	size = strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
 #else
 	model_time_tm = gmtime(&model_time);
-	size = strftime(model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), model_time_tm);
+	strftime(model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), model_time_tm);
 #endif
 
 	result = g_strdup (model_time_str);
@@ -470,16 +469,15 @@ gboolean ca_refresh_model_callback ()
                 
 	} else {
 /*                 GtkTooltips * table_tooltips = gtk_tooltips_new(); */
-                guint column_number;
           
 		/* There's no model assigned to the treeview yet, so we add its columns */
 		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
-		column_number = gtk_tree_view_insert_column_with_attributes (treeview,
-                                                                             -1, _("Subject"), renderer,
-                                                                             "markup", CA_MODEL_COLUMN_SUBJECT,
-                                                                             NULL);
+		gtk_tree_view_insert_column_with_attributes (treeview,
+							     -1, _("Subject"), renderer,
+							     "markup", CA_MODEL_COLUMN_SUBJECT,
+							     NULL);
 		
 /*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
 /*                                       _("Subject of the certificate or request"),  */
@@ -487,10 +485,10 @@ gboolean ca_refresh_model_callback ()
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
 		
-		column_number = gtk_tree_view_insert_column_with_data_func (treeview,
-                                                                            -1, "", renderer,
-                                                                            __ca_tree_view_is_ca_datafunc, 
-                                                                            NULL, NULL);
+		gtk_tree_view_insert_column_with_data_func (treeview,
+							    -1, "", renderer,
+							    __ca_tree_view_is_ca_datafunc, 
+							    NULL, NULL);
 
 /*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
 /*                                       _("It's a CA certificate"),  */
@@ -499,10 +497,10 @@ gboolean ca_refresh_model_callback ()
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
 
-		column_number = gtk_tree_view_insert_column_with_data_func (treeview,
-                                                                            -1, "", renderer,
-                                                                            __ca_tree_view_private_key_in_db_datafunc, 
-                                                                            NULL, NULL);
+		gtk_tree_view_insert_column_with_data_func (treeview,
+							    -1, "", renderer,
+							    __ca_tree_view_private_key_in_db_datafunc, 
+							    NULL, NULL);
 
 /*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
 /*                                       _("Private key kept in internal database"),  */
@@ -1338,10 +1336,9 @@ guint64 ca_get_selected_row_id ()
 	GtkTreeIter *iter;
 	guint64 result;
 
-	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
 
-	type = 0;
 	return result;
 }
 
@@ -1350,10 +1347,9 @@ gchar * ca_get_selected_row_pem ()
 	GtkTreeIter *iter;
 	gchar * result;
 
-	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
 	
-	type = 0;
 	return result;
 }
 

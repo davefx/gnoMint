@@ -1200,7 +1200,7 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	printf (_("Certificate:\n"));
 
 	serial_number = &cert->serial_number;
-        aux = uint160_strdup_printf (&cert->serial_number);
+        aux = uint160_strdup_printf (serial_number);
 	printf (_("\tSerial number: %s\n"), aux);
         g_free (aux);
 

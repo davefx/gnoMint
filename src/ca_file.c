@@ -2013,10 +2013,10 @@ void __ca_file_mark_expired_and_revoked_certificates_as_already_shown_in_crl (gu
                 revocation = atol (cursor->data);
                 cursor = g_list_next (cursor);
                 
-                sql = sqlite3_mprintf ("UPDATE certificates SET expired_already_in_crl=1 "
+                sql = sqlite3_mprintf ("UPDATE certificates SET expired_already_in_crl=1, revocation=%ld "
                                        "WHERE parent_id=%"GNOMINT_GUINT64_FORMAT" AND revocation IS NOT NULL AND pem='%q' AND "
                                        "expired_already_in_crl=0 AND expiration < strftime('%%s','now'));",
-                                       ca_id, certificate_pem);
+                                       revocation, ca_id, certificate_pem);
 
 
                 sqlite3_exec (ca_db, sql,
