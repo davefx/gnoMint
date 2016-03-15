@@ -1,8 +1,8 @@
 AC_PREREQ([2.64])
 
-AC_INIT(gnoMint, [1.2.1], [<davefx@gmail.com>], gnomint)
+AC_INIT(gnoMint, [1.3.0], [<davefx@gmail.com>], gnomint)
 
-PACKAGE_COPYRIGHT="(c) 2006-2015 David Marín Carreño <davefx@gmail.com>"
+PACKAGE_COPYRIGHT="(c) 2006-2016 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
 PACKAGE_AUTHORS=$(cat AUTHORS | tr '\n' ',' | sed 's/,/\\n/g')
 AC_DEFINE_UNQUOTED(PACKAGE_COPYRIGHT, "$PACKAGE_COPYRIGHT")

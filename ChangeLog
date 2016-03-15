@@ -1,3 +1,99 @@
+commit aeba061479316a4d135b8ed1a60e4f4cc5e43cf7 (HEAD -> master, origin/master)
+Author: David Marín Carreño <davefx@gmail.com>
+Date:   Tue Mar 15 22:45:33 2016 +0100
+
+    Now all certificates are signed with SHA512 instead of SHA1
+
+commit 1108eb894355927bc6d093c3b810fc64eb6f69cb
+Author: David Marín Carreño <davefx@gmail.com>
+Date:   Tue Mar 15 19:57:39 2016 +0100
+
+    Adding file to .gitignore
+
+commit 66efbc039409651643570d56f008211e63a7d500
+Author: David Marín Carreño <davefx@gmail.com>
+Date:   Tue Mar 15 19:53:32 2016 +0100
+
+    Removing warnings due to variables set but not used
+
+commit a3dc8720912b0097c2880c4cab9ba35b11e2fd50
+Author: David Marín Carreño <davefx@gmail.com>
+Date:   Tue Mar 15 19:25:07 2016 +0100
+
+    Adding support for SHA256
+
+commit 3b937be3ff78e957718c69a3d2183d3fab158eed
+Author: David Marín <davefx@gmail.com>
+Date:   Tue Mar 15 19:21:00 2016 +0100
+
+    Update README
+
+commit ce6c59915ef6fe20c98a0c7c8c1f221249198f2c
+Author: David Marín <davefx@gmail.com>
+Date:   Thu Aug 6 21:40:23 2015 +0200
+
+    Fixing some problems with 'make dist'. Now it works ok
+
+commit 06938a9641de354deed63c1e9ce93f1695e2bd0b
+Author: David Marín <davefx@gmail.com>
+Date:   Thu Aug 6 20:20:20 2015 +0200
+
+    Fixing problems while compiling in Ubuntu 15.04
+
+commit 2ea691ecaf897a616a5e8cddfda075dc1981eb40
+Author: David Marín <davefx@gmail.com>
+Date:   Thu Aug 6 20:06:17 2015 +0200
+
+    Fixing and update source code base so it compiles again...
+
+commit 29f551e01808928abf2f95f0b4d1dfd108225de8
+Author: Kevin Zheng <kevinz5000@gmail.com>
+Date:   Wed Feb 5 17:41:13 2014 -0600
+
+    Compile without -Werror.
+
+commit 3d3e66ac53c9b82ded0e5974094888f0f44a047e
+Author: Kevin Zheng <kevinz5000@gmail.com>
+Date:   Sun Jan 26 16:42:07 2014 -0600
+
+    Clean up deprecated functions.
+
+commit 4fae5bb2a5df0c3f67bfcb53c98e274c01579868
+Author: Kevin Zheng <kevinz5000@gmail.com>
+Date:   Sun Nov 24 12:23:38 2013 -0600
+
+    Clean up autotools and sort gitignore.
+
+commit 69d1de0e85df77bece4de0a1eeb2c8b08f649af7
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 13:02:35 2010 +0200
+
+    Fixing bug #2931708. Now it is not possible to enter invalid DSA keylengths
+
+commit 891a4ac513c5445f919452a13b4bb4316be8ad98
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 12:16:33 2010 +0200
+
+    Completing Spanish translation
+
+commit abf68cd278bcea59d1a2936212a8030cde637fa0
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 12:14:53 2010 +0200
+
+    Adding SHA256 fingerprint
+
+commit f072fb063d253b6f6f029dff05f1044409fd6ff1 (tag: 1.2.1)
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 11:19:44 2010 +0200
+
+    Adding oc.po file
+
+commit b763cbb860433308d4cfc6d4b5301c6b6fae976b
+Author: David Marín <davefx@gmail.com>
+Date:   Wed Aug 11 11:17:57 2010 +0200
+
+    Updating Changelog file
+
 commit 2dd2afe85c99637871113f4fa8d579fc2ccf18c7
 Author: David Marín <davefx@gmail.com>
 Date:   Wed Aug 11 11:14:29 2010 +0200
@@ -34,7 +130,7 @@ Date:   Wed Aug 11 09:32:33 2010 +0200
 
     Fixing use of an already freed string in ca-cli-callbacks.c. Fixes RedHat Bugzilla #584069
 
-commit 3dd98ca24287ddda9c4802cc8397c9e82b449ac2
+commit 3dd98ca24287ddda9c4802cc8397c9e82b449ac2 (tag: 1.2.0)
 Author: David Marín <davefx@gmail.com>
 Date:   Tue Aug 10 18:58:54 2010 +0200
 
@@ -76,7 +172,7 @@ Date:   Tue Jun 1 19:28:06 2010 +0200
 
     Adding execute permissions
 
-commit 7ebea2e4d9923d7ab0b442b1c4134af659b76662
+commit 7ebea2e4d9923d7ab0b442b1c4134af659b76662 (trunk)
 Author: davefx <davefx@8ce44e8e-8d12-0410-9598-ae135bd4683b>
 Date:   Thu Apr 1 22:35:21 2010 +0000
 
