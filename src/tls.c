@@ -568,6 +568,15 @@ gchar * tls_generate_csr (TlsCreationData * creation_data,
 {
 	gnutls_x509_crq_t crq;
 	size_t csr_len = 0;
+	gnutls_privkey_t pkey;
+
+	if (gnutls_privkey_init(&pkey) < 0) {
+ 	        return g_strdup_printf(_("Error when initializing privkey structure"));
+	}
+	
+	if (gnutls_privkey_import_x509(pkey, (* key), 0) < 0) {
+  	        return g_strdup_printf(_("Error when importing private key into privkey structure"));
+	}
 
 	if (gnutls_x509_crq_init (&crq) < 0) {
 		return g_strdup_printf(_("Error when initializing csr structure"));
@@ -606,7 +615,7 @@ gchar * tls_generate_csr (TlsCreationData * creation_data,
 	}
 	
 
-	if (gnutls_x509_crq_sign2(crq, (* key), GNUTLS_DIG_SHA512, 0)) {
+	if (gnutls_x509_crq_privkey_sign(crq, pkey, GNUTLS_DIG_SHA512, 0)) {
 		return g_strdup_printf(_("Error when signing self-signed csr"));
 	}
 	
@@ -1393,6 +1402,7 @@ gchar * tls_generate_crl (GList * revoked_certs,
 
         gnutls_x509_crt_t ca_crt;
         gnutls_x509_privkey_t ca_pkey;
+	gnutls_privkey_t ca_privkey;
 
         GList *cursor = NULL;
 
@@ -1466,9 +1476,20 @@ gchar * tls_generate_crl (GList * revoked_certs,
 		fprintf (stderr, "Error importing ca privkey\n");
                 return NULL;
 	}
-        
-        if (gnutls_x509_crl_sign2 (crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0)) {
-		fprintf (stderr, "Error signing CRL: %d\n", gnutls_x509_crl_sign2 (crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0));
+
+	if (gnutls_privkey_init(& ca_privkey) < 0) {
+		fprintf(stderr, "Error when initializing privkey structure");
+	        return NULL;
+	}
+
+	if (gnutls_privkey_import_x509(ca_privkey, ca_pkey, 0) < 0) {
+	        fprintf(stderr, "Error when importing private key into privkey structure");
+		return NULL;
+	}
+
+	
+        if (gnutls_x509_crl_privkey_sign (crl, ca_crt, ca_privkey, GNUTLS_DIG_SHA512, 0)) {
+		fprintf (stderr, "Error signing CRL: %d\n", gnutls_x509_crl_privkey_sign (crl, ca_crt, ca_privkey, GNUTLS_DIG_SHA512, 0));
                 return NULL;
         }
 

@@ -25,6 +25,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/pkcs12.h>
+#include <gnutls/abstract.h>
 #include <stdio.h>
 
 #define TLS_INVALID_PASSWORD GNUTLS_E_DECRYPTION_FAILED
