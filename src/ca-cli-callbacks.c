@@ -301,7 +301,7 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		TlsCert *tlscert = NULL;
 		gchar *pem = NULL;
 
-		pem = ca_file_get_public_pem_from_id (ca_id, CA_FILE_ELEMENT_TYPE_CERT);
+		pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 		g_assert (pem);
 
                 tlscert = tls_parse_cert_pem (pem);
