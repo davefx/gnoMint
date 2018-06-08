@@ -182,9 +182,9 @@ dnl
 
 dnl
 if test "x$GCC" = "xyes"; then
-	CFLAGS="-Wall -Werror "
+	CFLAGS+="-Wall "
 	if test "x$use_debug" = "xYes"; then
-   	   CFLAGS="$CFLAGS -g -O0"
+   	   CFLAGS+="$CFLAGS -g -O0"
 	fi
 fi
 
