@@ -202,7 +202,6 @@ AC_SUBST(LDFLAGS)
 AC_CONFIG_FILES([
 Makefile
 src/Makefile
-m4/Makefile
 gui/Makefile
 po/Makefile.in
 mime/Makefile
