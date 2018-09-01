@@ -933,7 +933,7 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
-	gint id;
+	guint64 id;
 	gchar * strerror = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
@@ -984,7 +984,7 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
-	gint id;
+	guint64 id;
         gchar * error_msg = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
@@ -1033,7 +1033,7 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
-	gint id;
+	guint64 id;
 
         gchar *error_msg = NULL;
 
@@ -1198,7 +1198,7 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 	GtkTreeIter *iter = NULL;	
 	gint type;
 	gchar *filename = NULL;
-	gint id;
+	guint64 id;
 
 	type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 
@@ -1231,7 +1231,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
-	gint id = 0;
+	guint64 id = 0;
 
 	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
 		gtk_tree_iter_free (iter);
@@ -1290,7 +1290,7 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
-	gint id = 0;
+	guint64 id = 0;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
 		gtk_tree_iter_free (iter);
