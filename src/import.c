@@ -82,7 +82,7 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	printf (_("The whole selected file, or some of its elements, seems to\n"
 		  "be cyphered using a password or passphrase. For importing\n"
 		  "the file into gnoMint database, you must provide an \n"
-		  "appropiate password.\n"));
+		  "appropriate password.\n"));
 
 	prompt = g_strdup_printf (_("Please introduce password for `%s'"), crypted_part_description);
 	password = dialog_ask_for_password (prompt);
