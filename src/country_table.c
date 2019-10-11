@@ -520,7 +520,7 @@ void country_table_populate()
 	country_table[i++].code = "VU";
 	country_table[i].name = D_("Venezuela");
 	country_table[i++].code = "VE";
-	country_table[i].name = D_("Viet Nam");
+	country_table[i].name = D_("Vietnam");
 	country_table[i++].code = "VN";
 	country_table[i].name = D_("Virgin Islands, British");
 	country_table[i++].code = "VG";

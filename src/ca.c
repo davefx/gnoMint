@@ -989,7 +989,7 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export uncrypted private key"),
+	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export unencrypted private key"),
 							  GTK_WINDOW(widget),
 							  GTK_FILE_CHOOSER_ACTION_SAVE,
 							  _("_Cancel"), GTK_RESPONSE_CANCEL,
