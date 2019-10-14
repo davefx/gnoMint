@@ -1,15 +1,16 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="2.16"/>
-  <object class="GtkVBox" id="san_manager_vbox">
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkBox" id="san_manager_vbox">
     <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="orientation">vertical</property>
     <property name="spacing">6</property>
     <child>
       <object class="GtkScrolledWindow" id="scrolled_window">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="hscrollbar_policy">automatic</property>
-        <property name="vscrollbar_policy">automatic</property>
         <property name="shadow_type">in</property>
         <property name="height_request">120</property>
         <child>
@@ -54,17 +55,17 @@
       </packing>
     </child>
     <child>
-      <object class="GtkHButtonBox" id="button_box">
+      <object class="GtkButtonBox" id="button_box">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <property name="spacing">6</property>
         <property name="layout_style">start</property>
         <child>
           <object class="GtkButton" id="add_button">
-            <property name="label">gtk-add</property>
+            <property name="label" translatable="yes">_Add</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_stock">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -74,11 +75,10 @@
         </child>
         <child>
           <object class="GtkButton" id="edit_button">
-            <property name="label">gtk-edit</property>
+            <property name="label" translatable="yes">_Edit</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_stock">True</property>
             <property name="sensitive">False</property>
           </object>
           <packing>
@@ -89,11 +89,10 @@
         </child>
         <child>
           <object class="GtkButton" id="remove_button">
-            <property name="label">gtk-remove</property>
+            <property name="label" translatable="yes">_Remove</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_stock">True</property>
             <property name="sensitive">False</property>
           </object>
           <packing>
