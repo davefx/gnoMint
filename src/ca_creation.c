@@ -29,7 +29,7 @@
 
 gint ca_creation_is_launched = -1;
 
-static GMutex ca_creation_thread_status_mutex = G_STATIC_MUTEX_INIT;
+static GMutex ca_creation_thread_status_mutex;
 gint ca_creation_thread_status = 0;
 gchar * ca_creation_message = "";
 
