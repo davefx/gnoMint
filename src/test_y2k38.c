@@ -10,6 +10,36 @@
 #include <string.h>
 #include <assert.h>
 
+// Portable timegm() implementation for systems that don't have it
+#ifdef WIN32
+#define _CRT_SECURE_NO_WARNINGS
+#include <windows.h>
+// On Windows, use _mkgmtime if available, otherwise use a portable implementation
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#define timegm _mkgmtime
+#else
+// Portable timegm implementation for older Windows systems
+static time_t timegm(struct tm *tm) {
+    time_t ret;
+    char *tz;
+    
+    tz = getenv("TZ");
+    putenv("TZ=UTC");
+    tzset();
+    ret = mktime(tm);
+    if (tz) {
+        char buf[256];
+        snprintf(buf, sizeof(buf), "TZ=%s", tz);
+        putenv(buf);
+    } else {
+        putenv("TZ=");
+    }
+    tzset();
+    return ret;
+}
+#endif
+#endif
+
 // Test that time_t is 64-bit
 void test_time_t_size() {
     printf("Test 1: Checking time_t size...\n");
@@ -38,13 +68,8 @@ void test_dates_beyond_2038() {
     test_tm.tm_min = 0;
     test_tm.tm_sec = 0;
     
-    // Use timegm() for UTC time conversion (avoids timezone issues)
-    #ifndef WIN32
+    // Use timegm() for UTC time conversion (portable implementation above)
     time_t test_time = timegm(&test_tm);
-    #else
-    // On Windows, use _mkgmtime if available
-    time_t test_time = _mkgmtime(&test_tm);
-    #endif
     
     printf("  Testing date: 2039-01-01 00:00:00 UTC\n");
     printf("  time_t value: %ld\n", (long)test_time);
