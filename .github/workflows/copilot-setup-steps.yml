@@ -1,0 +1,86 @@
+name: GitHub Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install all project dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            gcc \
+            g++ \
+            make \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            libgtk-3-dev \
+            libglib2.0-dev \
+            libgnutls28-dev \
+            gnutls-bin \
+            libsqlite3-dev \
+            libgcrypt20-dev \
+            libreadline-dev \
+            libgdk-pixbuf2.0-dev \
+            gettext \
+            intltool \
+            iso-codes
+      
+      - name: Verify dependencies
+        run: |
+          echo "==================================="
+          echo "Verifying installed dependencies..."
+          echo "==================================="
+          echo ""
+          echo "GCC version:"
+          gcc --version | head -n 1
+          echo ""
+          echo "GTK+ version:"
+          pkg-config --modversion gtk+-3.0
+          echo ""
+          echo "GLib version:"
+          pkg-config --modversion glib-2.0
+          echo ""
+          echo "GnuTLS version:"
+          GNUTLS_VERSION=$(pkg-config --modversion gnutls)
+          echo "$GNUTLS_VERSION"
+          echo "Minimum required: 2.0 (advanced features: 2.7.4)"
+          echo ""
+          echo "SQLite version:"
+          pkg-config --modversion sqlite3
+          echo ""
+          echo "libgcrypt version:"
+          libgcrypt-config --version
+          echo ""
+          echo "==================================="
+          echo "All dependencies installed!"
+          echo "==================================="
+      
+      - name: Generate build configuration
+        run: |
+          ./autogen.sh
+      
+      - name: Configure project
+        run: |
+          ./configure
+      
+      - name: Build project
+        run: |
+          make
+      
+      - name: Display build summary
+        run: |
+          echo "==================================="
+          echo "Build completed successfully!"
+          echo "==================================="
