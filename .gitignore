@@ -34,3 +34,4 @@ po/.intltool-merge-cache
 po/POTFILES
 po/stamp-it
 po/Makefile.in.in
+gui/gnomint.appdata.xml
