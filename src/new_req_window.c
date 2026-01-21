@@ -23,6 +23,7 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "creation_process_window.h"
 #include "ca_file.h"
@@ -44,7 +45,9 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
       NEW_REQ_CA_MODEL_COLUMN_DN=3,
       NEW_REQ_CA_MODEL_COLUMN_PARENT_DN=4,
       NEW_REQ_CA_MODEL_COLUMN_PEM=5,
-      NEW_REQ_CA_MODEL_COLUMN_NUMBER=6}
+      NEW_REQ_CA_MODEL_COLUMN_EXPIRATION=6,
+      NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT=7,
+      NEW_REQ_CA_MODEL_COLUMN_NUMBER=8}
         NewReqCaListModelColumns;
 
 typedef struct {
@@ -73,6 +76,13 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	GtkTreeStore * new_model = pdata->new_model;
 
         const gchar * string_value;
+	gchar *subject_with_expiration = NULL;
+
+	// Format subject with expiration year
+	subject_with_expiration = ca_file_format_subject_with_expiration(
+		argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT], 
+		argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION],
+		argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT]);
 
 	// First we check if this is the first CA, or is a self-signed certificate
 	if (! pdata->last_ca_iter || (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_DN],argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN])) ) {
@@ -131,10 +141,12 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	gtk_tree_store_set (new_model, &iter,
 			    0, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_ID]), 
 			    1, argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL],
-			    2, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT],
+			    2, subject_with_expiration,
 			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
 			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
                             5, argv[NEW_REQ_CA_MODEL_COLUMN_PEM],
+			    6, argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION],
+			    7, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT],
 			    -1);
 	if (pdata->last_ca_iter)
 		gtk_tree_iter_free (pdata->last_ca_iter);
@@ -142,6 +154,7 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 
 	g_free (last_dn_value);
 	g_free (last_parent_dn_value);
+	g_free (subject_with_expiration);
 
 	return 0;
 }
@@ -155,7 +168,7 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
         __NewReqWindowRefreshModelAddCaUserData pdata;
 
 	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_STRING, G_TYPE_STRING,
-						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
         pdata.new_model = new_req_ca_list_model;
         pdata.last_parent_iter = NULL;
