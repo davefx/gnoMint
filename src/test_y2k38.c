@@ -113,12 +113,8 @@ void test_dates_far_future() {
     struct tm future_tm = *now_tm;
     future_tm.tm_year += 50;
     
-    // Use timegm() for UTC time conversion
-    #ifndef WIN32
+    // Use timegm() for UTC time conversion (portable implementation above)
     time_t future_time = timegm(&future_tm);
-    #else
-    time_t future_time = _mkgmtime(&future_tm);
-    #endif
     
     if (future_time == (time_t)-1) {
         printf("  ✗ FAIL: timegm() failed for date 50 years in the future\n");
