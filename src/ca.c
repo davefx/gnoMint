@@ -1430,135 +1430,18 @@ G_MODULE_EXPORT void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data
 
 
 
-gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
-{
-	GObject *menu, *widget;
-	GtkTreeView * tree_view =  GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-	GtkTreeIter *iter = NULL;
-	gboolean pk_indb, is_revoked;
-	gint selection_type;
-	GdkDisplay *display;
-	GdkSeat *seat;
-	GdkDevice *pointer;
-	GdkWindow *window;
-	gint x, y;
-	GdkRectangle rect;
-
-	selection_type  = __ca_selection_type (tree_view, &iter);
-	switch (selection_type) {
-		
-	case CA_FILE_ELEMENT_TYPE_CERT:
-		if (!cert_popup_menu_gtkb) {
-			if (iter)
-				gtk_tree_iter_free (iter);
-			return FALSE;
-		}
-		
-		menu = gtk_builder_get_object (cert_popup_menu_gtkb,
-					     "certificate_popup_menu");
-		
-		if (!menu) {
-			if (iter)
-				gtk_tree_iter_free (iter);
-			return FALSE;
-		}
-		
-		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-				   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
-		
-		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
-		if (widget)
-			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-		
-		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
-		if (widget)
-			gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
-
-		/* Get current pointer position and show menu there */
-		window = gtk_widget_get_window (GTK_WIDGET(tree_view));
-		if (window) {
-			display = gdk_window_get_display (window);
-			seat = gdk_display_get_default_seat (display);
-			pointer = gdk_seat_get_pointer (seat);
-			gdk_window_get_device_position (window, pointer, &x, &y, NULL);
-			
-			rect.x = x;
-			rect.y = y;
-			rect.width = 1;
-			rect.height = 1;
-			
-			/* Attach menu to widget to ensure proper behavior */
-			gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
-			gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
-						GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, NULL);
-		}
-		gtk_tree_iter_free (iter);
-		return FALSE;
-	case CA_FILE_ELEMENT_TYPE_CSR:
-		if (!csr_popup_menu_gtkb) {
-			if (iter)
-				gtk_tree_iter_free (iter);
-			return FALSE;
-		}
-		
-		menu = gtk_builder_get_object (csr_popup_menu_gtkb,
-					     "csr_popup_menu");
-
-		if (!menu) {
-			if (iter)
-				gtk_tree_iter_free (iter);
-			return FALSE;
-		}
-
-		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-				   -1);
-		
-		widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
-		if (widget)
-			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-		
-		/* Get current pointer position and show menu there */
-		window = gtk_widget_get_window (GTK_WIDGET(tree_view));
-		if (window) {
-			display = gdk_window_get_display (window);
-			seat = gdk_display_get_default_seat (display);
-			pointer = gdk_seat_get_pointer (seat);
-			gdk_window_get_device_position (window, pointer, &x, &y, NULL);
-			
-			rect.x = x;
-			rect.y = y;
-			rect.width = 1;
-			rect.height = 1;
-			
-			/* Attach menu to widget to ensure proper behavior */
-			gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
-			gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
-						GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, NULL);
-		}
-		gtk_tree_iter_free (iter);
-		return FALSE;
-	default:
-	case -1:
-		if (iter)
-			gtk_tree_iter_free (iter);
-		return FALSE;
-	}
-
-}
-
-void ca_treeview_popup_timeout_program (GdkEventButton *event)
-{
-	g_timeout_add (1, ca_treeview_popup_timeout_program_cb, NULL); 
-
-}
-					
 
 G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 				    GdkEvent *event, gpointer user_data)
 {
 	GdkEventButton *event_button;
+	GObject *menu, *widget;
+	GtkTreeIter *iter = NULL;
+	gboolean pk_indb, is_revoked;
+	gint selection_type;
+	GdkWindow *window;
+	gint x, y;
+	GdkRectangle rect;
 	
 	g_return_val_if_fail (event != NULL, FALSE);
 	
@@ -1566,7 +1449,105 @@ G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 
 		event_button = (GdkEventButton *) event;
 		if (event_button->button == 3) {
-			ca_treeview_popup_timeout_program (event_button);
+			/* Handle right-click popup menu directly */
+			selection_type  = __ca_selection_type (tree_view, &iter);
+			
+			switch (selection_type) {
+				
+			case CA_FILE_ELEMENT_TYPE_CERT:
+				if (!cert_popup_menu_gtkb) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+				
+				menu = gtk_builder_get_object (cert_popup_menu_gtkb,
+							     "certificate_popup_menu");
+				
+				if (!menu) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+				
+				gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+						   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+						   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
+				
+				widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
+				if (widget)
+					gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+				
+				widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
+				if (widget)
+					gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
+
+				/* Get click position and show menu there */
+				window = gtk_widget_get_window (GTK_WIDGET(tree_view));
+				if (window) {
+					gdk_window_get_device_position (window, event_button->device, &x, &y, NULL);
+					
+					rect.x = x;
+					rect.y = y;
+					rect.width = 1;
+					rect.height = 1;
+					
+					/* Attach menu to widget and show at click position */
+					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
+					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
+								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, 
+								(GdkEvent *)event_button);
+				}
+				gtk_tree_iter_free (iter);
+				return TRUE;  /* Event handled */
+			case CA_FILE_ELEMENT_TYPE_CSR:
+				if (!csr_popup_menu_gtkb) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+				
+				menu = gtk_builder_get_object (csr_popup_menu_gtkb,
+							     "csr_popup_menu");
+
+				if (!menu) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+
+				gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+						   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+						   -1);
+				
+				widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
+				if (widget)
+					gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+				
+				/* Get click position and show menu there */
+				window = gtk_widget_get_window (GTK_WIDGET(tree_view));
+				if (window) {
+					gdk_window_get_device_position (window, event_button->device, &x, &y, NULL);
+					
+					rect.x = x;
+					rect.y = y;
+					rect.width = 1;
+					rect.height = 1;
+					
+					/* Attach menu to widget and show at click position */
+					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
+					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
+								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST,
+								(GdkEvent *)event_button);
+				}
+				gtk_tree_iter_free (iter);
+				return TRUE;  /* Event handled */
+			default:
+			case -1:
+				if (iter)
+					gtk_tree_iter_free (iter);
+				return FALSE;
+			}
 		}
 	}
 	
