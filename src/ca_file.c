@@ -169,7 +169,7 @@ gchar ** __ca_file_get_single_row (sqlite3 *db, const gchar *query, ...)
 {
 	gchar **result = NULL;
 	gchar *sql = NULL;
-	gchar * error;
+	gchar * error = NULL;
 	va_list list;	
 
 	va_start (list, query);

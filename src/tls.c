@@ -51,9 +51,8 @@ gchar * tls_generate_rsa_keys (TlsCreationData *creation_data,
 
 
 	/* Calculate private key length */
-	(* private_key) = g_new0 (gchar, 1);	
+	(* private_key) = NULL;	
 	gnutls_x509_privkey_export ((** key), GNUTLS_X509_FMT_PEM, (* private_key), &private_key_len);
-	g_free (* private_key);
 
 	/* Save the private key to a PEM format */
 	(* private_key) = g_new0 (gchar, private_key_len);	
@@ -85,9 +84,8 @@ gchar * tls_generate_dsa_keys (TlsCreationData *creation_data,
 
 
 	/* Calculate private key length */
-	(* private_key) = g_new0 (gchar, 1);	
+	(* private_key) = NULL;	
 	gnutls_x509_privkey_export ((** key), GNUTLS_X509_FMT_PEM, (* private_key), &private_key_len);
-	g_free (* private_key);
 
 	/* Save the private key to a PEM format */
 	(* private_key) = g_new0 (gchar, private_key_len);	
@@ -120,9 +118,8 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 	}
 
 	/* Calculate pkcs8 length */
-	pkcs8_private_key = g_new0 (gchar, 1);
+	pkcs8_private_key = NULL;
 	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
-	g_free (pkcs8_private_key);
 
 	/* Save the private key to a PEM format */
 	pkcs8_private_key = g_new0 (gchar, pkcs8_private_key_len);	
@@ -1110,19 +1107,19 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	while (gnutls_x509_crt_get_key_purpose_oid (*cert, i, aux, &size, &critical) >= 0) {
 		uaux = g_new0(guchar, size);
 		gnutls_x509_crt_get_key_purpose_oid (*cert, i, aux, &size, &critical);
-		if (strcasecmp (aux, GNUTLS_KP_TLS_WWW_SERVER) == 0)
+		if (aux && strcasecmp (aux, GNUTLS_KP_TLS_WWW_SERVER) == 0)
 			res->uses = g_list_append (res->uses, _("TLS WWW Server"));
-		else if (strcasecmp (aux, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
 			res->uses = g_list_append (res->uses, _("TLS WWW Client."));
-		else if (strcasecmp (aux, GNUTLS_KP_CODE_SIGNING) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_CODE_SIGNING) == 0)
 			res->uses = g_list_append (res->uses, _("Code signing"));
-		else if (strcasecmp (aux, GNUTLS_KP_EMAIL_PROTECTION) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_EMAIL_PROTECTION) == 0)
 			res->uses = g_list_append (res->uses, _("Email protection"));
-		else if (strcasecmp (aux, GNUTLS_KP_TIME_STAMPING) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_TIME_STAMPING) == 0)
 			res->uses = g_list_append (res->uses, _("Time stamping"));
-		else if (strcasecmp (aux, GNUTLS_KP_OCSP_SIGNING) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_OCSP_SIGNING) == 0)
 			res->uses = g_list_append (res->uses, _("OCSP signing"));
-		else if (strcasecmp (aux, GNUTLS_KP_ANY) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_ANY) == 0)
 			res->uses = g_list_append (res->uses, _("Any purpose"));
 		g_free (uaux);
 		size = 0;

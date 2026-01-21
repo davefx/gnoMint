@@ -69,7 +69,8 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 
 	file = g_io_channel_new_file (filename, "w", &error);
 	if (error) {
-		g_free (password);
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
 	} 
 
@@ -88,6 +89,8 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 	if (!crypted_pkey || !dn) {
 		pkey_manage_data_free (crypted_pkey);
 		g_free (dn);
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while getting private key."));
 	}
 
@@ -97,6 +100,8 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 	g_free (dn);
 
 	if (! privatekey) {
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while uncrypting private key."));
 	}
 	
@@ -115,12 +120,16 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 	g_free (privatekey);
 	
 	if (!pem) {
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while password-protecting private key."));
 	}
 	
 	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 	if (error) {
 		g_free (pem);
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
 	} 
 	g_free (pem);
@@ -149,6 +158,8 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
         
         file = g_io_channel_new_file (filename, "w", &error);
 	if (error) {
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
 	} 
 	
@@ -163,6 +174,8 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 	if (!crypted_pkey || !dn) {
 		pkey_manage_data_free(crypted_pkey);
 		g_free (dn);
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while getting private key."));
 	}
 	
@@ -172,11 +185,16 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 	g_free (dn);
 	
 	if (!pem) {
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while decrypting private key."));
 	}
 	
 	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 	if (error) {
+		g_free (pem);
+		if (file)
+			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
 	} 
 	g_free (pem);

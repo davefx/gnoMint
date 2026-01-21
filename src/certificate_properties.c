@@ -278,7 +278,11 @@ gchar * __certificate_properties_dump_raw_data(const unsigned char *buffer, size
 	}
 	for (i = 0; i < buffer_size; i++)
 	{
-		result_iterator += sprintf(result_iterator, "%02x:", buffer[i]);
+		size_t remaining = 4 * buffer_size - (result_iterator - result);
+		int written = snprintf(result_iterator, remaining, "%02x:", buffer[i]);
+		if (written < 0 || written >= remaining)
+			break;
+		result_iterator += written;
 		if ((i % BYTES_PER_LINE) == BYTES_PER_LINE - 1)
 			*result_iterator++ = '\n';
 	}
@@ -298,7 +302,11 @@ const gchar * __certificate_properties_lookup_oid_label(const certificate_proper
 	for (i = certificate_properties_oid_label_table; i->oid; i++)
 		if (strcmp(i->oid, oid) == 0)
 			break;
-	return _(i->label);
+	
+	if (i->label)
+		return _(i->label);
+	else
+		return _("Unknown");
 }
 
 
