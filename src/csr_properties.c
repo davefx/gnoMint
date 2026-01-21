@@ -67,6 +67,9 @@ void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectOULabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->ou);
 
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectEmailLabel1");	
+	gtk_label_set_text (GTK_LABEL(widget), csr->emailAddress);
+
 	if (! privkey_in_db) {
 		widget = gtk_builder_get_object (csr_properties_window_gtkb, "privatekey_in_db_label");
 		gtk_label_set_markup (GTK_LABEL(widget), _("<b>This Certificate Signing Request has its corresponding private key saved in a external file.</b>"));
