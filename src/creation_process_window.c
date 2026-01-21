@@ -148,6 +148,10 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 	
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
 	gtk_widget_show_all (GTK_WIDGET(widget));
+	
+	/* Process pending events to ensure window is displayed */
+	while (gtk_events_pending())
+		gtk_main_iteration();
 
 	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
@@ -275,6 +279,10 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
 	gtk_widget_show_all (GTK_WIDGET(widget));
+	
+	/* Process pending events to ensure window is displayed */
+	while (gtk_events_pending())
+		gtk_main_iteration();
 
 	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 
