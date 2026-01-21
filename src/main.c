@@ -19,6 +19,7 @@
 
 #include <libintl.h>
 #include <glib.h>
+#include <gio/gio.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
@@ -208,7 +209,16 @@ int main (int   argc,
                                 /* Copy the old file to the new location */
                                 GFile *old_file = g_file_new_for_path(old_defaultfile);
                                 GFile *new_file = g_file_new_for_path(defaultfile);
-                                g_file_copy(old_file, new_file, G_FILE_COPY_NONE, NULL, NULL, NULL, NULL);
+                                GError *error = NULL;
+                                
+                                if (!g_file_copy(old_file, new_file, G_FILE_COPY_NONE, NULL, NULL, NULL, &error)) {
+                                        g_warning("Failed to migrate database from %s to %s: %s", 
+                                                  old_defaultfile, defaultfile, error ? error->message : "unknown error");
+                                        if (error) {
+                                                g_error_free(error);
+                                        }
+                                }
+                                
                                 g_object_unref(old_file);
                                 g_object_unref(new_file);
                         }
