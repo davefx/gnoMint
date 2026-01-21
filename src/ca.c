@@ -1360,11 +1360,12 @@ gboolean ca_open (gchar *filename, gboolean create)
 guint64 ca_get_selected_row_id ()
 {
 	GtkTreeIter *iter;
-	guint64 result;
+	guint64 result = 0;
 
-	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
-	gtk_tree_iter_free (iter);
+	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
+		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
+		gtk_tree_iter_free (iter);
+	}
 
 	return result;
 }
@@ -1372,11 +1373,12 @@ guint64 ca_get_selected_row_id ()
 gchar * ca_get_selected_row_pem ()
 {
 	GtkTreeIter *iter;
-	gchar * result;
+	gchar * result = NULL;
 
-	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
-	gtk_tree_iter_free (iter);
+	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
+		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
+		gtk_tree_iter_free (iter);
+	}
 	
 	return result;
 }
