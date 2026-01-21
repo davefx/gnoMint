@@ -1469,7 +1469,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		if (widget)
 			gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
-		gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
+		gtk_menu_popup_at_widget (GTK_MENU(menu), GTK_WIDGET(tree_view),
+					  GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
@@ -1496,7 +1497,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		if (widget)
 			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
-		gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
+		gtk_menu_popup_at_widget (GTK_MENU(menu), GTK_WIDGET(tree_view),
+					  GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	default:
