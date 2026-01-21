@@ -51,9 +51,8 @@ gchar * tls_generate_rsa_keys (TlsCreationData *creation_data,
 
 
 	/* Calculate private key length */
-	(* private_key) = g_new0 (gchar, 1);	
+	(* private_key) = NULL;	
 	gnutls_x509_privkey_export ((** key), GNUTLS_X509_FMT_PEM, (* private_key), &private_key_len);
-	g_free (* private_key);
 
 	/* Save the private key to a PEM format */
 	(* private_key) = g_new0 (gchar, private_key_len);	
@@ -85,9 +84,8 @@ gchar * tls_generate_dsa_keys (TlsCreationData *creation_data,
 
 
 	/* Calculate private key length */
-	(* private_key) = g_new0 (gchar, 1);	
+	(* private_key) = NULL;	
 	gnutls_x509_privkey_export ((** key), GNUTLS_X509_FMT_PEM, (* private_key), &private_key_len);
-	g_free (* private_key);
 
 	/* Save the private key to a PEM format */
 	(* private_key) = g_new0 (gchar, private_key_len);	
@@ -120,9 +118,8 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 	}
 
 	/* Calculate pkcs8 length */
-	pkcs8_private_key = g_new0 (gchar, 1);
+	pkcs8_private_key = NULL;
 	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
-	g_free (pkcs8_private_key);
 
 	/* Save the private key to a PEM format */
 	pkcs8_private_key = g_new0 (gchar, pkcs8_private_key_len);	
