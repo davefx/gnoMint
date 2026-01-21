@@ -11,46 +11,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Install build essentials
+      - name: Install all project dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential gcc g++ make
-      
-      - name: Install autotools
-        run: |
-          sudo apt-get install -y autoconf automake libtool pkg-config
-      
-      - name: Install GTK+ 3 development files
-        run: |
-          sudo apt-get install -y libgtk-3-dev
-      
-      - name: Install GLib development files
-        run: |
-          sudo apt-get install -y libglib2.0-dev
-      
-      - name: Install GnuTLS development files
-        run: |
-          sudo apt-get install -y libgnutls28-dev gnutls-bin
-      
-      - name: Install SQLite development files
-        run: |
-          sudo apt-get install -y libsqlite3-dev
-      
-      - name: Install libgcrypt development files
-        run: |
-          sudo apt-get install -y libgcrypt20-dev
-      
-      - name: Install readline development files
-        run: |
-          sudo apt-get install -y libreadline-dev
-      
-      - name: Install GDK Pixbuf development files
-        run: |
-          sudo apt-get install -y libgdk-pixbuf2.0-dev
-      
-      - name: Install localization tools
-        run: |
-          sudo apt-get install -y gettext intltool iso-codes
+          sudo apt-get install -y \
+            build-essential \
+            gcc \
+            g++ \
+            make \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            libgtk-3-dev \
+            libglib2.0-dev \
+            libgnutls28-dev \
+            gnutls-bin \
+            libsqlite3-dev \
+            libgcrypt20-dev \
+            libreadline-dev \
+            libgdk-pixbuf2.0-dev \
+            gettext \
+            intltool \
+            iso-codes
       
       - name: Verify dependencies
         run: |
@@ -68,7 +51,9 @@ jobs:
           pkg-config --modversion glib-2.0
           echo ""
           echo "GnuTLS version:"
-          pkg-config --modversion gnutls
+          GNUTLS_VERSION=$(pkg-config --modversion gnutls)
+          echo "$GNUTLS_VERSION"
+          echo "Minimum required: 2.0 (advanced features: 2.7.4)"
           echo ""
           echo "SQLite version:"
           pkg-config --modversion sqlite3
