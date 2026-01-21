@@ -20,6 +20,7 @@
 #include <glib/gi18n.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #ifndef GNOMINTCLI
 #include <glib-object.h>
@@ -46,7 +47,9 @@ enum {CRL_CA_MODEL_COLUMN_ID=0,
       CRL_CA_MODEL_COLUMN_DN=3,
       CRL_CA_MODEL_COLUMN_PARENT_DN=4,
       CRL_CA_MODEL_COLUMN_PEM=5,
-      CRL_CA_MODEL_COLUMN_NUMBER=6}
+      CRL_CA_MODEL_COLUMN_EXPIRATION=6,
+      CRL_CA_MODEL_COLUMN_SUBJECT_COUNT=7,
+      CRL_CA_MODEL_COLUMN_NUMBER=8}
         CrlCaListModelColumns;
 
 typedef struct {
@@ -69,6 +72,13 @@ int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **column
 	GtkTreeStore * new_model = pdata->new_model;
 
         const gchar * string_value;
+	gchar *subject_with_expiration = NULL;
+
+	// Format subject with expiration year
+	subject_with_expiration = ca_file_format_subject_with_expiration(
+		argv[CRL_CA_MODEL_COLUMN_SUBJECT], 
+		argv[CRL_CA_MODEL_COLUMN_EXPIRATION],
+		argv[CRL_CA_MODEL_COLUMN_SUBJECT_COUNT]);
 
 	// First we check if this is the first CA, or is a self-signed certificate
 	if (! pdata->last_ca_iter || (! strcmp (argv[CRL_CA_MODEL_COLUMN_DN],argv[CRL_CA_MODEL_COLUMN_PARENT_DN])) ) {
@@ -127,10 +137,12 @@ int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **column
 	gtk_tree_store_set (new_model, &iter,
 			    CRL_CA_MODEL_COLUMN_ID, atoi(argv[CRL_CA_MODEL_COLUMN_ID]), 
 			    CRL_CA_MODEL_COLUMN_SERIAL, atoll(argv[CRL_CA_MODEL_COLUMN_SERIAL]),
-			    CRL_CA_MODEL_COLUMN_SUBJECT, argv[CRL_CA_MODEL_COLUMN_SUBJECT],
+			    CRL_CA_MODEL_COLUMN_SUBJECT, subject_with_expiration,
 			    CRL_CA_MODEL_COLUMN_DN, argv[CRL_CA_MODEL_COLUMN_DN],
 			    CRL_CA_MODEL_COLUMN_PARENT_DN, argv[CRL_CA_MODEL_COLUMN_PARENT_DN],
                             CRL_CA_MODEL_COLUMN_PEM, argv[CRL_CA_MODEL_COLUMN_PEM],
+			    CRL_CA_MODEL_COLUMN_EXPIRATION, argv[CRL_CA_MODEL_COLUMN_EXPIRATION],
+			    CRL_CA_MODEL_COLUMN_SUBJECT_COUNT, argv[CRL_CA_MODEL_COLUMN_SUBJECT_COUNT],
 			    -1);
 	if (pdata->last_ca_iter)
 		gtk_tree_iter_free (pdata->last_ca_iter);
@@ -138,6 +150,7 @@ int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **column
 
 	g_free (last_dn_value);
 	g_free (last_parent_dn_value);
+	g_free (subject_with_expiration);
 
 	return 0;
 }
@@ -149,7 +162,7 @@ void __crl_populate_ca_treeview (GtkTreeView *treeview)
         __CrlRefreshModelAddCaUserData pdata;
 
 	crl_ca_list_model = gtk_tree_store_new (CRL_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT, G_TYPE_UINT64, G_TYPE_STRING,
-                                                G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+                                                G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
         pdata.new_model = crl_ca_list_model;
         pdata.last_parent_iter = NULL;

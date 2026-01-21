@@ -95,8 +95,11 @@ gint creation_process_window_ca_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	/* Only pulse if we have a valid progress bar widget */
+	if (data && GTK_IS_PROGRESS_BAR(data)) {
+		gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	}
 
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "status_message_label");
 
@@ -138,22 +141,52 @@ gint creation_process_window_ca_pulse (gpointer data)
 void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 {
 	GObject * widget = NULL;
+	GObject * progressbar = NULL;
+	GError * error = NULL;
 		 
 	creation_process_window_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (creation_process_window_gtkb, 
+	
+	if (!gtk_builder_add_from_file (creation_process_window_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "creation_process_window.ui", NULL ),
-				   NULL);
+				   &error)) {
+		g_critical("Failed to load UI file: %s", error ? error->message : "unknown error");
+		if (error) g_error_free(error);
+		return;
+	}
 	
 	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	if (!widget) {
+		g_critical("Failed to get creation_process_window widget");
+		return;
+	}
+	
+	gtk_widget_show_all (GTK_WIDGET(widget));
+	
+	/* Process pending events to ensure window is displayed */
+	while (gtk_events_pending())
+		gtk_main_iteration();
+
 	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
-
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
-
-	timer = g_timeout_add (100, creation_process_window_ca_pulse, widget);
-
+	progressbar = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
+	
+	/* Timer must always start to monitor thread status */
+	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
+		/* Ensure progress bar is visible and pulse it initially */
+		gtk_widget_show (GTK_WIDGET(progressbar));
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(progressbar));
+		timer = g_timeout_add (100, creation_process_window_ca_pulse, progressbar);
+	} else {
+		/* Fallback: start timer with NULL, pulse callback will handle it */
+		if (!progressbar) {
+			g_warning("Progress bar widget 'creation_process_window_progressbar' not found in UI file");
+		} else {
+			g_warning("Widget 'creation_process_window_progressbar' is not a valid GtkProgressBar");
+		}
+		timer = g_timeout_add (100, creation_process_window_ca_pulse, NULL);
+	}
 
 }
 
@@ -221,8 +254,11 @@ gint creation_process_window_csr_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	/* Only pulse if we have a valid progress bar widget */
+	if (data && GTK_IS_PROGRESS_BAR(data)) {
+		gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "status_message_label"));
 
@@ -260,24 +296,56 @@ gint creation_process_window_csr_pulse (gpointer data)
 void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 {
 	GObject * widget = NULL;
+	GObject * progressbar = NULL;
+	GError * error = NULL;
 	
 	creation_process_window_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (creation_process_window_gtkb,
+	
+	if (!gtk_builder_add_from_file (creation_process_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "creation_process_window.ui", NULL),
-				   NULL);
+				   &error)) {
+		g_critical("Failed to load UI file: %s", error ? error->message : "unknown error");
+		if (error) g_error_free(error);
+		return;
+	}
 	
 	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "titleLabel");
-	gtk_label_set_text (GTK_LABEL (widget), _("Creating Certificate Signing Request"));
+	if (widget) {
+		gtk_label_set_text (GTK_LABEL (widget), _("Creating Certificate Signing Request"));
+	}
+
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	if (!widget) {
+		g_critical("Failed to get creation_process_window widget");
+		return;
+	}
+	
+	gtk_widget_show_all (GTK_WIDGET(widget));
+	
+	/* Process pending events to ensure window is displayed */
+	while (gtk_events_pending())
+		gtk_main_iteration();
 
 	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
-
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
-
-	timer = g_timeout_add (100, creation_process_window_csr_pulse, widget);
-
+	progressbar = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
+	
+	/* Timer must always start to monitor thread status */
+	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
+		/* Ensure progress bar is visible and pulse it initially */
+		gtk_widget_show (GTK_WIDGET(progressbar));
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(progressbar));
+		timer = g_timeout_add (100, creation_process_window_csr_pulse, progressbar);
+	} else {
+		/* Fallback: start timer with NULL, pulse callback will handle it */
+		if (!progressbar) {
+			g_warning("Progress bar widget 'creation_process_window_progressbar' not found in UI file");
+		} else {
+			g_warning("Widget 'creation_process_window_progressbar' is not a valid GtkProgressBar");
+		}
+		timer = g_timeout_add (100, creation_process_window_csr_pulse, NULL);
+	}
 
 }

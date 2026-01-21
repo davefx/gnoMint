@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2006-2016 David Marín Carreño <davefx@gmail.com> -->
+<component type="desktop-application">
+  <id>net.sourceforge.gnomint</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <_name>gnoMint</_name>
+  <_summary>X.509 Certification Authority management tool</_summary>
+  
+  <description>
+    <_p>
+      gnoMint is a tool for easily creating and managing certification authorities (CAs).
+      It provides fancy visualization of all your certificates, and their properties, as well
+      as an easy management of the CA activities.
+    </_p>
+    <_p>
+      With gnoMint you can:
+    </_p>
+    <ul>
+      <_li>Create and manage your own Certification Authority (CA)</_li>
+      <_li>Create and sign certificates for servers and users</_li>
+      <_li>Create and manage Certificate Signing Requests (CSRs)</_li>
+      <_li>Export certificates and private keys in several formats (PEM, DER, PKCS#12)</_li>
+      <_li>Revoke certificates and generate Certificate Revocation Lists (CRLs)</_li>
+      <_li>Import existing certificates and CAs</_li>
+    </ul>
+    <_p>
+      gnoMint provides a simple and intuitive graphical interface based on GTK for all these
+      operations, making certificate management accessible even for users without deep knowledge
+      of X.509 standards and cryptography.
+    </_p>
+  </description>
+  
+  <launchable type="desktop-id">gnomint.desktop</launchable>
+  
+  <screenshots>
+    <screenshot type="default">
+      <_caption>Main window showing certificate list</_caption>
+      <image>https://gnomint.sourceforge.net/images/main_window_thumb.png</image>
+    </screenshot>
+  </screenshots>
+  
+  <url type="homepage">https://gnomint.sourceforge.net</url>
+  <url type="bugtracker">https://github.com/davefx/gnoMint/issues</url>
+  
+  <developer id="com.gmail.davefx">
+    <name>David Marín Carreño</name>
+  </developer>
+  
+  <provides>
+    <binary>gnomint</binary>
+  </provides>
+  
+  <!-- Update this section with each new release -->
+  <releases>
+    <release version="1.3.0" date="2016-01-01"/>
+  </releases>
+  
+  <content_rating type="oars-1.1" />
+</component>
