@@ -2804,14 +2804,22 @@ gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gcha
 	}
 	
 	// Only show expiration if there are multiple CAs with the same subject
-	int subject_count = subject_count_str ? atoi(subject_count_str) : 1;
+	int subject_count = 1;
+	if (subject_count_str) {
+		char *endptr;
+		long count = strtol(subject_count_str, &endptr, 10);
+		if (*endptr == '\0' && count > 0) {
+			subject_count = (int)count;
+		}
+	}
+	
 	if (subject_count <= 1 || !expiration_str) {
 		return g_strdup(subject);
 	}
 	
 	time_t expiration_timestamp = (time_t) atoll(expiration_str);
 	struct tm expiration_tm;
-	char date_str[64];
+	char date_str[16];  // "YYYY-MM-DD" + null terminator
 	
 #ifndef WIN32
 	if (localtime_r(&expiration_timestamp, &expiration_tm)) {
