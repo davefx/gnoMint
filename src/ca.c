@@ -1443,32 +1443,55 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 	switch (selection_type) {
 		
 	case CA_FILE_ELEMENT_TYPE_CERT:
+		if (!cert_popup_menu_gtkb) {
+			gtk_tree_iter_free (iter);
+			return FALSE;
+		}
+		
 		menu = gtk_builder_get_object (cert_popup_menu_gtkb,
 					     "certificate_popup_menu");
+		
+		if (!menu) {
+			gtk_tree_iter_free (iter);
+			return FALSE;
+		}
 		
 		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
 				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 				   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
 		
 		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
-		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+		if (widget)
+			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
 		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
-		gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
+		if (widget)
+			gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
 		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
+		if (!csr_popup_menu_gtkb) {
+			gtk_tree_iter_free (iter);
+			return FALSE;
+		}
+		
 		menu = gtk_builder_get_object (csr_popup_menu_gtkb,
 					     "csr_popup_menu");
+
+		if (!menu) {
+			gtk_tree_iter_free (iter);
+			return FALSE;
+		}
 
 		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
 				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 				   -1);
 		
 		widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
-		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+		if (widget)
+			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
 		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
 		gtk_tree_iter_free (iter);
