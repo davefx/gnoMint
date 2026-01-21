@@ -283,7 +283,7 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 	gboolean change_data = FALSE;
 
 	TlsCreationData *csr_creation_data = NULL;
-	guint max_key_length;
+	guint max_key_length = 10240;
 
 
 	if (argc == 2) {
