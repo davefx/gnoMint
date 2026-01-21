@@ -28,6 +28,7 @@ gtkbuilder_DATA =   \
 	new_crl_dialog.ui \
 	new_req_window.ui \
 	preferences_dialog.ui \
+	wizard_window.ui \
 	gnomint.png \
 	key-16.png \
 	ca-stamp-16.png \

@@ -35,7 +35,8 @@ gnomint_SOURCES = \
 	crl.c \
 	uint160.c \
 	import.c \
-	export.c
+	export.c \
+	wizard_window.c
 
 
 gnomint_LDADD = \
@@ -115,4 +116,5 @@ EXTRA_DIST = \
 	uint160.h \
 	import.h \
 	ca-cli.h \
-	ca-cli-callbacks.h
+	ca-cli-callbacks.h \
+	wizard_window.h
