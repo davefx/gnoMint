@@ -138,6 +138,7 @@ gint creation_process_window_ca_pulse (gpointer data)
 void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 {
 	GObject * widget = NULL;
+	GObject * progressbar = NULL;
 		 
 	creation_process_window_gtkb = gtk_builder_new();
 	gtk_builder_add_from_file (creation_process_window_gtkb, 
@@ -155,11 +156,11 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 
 	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
-
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
-
-	timer = g_timeout_add (100, creation_process_window_ca_pulse, widget);
+	progressbar = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
+	
+	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
+		timer = g_timeout_add (100, creation_process_window_ca_pulse, progressbar);
+	}
 
 }
 
@@ -266,6 +267,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 {
 	GObject * widget = NULL;
+	GObject * progressbar = NULL;
 	
 	creation_process_window_gtkb = gtk_builder_new();
 	gtk_builder_add_from_file (creation_process_window_gtkb,
@@ -286,10 +288,10 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 
 	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
-
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
-
-	timer = g_timeout_add (100, creation_process_window_csr_pulse, widget);
+	progressbar = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
+	
+	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
+		timer = g_timeout_add (100, creation_process_window_csr_pulse, progressbar);
+	}
 
 }
