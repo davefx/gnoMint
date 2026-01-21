@@ -456,7 +456,7 @@ G_MODULE_EXPORT void on_new_cert_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
-        gtk_object_destroy(GTK_OBJECT(window));	
+        gtk_widget_destroy(GTK_WIDGET(window));	
 	
 }
 
@@ -743,7 +743,7 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 	}
 
 	widget = G_OBJECT(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
-        gtk_object_destroy(GTK_OBJECT(widget));	
+        gtk_widget_destroy(GTK_WIDGET(widget));	
 
 	dialog_refresh_list();
 
