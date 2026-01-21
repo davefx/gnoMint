@@ -1,0 +1,99 @@
+name: GitHub Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install build essentials
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc g++ make
+      
+      - name: Install autotools
+        run: |
+          sudo apt-get install -y autoconf automake libtool pkg-config
+      
+      - name: Install GTK+ 3 development files
+        run: |
+          sudo apt-get install -y libgtk-3-dev
+      
+      - name: Install GLib development files
+        run: |
+          sudo apt-get install -y libglib2.0-dev
+      
+      - name: Install GnuTLS development files
+        run: |
+          sudo apt-get install -y libgnutls28-dev gnutls-bin
+      
+      - name: Install SQLite development files
+        run: |
+          sudo apt-get install -y libsqlite3-dev
+      
+      - name: Install libgcrypt development files
+        run: |
+          sudo apt-get install -y libgcrypt20-dev
+      
+      - name: Install readline development files
+        run: |
+          sudo apt-get install -y libreadline-dev
+      
+      - name: Install GDK Pixbuf development files
+        run: |
+          sudo apt-get install -y libgdk-pixbuf2.0-dev
+      
+      - name: Install localization tools
+        run: |
+          sudo apt-get install -y gettext intltool iso-codes
+      
+      - name: Verify dependencies
+        run: |
+          echo "==================================="
+          echo "Verifying installed dependencies..."
+          echo "==================================="
+          echo ""
+          echo "GCC version:"
+          gcc --version | head -n 1
+          echo ""
+          echo "GTK+ version:"
+          pkg-config --modversion gtk+-3.0
+          echo ""
+          echo "GLib version:"
+          pkg-config --modversion glib-2.0
+          echo ""
+          echo "GnuTLS version:"
+          pkg-config --modversion gnutls
+          echo ""
+          echo "SQLite version:"
+          pkg-config --modversion sqlite3
+          echo ""
+          echo "libgcrypt version:"
+          libgcrypt-config --version
+          echo ""
+          echo "==================================="
+          echo "All dependencies installed!"
+          echo "==================================="
+      
+      - name: Generate build configuration
+        run: |
+          ./autogen.sh
+      
+      - name: Configure project
+        run: |
+          ./configure
+      
+      - name: Build project
+        run: |
+          make
+      
+      - name: Display build summary
+        run: |
+          echo "==================================="
+          echo "Build completed successfully!"
+          echo "==================================="
