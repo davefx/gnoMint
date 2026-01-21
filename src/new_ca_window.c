@@ -129,7 +129,7 @@ G_MODULE_EXPORT void on_new_ca_cancel_clicked (GtkButton *widget,
 	
 	GtkWindow *window = GTK_WINDOW(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window"));
 
-	gtk_object_destroy(GTK_OBJECT(window));
+	gtk_widget_destroy(GTK_WIDGET(window));
 	
 }
 
@@ -299,7 +299,7 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
         }
 
 	window = GTK_WINDOW(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window"));
-	gtk_object_destroy(GTK_OBJECT(window));
+	gtk_widget_destroy(GTK_WIDGET(window));
 
 	creation_process_window_ca_display (ca_creation_data);
 	

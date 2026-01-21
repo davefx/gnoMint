@@ -242,7 +242,8 @@ void __certificate_properties_populate (const char *certificate_pem)
 		for (i = g_list_length(cert->uses) - 1; i >= 0; i--) {
 			GtkLabel *label = NULL;
 			label = GTK_LABEL(gtk_label_new ((gchar *) g_list_nth_data (cert->uses, i)));
-			gtk_misc_set_alignment (GTK_MISC(label), 0.0, 0.5);
+			gtk_label_set_xalign (label, 0.0);
+			gtk_label_set_yalign (label, 0.5);
 			gtk_box_pack_end (GTK_BOX(widget), GTK_WIDGET(label), 0, 0, 0);
 		}
 		gtk_widget_show_all (GTK_WIDGET(widget));

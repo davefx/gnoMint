@@ -18,36 +18,35 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <libintl.h>
-#include <gconf/gconf-client.h>
+#include <gio/gio.h>
 
 #include <glib/gi18n.h>
 
 #include "preferences.h"
 
 
-static GConfEngine * preferences_engine;
+static GSettings * preferences_settings;
 
 void preferences_init (int argc, char **argv)
 {
-        gconf_init (argc, argv, NULL);
-        preferences_engine = gconf_engine_get_default ();
+        preferences_settings = g_settings_new ("org.gnome.gnomint");
 }
 
 
 gboolean preferences_get_gnome_keyring_export ()
 {
-        return gconf_engine_get_bool (preferences_engine, "/apps/gnomint/gnome_keyring_export", NULL);
+        return g_settings_get_boolean (preferences_settings, "gnome-keyring-export");
 }
 
 void preferences_set_gnome_keyring_export (gboolean new_value)
 {
-        gconf_engine_set_bool (preferences_engine, "/apps/gnomint/gnome_keyring_export", new_value, NULL);
+        g_settings_set_boolean (preferences_settings, "gnome-keyring-export", new_value);
 }
 
 
 void preferences_deinit ()
 {
-        gconf_engine_unref (preferences_engine);
-        preferences_engine = NULL;
+        g_object_unref (preferences_settings);
+        preferences_settings = NULL;
 }
 

@@ -291,8 +291,8 @@ G_MODULE_EXPORT void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_
 	dialog = gtk_file_chooser_dialog_new (_("Create new CA database"),
 					      GTK_WINDOW(widget),
 					      GTK_FILE_CHOOSER_ACTION_SAVE,
-					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-					      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					      _("_Cancel"), GTK_RESPONSE_CANCEL,
+					      _("_Open"), GTK_RESPONSE_ACCEPT,
 					      NULL);
 	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 
@@ -363,8 +363,8 @@ G_MODULE_EXPORT void on_open1_activate  (GtkMenuItem *menuitem, gpointer     use
 	dialog = gtk_file_chooser_dialog_new (_("Open CA database"),
 					      GTK_WINDOW(widget),
 					      GTK_FILE_CHOOSER_ACTION_OPEN,
-					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-					      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					      _("_Cancel"), GTK_RESPONSE_CANCEL,
+					      _("_Open"), GTK_RESPONSE_ACCEPT,
 					      NULL);
 	
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
@@ -451,8 +451,8 @@ G_MODULE_EXPORT void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     
 	dialog = gtk_file_chooser_dialog_new (_("Save CA database as..."),
 					      GTK_WINDOW(widget),
 					      GTK_FILE_CHOOSER_ACTION_SAVE,
-					      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-					      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					      _("_Cancel"), GTK_RESPONSE_CANCEL,
+					      _("_Open"), GTK_RESPONSE_ACCEPT,
 					      NULL);
 	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	

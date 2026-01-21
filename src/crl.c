@@ -213,7 +213,7 @@ void crl_window_display (void)
 G_MODULE_EXPORT void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata)
 {
 	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-        gtk_object_destroy(GTK_OBJECT(window));	
+        gtk_widget_destroy(GTK_WIDGET(window));	
 
 }
 
@@ -241,8 +241,8 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export Certificate Revocation List"),
 							  GTK_WINDOW(widget),
 							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+							  _("_Cancel"), GTK_RESPONSE_CANCEL,
+							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
 		
 	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
@@ -274,7 +274,7 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 
         dialog = GTK_DIALOG(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-        gtk_object_destroy(GTK_OBJECT(dialog));	
+        gtk_widget_destroy(GTK_WIDGET(dialog));	
 			
 }
 
