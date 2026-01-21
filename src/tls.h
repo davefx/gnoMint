@@ -93,6 +93,7 @@ typedef struct __TlsCert {
 	gchar * st;
 	gchar * l;
 	gchar * dn;
+	gchar * emailAddress;
 
 	gchar * i_cn;
 	gchar * i_o;
@@ -101,6 +102,7 @@ typedef struct __TlsCert {
 	gchar * i_st;
 	gchar * i_l;
 	gchar * i_dn;
+	gchar * i_emailAddress;
 
 	gchar * sha1;
 	gchar * md5;
@@ -128,6 +130,7 @@ typedef struct __TlsCsr {
 	gchar * st;
 	gchar * l;
 	gchar * dn;
+	gchar * emailAddress;
 
 	gchar * key_id;
 } TlsCsr;
