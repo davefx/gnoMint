@@ -146,6 +146,9 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 	
 	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	gtk_widget_show_all (GTK_WIDGET(widget));
+
 	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
@@ -153,9 +156,6 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
 	timer = g_timeout_add (100, creation_process_window_ca_pulse, widget);
-
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
-	gtk_widget_show (GTK_WIDGET(widget));
 
 }
 
@@ -273,6 +273,9 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "titleLabel");
 	gtk_label_set_text (GTK_LABEL (widget), _("Creating Certificate Signing Request"));
 
+	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	gtk_widget_show_all (GTK_WIDGET(widget));
+
 	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
@@ -280,8 +283,5 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(widget));
 
 	timer = g_timeout_add (100, creation_process_window_csr_pulse, widget);
-
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
-	gtk_widget_show (GTK_WIDGET(widget));
 
 }
