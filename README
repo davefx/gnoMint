@@ -2,3 +2,19 @@ gnoMint - A Certification Authority Software using GTK libraries.
 
 You can get more information at http://gnomint.sf.net
 
+
+Year 2038 (Y2K38) Support
+--------------------------
+
+gnoMint is designed to handle certificates with expiration dates beyond 
+January 19, 2038 (the Year 2038 problem). The application uses 64-bit 
+time_t values to ensure proper handling of dates far into the future.
+
+The following measures have been implemented:
+- Compile-time flags (_TIME_BITS=64, _FILE_OFFSET_BITS=64) to ensure 
+  64-bit time_t even on 32-bit systems
+- Static assertions to verify time_t is 64-bit at compile time
+- Support for certificate expiration dates well beyond 2038
+
+This ensures gnoMint can safely create and manage certificates with 
+validity periods extending decades into the future.
