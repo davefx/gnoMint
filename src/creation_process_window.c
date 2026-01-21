@@ -163,6 +163,9 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 	
 	/* Timer must always start to monitor thread status */
 	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
+		/* Ensure progress bar is visible and pulse it initially */
+		gtk_widget_show (GTK_WIDGET(progressbar));
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(progressbar));
 		timer = g_timeout_add (100, creation_process_window_ca_pulse, progressbar);
 	} else {
 		/* Fallback: start timer with NULL, pulse callback will handle it */
@@ -303,6 +306,9 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 	
 	/* Timer must always start to monitor thread status */
 	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
+		/* Ensure progress bar is visible and pulse it initially */
+		gtk_widget_show (GTK_WIDGET(progressbar));
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(progressbar));
 		timer = g_timeout_add (100, creation_process_window_csr_pulse, progressbar);
 	} else {
 		/* Fallback: start timer with NULL, pulse callback will handle it */
