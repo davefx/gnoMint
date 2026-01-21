@@ -794,12 +794,16 @@ G_MODULE_EXPORT gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 	switch (__ca_selection_type (tree_view, &selection_iter)) {
 	case CA_FILE_ELEMENT_TYPE_CERT:
 		__ca_activate_certificate_selection (selection_iter);
+		gtk_tree_iter_free (selection_iter);
 		break;
 	case CA_FILE_ELEMENT_TYPE_CSR:
 		__ca_activate_csr_selection (selection_iter);
+		gtk_tree_iter_free (selection_iter);
 		break;
 	case -1:
 	default:
+		if (selection_iter)
+			gtk_tree_iter_free (selection_iter);
 		__ca_deactivate_actions();
 		break;
 	}
@@ -1135,6 +1139,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 	if (!response || response == GTK_RESPONSE_CANCEL) {
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		return;
 	} 
 	
@@ -1143,6 +1148,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		__ca_export_public_pem (iter, type);
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
@@ -1152,6 +1158,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		g_free (__ca_export_private_pkcs8 (iter, type));
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
@@ -1161,6 +1168,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		__ca_export_private_pem (iter, type);
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
@@ -1170,12 +1178,14 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		__ca_export_pkcs12 (iter, type);
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
 	
 	gtk_widget_destroy (GTK_WIDGET(widget));
 	g_object_unref (G_OBJECT(dialog_gtkb));
+	gtk_tree_iter_free (iter);
 	dialog_error (_("Unexpected error"));
 }
 
@@ -1193,6 +1203,7 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 	filename = __ca_export_private_pkcs8 (iter, type);
 
 	if (! filename) {
+		gtk_tree_iter_free (iter);
 		return;
 	}
 	
@@ -1202,6 +1213,7 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 		ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CSR, filename, id);
 
 	g_free (filename);
+	gtk_tree_iter_free (iter);
 
 	dialog_refresh_list();
 }
@@ -1217,8 +1229,10 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	gint response = 0;
 	gint id = 0;
 
-	if (type == CA_FILE_ELEMENT_TYPE_CSR)
+	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
+		gtk_tree_iter_free (iter);
 		return;
+	}
 	
 
 
@@ -1249,6 +1263,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 
 	if (response == GTK_RESPONSE_NO) {
+		gtk_tree_iter_free (iter);
 		return;
 	}
 
@@ -1258,6 +1273,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 
         }
 
+	gtk_tree_iter_free (iter);
 	dialog_refresh_list();
   
 }
@@ -1272,8 +1288,10 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 	gint response = 0;
 	gint id = 0;
 
-	if (type != CA_FILE_ELEMENT_TYPE_CSR)
+	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
+		gtk_tree_iter_free (iter);
 		return;
+	}
 	
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
@@ -1287,12 +1305,14 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 
 	if (response == GTK_RESPONSE_NO) {
+		gtk_tree_iter_free (iter);
 		return;
 	}
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
 	ca_file_remove_csr (id);
 
+	gtk_tree_iter_free (iter);
 	dialog_refresh_list();
 }
 
@@ -1305,8 +1325,10 @@ G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_
 	gchar * csr_parent_id;
 	guint64 csr_id;
 
-	if (type != CA_FILE_ELEMENT_TYPE_CSR)
+	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
+		gtk_tree_iter_free (iter);
 		return;
+	}
 		
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &csr_id, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
 
@@ -1314,6 +1336,7 @@ G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_
 	
 	g_free (csr_pem);
         g_free (csr_parent_id);
+	gtk_tree_iter_free (iter);
 }
 
 
@@ -1341,6 +1364,7 @@ guint64 ca_get_selected_row_id ()
 
 	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
+	gtk_tree_iter_free (iter);
 
 	return result;
 }
@@ -1352,6 +1376,7 @@ gchar * ca_get_selected_row_pem ()
 
 	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
+	gtk_tree_iter_free (iter);
 	
 	return result;
 }
