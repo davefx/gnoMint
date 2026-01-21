@@ -28,6 +28,14 @@
 _Static_assert(sizeof(time_t) >= 8, 
     "time_t must be at least 64 bits to avoid Y2K38 problem. "
     "Please ensure _TIME_BITS=64 and _FILE_OFFSET_BITS=64 are defined.");
+#elif defined(_MSC_VER)
+// MSVC static assertion
+static_assert(sizeof(time_t) >= 8, 
+    "time_t must be at least 64 bits to avoid Y2K38 problem. "
+    "Please ensure _USE_32BIT_TIME_T is not defined.");
+#else
+// For other compilers, generate a compile-time error if time_t is too small
+typedef char __time_t_must_be_64bit__[sizeof(time_t) >= 8 ? 1 : -1];
 #endif
 
 #endif // _TIME64_CHECK_H_

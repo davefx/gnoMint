@@ -38,12 +38,19 @@ void test_dates_beyond_2038() {
     test_tm.tm_min = 0;
     test_tm.tm_sec = 0;
     
-    time_t test_time = mktime(&test_tm);
-    printf("  Testing date: 2039-01-01 00:00:00\n");
+    // Use timegm() for UTC time conversion (avoids timezone issues)
+    #ifndef WIN32
+    time_t test_time = timegm(&test_tm);
+    #else
+    // On Windows, use _mkgmtime if available
+    time_t test_time = _mkgmtime(&test_tm);
+    #endif
+    
+    printf("  Testing date: 2039-01-01 00:00:00 UTC\n");
     printf("  time_t value: %ld\n", (long)test_time);
     
     if (test_time == (time_t)-1) {
-        printf("  ✗ FAIL: mktime() failed for year 2039\n");
+        printf("  ✗ FAIL: timegm() failed for year 2039\n");
         exit(1);
     }
     
@@ -56,7 +63,7 @@ void test_dates_beyond_2038() {
     
     char buf[100];
     strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", result_tm);
-    printf("  Converted back to: %s\n", buf);
+    printf("  Converted back to: %s UTC\n", buf);
     
     if (result_tm->tm_year != 139) {
         printf("  ✗ FAIL: Year mismatch after conversion\n");
@@ -75,16 +82,21 @@ void test_dates_far_future() {
     struct tm *now_tm = gmtime(&now);
     char now_str[100];
     strftime(now_str, sizeof(now_str), "%Y-%m-%d", now_tm);
-    printf("  Current date: %s\n", now_str);
+    printf("  Current date: %s UTC\n", now_str);
     
     // Add 50 years (600 months)
     struct tm future_tm = *now_tm;
     future_tm.tm_year += 50;
     
-    time_t future_time = mktime(&future_tm);
+    // Use timegm() for UTC time conversion
+    #ifndef WIN32
+    time_t future_time = timegm(&future_tm);
+    #else
+    time_t future_time = _mkgmtime(&future_tm);
+    #endif
     
     if (future_time == (time_t)-1) {
-        printf("  ✗ FAIL: mktime() failed for date 50 years in the future\n");
+        printf("  ✗ FAIL: timegm() failed for date 50 years in the future\n");
         exit(1);
     }
     
@@ -96,7 +108,7 @@ void test_dates_far_future() {
     
     char future_str[100];
     strftime(future_str, sizeof(future_str), "%Y-%m-%d", result_tm);
-    printf("  Date in 50 years: %s\n", future_str);
+    printf("  Date in 50 years: %s UTC\n", future_str);
     printf("  time_t value: %ld\n", (long)future_time);
     
     printf("  ✓ PASS: Can handle dates 50 years in the future\n");
