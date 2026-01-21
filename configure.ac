@@ -1,6 +1,6 @@
-AC_PREREQ([2.64])
+AC_PREREQ([2.72])
 
-AC_INIT(gnoMint, [1.3.0], [<davefx@gmail.com>], gnomint)
+AC_INIT([gnoMint],[1.3.0],[<davefx@gmail.com>],[gnomint])
 
 PACKAGE_COPYRIGHT="(c) 2006-2016 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"
@@ -20,17 +20,25 @@ AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
 
 # Check for programs
-AC_ISC_POSIX
+AC_SEARCH_LIBS([strerror],[cposix])
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_DISABLE_STATIC
-AM_PROG_LIBTOOL
+LT_INIT
 AM_PROG_CC_C_O
 
 # Checks for header files.
-AC_HEADER_STDC
+m4_warn([obsolete],
+[The preprocessor macro 'STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  C89 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_CHECK_HEADERS([libintl.h locale.h stdlib.h string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -54,7 +62,7 @@ AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "$GETTEXT_PACKAGE")
 ALL_LINGUAS="ca cs de es fi fr it pt_BR oc ru sk sv"
 AM_GLIB_GNU_GETTEXT
 AM_GLIB_DEFINE_LOCALEDIR(PACKAGE_LOCALE_DIR)
-AC_PROG_INTLTOOL([0.23])
+IT_PROG_INTLTOOL([0.23])
 
 # required versions
 GNUTLS_REQUIRED=2.0
@@ -98,9 +106,9 @@ AC_CHECK_HEADER(readline/readline.h, readline_found=true, [AC_MSG_ERROR([libread
 old_LIBS=$LIBS
 LIBS="-lreadline"
 
-AC_TRY_LINK(,,[	READLINE_LIBS="-lreadline" ],[ 
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[	READLINE_LIBS="-lreadline" ],[ 
                 LIBS="$LIBS -ltermcap" 
-		AC_TRY_LINK(,,[ READLINE_LIBS="-lreadline -ltermcap" ],[
+		AC_TRY_LINK(,,[ READLINE_LIBS='-lreadline -ltermcap' ],[
 			AC_MSG_ERROR([Cannot figure out how to link with the readline library; see config.log for more information])
 		])
 ])
@@ -173,7 +181,7 @@ dnl
 
 dnl
 if test "x$GCC" = "xyes"; then
-	CFLAGS+="-Wall "
+	CFLAGS+=" -Wall "
 	if test "x$use_debug" = "xYes"; then
    	   CFLAGS+="$CFLAGS -g -O0"
 	fi
@@ -186,7 +194,7 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 src/Makefile
 m4/Makefile
@@ -196,6 +204,7 @@ mime/Makefile
 gconf/Makefile
 gnomint.spec
 ])
+AC_OUTPUT
 
 dnl
 dnl Print a little note
