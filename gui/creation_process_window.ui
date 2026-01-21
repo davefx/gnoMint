@@ -57,8 +57,6 @@
             <child>
               <object class="GtkProgressBar" id="creation_process_window_progressbar">
                 <property name="visible">True</property>
-                <property name="activity_mode">True</property>
-                <property name="pulse_step">0</property>
               </object>
               <packing>
                 <property name="expand">False</property>
