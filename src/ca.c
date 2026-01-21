@@ -1434,7 +1434,6 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 {
 	GObject *menu, *widget;
 	GtkTreeView * tree_view =  GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-	GdkEventButton *event_button = (GdkEventButton *) data;
 	GtkTreeIter *iter = NULL;
 	gboolean pk_indb, is_revoked;
 	gint selection_type;
@@ -1470,7 +1469,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		if (widget)
 			gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
-		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
+		gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
@@ -1497,7 +1496,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		if (widget)
 			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
-		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
+		gtk_menu_popup_at_pointer (GTK_MENU(menu), NULL);
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	default:
@@ -1511,7 +1510,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 
 void ca_treeview_popup_timeout_program (GdkEventButton *event)
 {
-	g_timeout_add (1, ca_treeview_popup_timeout_program_cb, event); 
+	g_timeout_add (1, ca_treeview_popup_timeout_program_cb, NULL); 
 
 }
 					
