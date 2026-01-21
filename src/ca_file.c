@@ -2408,7 +2408,7 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 		g_free (aux);
 	} 
 
-        sql = sqlite3_mprintf ("SELECT id, serial, subject, dn, parent_dn, pem "
+        sql = sqlite3_mprintf ("SELECT id, serial, subject, dn, parent_dn, pem, expiration "
                                "FROM certificates WHERE is_ca=1 AND revocation IS NULL "
                                "ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u))",
                                num_chars, num_chars);
