@@ -1437,6 +1437,12 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 	GtkTreeIter *iter = NULL;
 	gboolean pk_indb, is_revoked;
 	gint selection_type;
+	GdkDisplay *display;
+	GdkSeat *seat;
+	GdkDevice *pointer;
+	GdkWindow *window;
+	gint x, y;
+	GdkRectangle rect;
 
 	selection_type  = __ca_selection_type (tree_view, &iter);
 	switch (selection_type) {
@@ -1469,8 +1475,22 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		if (widget)
 			gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
-		gtk_menu_popup_at_widget (GTK_MENU(menu), GTK_WIDGET(tree_view),
-					  GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
+		/* Get current pointer position and show menu there */
+		window = gtk_widget_get_window (GTK_WIDGET(tree_view));
+		if (window) {
+			display = gdk_window_get_display (window);
+			seat = gdk_display_get_default_seat (display);
+			pointer = gdk_seat_get_pointer (seat);
+			gdk_window_get_device_position (window, pointer, &x, &y, NULL);
+			
+			rect.x = x;
+			rect.y = y;
+			rect.width = 1;
+			rect.height = 1;
+			
+			gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
+						GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, NULL);
+		}
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
@@ -1497,8 +1517,22 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		if (widget)
 			gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
-		gtk_menu_popup_at_widget (GTK_MENU(menu), GTK_WIDGET(tree_view),
-					  GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
+		/* Get current pointer position and show menu there */
+		window = gtk_widget_get_window (GTK_WIDGET(tree_view));
+		if (window) {
+			display = gdk_window_get_display (window);
+			seat = gdk_display_get_default_seat (display);
+			pointer = gdk_seat_get_pointer (seat);
+			gdk_window_get_device_position (window, pointer, &x, &y, NULL);
+			
+			rect.x = x;
+			rect.y = y;
+			rect.width = 1;
+			rect.height = 1;
+			
+			gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
+						GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, NULL);
+		}
 		gtk_tree_iter_free (iter);
 		return FALSE;
 	default:
