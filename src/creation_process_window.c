@@ -138,6 +138,7 @@ gint creation_process_window_ca_pulse (gpointer data)
 void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 {
 	GObject * widget = NULL;
+	GObject * window = NULL;
 		 
 	creation_process_window_gtkb = gtk_builder_new();
 	gtk_builder_add_from_file (creation_process_window_gtkb, 
@@ -154,6 +155,8 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 
 	timer = g_timeout_add (100, creation_process_window_ca_pulse, widget);
 
+	window = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	gtk_widget_show (GTK_WIDGET(window));
 
 }
 
@@ -260,6 +263,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 {
 	GObject * widget = NULL;
+	GObject * window = NULL;
 	
 	creation_process_window_gtkb = gtk_builder_new();
 	gtk_builder_add_from_file (creation_process_window_gtkb,
@@ -279,5 +283,7 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 
 	timer = g_timeout_add (100, creation_process_window_csr_pulse, widget);
 
+	window = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	gtk_widget_show (GTK_WIDGET(window));
 
 }
