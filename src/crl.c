@@ -72,28 +72,11 @@ int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **column
 
         const gchar * string_value;
 	gchar *subject_with_expiration = NULL;
-	time_t expiration_timestamp;
-	struct tm expiration_tm;
 
 	// Format subject with expiration year
-	if (argv[CRL_CA_MODEL_COLUMN_EXPIRATION]) {
-		expiration_timestamp = (time_t) atoll(argv[CRL_CA_MODEL_COLUMN_EXPIRATION]);
-#ifndef WIN32
-		if (localtime_r(&expiration_timestamp, &expiration_tm)) {
-#else
-		struct tm *exp_tm_ptr = localtime(&expiration_timestamp);
-		if (exp_tm_ptr) {
-			expiration_tm = *exp_tm_ptr;
-#endif
-			subject_with_expiration = g_strdup_printf("%s (expires %d)", 
-			                                          argv[CRL_CA_MODEL_COLUMN_SUBJECT],
-			                                          expiration_tm.tm_year + 1900);
-		} else {
-			subject_with_expiration = g_strdup(argv[CRL_CA_MODEL_COLUMN_SUBJECT]);
-		}
-	} else {
-		subject_with_expiration = g_strdup(argv[CRL_CA_MODEL_COLUMN_SUBJECT]);
-	}
+	subject_with_expiration = ca_file_format_subject_with_expiration(
+		argv[CRL_CA_MODEL_COLUMN_SUBJECT], 
+		argv[CRL_CA_MODEL_COLUMN_EXPIRATION]);
 
 	// First we check if this is the first CA, or is a self-signed certificate
 	if (! pdata->last_ca_iter || (! strcmp (argv[CRL_CA_MODEL_COLUMN_DN],argv[CRL_CA_MODEL_COLUMN_PARENT_DN])) ) {

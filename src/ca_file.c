@@ -2795,3 +2795,25 @@ gboolean ca_file_check_if_is_csr_id (guint64 csr_id)
 	return res;
 
 }
+
+gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gchar *expiration_str)
+{
+	if (!subject || !expiration_str) {
+		return g_strdup(subject ? subject : "");
+	}
+	
+	time_t expiration_timestamp = (time_t) atoll(expiration_str);
+	struct tm expiration_tm;
+	
+#ifndef WIN32
+	if (localtime_r(&expiration_timestamp, &expiration_tm)) {
+#else
+	struct tm *exp_tm_ptr = localtime(&expiration_timestamp);
+	if (exp_tm_ptr) {
+		expiration_tm = *exp_tm_ptr;
+#endif
+		return g_strdup_printf("%s (expires %d)", subject, expiration_tm.tm_year + 1900);
+	} else {
+		return g_strdup(subject);
+	}
+}
