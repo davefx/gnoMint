@@ -69,7 +69,6 @@ gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename)
 
 	file = g_io_channel_new_file (filename, "w", &error);
 	if (error) {
-		g_free (password);
 		if (file)
 			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
