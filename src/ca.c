@@ -1488,6 +1488,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 			rect.width = 1;
 			rect.height = 1;
 			
+			/* Attach menu to widget to ensure proper behavior */
+			gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
 			gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
 						GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, NULL);
 		}
@@ -1530,6 +1532,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 			rect.width = 1;
 			rect.height = 1;
 			
+			/* Attach menu to widget to ensure proper behavior */
+			gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
 			gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
 						GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, NULL);
 		}
