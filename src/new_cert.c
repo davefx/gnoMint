@@ -736,6 +736,9 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 
 	cert_creation_data->crl_distribution_point = ca_file_policy_get (ca_id, "CRL_DISTRIBUTION_POINT");
 
+	// SANs will be copied from the CSR by default
+	cert_creation_data->subject_alt_name = NULL;
+
 	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
 
 	if (strerror) {

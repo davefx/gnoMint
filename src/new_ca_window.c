@@ -249,6 +249,13 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 	else
 		ca_creation_data->cn = NULL;
 
+	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "san_entry"));
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		ca_creation_data->subject_alt_name = g_strdup (text);
+	else
+		ca_creation_data->subject_alt_name = NULL;
+
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "dsa_radiobutton"));
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 	ca_creation_data->key_type = active;
