@@ -1033,9 +1033,10 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
 				break;
 			
-			// Allocate buffer for the SAN
+			// Allocate buffer for the SAN (with null terminator for safety)
 			gchar *san_buffer = g_new0(gchar, san_size + 1);
-			result = gnutls_x509_crq_get_subject_alt_name(csr, san_idx, san_buffer, &san_size, &san_type, NULL);
+			size_t actual_size = san_size;
+			result = gnutls_x509_crq_get_subject_alt_name(csr, san_idx, san_buffer, &actual_size, &san_type, NULL);
 			
 			if (result < 0) {
 				g_free(san_buffer);
@@ -1043,7 +1044,7 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 			}
 			
 			// Copy this SAN to the certificate
-			if (gnutls_x509_crt_set_subject_alt_name(crt, san_type, san_buffer, san_size, GNUTLS_FSAN_APPEND) < 0) {
+			if (gnutls_x509_crt_set_subject_alt_name(crt, san_type, san_buffer, actual_size, GNUTLS_FSAN_APPEND) < 0) {
 				g_free(san_buffer);
 				san_error = TRUE;
 				break;
@@ -1053,12 +1054,8 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 			san_idx++;
 		}
 		
-		// If there was an error copying SANs, log it but continue (SANs are optional)
-		// In production, you might want to fail here instead
-		if (san_error && san_idx == 0) {
-			// Only fail if we couldn't copy any SANs and there was at least one
-			// For now, just continue - SANs from CSR are best-effort
-		}
+		// SANs from CSR are best-effort; if none copied, that's OK
+		(void)san_error; // Suppress unused variable warning
 	}
 		
 
