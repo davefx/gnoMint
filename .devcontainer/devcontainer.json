@@ -1,0 +1,40 @@
+{
+	"name": "gnoMint Development Environment",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+	
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+				"C_Cpp.default.compilerPath": "/usr/bin/gcc",
+				"C_Cpp.default.cStandard": "c11",
+				"C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
+				"files.associations": {
+					"*.c": "c",
+					"*.h": "c"
+				}
+			},
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-vscode.cpptools-extension-pack",
+				"GitHub.copilot",
+				"GitHub.copilot-chat"
+			]
+		}
+	},
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+
+	// Set environment variables
+	"remoteEnv": {
+		"DISPLAY": ":0"
+	},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "vscode"
+}
