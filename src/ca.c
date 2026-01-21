@@ -765,24 +765,28 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 
 	selection_path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
 	
-	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
-	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+	if (cert_parent_iter) {
+		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
+		if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+			gtk_tree_path_free (parent);
+			gtk_tree_path_free (selection_path);
+			/* It's a certificate */
+			return CA_FILE_ELEMENT_TYPE_CERT;
+		}
 		gtk_tree_path_free (parent);
-		gtk_tree_path_free (selection_path);
-		/* It's a certificate */
-		return CA_FILE_ELEMENT_TYPE_CERT;
 	}
 
-	gtk_tree_path_free (parent);
-	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
-	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+	if (csr_parent_iter) {
+		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
+		if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+			gtk_tree_path_free (parent);
+			gtk_tree_path_free (selection_path);
+			/* It's a CSR */
+			return CA_FILE_ELEMENT_TYPE_CSR;
+		}
 		gtk_tree_path_free (parent);
-		gtk_tree_path_free (selection_path);
-		/* It's a CSR */
-		return CA_FILE_ELEMENT_TYPE_CSR;
 	}
 
-	gtk_tree_path_free (parent);
 	gtk_tree_path_free (selection_path);
 	return -1;
 }
