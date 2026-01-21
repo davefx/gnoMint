@@ -95,8 +95,11 @@ gint creation_process_window_ca_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	/* Only pulse if we have a valid progress bar widget */
+	if (data && GTK_IS_PROGRESS_BAR(data)) {
+		gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	}
 
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "status_message_label");
 
@@ -158,8 +161,13 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 
 	progressbar = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
 	
+	/* Timer must always start to monitor thread status */
 	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
 		timer = g_timeout_add (100, creation_process_window_ca_pulse, progressbar);
+	} else {
+		/* Fallback: start timer with NULL, pulse callback will handle it */
+		g_warning("Progress bar widget not found or invalid, starting timer anyway");
+		timer = g_timeout_add (100, creation_process_window_ca_pulse, NULL);
 	}
 
 }
@@ -228,8 +236,11 @@ gint creation_process_window_csr_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
-	gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	/* Only pulse if we have a valid progress bar widget */
+	if (data && GTK_IS_PROGRESS_BAR(data)) {
+		gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
+		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "status_message_label"));
 
@@ -290,8 +301,13 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 
 	progressbar = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window_progressbar");
 	
+	/* Timer must always start to monitor thread status */
 	if (progressbar && GTK_IS_PROGRESS_BAR(progressbar)) {
 		timer = g_timeout_add (100, creation_process_window_csr_pulse, progressbar);
+	} else {
+		/* Fallback: start timer with NULL, pulse callback will handle it */
+		g_warning("Progress bar widget not found or invalid, starting timer anyway");
+		timer = g_timeout_add (100, creation_process_window_csr_pulse, NULL);
 	}
 
 }
