@@ -1422,8 +1422,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
 		gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
-		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
-				event_button->button, event_button->time);
+		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
 		menu = gtk_builder_get_object (csr_popup_menu_gtkb,
@@ -1436,8 +1435,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
 		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
-		gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL, 
-				event_button->button, event_button->time);
+		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
 		return FALSE;
 	default:
 	case -1:

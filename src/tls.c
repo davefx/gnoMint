@@ -1107,19 +1107,19 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	while (gnutls_x509_crt_get_key_purpose_oid (*cert, i, aux, &size, &critical) >= 0) {
 		uaux = g_new0(guchar, size);
 		gnutls_x509_crt_get_key_purpose_oid (*cert, i, aux, &size, &critical);
-		if (strcasecmp (aux, GNUTLS_KP_TLS_WWW_SERVER) == 0)
+		if (aux && strcasecmp (aux, GNUTLS_KP_TLS_WWW_SERVER) == 0)
 			res->uses = g_list_append (res->uses, _("TLS WWW Server"));
-		else if (strcasecmp (aux, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
 			res->uses = g_list_append (res->uses, _("TLS WWW Client."));
-		else if (strcasecmp (aux, GNUTLS_KP_CODE_SIGNING) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_CODE_SIGNING) == 0)
 			res->uses = g_list_append (res->uses, _("Code signing"));
-		else if (strcasecmp (aux, GNUTLS_KP_EMAIL_PROTECTION) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_EMAIL_PROTECTION) == 0)
 			res->uses = g_list_append (res->uses, _("Email protection"));
-		else if (strcasecmp (aux, GNUTLS_KP_TIME_STAMPING) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_TIME_STAMPING) == 0)
 			res->uses = g_list_append (res->uses, _("Time stamping"));
-		else if (strcasecmp (aux, GNUTLS_KP_OCSP_SIGNING) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_OCSP_SIGNING) == 0)
 			res->uses = g_list_append (res->uses, _("OCSP signing"));
-		else if (strcasecmp (aux, GNUTLS_KP_ANY) == 0)
+		else if (aux && strcasecmp (aux, GNUTLS_KP_ANY) == 0)
 			res->uses = g_list_append (res->uses, _("Any purpose"));
 		g_free (uaux);
 		size = 0;
