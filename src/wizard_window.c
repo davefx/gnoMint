@@ -123,6 +123,7 @@ static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cer
     
     if (error_message) {
         dialog_error (g_strdup_printf (_("Failed to save CSR:\n%s"), error_message));
+        g_free (error_message);
         tls_csr_free(tlscsr);
         g_free(private_key);
         g_free(certificate_sign_request);
@@ -181,6 +182,7 @@ static gboolean __wizard_export_cert_and_key (guint64 cert_id, const gchar *serv
     error = export_private_pem (cert_id, CA_FILE_ELEMENT_TYPE_CERT, key_path);
     if (error) {
         dialog_error (g_strdup_printf (_("Failed to export private key:\n%s"), error));
+        g_free (error);
         success = FALSE;
         goto cleanup;
     }
@@ -255,7 +257,7 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
     
     // Get the newly created certificate ID
     guint64 cert_id = 0;
-    gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE ca=%lu ORDER BY id DESC LIMIT 1;", ca_id);
+    gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE ca=%" G_GUINT64_FORMAT " ORDER BY id DESC LIMIT 1;", ca_id);
     gchar *db_error = NULL;
     
     int callback(void *data, int argc, char **argv, char **columnNames) {
@@ -331,7 +333,10 @@ void wizard_window_display (WizardCertType cert_type)
     cert_type_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "cert_type_combo"));
     gtk_combo_box_set_active (GTK_COMBO_BOX(cert_type_combo), cert_type);
     
-    // Connect signals
+    // Connect signals - builder will be unreferenced when dialog is destroyed
+    g_signal_connect (dialog, "destroy", G_CALLBACK(gtk_widget_destroyed), &wizard_window_gtkb);
+    g_signal_connect_swapped (dialog, "destroy", G_CALLBACK(g_object_unref), wizard_window_gtkb);
+    
     g_signal_connect (generate_button, "clicked", 
                       G_CALLBACK(on_wizard_generate_button_clicked), dialog);
     g_signal_connect (cancel_button, "clicked", 
