@@ -82,12 +82,12 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	// Format subject with expiration year
 	if (argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION]) {
 		expiration_timestamp = (time_t) atoll(argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION]);
-#ifdef G_OS_WIN32
+#ifndef WIN32
+		if (localtime_r(&expiration_timestamp, &expiration_tm)) {
+#else
 		struct tm *exp_tm_ptr = localtime(&expiration_timestamp);
 		if (exp_tm_ptr) {
 			expiration_tm = *exp_tm_ptr;
-#else
-		if (localtime_r(&expiration_timestamp, &expiration_tm)) {
 #endif
 			subject_with_expiration = g_strdup_printf("%s (expires %d)", 
 			                                          argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT],
