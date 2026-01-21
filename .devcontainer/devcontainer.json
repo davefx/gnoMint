@@ -9,7 +9,7 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"terminal.integrated.shell.linux": "/bin/bash",
+				"terminal.integrated.defaultProfile.linux": "bash",
 				"C_Cpp.default.compilerPath": "/usr/bin/gcc",
 				"C_Cpp.default.cStandard": "c11",
 				"C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
