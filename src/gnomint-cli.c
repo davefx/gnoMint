@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <glib.h>
+#include <gio/gio.h>
 #include <glib/gi18n.h>
 #include <stdlib.h>
 
@@ -66,7 +67,29 @@ int main (int argc, char **argv)
 
         } else {
                 /* No arguments, or failure when opening file */
-                defaultfile = g_build_filename (g_get_home_dir(), ".gnomint", "default.gnomint", NULL);
+                const gchar *data_dir = g_get_user_data_dir();
+                gchar *gnomint_data_dir = g_build_filename (data_dir, "gnomint", NULL);
+                
+                /* Ensure the directory exists */
+                g_mkdir_with_parents (gnomint_data_dir, 0700);
+                
+                defaultfile = g_build_filename (gnomint_data_dir, "default.gnomint", NULL);
+                g_free (gnomint_data_dir);
+                
+                /* Check if we need to migrate from old location */
+                if (!g_file_test(defaultfile, G_FILE_TEST_EXISTS)) {
+                        gchar *old_defaultfile = g_build_filename (g_get_home_dir(), ".gnomint", "default.gnomint", NULL);
+                        if (g_file_test(old_defaultfile, G_FILE_TEST_EXISTS)) {
+                                /* Copy the old file to the new location */
+                                GFile *old_file = g_file_new_for_path(old_defaultfile);
+                                GFile *new_file = g_file_new_for_path(defaultfile);
+                                g_file_copy(old_file, new_file, G_FILE_COPY_NONE, NULL, NULL, NULL, NULL);
+                                g_object_unref(old_file);
+                                g_object_unref(new_file);
+                        }
+                        g_free (old_defaultfile);
+                }
+                
                 ca_open (defaultfile, TRUE);
         }
 
