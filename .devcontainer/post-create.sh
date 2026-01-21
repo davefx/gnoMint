@@ -15,27 +15,27 @@ echo "Checking installed dependencies..."
 echo ""
 
 echo "GCC version:"
-gcc --version | head -n 1
+gcc --version | head -n 1 || echo "GCC not found"
 
 echo ""
 echo "GTK+ version:"
-pkg-config --modversion gtk+-3.0
+pkg-config --modversion gtk+-3.0 || echo "GTK+ not found"
 
 echo ""
 echo "GLib version:"
-pkg-config --modversion glib-2.0
+pkg-config --modversion glib-2.0 || echo "GLib not found"
 
 echo ""
 echo "GnuTLS version:"
-pkg-config --modversion gnutls
+pkg-config --modversion gnutls || echo "GnuTLS not found"
 
 echo ""
 echo "SQLite version:"
-pkg-config --modversion sqlite3
+pkg-config --modversion sqlite3 || echo "SQLite not found"
 
 echo ""
 echo "libgcrypt version:"
-libgcrypt-config --version
+libgcrypt-config --version || echo "libgcrypt not found"
 
 echo ""
 echo "==================================="

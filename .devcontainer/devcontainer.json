@@ -2,7 +2,11 @@
 	"name": "gnoMint Development Environment",
 	"build": {
 		"dockerfile": "Dockerfile",
-		"context": ".."
+		"context": "..",
+		"args": {
+			"USER_UID": "1000",
+			"USER_GID": "1000"
+		}
 	},
 	
 	// Configure tool-specific properties.
@@ -29,11 +33,6 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bash .devcontainer/post-create.sh",
-
-	// Set environment variables
-	"remoteEnv": {
-		"DISPLAY": ":0"
-	},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "vscode"
