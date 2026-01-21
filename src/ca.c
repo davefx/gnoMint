@@ -1442,6 +1442,8 @@ G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 	GdkWindow *window;
 	gint x, y;
 	GdkRectangle rect;
+	GtkTreePath *path = NULL;
+	GtkTreeSelection *selection;
 	
 	g_return_val_if_fail (event != NULL, FALSE);
 	
@@ -1449,6 +1451,16 @@ G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 
 		event_button = (GdkEventButton *) event;
 		if (event_button->button == 3) {
+			/* Select the row under cursor before showing menu */
+			if (gtk_tree_view_get_path_at_pos(tree_view, 
+							  (gint)event_button->x, 
+							  (gint)event_button->y,
+							  &path, NULL, NULL, NULL)) {
+				selection = gtk_tree_view_get_selection(tree_view);
+				gtk_tree_selection_select_path(selection, path);
+				gtk_tree_path_free(path);
+			}
+			
 			/* Handle right-click popup menu directly */
 			selection_type  = __ca_selection_type (tree_view, &iter);
 			
@@ -1492,7 +1504,8 @@ G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 					rect.width = 1;
 					rect.height = 1;
 					
-					/* Attach menu to widget and show at click position */
+					/* Detach if already attached to avoid warning, then attach and show */
+					gtk_menu_detach (GTK_MENU(menu));
 					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
 					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
 								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, 
@@ -1534,7 +1547,8 @@ G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 					rect.width = 1;
 					rect.height = 1;
 					
-					/* Attach menu to widget and show at click position */
+					/* Detach if already attached to avoid warning, then attach and show */
+					gtk_menu_detach (GTK_MENU(menu));
 					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
 					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
 								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST,
