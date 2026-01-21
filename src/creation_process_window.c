@@ -66,7 +66,7 @@ void creation_process_window_ca_finish (void)
 	GtkWidget *dialog = NULL;
 	
 	g_thread_join (creation_process_window_thread);
-	gtk_timeout_remove (timer);	       
+	g_source_remove (timer);	       
 	timer = 0;
 	
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
@@ -116,7 +116,7 @@ gint creation_process_window_ca_pulse (gpointer data)
 		creation_process_window_ca_finish ();
 	} else if (status < 0) {
 		error_message = (gchar *) g_thread_join (creation_process_window_thread);
-		gtk_timeout_remove (timer);	       
+		g_source_remove (timer);	       
 		timer = 0;
 		if (error_message) {
 			creation_process_window_error_dialog (error_message);
@@ -165,7 +165,7 @@ G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 	GtkWidget *dialog, *widget;
 
 	if (timer) {
-		gtk_timeout_remove (timer);	       
+		g_source_remove (timer);	       
 		timer = 0;
 	}
    
@@ -196,7 +196,7 @@ void creation_process_window_csr_finish (void) {
 	GtkWidget *widget = NULL, *dialog = NULL;
 	
 	g_thread_join (creation_process_window_thread);
-	gtk_timeout_remove (timer);	       
+	g_source_remove (timer);	       
 	timer = 0;
 	
 	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window"));
@@ -242,7 +242,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 		creation_process_window_csr_finish ();
 	} else if (status < 0) {
 		error_message = (gchar *) g_thread_join (creation_process_window_thread);
-		gtk_timeout_remove (timer);	       
+		g_source_remove (timer);	       
 		timer = 0;
 		if (error_message) {
 			creation_process_window_error_dialog (error_message);
