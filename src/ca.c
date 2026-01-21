@@ -1444,7 +1444,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		
 	case CA_FILE_ELEMENT_TYPE_CERT:
 		if (!cert_popup_menu_gtkb) {
-			gtk_tree_iter_free (iter);
+			if (iter)
+				gtk_tree_iter_free (iter);
 			return FALSE;
 		}
 		
@@ -1452,7 +1453,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 					     "certificate_popup_menu");
 		
 		if (!menu) {
-			gtk_tree_iter_free (iter);
+			if (iter)
+				gtk_tree_iter_free (iter);
 			return FALSE;
 		}
 		
@@ -1473,7 +1475,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
 		if (!csr_popup_menu_gtkb) {
-			gtk_tree_iter_free (iter);
+			if (iter)
+				gtk_tree_iter_free (iter);
 			return FALSE;
 		}
 		
@@ -1481,7 +1484,8 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 					     "csr_popup_menu");
 
 		if (!menu) {
-			gtk_tree_iter_free (iter);
+			if (iter)
+				gtk_tree_iter_free (iter);
 			return FALSE;
 		}
 
