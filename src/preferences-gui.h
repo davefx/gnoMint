@@ -43,11 +43,10 @@ void preferences_set_gnome_keyring_export (gboolean new_value);
 void preferences_deinit (void);
 
 
-#include <gconf/gconf-client.h>
-void preferences_changed_callback(GConfClient* client,
-                                  guint cnxn_id,
-                                  GConfEntry *entry,
-                                  gpointer user_data);
+#include <gio/gio.h>
+void preferences_changed_callback(GSettings* settings,
+                                   const gchar *key,
+                                   gpointer user_data);
 
 
 #endif

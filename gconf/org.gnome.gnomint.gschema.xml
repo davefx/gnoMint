@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.gnomint" path="/org/gnome/gnomint/">
+    
+    <key name="size" type="s">
+      <default>'(500,400)'</default>
+      <summary>Window size</summary>
+      <description>
+        The (width,length) size gnoMint should take when started. 
+        This cannot be smaller than (320,200).
+      </description>
+    </key>
+    
+    <key name="revoked-visible" type="b">
+      <default>false</default>
+      <summary>Revoked certificates visibility</summary>
+      <description>
+        Whether the revoked certificates should be visible.
+      </description>
+    </key>
+    
+    <key name="crq-visible" type="b">
+      <default>true</default>
+      <summary>Certificate requests visibility</summary>
+      <description>
+        Whether the certificate requests should be visible.
+      </description>
+    </key>
+    
+    <key name="gnome-keyring-export" type="b">
+      <default>true</default>
+      <summary>Automatic exporting of certificates for gnome-keyring</summary>
+      <description>
+        Whether the created or imported certificates are 
+        automatically exported to gnome-keyring certificate-store.
+      </description>
+    </key>
+    
+  </schema>
+</schemalist>

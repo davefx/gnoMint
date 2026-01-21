@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <string.h>
-#include <gconf/gconf-client.h>
+#include <gio/gio.h>
 
 
 #include "preferences-gui.h"
@@ -26,7 +26,7 @@
 #include <glib/gi18n.h>
 
 
-static GConfClient * preferences_client;
+static GSettings * preferences_settings;
 
 PreferencesGuiChangeCallback csr_visible_callback = NULL;
 PreferencesGuiChangeCallback revoked_visible_callback = NULL;
@@ -42,18 +42,20 @@ void preferences_gui_set_revoked_visible_callback (PreferencesGuiChangeCallback 
 }
 
 
-void preferences_changed_callback(GConfClient* client,
-                                  guint cnxn_id,
-                                  GConfEntry *entry,
-                                  gpointer user_data)
+void preferences_changed_callback(GSettings* settings,
+                                   const gchar *key,
+                                   gpointer user_data)
 {
 
-        gboolean value = gconf_value_get_bool (gconf_entry_get_value(entry));
-        if (! strcmp (gconf_entry_get_key(entry), "/apps/gnomint/crq_visible") && csr_visible_callback)
+        if (! strcmp (key, "crq-visible") && csr_visible_callback) {
+                gboolean value = g_settings_get_boolean (settings, key);
                 csr_visible_callback (value, TRUE);
+        }
 
-        if (! strcmp (gconf_entry_get_key(entry), "/apps/gnomint/revoked_visible") && revoked_visible_callback)
+        if (! strcmp (key, "revoked-visible") && revoked_visible_callback) {
+                gboolean value = g_settings_get_boolean (settings, key);
                 revoked_visible_callback (value, TRUE);
+        }
 
 }
 
@@ -61,72 +63,64 @@ void preferences_changed_callback(GConfClient* client,
 
 void preferences_init (int argc, char ** argv)
 {
-        gconf_init(argc, argv, NULL);
-        
-        preferences_client = gconf_client_get_default();
+        preferences_settings = g_settings_new ("org.gnome.gnomint");
 
-        gconf_client_add_dir(preferences_client,
-                             "/apps/gnomint",
-                             GCONF_CLIENT_PRELOAD_NONE,
-                             NULL);
+        g_signal_connect (preferences_settings, "changed::revoked-visible",
+                          G_CALLBACK (preferences_changed_callback),
+                          NULL);
 
-        gconf_client_notify_add (preferences_client, "/apps/gnomint/revoked_visible",
-                                 preferences_changed_callback,
-                                 NULL, NULL, NULL);
-
-        gconf_client_notify_add (preferences_client, "/apps/gnomint/crq_visible",
-                                 preferences_changed_callback,
-                                 NULL, NULL, NULL);
-
+        g_signal_connect (preferences_settings, "changed::crq-visible",
+                          G_CALLBACK (preferences_changed_callback),
+                          NULL);
 
 }
 
 
 gchar * preferences_get_size ()
 {
-        return gconf_client_get_string (preferences_client, "/apps/gnomint/size", NULL);
+        return g_settings_get_string (preferences_settings, "size");
 }
 
 void preferences_set_size (const gchar *new_value)
 {
-        gconf_client_set_string (preferences_client, "/apps/gnomint/size", new_value, NULL);
+        g_settings_set_string (preferences_settings, "size", new_value);
 }
 
 
 gboolean preferences_get_revoked_visible ()
 {
-        return gconf_client_get_bool (preferences_client, "/apps/gnomint/revoked_visible", NULL);
+        return g_settings_get_boolean (preferences_settings, "revoked-visible");
 }
 
 void preferences_set_revoked_visible (gboolean new_value)
 {
-        gconf_client_set_bool (preferences_client, "/apps/gnomint/revoked_visible", new_value, NULL);
+        g_settings_set_boolean (preferences_settings, "revoked-visible", new_value);
 }
 
 gboolean preferences_get_crq_visible ()
 {
-        return gconf_client_get_bool (preferences_client, "/apps/gnomint/crq_visible", NULL);
+        return g_settings_get_boolean (preferences_settings, "crq-visible");
 }
 
 void preferences_set_crq_visible (gboolean new_value)
 {
-        gconf_client_set_bool (preferences_client, "/apps/gnomint/crq_visible", new_value, NULL);
+        g_settings_set_boolean (preferences_settings, "crq-visible", new_value);
 }
 
 gboolean preferences_get_gnome_keyring_export ()
 {
-        return gconf_client_get_bool (preferences_client, "/apps/gnomint/gnome_keyring_export", NULL);
+        return g_settings_get_boolean (preferences_settings, "gnome-keyring-export");
 }
 
 void preferences_set_gnome_keyring_export (gboolean new_value)
 {
-        gconf_client_set_bool (preferences_client, "/apps/gnomint/gnome_keyring_export", new_value, NULL);
+        g_settings_set_boolean (preferences_settings, "gnome-keyring-export", new_value);
 }
 
 
 void preferences_deinit ()
 {
-        g_object_unref (preferences_client);
-        preferences_client = NULL;
+        g_object_unref (preferences_settings);
+        preferences_settings = NULL;
 }
 

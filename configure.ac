@@ -60,8 +60,7 @@ AC_PROG_INTLTOOL([0.23])
 GNUTLS_REQUIRED=2.0
 GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION=2.7.4
 SQLITE_REQUIRED=3.0
-GLIB_REQUIRED=2.6.0
-GCONF_REQUIRED=2.0
+GLIB_REQUIRED=2.32.0
 GTK_REQUIRED=3.10.0
 ISO_CODES_REQUIRED=0.35
 
@@ -84,7 +83,7 @@ fi
 PKG_CHECK_MODULES(GNOMINT, 
 	glib-2.0 >= $GLIB_REQUIRED \
 	gthread-2.0 >= $GLIB_REQUIRED \
-	gconf-2.0 >= $GCONF_REQUIRED \
+	gio-2.0 >= $GLIB_REQUIRED \
 	gtk+-3.0 >= $GTK_REQUIRED \
 	gdk-pixbuf-2.0 \
 	gnutls >= $GNUTLS_REQUIRED \
@@ -112,7 +111,7 @@ AC_SUBST(READLINE_LIBS)
 
 PKG_CHECK_MODULES(GNOMINTCLI, 
 	glib-2.0 >= $GLIB_REQUIRED \
-	gconf-2.0 >= $GCONF_REQUIRED \
+	gio-2.0 >= $GLIB_REQUIRED \
 	gnutls >= $GNUTLS_REQUIRED \
 )
 AC_SUBST(GNOMINTCLI_CFLAGS)
@@ -150,16 +149,8 @@ dnl glib-genmarshal
 GLIB_GENMARSHAL=`$PKG_CONFIG --variable=glib_genmarshal glib-2.0`
 AC_SUBST(GLIB_GENMARSHAL)
 
-dnl The following conditional is set in AM_GCONF_SOURCE_2.
-dnl Because we may skip its execution, we have to set a default here.
-m4_pattern_allow([^AM_GCONF_SOURCE_2$])
-AM_CONDITIONAL([GCONF_SCHEMAS_INSTALL], [false])
-GCONFTOOL=""
-AC_CHECK_PROG(GCONFTOOL, gconftool-2, gconftool-2)
-if test x"$GCONFTOOL" = x; then
-	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
-fi
-AM_GCONF_SOURCE_2
+dnl GSettings
+GLIB_GSETTINGS
 
 
 dnl
