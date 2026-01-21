@@ -790,7 +790,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 G_MODULE_EXPORT gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data)
 {
-	GtkTreeIter *selection_iter;
+	GtkTreeIter *selection_iter = NULL;
 	switch (__ca_selection_type (tree_view, &selection_iter)) {
 	case CA_FILE_ELEMENT_TYPE_CERT:
 		__ca_activate_certificate_selection (selection_iter);
@@ -1087,7 +1087,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 {
 	GObject * widget = NULL;
 	//GtkDialog * dialog = NULL;
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	GtkBuilder * dialog_gtkb = NULL;
 	gboolean has_pk_in_db = FALSE;
@@ -1191,7 +1191,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type;
 	gchar *filename = NULL;
 	gint id;
@@ -1224,7 +1224,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
         gchar * errmsg = NULL;
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
 	gint id = 0;
@@ -1283,7 +1283,7 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
 	gint id = 0;
@@ -1318,7 +1318,7 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 
 G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkTreeIter *iter;
+	GtkTreeIter *iter = NULL;
 
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gchar * csr_pem;
@@ -1359,7 +1359,7 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 guint64 ca_get_selected_row_id ()
 {
-	GtkTreeIter *iter;
+	GtkTreeIter *iter = NULL;
 	guint64 result = 0;
 
 	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
@@ -1372,7 +1372,7 @@ guint64 ca_get_selected_row_id ()
 
 gchar * ca_get_selected_row_pem ()
 {
-	GtkTreeIter *iter;
+	GtkTreeIter *iter = NULL;
 	gchar * result = NULL;
 
 	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
@@ -1431,7 +1431,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 	GObject *menu, *widget;
 	GtkTreeView * tree_view =  GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
 	GdkEventButton *event_button = (GdkEventButton *) data;
-	GtkTreeIter *iter;
+	GtkTreeIter *iter = NULL;
 	gboolean pk_indb, is_revoked;
 	gint selection_type;
 
