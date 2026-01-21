@@ -1,4 +1,4 @@
-AC_PREREQ([2.72])
+AC_PREREQ([2.69])
 
 AC_INIT([gnoMint],[1.3.0],[<davefx@gmail.com>],[gnomint])
 
