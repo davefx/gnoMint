@@ -768,6 +768,7 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
 	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
 		gtk_tree_path_free (parent);
+		gtk_tree_path_free (selection_path);
 		/* It's a certificate */
 		return CA_FILE_ELEMENT_TYPE_CERT;
 	}
@@ -776,11 +777,13 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
 	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
 		gtk_tree_path_free (parent);
+		gtk_tree_path_free (selection_path);
 		/* It's a CSR */
 		return CA_FILE_ELEMENT_TYPE_CSR;
 	}
 
 	gtk_tree_path_free (parent);
+	gtk_tree_path_free (selection_path);
 	return -1;
 }
 
@@ -1423,6 +1426,7 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
 		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
+		gtk_tree_iter_free (iter);
 		return FALSE;
 	case CA_FILE_ELEMENT_TYPE_CSR:
 		menu = gtk_builder_get_object (csr_popup_menu_gtkb,
@@ -1436,9 +1440,12 @@ gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
 		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
 		
 		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
+		gtk_tree_iter_free (iter);
 		return FALSE;
 	default:
 	case -1:
+		if (iter)
+			gtk_tree_iter_free (iter);
 		return FALSE;
 	}
 
