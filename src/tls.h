@@ -52,6 +52,8 @@ typedef struct {
 	gchar * password; 
 
         gchar * parent_ca_id_str;
+
+	gchar * subject_alt_name; // Comma-separated list of SANs (e.g., "DNS:example.com,DNS:*.example.com,IP:192.168.1.1")
 } TlsCreationData;
 
 typedef struct {
@@ -80,6 +82,8 @@ typedef struct {
 	gchar * crl_distribution_point;
 
 	gchar * cadb_password;
+
+	gchar * subject_alt_name; // Comma-separated list of SANs (e.g., "DNS:example.com,DNS:*.example.com,IP:192.168.1.1")
 
 } TlsCertCreationData;
 

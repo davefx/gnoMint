@@ -30,6 +30,120 @@ void tls_init ()
 
 }
 
+/* Helper function to parse and add Subject Alternative Names to a certificate
+ * san_string format: "DNS:example.com,DNS:*.example.com,IP:192.168.1.1,EMAIL:admin@example.com"
+ * Returns 0 on success, -1 on error
+ */
+static gint tls_add_san_to_cert (gnutls_x509_crt_t crt, const gchar *san_string)
+{
+	if (!san_string || !san_string[0])
+		return 0;
+
+	gchar **san_entries = g_strsplit(san_string, ",", -1);
+	gint i, result = 0;
+
+	for (i = 0; san_entries[i] != NULL; i++) {
+		gchar *entry = g_strstrip(san_entries[i]);
+		if (!entry || !entry[0])
+			continue;
+
+		gchar **parts = g_strsplit(entry, ":", 2);
+		if (!parts[0] || !parts[1]) {
+			g_strfreev(parts);
+			continue;
+		}
+
+		gchar *type = g_strstrip(parts[0]);
+		gchar *value = g_strstrip(parts[1]);
+
+		if (g_ascii_strcasecmp(type, "DNS") == 0) {
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "IP") == 0) {
+			// Parse IP address (supports both IPv4 and IPv6)
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_IPADDRESS, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "EMAIL") == 0 || g_ascii_strcasecmp(type, "RFC822") == 0) {
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "URI") == 0) {
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_URI, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		}
+
+		g_strfreev(parts);
+
+		if (result < 0) {
+			g_strfreev(san_entries);
+			return -1;
+		}
+	}
+
+	g_strfreev(san_entries);
+	return 0;
+}
+
+/* Helper function to parse and add Subject Alternative Names to a CSR
+ * san_string format: "DNS:example.com,DNS:*.example.com,IP:192.168.1.1,EMAIL:admin@example.com"
+ * Returns 0 on success, -1 on error
+ */
+static gint tls_add_san_to_crq (gnutls_x509_crq_t crq, const gchar *san_string)
+{
+	if (!san_string || !san_string[0])
+		return 0;
+
+	gchar **san_entries = g_strsplit(san_string, ",", -1);
+	gint i, result = 0;
+
+	for (i = 0; san_entries[i] != NULL; i++) {
+		gchar *entry = g_strstrip(san_entries[i]);
+		if (!entry || !entry[0])
+			continue;
+
+		gchar **parts = g_strsplit(entry, ":", 2);
+		if (!parts[0] || !parts[1]) {
+			g_strfreev(parts);
+			continue;
+		}
+
+		gchar *type = g_strstrip(parts[0]);
+		gchar *value = g_strstrip(parts[1]);
+
+		if (g_ascii_strcasecmp(type, "DNS") == 0) {
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "IP") == 0) {
+			// Parse IP address (supports both IPv4 and IPv6)
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_IPADDRESS, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "EMAIL") == 0 || g_ascii_strcasecmp(type, "RFC822") == 0) {
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_RFC822NAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "URI") == 0) {
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_URI, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		}
+
+		g_strfreev(parts);
+
+		if (result < 0) {
+			g_strfreev(san_entries);
+			return -1;
+		}
+	}
+
+	g_strfreev(san_entries);
+	return 0;
+}
+
 gchar * tls_generate_rsa_keys (TlsCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key)
@@ -515,6 +629,14 @@ gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data,
 		gnutls_x509_crt_set_crl_dist_points (crt, GNUTLS_SAN_URI, creation_data->crl_distribution_point, 0);
 	}
 
+	// Add Subject Alternative Names if provided
+	if (creation_data->subject_alt_name && creation_data->subject_alt_name[0]) {
+		if (tls_add_san_to_cert(crt, creation_data->subject_alt_name) < 0) {
+			gnutls_x509_crt_deinit (crt);
+			return g_strdup_printf(_("Error when setting Subject Alternative Name extension"));
+		}
+	}
+
 	keyid = g_new0 (guchar,1);	
 	gnutls_x509_crt_get_key_id(crt, 0, keyid, &keyidsize);
 	g_free (keyid);
@@ -611,6 +733,12 @@ gchar * tls_generate_csr (TlsCreationData * creation_data,
 					       0, creation_data->cn, strlen(creation_data->cn));	
 	}
 	
+	// Add Subject Alternative Names if provided
+	if (creation_data->subject_alt_name && creation_data->subject_alt_name[0]) {
+		if (tls_add_san_to_crq(crq, creation_data->subject_alt_name) < 0) {
+			return g_strdup_printf(_("Error when setting Subject Alternative Name extension"));
+		}
+	}
 
 	if (gnutls_x509_crq_privkey_sign(crq, pkey, GNUTLS_DIG_SHA512, 0)) {
 		return g_strdup_printf(_("Error when signing self-signed csr"));
@@ -844,6 +972,39 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 		gnutls_x509_crt_set_crl_dist_points (crt, GNUTLS_SAN_URI, creation_data->crl_distribution_point, 0);
 	else
 		gnutls_x509_crt_cpy_crl_dist_points (crt, ca_crt);
+
+	// Add Subject Alternative Names
+	// If explicitly provided in creation_data, use those; otherwise try to copy from CSR
+	if (creation_data->subject_alt_name && creation_data->subject_alt_name[0]) {
+		if (tls_add_san_to_cert(crt, creation_data->subject_alt_name) < 0) {
+			gnutls_x509_crq_deinit (csr);
+			gnutls_x509_crt_deinit (crt);
+			gnutls_x509_crt_deinit (ca_crt);
+			gnutls_x509_privkey_deinit (ca_pkey);
+			return g_strdup_printf(_("Error when setting Subject Alternative Name extension"));
+		}
+	} else {
+		// Try to copy SANs from CSR
+		gint san_idx = 0;
+		while (1) {
+			gchar san_buffer[1024];
+			size_t san_size = sizeof(san_buffer);
+			guint san_type = 0;
+			gint result = gnutls_x509_crq_get_subject_alt_name(csr, san_idx, san_buffer, &san_size, &san_type, NULL);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || result == GNUTLS_E_UNKNOWN_ALGORITHM)
+				break;
+			
+			if (result < 0)
+				break;
+			
+			// Copy this SAN to the certificate
+			if (gnutls_x509_crt_set_subject_alt_name(crt, san_type, san_buffer, san_size, GNUTLS_FSAN_APPEND) < 0)
+				break;
+			
+			san_idx++;
+		}
+	}
 		
 
 	if (gnutls_x509_crt_sign2(crt, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0)) {
