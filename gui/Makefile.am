@@ -34,6 +34,7 @@ gtkbuilder_DATA =   \
 	new_crl_dialog.ui \
 	new_req_window.ui \
 	preferences_dialog.ui \
+	wizard_window.ui \
 	san_editor_dialog.ui \
 	san_manager_widget.ui \
 	gnomint.png \
