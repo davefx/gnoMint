@@ -1554,6 +1554,73 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	}
 #endif
 
+	// Extract Subject Alternative Names from CSR
+	{
+		GString *san_string = g_string_new(NULL);
+		gint san_idx = 0;
+		gboolean first = TRUE;
+		
+		while (1) {
+			size_t san_size = 0;
+			guint san_type = 0;
+			gint result = gnutls_x509_crq_get_subject_alt_name(*csr, san_idx, NULL, &san_size, &san_type, NULL);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || result == GNUTLS_E_UNKNOWN_ALGORITHM)
+				break;
+			
+			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				break;
+			
+			gchar *san_buffer = g_new0(gchar, san_size + 1);
+			result = gnutls_x509_crq_get_subject_alt_name(*csr, san_idx, san_buffer, &san_size, &san_type, NULL);
+			
+			if (result >= 0) {
+				if (!first) {
+					g_string_append(san_string, ", ");
+				}
+				first = FALSE;
+				
+				switch (san_type) {
+				case GNUTLS_SAN_DNSNAME:
+					g_string_append_printf(san_string, "DNS:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_RFC822NAME:
+					g_string_append_printf(san_string, "EMAIL:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_URI:
+					g_string_append_printf(san_string, "URI:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_IPADDRESS:
+					// Convert binary IP to string representation
+					if (san_size == 4) {
+						// IPv4
+						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
+							(guchar)san_buffer[0], (guchar)san_buffer[1],
+							(guchar)san_buffer[2], (guchar)san_buffer[3]);
+					} else if (san_size == 16) {
+						// IPv6
+						g_string_append(san_string, "IP:");
+						for (int i = 0; i < 16; i += 2) {
+							if (i > 0) g_string_append(san_string, ":");
+							g_string_append_printf(san_string, "%02x%02x",
+								(guchar)san_buffer[i], (guchar)san_buffer[i+1]);
+						}
+					}
+					break;
+				}
+			}
+			
+			g_free(san_buffer);
+			san_idx++;
+		}
+		
+		if (san_string->len > 0) {
+			res->subject_alt_name = g_string_free(san_string, FALSE);
+		} else {
+			g_string_free(san_string, TRUE);
+			res->subject_alt_name = NULL;
+		}
+	}
 
 	gnutls_x509_crq_deinit (*csr);
 	g_free (csr);
@@ -1591,6 +1658,10 @@ void tls_csr_free (TlsCsr *tlscsr)
 
 	if (tlscsr->key_id) {
 		g_free (tlscsr->key_id);
+	}
+
+	if (tlscsr->subject_alt_name) {
+		g_free (tlscsr->subject_alt_name);
 	}
 
 	g_free (tlscsr);

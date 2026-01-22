@@ -134,6 +134,8 @@ typedef struct __TlsCsr {
 	gchar * dn;
 
 	gchar * key_id;
+	
+	gchar * subject_alt_name; // Human-readable SANs (e.g., "DNS:example.com, IP:192.168.1.1")
 } TlsCsr;
 
 void tls_init (void);
