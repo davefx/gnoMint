@@ -73,6 +73,8 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 				regfree(&regex);
 				if (ret == 0)
 					return TRUE;
+			} else {
+				regfree(&regex);
 			}
 			if (error_message)
 				*error_message = g_strdup(_("Invalid DNS name. Use format: example.com or *.example.com"));
@@ -128,15 +130,17 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 	GtkEntry *value_entry;
 	GtkWidget *parent;
 	gint response;
+	gchar *ui_file;
 	
 	// Load editor dialog if not already loaded
 	if (!data->editor_builder) {
 		data->editor_builder = gtk_builder_new();
-		if (!gtk_builder_add_from_file(data->editor_builder,
-		                                g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_editor_dialog.ui", NULL),
-		                                NULL)) {
+		ui_file = g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_editor_dialog.ui", NULL);
+		if (!gtk_builder_add_from_file(data->editor_builder, ui_file, NULL)) {
+			g_free(ui_file);
 			return FALSE;
 		}
+		g_free(ui_file);
 	}
 	
 	dialog = GTK_DIALOG(gtk_builder_get_object(data->editor_builder, "san_editor_dialog"));

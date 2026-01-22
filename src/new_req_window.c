@@ -231,12 +231,13 @@ void new_req_window_display()
 {
 	GtkBuilder *san_builder;
 	GtkWidget *alignment;
+	gchar *ui_file;
 
 	new_req_window_gtkb = gtk_builder_new();
 
-	gtk_builder_add_from_file (new_req_window_gtkb,
-				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL),
-				   NULL);
+	ui_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL);
+	gtk_builder_add_from_file (new_req_window_gtkb, ui_file, NULL);
+	g_free(ui_file);
 	
 	gtk_builder_connect_signals (new_req_window_gtkb, NULL); 	
 	
@@ -252,9 +253,9 @@ void new_req_window_display()
 
 	// Initialize SAN manager widget
 	san_builder = gtk_builder_new();
-	gtk_builder_add_from_file(san_builder,
-	                          g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_manager_widget.ui", NULL),
-	                          NULL);
+	ui_file = g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_manager_widget.ui", NULL);
+	gtk_builder_add_from_file(san_builder, ui_file, NULL);
+	g_free(ui_file);
 	san_manager_widget1 = san_manager_create(san_builder, "san_manager_vbox");
 	
 	if (san_manager_widget1) {
