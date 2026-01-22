@@ -1399,42 +1399,48 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 		int san_idx = 0;
 		
 		while (1) {
-			char buffer[256];
-			size_t buffer_size = sizeof(buffer);
+			// First, query the size needed
+			size_t san_size = 0;
 			unsigned int san_type = 0;
-			int result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, buffer, &buffer_size, &san_type);
+			int result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, NULL, &san_size, &san_type);
 			
 			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
 				break;
 			
-			if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			// Allocate buffer for the SAN (with null terminator for safety)
+			gchar *san_buffer = g_new0(gchar, san_size + 1);
+			size_t actual_size = san_size;
+			result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, san_buffer, &actual_size, &san_type);
+			
+			// Only process if we successfully got the data
+			if (result >= 0) {
 				if (!first)
 					g_string_append(san_string, ", ");
 				first = FALSE;
 				
 				switch (san_type) {
 				case GNUTLS_SAN_DNSNAME:
-					g_string_append_printf(san_string, "DNS:%s", buffer);
+					g_string_append_printf(san_string, "DNS:%s", san_buffer);
 					break;
 				case GNUTLS_SAN_RFC822NAME:
-					g_string_append_printf(san_string, "EMAIL:%s", buffer);
+					g_string_append_printf(san_string, "EMAIL:%s", san_buffer);
 					break;
 				case GNUTLS_SAN_URI:
-					g_string_append_printf(san_string, "URI:%s", buffer);
+					g_string_append_printf(san_string, "URI:%s", san_buffer);
 					break;
 				case GNUTLS_SAN_IPADDRESS:
 					// Convert binary IP to readable format
-					if (buffer_size == 4) {
+					if (actual_size == 4) {
 						// IPv4
 						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
-							(unsigned char)buffer[0], (unsigned char)buffer[1],
-							(unsigned char)buffer[2], (unsigned char)buffer[3]);
-					} else if (buffer_size == 16) {
+							(unsigned char)san_buffer[0], (unsigned char)san_buffer[1],
+							(unsigned char)san_buffer[2], (unsigned char)san_buffer[3]);
+					} else if (actual_size == 16) {
 						// IPv6
 						gchar ip_str[INET6_ADDRSTRLEN];
-						if (inet_ntop(AF_INET6, buffer, ip_str, sizeof(ip_str))) {
+						if (inet_ntop(AF_INET6, san_buffer, ip_str, sizeof(ip_str))) {
 							g_string_append_printf(san_string, "IP:%s", ip_str);
 						} else {
 							// Fallback to hex if conversion fails
@@ -1442,13 +1448,15 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 							for (int j = 0; j < 16; j += 2) {
 								if (j > 0) g_string_append(san_string, ":");
 								g_string_append_printf(san_string, "%02x%02x",
-									(unsigned char)buffer[j], (unsigned char)buffer[j+1]);
+									(unsigned char)san_buffer[j], (unsigned char)san_buffer[j+1]);
 							}
 						}
 					}
 					break;
 				}
 			}
+			
+			g_free(san_buffer);
 			san_idx++;
 		}
 		
