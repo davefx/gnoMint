@@ -1401,8 +1401,8 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 		while (1) {
 			// First, query the size needed
 			size_t san_size = 0;
-			unsigned int san_type = 0;
-			int result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, NULL, &san_size, &san_type);
+			unsigned int critical = 0;
+			int result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, NULL, &san_size, &critical);
 			
 			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
@@ -1412,15 +1412,16 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 			// Allocate buffer for the SAN (with null terminator for safety)
 			gchar *san_buffer = g_new0(gchar, san_size + 1);
 			size_t actual_size = san_size;
-			result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, san_buffer, &actual_size, &san_type);
+			result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, san_buffer, &actual_size, &critical);
 			
-			// Only process if we successfully got the data
+			// The result contains the SAN type when successful (>= 0)
 			if (result >= 0) {
 				if (!first)
 					g_string_append(san_string, ", ");
 				first = FALSE;
 				
-				switch (san_type) {
+				// result is the SAN type
+				switch (result) {
 				case GNUTLS_SAN_DNSNAME:
 					g_string_append_printf(san_string, "DNS:%s", san_buffer);
 					break;
