@@ -39,3 +39,5 @@ po/.intltool-merge-cache.lock
 po/POTFILES
 po/stamp-it
 po/Makefile.in.in
+po/.intltool-merge-cache.lock
+src/test_y2k38

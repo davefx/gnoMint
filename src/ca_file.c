@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "time64_check.h"
 #include "dialog.h"
 #include "tls.h"
 #include "ca_file.h"
