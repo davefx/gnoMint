@@ -39,7 +39,7 @@
 #include "crl.h"
 
 extern CaCommand ca_commands[];
-#define CA_COMMAND_NUMBER 31
+#define CA_COMMAND_NUMBER 33
 
 extern gchar * gnomint_current_opened_file;
 extern gchar * ca_creation_message;
@@ -1574,4 +1574,212 @@ int ca_cli_callback_exit (int argc, char **argv)
         printf (_("Exiting gnomint-cli...\n"));
         exit (0);
         return 0;
+}
+
+int ca_cli_callback_addservercert (int argc, char **argv)
+{
+	guint64 ca_id;
+	gchar *cert_type_str;
+	gchar *server_name;
+	TlsCreationData *creation_data = NULL;
+	TlsCertCreationData *cert_creation_data = NULL;
+	gchar *private_key = NULL;
+	gnutls_x509_privkey_t *csr_key = NULL;
+	gchar *certificate_sign_request = NULL;
+	gchar *error_message = NULL;
+	TlsCsr *tlscsr = NULL;
+	guint64 csr_id = 0;
+	gboolean is_web_server = TRUE;
+
+	// Parse parameters
+	ca_id = atoll(argv[1]);
+	cert_type_str = argv[2];
+	server_name = argv[3];
+
+	// Validate CA ID
+	if (!ca_file_check_if_is_cert_id(ca_id)) {
+		dialog_error(_("The given CA id is not valid"));
+		return -1;
+	}
+
+	// Validate certificate type
+	if (g_ascii_strcasecmp(cert_type_str, "web") == 0 || 
+	    g_ascii_strcasecmp(cert_type_str, "webserver") == 0) {
+		is_web_server = TRUE;
+	} else if (g_ascii_strcasecmp(cert_type_str, "email") == 0 || 
+	           g_ascii_strcasecmp(cert_type_str, "emailserver") == 0) {
+		is_web_server = FALSE;
+	} else {
+		dialog_error(_("Certificate type must be 'web' or 'email'"));
+		return -1;
+	}
+
+	// Validate server name
+	if (!server_name || strlen(server_name) == 0) {
+		dialog_error(_("Server name cannot be empty"));
+		return -1;
+	}
+
+	printf(_("Creating %s certificate for: %s\n"), 
+	       is_web_server ? _("web server") : _("email server"), 
+	       server_name);
+
+	// Create CSR
+	creation_data = g_new0(TlsCreationData, 1);
+	creation_data->key_type = 0; // RSA
+	creation_data->key_bitlength = 2048;
+	creation_data->country = g_strdup("");
+	creation_data->state = g_strdup("");
+	creation_data->city = g_strdup("");
+	creation_data->org = g_strdup("");
+	creation_data->ou = g_strdup("");
+	creation_data->cn = g_strdup(server_name);
+	creation_data->emailAddress = g_strdup("");
+	creation_data->parent_ca_id_str = g_strdup_printf("'%" G_GUINT64_FORMAT "'", ca_id);
+
+	// Apply CA field inheritance
+	GHashTable *policy_table = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	
+	int policy_callback(void *pArg, int argc, char **argv, char **columnNames) {
+		GHashTable *table = (GHashTable *)pArg;
+		if (argc >= 3 && argv[1] && argv[2]) {
+			g_hash_table_insert(table, g_strdup(argv[1]), g_strdup(argv[2]));
+		}
+		return 0;
+	}
+	
+	ca_file_foreach_policy(policy_callback, ca_id, policy_table);
+
+	// Get CA certificate fields for inheritance
+	gchar *ca_pem = ca_file_get_public_pem_from_id(CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	if (ca_pem) {
+		TlsCert *ca_cert = tls_parse_cert_pem(ca_pem);
+		g_free(ca_pem);
+		
+		if (ca_cert) {
+			gchar *strvalue;
+			gint inherit_value;
+			
+			// Apply inheritance for each field
+			strvalue = (gchar *)g_hash_table_lookup(policy_table, "C_INHERIT");
+			inherit_value = strvalue ? atoi(strvalue) : 0;
+			if (inherit_value && ca_cert->c) {
+				g_free(creation_data->country);
+				creation_data->country = g_strdup(ca_cert->c);
+			}
+			
+			strvalue = (gchar *)g_hash_table_lookup(policy_table, "ST_INHERIT");
+			inherit_value = strvalue ? atoi(strvalue) : 0;
+			if (inherit_value && ca_cert->st) {
+				g_free(creation_data->state);
+				creation_data->state = g_strdup(ca_cert->st);
+			}
+			
+			strvalue = (gchar *)g_hash_table_lookup(policy_table, "L_INHERIT");
+			inherit_value = strvalue ? atoi(strvalue) : 0;
+			if (inherit_value && ca_cert->l) {
+				g_free(creation_data->city);
+				creation_data->city = g_strdup(ca_cert->l);
+			}
+			
+			strvalue = (gchar *)g_hash_table_lookup(policy_table, "O_INHERIT");
+			inherit_value = strvalue ? atoi(strvalue) : 0;
+			if (inherit_value && ca_cert->o) {
+				g_free(creation_data->org);
+				creation_data->org = g_strdup(ca_cert->o);
+			}
+			
+			strvalue = (gchar *)g_hash_table_lookup(policy_table, "OU_INHERIT");
+			inherit_value = strvalue ? atoi(strvalue) : 0;
+			if (inherit_value && ca_cert->ou) {
+				g_free(creation_data->ou);
+				creation_data->ou = g_strdup(ca_cert->ou);
+			}
+			
+			tls_cert_free(ca_cert);
+		}
+	}
+	
+	g_hash_table_destroy(policy_table);
+
+	// Generate RSA key pair
+	error_message = tls_generate_rsa_keys(creation_data, &private_key, &csr_key);
+	if (error_message) {
+		printf(_("Error: Key generation failed: %s\n"), error_message);
+		tls_creation_data_free(creation_data);
+		return -1;
+	}
+
+	// Generate CSR
+	error_message = tls_generate_csr(creation_data, csr_key, &certificate_sign_request);
+	if (error_message) {
+		printf(_("Error: CSR generation failed: %s\n"), error_message);
+		g_free(private_key);
+		tls_creation_data_free(creation_data);
+		return -1;
+	}
+
+	// Parse CSR
+	tlscsr = tls_parse_csr_pem(certificate_sign_request);
+	if (!tlscsr) {
+		printf(_("Error: Failed to parse generated CSR\n"));
+		g_free(private_key);
+		g_free(certificate_sign_request);
+		tls_creation_data_free(creation_data);
+		return -1;
+	}
+
+	// Save CSR to database
+	error_message = ca_file_insert_csr(private_key, certificate_sign_request, 
+	                                   creation_data->parent_ca_id_str, &csr_id);
+	if (error_message) {
+		printf(_("Error: Failed to save CSR: %s\n"), error_message);
+		g_free(error_message);
+		tls_csr_free(tlscsr);
+		g_free(private_key);
+		g_free(certificate_sign_request);
+		tls_creation_data_free(creation_data);
+		return -1;
+	}
+
+	tls_csr_free(tlscsr);
+	g_free(private_key);
+	g_free(certificate_sign_request);
+	tls_creation_data_free(creation_data);
+
+	printf(_("CSR created with ID: %" G_GUINT64_FORMAT "\n"), csr_id);
+
+	// Prepare certificate creation data
+	cert_creation_data = g_new0(TlsCertCreationData, 1);
+	cert_creation_data->key_months_before_expiration = 12; // 1 year default
+	cert_creation_data->ca = FALSE; // Not a CA certificate
+	cert_creation_data->crl_signing = FALSE;
+	cert_creation_data->digital_signature = TRUE;
+	cert_creation_data->key_encipherment = TRUE;
+
+	// Set certificate usage based on type
+	if (is_web_server) {
+		cert_creation_data->web_server = TRUE;
+		cert_creation_data->web_client = FALSE;
+		cert_creation_data->email_protection = FALSE;
+	} else {
+		cert_creation_data->web_server = TRUE;
+		cert_creation_data->web_client = TRUE;
+		cert_creation_data->email_protection = TRUE;
+	}
+
+	// Sign the CSR
+	error_message = (gchar *)new_cert_sign_csr(csr_id, ca_id, cert_creation_data);
+	if (error_message) {
+		printf(_("Error: Failed to sign certificate: %s\n"), error_message);
+		g_free(cert_creation_data);
+		return -1;
+	}
+
+	g_free(cert_creation_data);
+
+	printf(_("Certificate generated successfully for: %s\n"), server_name);
+	printf(_("Certificate type: %s\n"), is_web_server ? _("Web Server") : _("Email Server"));
+
+	return 0;
 }
