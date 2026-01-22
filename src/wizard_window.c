@@ -23,13 +23,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sqlite3.h>
+#include <time.h>
 
 #include "wizard_window.h"
 #include "ca_file.h"
+#include "ca.h"
 #include "tls.h"
 #include "pkey_manage.h"
 #include "dialog.h"
-#include "export.h"
 #include "new_cert.h"
 
 #include <glib/gi18n.h>
@@ -40,14 +41,77 @@ static WizardCertType current_wizard_type = WIZARD_CERT_TYPE_WEB_SERVER;
 // External declaration of ca_db from ca_file.c
 extern sqlite3 *ca_db;
 
-// Helper function to get the first available CA
-static guint64 __wizard_get_first_ca_id (void)
+typedef struct {
+    guint64 ca_id;
+    gchar *subject;
+    time_t expiration;
+} CAInfo;
+
+// Helper function to get CA list (non-expired first)
+static GList * __wizard_get_ca_list (void)
 {
-    guint64 ca_id = 0;
-    gchar *query = "SELECT id FROM certificates WHERE is_ca=1 LIMIT 1;";
+    GList *ca_list = NULL;
+    gchar *query = "SELECT id, subject, expiration FROM certificates WHERE is_ca=1 AND revocation IS NULL ORDER BY expiration DESC;";
     gchar *error = NULL;
     
-    // Use a simple callback to get the first CA id
+    int callback(void *data, int argc, char **argv, char **columnNames) {
+        if (argc >= 3 && argv[0] && argv[1]) {
+            GList **list = (GList **)data;
+            CAInfo *ca = g_new0(CAInfo, 1);
+            ca->ca_id = g_ascii_strtoull(argv[0], NULL, 10);
+            ca->subject = g_strdup(argv[1]);
+            ca->expiration = argv[2] ? (time_t)g_ascii_strtoull(argv[2], NULL, 10) : 0;
+            *list = g_list_append(*list, ca);
+        }
+        return 0;
+    }
+    
+    sqlite3_exec (ca_db, query, callback, &ca_list, &error);
+    
+    if (error) {
+        g_free (error);
+    }
+    
+    return ca_list;
+}
+
+// Helper function to get selected CA from main window or first non-expired
+static guint64 __wizard_get_default_ca_id (void)
+{
+    guint64 selected_ca = ca_get_selected_row_id();
+    
+    // Check if selected item is a CA
+    if (selected_ca > 0) {
+        gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE id=%" G_GUINT64_FORMAT " AND is_ca=1 AND revocation IS NULL;", selected_ca);
+        gchar *error = NULL;
+        guint64 result = 0;
+        
+        int callback(void *data, int argc, char **argv, char **columnNames) {
+            if (argc > 0 && argv[0]) {
+                guint64 *id = (guint64 *)data;
+                *id = g_ascii_strtoull(argv[0], NULL, 10);
+            }
+            return 0;
+        }
+        
+        sqlite3_exec (ca_db, query, callback, &result, &error);
+        g_free(query);
+        
+        if (error) {
+            g_free (error);
+        }
+        
+        if (result > 0) {
+            return result;
+        }
+    }
+    
+    // Get first non-expired CA
+    time_t now = time(NULL);
+    gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE is_ca=1 AND revocation IS NULL AND expiration > %ld ORDER BY expiration DESC LIMIT 1;", (long)now);
+    gchar *error = NULL;
+    guint64 ca_id = 0;
+    
     int callback(void *data, int argc, char **argv, char **columnNames) {
         if (argc > 0 && argv[0]) {
             guint64 *id = (guint64 *)data;
@@ -57,16 +121,106 @@ static guint64 __wizard_get_first_ca_id (void)
     }
     
     sqlite3_exec (ca_db, query, callback, &ca_id, &error);
+    g_free(query);
     
     if (error) {
         g_free (error);
     }
     
+    // If no non-expired CA found, get any CA
+    if (ca_id == 0) {
+        query = "SELECT id FROM certificates WHERE is_ca=1 AND revocation IS NULL LIMIT 1;";
+        sqlite3_exec (ca_db, query, callback, &ca_id, &error);
+        
+        if (error) {
+            g_free (error);
+        }
+    }
+    
     return ca_id;
 }
 
+// Helper function to get CA fields for inheritance
+static void __wizard_get_ca_fields (guint64 ca_id, TlsCreationData *creation_data)
+{
+    // Get CA policy settings
+    GHashTable *policy_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+    
+    int policy_callback(void *pArg, int argc, char **argv, char **columnNames) {
+        GHashTable *table = (GHashTable *)pArg;
+        if (argc >= 3 && argv[1] && argv[2]) {
+            g_hash_table_insert (table, g_strdup(argv[1]), g_strdup(argv[2]));
+        }
+        return 0;
+    }
+    
+    ca_file_foreach_policy (policy_callback, ca_id, policy_table);
+    
+    // Get CA certificate fields
+    gchar *ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+    if (!ca_pem) {
+        g_hash_table_destroy (policy_table);
+        return;
+    }
+    
+    TlsCert *ca_cert = tls_parse_cert_pem (ca_pem);
+    g_free (ca_pem);
+    
+    if (!ca_cert) {
+        g_hash_table_destroy (policy_table);
+        return;
+    }
+    
+    // Check and apply inheritance for each field
+    gchar *strvalue;
+    gint inherit_value;
+    
+    // Country (C)
+    strvalue = (gchar *)g_hash_table_lookup (policy_table, "C_INHERIT");
+    inherit_value = strvalue ? atoi(strvalue) : 0;
+    if (inherit_value && ca_cert->c) {
+        g_free (creation_data->country);
+        creation_data->country = g_strdup (ca_cert->c);
+    }
+    
+    // State (ST)
+    strvalue = (gchar *)g_hash_table_lookup (policy_table, "ST_INHERIT");
+    inherit_value = strvalue ? atoi(strvalue) : 0;
+    if (inherit_value && ca_cert->st) {
+        g_free (creation_data->state);
+        creation_data->state = g_strdup (ca_cert->st);
+    }
+    
+    // Locality (L)
+    strvalue = (gchar *)g_hash_table_lookup (policy_table, "L_INHERIT");
+    inherit_value = strvalue ? atoi(strvalue) : 0;
+    if (inherit_value && ca_cert->l) {
+        g_free (creation_data->city);
+        creation_data->city = g_strdup (ca_cert->l);
+    }
+    
+    // Organization (O)
+    strvalue = (gchar *)g_hash_table_lookup (policy_table, "O_INHERIT");
+    inherit_value = strvalue ? atoi(strvalue) : 0;
+    if (inherit_value && ca_cert->o) {
+        g_free (creation_data->org);
+        creation_data->org = g_strdup (ca_cert->o);
+    }
+    
+    // Organizational Unit (OU)
+    strvalue = (gchar *)g_hash_table_lookup (policy_table, "OU_INHERIT");
+    inherit_value = strvalue ? atoi(strvalue) : 0;
+    if (inherit_value && ca_cert->ou) {
+        g_free (creation_data->ou);
+        creation_data->ou = g_strdup (ca_cert->ou);
+    }
+    
+    tls_cert_free (ca_cert);
+    g_hash_table_destroy (policy_table);
+}
+
 // Helper function to create CSR with default settings
-static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cert_type)
+static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cert_type, guint64 ca_id)
 {
     TlsCreationData *creation_data = g_new0 (TlsCreationData, 1);
     gchar *private_key = NULL;
@@ -86,7 +240,10 @@ static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cer
     creation_data->ou = g_strdup(""); // Empty organizational unit
     creation_data->cn = g_strdup(server_name); // Server name as CN
     creation_data->emailAddress = g_strdup("");
-    creation_data->parent_ca_id_str = NULL;
+    creation_data->parent_ca_id_str = g_strdup_printf("'%" G_GUINT64_FORMAT "'", ca_id);
+    
+    // Apply CA field inheritance based on CA policy
+    __wizard_get_ca_fields (ca_id, creation_data);
     
     // Generate RSA key pair
     error_message = tls_generate_rsa_keys (creation_data, &private_key, &csr_key);
@@ -140,72 +297,12 @@ static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cer
     return csr_id;
 }
 
-// Helper function to export certificate and key
-static gboolean __wizard_export_cert_and_key (guint64 cert_id, const gchar *server_name)
-{
-    gchar *gnomint_dir = g_build_filename (g_get_home_dir(), ".gnomint", NULL);
-    gchar *cert_filename = g_strdup_printf ("%s-cert.pem", server_name);
-    gchar *key_filename = g_strdup_printf ("%s-key.pem", server_name);
-    gchar *cert_path = g_build_filename (gnomint_dir, cert_filename, NULL);
-    gchar *key_path = g_build_filename (gnomint_dir, key_filename, NULL);
-    gchar *error = NULL;
-    gboolean success = TRUE;
-    
-    // Create .gnomint directory if it doesn't exist
-    if (!g_file_test (gnomint_dir, G_FILE_TEST_EXISTS)) {
-        if (g_mkdir_with_parents (gnomint_dir, 0700) != 0) {
-            dialog_error (_("Failed to create ~/.gnomint directory."));
-            success = FALSE;
-            goto cleanup;
-        }
-    }
-    
-    // Export certificate PEM
-    gchar *cert_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id);
-    if (!cert_pem) {
-        dialog_error (_("Failed to get certificate data."));
-        success = FALSE;
-        goto cleanup;
-    }
-    
-    GError *gerror = NULL;
-    if (!g_file_set_contents (cert_path, cert_pem, strlen(cert_pem), &gerror)) {
-        dialog_error (g_strdup_printf (_("Failed to save certificate:\n%s"), gerror ? gerror->message : "Unknown error"));
-        g_clear_error (&gerror);
-        g_free (cert_pem);
-        success = FALSE;
-        goto cleanup;
-    }
-    g_free (cert_pem);
-    
-    // Export private key
-    error = export_private_pem (cert_id, CA_FILE_ELEMENT_TYPE_CERT, key_path);
-    if (error) {
-        dialog_error (g_strdup_printf (_("Failed to export private key:\n%s"), error));
-        g_free (error);
-        success = FALSE;
-        goto cleanup;
-    }
-    
-    // Show success message
-    dialog_info (g_strdup_printf (_("Certificate generated successfully!\n\nFiles saved to:\n• %s\n• %s"), 
-                                  cert_path, key_path));
-    
-cleanup:
-    g_free (gnomint_dir);
-    g_free (cert_filename);
-    g_free (key_filename);
-    g_free (cert_path);
-    g_free (key_path);
-    
-    return success;
-}
-
 // Button click handlers
 static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_data)
 {
     GtkWidget *dialog = GTK_WIDGET(user_data);
     GtkWidget *server_name_entry = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "server_name_entry"));
+    GtkWidget *signing_ca_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "signing_ca_combo"));
     const gchar *server_name = gtk_entry_get_text (GTK_ENTRY(server_name_entry));
     
     // Validate server name
@@ -214,15 +311,24 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
         return;
     }
     
-    // Get first available CA
-    guint64 ca_id = __wizard_get_first_ca_id ();
+    // Get selected CA
+    GtkTreeIter iter;
+    if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX(signing_ca_combo), &iter)) {
+        dialog_error (_("Please select a Certificate Authority."));
+        return;
+    }
+    
+    guint64 ca_id = 0;
+    GtkTreeModel *model = gtk_combo_box_get_model (GTK_COMBO_BOX(signing_ca_combo));
+    gtk_tree_model_get (model, &iter, 0, &ca_id, -1);
+    
     if (ca_id == 0) {
-        dialog_error (_("No Certificate Authority found. Please create a CA first."));
+        dialog_error (_("Invalid Certificate Authority selected."));
         return;
     }
     
     // Create CSR
-    guint64 csr_id = __wizard_create_csr (server_name, current_wizard_type);
+    guint64 csr_id = __wizard_create_csr (server_name, current_wizard_type, ca_id);
     if (csr_id == 0) {
         return; // Error already shown
     }
@@ -255,36 +361,13 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
         return;
     }
     
-    // Get the newly created certificate ID
-    guint64 cert_id = 0;
-    gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE ca=%" G_GUINT64_FORMAT " ORDER BY id DESC LIMIT 1;", ca_id);
-    gchar *db_error = NULL;
-    
-    int callback(void *data, int argc, char **argv, char **columnNames) {
-        if (argc > 0 && argv[0]) {
-            guint64 *id = (guint64 *)data;
-            *id = g_ascii_strtoull(argv[0], NULL, 10);
-        }
-        return 0;
-    }
-    
-    sqlite3_exec (ca_db, query, callback, &cert_id, &db_error);
-    g_free(query);
-    
-    if (db_error) {
-        g_free (db_error);
-    }
-    
-    if (cert_id == 0) {
-        dialog_error (_("Failed to find newly created certificate."));
-        g_free (cert_creation_data);
-        return;
-    }
-    
-    // Export certificate and key
-    __wizard_export_cert_and_key (cert_id, server_name);
-    
     g_free (cert_creation_data);
+    
+    // Show success message
+    dialog_info (_("Certificate generated successfully!"));
+    
+    // Refresh the main list to show the new certificate
+    dialog_refresh_list();
     
     // Close dialog
     gtk_widget_destroy (dialog);
@@ -302,6 +385,8 @@ void wizard_window_display (WizardCertType cert_type)
     GtkWidget *generate_button;
     GtkWidget *cancel_button;
     GtkWidget *cert_type_combo;
+    GtkWidget *signing_ca_combo;
+    GtkListStore *ca_list_store;
     GError *error = NULL;
     
     current_wizard_type = cert_type;
@@ -325,12 +410,62 @@ void wizard_window_display (WizardCertType cert_type)
         return;
     }
     
-    // Get buttons
+    // Get widgets
     generate_button = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "generate_button"));
     cancel_button = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "cancel_button"));
+    cert_type_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "cert_type_combo"));
+    signing_ca_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "signing_ca_combo"));
+    
+    // Populate CA list
+    ca_list_store = GTK_LIST_STORE(gtk_builder_get_object (wizard_window_gtkb, "ca_list_model"));
+    GList *ca_list = __wizard_get_ca_list();
+    
+    if (!ca_list) {
+        dialog_error (_("No Certificate Authority found. Please create a CA first."));
+        g_object_unref (wizard_window_gtkb);
+        return;
+    }
+    
+    guint64 default_ca_id = __wizard_get_default_ca_id();
+    gint default_index = 0;
+    gint current_index = 0;
+    time_t now = time(NULL);
+    
+    for (GList *l = ca_list; l != NULL; l = l->next) {
+        CAInfo *ca = (CAInfo *)l->data;
+        GtkTreeIter iter;
+        gchar *display_text;
+        
+        // Format display text with expiration status
+        if (ca->expiration > 0 && ca->expiration < now) {
+            display_text = g_strdup_printf("%s (expired)", ca->subject);
+        } else {
+            display_text = g_strdup(ca->subject);
+        }
+        
+        gtk_list_store_append (ca_list_store, &iter);
+        gtk_list_store_set (ca_list_store, &iter,
+                           0, ca->ca_id,
+                           1, display_text,
+                           -1);
+        
+        g_free(display_text);
+        
+        if (ca->ca_id == default_ca_id) {
+            default_index = current_index;
+        }
+        current_index++;
+        
+        g_free(ca->subject);
+        g_free(ca);
+    }
+    
+    g_list_free(ca_list);
+    
+    // Set default CA selection
+    gtk_combo_box_set_active (GTK_COMBO_BOX(signing_ca_combo), default_index);
     
     // Set certificate type combo
-    cert_type_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "cert_type_combo"));
     gtk_combo_box_set_active (GTK_COMBO_BOX(cert_type_combo), cert_type);
     
     // Connect signals - builder will be unreferenced when dialog is destroyed
