@@ -206,6 +206,14 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->ou);
 
+	// Display Subject Alternative Names if present
+	if (cert->subject_alt_name && cert->subject_alt_name[0]) {
+		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectAltNameLabel");
+		if (widget) {
+			gtk_label_set_text (GTK_LABEL(widget), cert->subject_alt_name);
+		}
+	}
+
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_cn);
 
@@ -739,8 +747,8 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 									     GtkTreeIter *parent, 
 									     gnutls_x509_crt_t *certificate)
 {
-	gint i;
-	for (i = 0; i < 1; i++)
+	gint i = 0;
+	while (1)
 	{
 		gint result;
 		guint critical;
@@ -753,7 +761,6 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 		result = gnutls_x509_crt_get_subject_alt_name(*certificate, i, buffer, &buffer_size, &critical);
 
 		if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
 			break;
 		}
 
@@ -837,6 +844,7 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 			g_free(hex_buffer);
 			break;
 		}
+		i++;
 	}
 }
 
