@@ -1392,6 +1392,74 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
         g_free (uaux);
         uaux = NULL;
 
+	// Extract Subject Alternative Names
+	{
+		GString *san_string = g_string_new(NULL);
+		gboolean first = TRUE;
+		int san_idx = 0;
+		
+		while (1) {
+			char buffer[256];
+			size_t buffer_size = sizeof(buffer);
+			unsigned int san_type = 0;
+			int result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, buffer, &buffer_size, &san_type);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				break;
+			
+			if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+				if (!first)
+					g_string_append(san_string, ", ");
+				first = FALSE;
+				
+				switch (san_type) {
+				case GNUTLS_SAN_DNSNAME:
+					g_string_append_printf(san_string, "DNS:%s", buffer);
+					break;
+				case GNUTLS_SAN_RFC822NAME:
+					g_string_append_printf(san_string, "EMAIL:%s", buffer);
+					break;
+				case GNUTLS_SAN_URI:
+					g_string_append_printf(san_string, "URI:%s", buffer);
+					break;
+				case GNUTLS_SAN_IPADDRESS:
+					// Convert binary IP to readable format
+					if (buffer_size == 4) {
+						// IPv4
+						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
+							(unsigned char)buffer[0], (unsigned char)buffer[1],
+							(unsigned char)buffer[2], (unsigned char)buffer[3]);
+					} else if (buffer_size == 16) {
+						// IPv6
+						gchar ip_str[INET6_ADDRSTRLEN];
+						if (inet_ntop(AF_INET6, buffer, ip_str, sizeof(ip_str))) {
+							g_string_append_printf(san_string, "IP:%s", ip_str);
+						} else {
+							// Fallback to hex if conversion fails
+							g_string_append(san_string, "IP:");
+							for (int j = 0; j < 16; j += 2) {
+								if (j > 0) g_string_append(san_string, ":");
+								g_string_append_printf(san_string, "%02x%02x",
+									(unsigned char)buffer[j], (unsigned char)buffer[j+1]);
+							}
+						}
+					}
+					break;
+				}
+			}
+			san_idx++;
+		}
+		
+		if (san_string->len > 0) {
+			res->subject_alt_name = g_string_free(san_string, FALSE);
+		} else {
+			g_string_free(san_string, TRUE);
+			res->subject_alt_name = NULL;
+		}
+	}
+
 	gnutls_x509_crt_deinit (*cert);
 	g_free (cert);
 
@@ -1449,6 +1517,7 @@ void tls_cert_free (TlsCert *tlscert)
 	g_free (tlscert->md5);
 	g_free (tlscert->key_id);
         g_free (tlscert->crl_distribution_point);
+	g_free (tlscert->subject_alt_name);
 
 	g_free (tlscert);
 }

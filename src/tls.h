@@ -117,6 +117,8 @@ typedef struct __TlsCert {
         gchar * issuer_key_id;
 
 	gchar * crl_distribution_point;
+	
+	gchar * subject_alt_name; // Human-readable SANs (e.g., "DNS:example.com, IP:192.168.1.1")
 
 	GList * uses;
 
