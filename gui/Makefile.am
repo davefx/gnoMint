@@ -4,6 +4,12 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
 @INTLTOOL_DESKTOP_RULE@
 
+appdata_in_files = gnomint.appdata.xml.in
+appdatadir = $(datadir)/appdata
+appdata_DATA = $(appdata_in_files:.xml.in=.xml)
+
+@INTLTOOL_XML_RULE@
+
 deskicondir = $(datadir)/pixmaps
 deskicon_DATA = gnomint.png
 
@@ -36,6 +42,6 @@ gtkbuilder_DATA =   \
 	extractpkey.png \
 	sign.png
 
-EXTRA_DIST = $(gtkbuilder_DATA) $(deskicon_DATA) $(desktop_in_files)
+EXTRA_DIST = $(gtkbuilder_DATA) $(deskicon_DATA) $(desktop_in_files) $(appdata_in_files)
 
-CLEANFILES = $(desktop_DATA)
+CLEANFILES = $(desktop_DATA) $(appdata_DATA)

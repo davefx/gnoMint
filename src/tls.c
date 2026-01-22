@@ -23,6 +23,7 @@
 #include <arpa/inet.h>
 #include <glib/gi18n.h>
 #include "uint160.h"
+#include "time64_check.h"
 #include "tls.h"
 
 void tls_init ()
