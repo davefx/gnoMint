@@ -209,9 +209,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 	// Display Subject Alternative Names if present
 	if (cert->subject_alt_name && cert->subject_alt_name[0]) {
 		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectAltNameLabel");
-		if (widget) {
-			gtk_label_set_text (GTK_LABEL(widget), cert->subject_alt_name);
-		}
+		gtk_label_set_text (GTK_LABEL(widget), cert->subject_alt_name);
 	}
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");	
