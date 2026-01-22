@@ -337,8 +337,8 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
                 new_req_ca_id = g_value_get_uint64(value);
 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
-                if (ca_file_policy_get (new_req_ca_id, "C_INHERIT")) {
-                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "C_FORCE_SAME"));
+                if (ca_file_policy_get_int (new_req_ca_id, "C_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "C_FORCE_SAME"));
                         model = GTK_TREE_MODEL(gtk_combo_box_get_model (GTK_COMBO_BOX(widget)));
                         gtk_tree_model_foreach (model, __new_req_window_lookup_country, tlscert->c);
                 } else {
@@ -347,8 +347,8 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
-                if (ca_file_policy_get (new_req_ca_id, "ST_INHERIT")) {
-                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "ST_FORCE_SAME"));
+                if (ca_file_policy_get_int (new_req_ca_id, "ST_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "ST_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->st);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
@@ -356,8 +356,8 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
-                if (ca_file_policy_get (new_req_ca_id, "L_INHERIT")) {
-                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "L_FORCE_SAME"));
+                if (ca_file_policy_get_int (new_req_ca_id, "L_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "L_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->l);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
@@ -365,8 +365,8 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
-                if (ca_file_policy_get (new_req_ca_id, "O_INHERIT")) {
-                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "O_FORCE_SAME"));
+                if (ca_file_policy_get_int (new_req_ca_id, "O_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "O_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->o);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
@@ -374,8 +374,8 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
                 }
                 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
-                if (ca_file_policy_get (new_req_ca_id, "OU_INHERIT")) {
-                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get (new_req_ca_id, "OU_FORCE_SAME"));
+                if (ca_file_policy_get_int (new_req_ca_id, "OU_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "OU_FORCE_SAME"));
                         gtk_entry_set_text(GTK_ENTRY(widget), tlscert->ou);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
