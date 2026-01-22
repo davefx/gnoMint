@@ -35,7 +35,9 @@ gnomint_SOURCES = \
 	crl.c \
 	uint160.c \
 	import.c \
-	export.c
+	export.c \
+	san_manager.c \
+	san_manager.h
 
 
 gnomint_LDADD = \
