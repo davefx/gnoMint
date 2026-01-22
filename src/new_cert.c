@@ -266,6 +266,13 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 	object = gtk_builder_get_object (new_cert_window_gtkb, "cn_label");
 	gtk_label_set_text (GTK_LABEL(object), csr_info->cn);
 	
+	object = gtk_builder_get_object (new_cert_window_gtkb, "san_label");
+	if (csr_info->subject_alt_name && csr_info->subject_alt_name[0]) {
+		gtk_label_set_text (GTK_LABEL(object), csr_info->subject_alt_name);
+	} else {
+		gtk_label_set_text (GTK_LABEL(object), _("None"));
+	}
+	
         object = gtk_builder_get_object (new_cert_window_gtkb, "signing_ca_treeview");
         __new_cert_populate_ca_treeview (GTK_TREE_VIEW(object));
 
@@ -748,6 +755,9 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->any_purpose = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
 
 	cert_creation_data->crl_distribution_point = ca_file_policy_get (ca_id, "CRL_DISTRIBUTION_POINT");
+
+	// SANs will be copied from the CSR by default
+	cert_creation_data->subject_alt_name = NULL;
 
 	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
 

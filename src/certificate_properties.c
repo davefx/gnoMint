@@ -23,6 +23,7 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 #include "tls.h"
 #include "ca_policy.h"
@@ -204,6 +205,12 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->ou);
+
+	// Display Subject Alternative Names if present
+	if (cert->subject_alt_name && cert->subject_alt_name[0]) {
+		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectAltNameLabel");
+		gtk_label_set_text (GTK_LABEL(widget), cert->subject_alt_name);
+	}
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_cn);
@@ -738,8 +745,8 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 									     GtkTreeIter *parent, 
 									     gnutls_x509_crt_t *certificate)
 {
-	gint i;
-	for (i = 0; i < 1; i++)
+	gint i = 0;
+	while (1)
 	{
 		gint result;
 		guint critical;
@@ -752,7 +759,6 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 		result = gnutls_x509_crt_get_subject_alt_name(*certificate, i, buffer, &buffer_size, &critical);
 
 		if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
 			break;
 		}
 
@@ -783,11 +789,43 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_IPADDRESS:
-			hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
-			g_free(hex_buffer);
+			// Convert binary IP to readable format
+			if (buffer_size == 4) {
+				// IPv4
+				gchar ip_str[INET_ADDRSTRLEN];
+				if (inet_ntop(AF_INET, buffer, ip_str, sizeof(ip_str))) {
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, ip_str, -1);
+				} else {
+					hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+					g_free(hex_buffer);
+				}
+			} else if (buffer_size == 16) {
+				// IPv6
+				gchar ip_str[INET6_ADDRSTRLEN];
+				if (inet_ntop(AF_INET6, buffer, ip_str, sizeof(ip_str))) {
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, ip_str, -1);
+				} else {
+					hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+					g_free(hex_buffer);
+				}
+			} else {
+				// Unknown format, fall back to hex
+				hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
+				gtk_tree_store_append(store, &l, parent);
+				gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
+						   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+				g_free(hex_buffer);
+			}
 			break;
 		case GNUTLS_SAN_DN:
 			hex_buffer = __certificate_properties_dump_RDNSequence (buffer, buffer_size);
@@ -804,6 +842,7 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 			g_free(hex_buffer);
 			break;
 		}
+		i++;
 	}
 }
 

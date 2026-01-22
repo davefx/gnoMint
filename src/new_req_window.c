@@ -31,6 +31,7 @@
 #include "tls.h"
 #include "pkey_manage.h"
 #include "new_req_window.h"
+#include "san_manager.h"
 
 #include <glib/gi18n.h>
 
@@ -38,6 +39,7 @@ GtkBuilder * new_req_window_gtkb = NULL;
 GtkTreeStore * new_req_ca_list_model = NULL;
 gboolean new_req_ca_id_valid = FALSE;
 guint64 new_req_ca_id;
+GtkWidget *san_manager_widget1 = NULL;
 
 enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
       NEW_REQ_CA_MODEL_COLUMN_SERIAL=1,
@@ -227,11 +229,15 @@ G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gp
 
 void new_req_window_display()
 {
+	GtkBuilder *san_builder;
+	GtkWidget *alignment;
+	gchar *ui_file;
+
 	new_req_window_gtkb = gtk_builder_new();
 
-	gtk_builder_add_from_file (new_req_window_gtkb,
-				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL),
-				   NULL);
+	ui_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL);
+	gtk_builder_add_from_file (new_req_window_gtkb, ui_file, NULL);
+	g_free(ui_file);
 	
 	gtk_builder_connect_signals (new_req_window_gtkb, NULL); 	
 	
@@ -245,6 +251,18 @@ void new_req_window_display()
 
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")), 2048);
 
+	// Initialize SAN manager widget
+	san_builder = gtk_builder_new();
+	ui_file = g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_manager_widget.ui", NULL);
+	gtk_builder_add_from_file(san_builder, ui_file, NULL);
+	g_free(ui_file);
+	san_manager_widget1 = san_manager_create(san_builder, "san_manager_vbox");
+	
+	if (san_manager_widget1) {
+		alignment = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "san_alignment1"));
+		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget1);
+		gtk_widget_show_all(san_manager_widget1);
+	}
 }
 
 void new_req_tab_activate (int tab_number)
@@ -500,6 +518,19 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 		csr_creation_data->cn = g_strdup (text);
 	else
 		csr_creation_data->cn = NULL;
+
+	// Get SANs from SAN manager widget
+	if (san_manager_widget1) {
+		gchar *san_string = san_manager_get_string(san_manager_widget1);
+		if (san_string && san_string[0])
+			csr_creation_data->subject_alt_name = san_string;
+		else {
+			g_free(san_string);
+			csr_creation_data->subject_alt_name = NULL;
+		}
+	} else {
+		csr_creation_data->subject_alt_name = NULL;
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));

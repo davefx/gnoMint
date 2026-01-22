@@ -20,6 +20,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 #include <glib/gi18n.h>
 #include "uint160.h"
 #include "time64_check.h"
@@ -29,6 +30,152 @@ void tls_init ()
 {
 	gnutls_global_init ();
 
+}
+
+/* Helper function to parse and add Subject Alternative Names to a certificate
+ * san_string format: "DNS:example.com,DNS:*.example.com,IP:192.168.1.1,EMAIL:admin@example.com"
+ * Returns 0 on success, -1 on error
+ */
+static gint tls_add_san_to_cert (gnutls_x509_crt_t crt, const gchar *san_string)
+{
+	if (!san_string || !san_string[0])
+		return 0;
+
+	gchar **san_entries = g_strsplit(san_string, ",", -1);
+	gint i, result = 0;
+
+	for (i = 0; san_entries[i] != NULL; i++) {
+		gchar *entry = g_strstrip(san_entries[i]);
+		if (!entry || !entry[0])
+			continue;
+
+		gchar **parts = g_strsplit(entry, ":", 2);
+		if (!parts[0] || !parts[1]) {
+			g_strfreev(parts);
+			continue;
+		}
+
+		gchar *type = g_strstrip(parts[0]);
+		gchar *value = g_strstrip(parts[1]);
+
+		if (g_ascii_strcasecmp(type, "DNS") == 0) {
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "IP") == 0) {
+			// Parse IP address (supports both IPv4 and IPv6) and convert to binary
+			struct in_addr ipv4_addr;
+			struct in6_addr ipv6_addr;
+			
+			// Try IPv4 first
+			if (inet_pton(AF_INET, value, &ipv4_addr) == 1) {
+				result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_IPADDRESS, 
+				                                               &ipv4_addr, sizeof(ipv4_addr), 
+				                                               GNUTLS_FSAN_APPEND);
+			}
+			// Try IPv6 if IPv4 failed
+			else if (inet_pton(AF_INET6, value, &ipv6_addr) == 1) {
+				result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_IPADDRESS, 
+				                                               &ipv6_addr, sizeof(ipv6_addr), 
+				                                               GNUTLS_FSAN_APPEND);
+			}
+			// Invalid IP address format
+			else {
+				result = -1;
+			}
+		} else if (g_ascii_strcasecmp(type, "EMAIL") == 0 || g_ascii_strcasecmp(type, "RFC822") == 0) {
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "URI") == 0) {
+			result = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_URI, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		}
+
+		g_strfreev(parts);
+
+		if (result < 0) {
+			g_strfreev(san_entries);
+			return -1;
+		}
+	}
+
+	g_strfreev(san_entries);
+	return 0;
+}
+
+/* Helper function to parse and add Subject Alternative Names to a CSR
+ * san_string format: "DNS:example.com,DNS:*.example.com,IP:192.168.1.1,EMAIL:admin@example.com"
+ * Returns 0 on success, -1 on error
+ */
+static gint tls_add_san_to_crq (gnutls_x509_crq_t crq, const gchar *san_string)
+{
+	if (!san_string || !san_string[0])
+		return 0;
+
+	gchar **san_entries = g_strsplit(san_string, ",", -1);
+	gint i, result = 0;
+
+	for (i = 0; san_entries[i] != NULL; i++) {
+		gchar *entry = g_strstrip(san_entries[i]);
+		if (!entry || !entry[0])
+			continue;
+
+		gchar **parts = g_strsplit(entry, ":", 2);
+		if (!parts[0] || !parts[1]) {
+			g_strfreev(parts);
+			continue;
+		}
+
+		gchar *type = g_strstrip(parts[0]);
+		gchar *value = g_strstrip(parts[1]);
+
+		if (g_ascii_strcasecmp(type, "DNS") == 0) {
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_DNSNAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "IP") == 0) {
+			// Parse IP address (supports both IPv4 and IPv6) and convert to binary
+			struct in_addr ipv4_addr;
+			struct in6_addr ipv6_addr;
+			
+			// Try IPv4 first
+			if (inet_pton(AF_INET, value, &ipv4_addr) == 1) {
+				result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_IPADDRESS, 
+				                                               &ipv4_addr, sizeof(ipv4_addr), 
+				                                               GNUTLS_FSAN_APPEND);
+			}
+			// Try IPv6 if IPv4 failed
+			else if (inet_pton(AF_INET6, value, &ipv6_addr) == 1) {
+				result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_IPADDRESS, 
+				                                               &ipv6_addr, sizeof(ipv6_addr), 
+				                                               GNUTLS_FSAN_APPEND);
+			}
+			// Invalid IP address format
+			else {
+				result = -1;
+			}
+		} else if (g_ascii_strcasecmp(type, "EMAIL") == 0 || g_ascii_strcasecmp(type, "RFC822") == 0) {
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_RFC822NAME, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		} else if (g_ascii_strcasecmp(type, "URI") == 0) {
+			result = gnutls_x509_crq_set_subject_alt_name(crq, GNUTLS_SAN_URI, 
+			                                               value, strlen(value), 
+			                                               GNUTLS_FSAN_APPEND);
+		}
+
+		g_strfreev(parts);
+
+		if (result < 0) {
+			g_strfreev(san_entries);
+			return -1;
+		}
+	}
+
+	g_strfreev(san_entries);
+	return 0;
 }
 
 gchar * tls_generate_rsa_keys (TlsCreationData *creation_data,
@@ -516,6 +663,14 @@ gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data,
 		gnutls_x509_crt_set_crl_dist_points (crt, GNUTLS_SAN_URI, creation_data->crl_distribution_point, 0);
 	}
 
+	// Add Subject Alternative Names if provided
+	if (creation_data->subject_alt_name && creation_data->subject_alt_name[0]) {
+		if (tls_add_san_to_cert(crt, creation_data->subject_alt_name) < 0) {
+			gnutls_x509_crt_deinit (crt);
+			return g_strdup_printf(_("Error when setting Subject Alternative Name extension"));
+		}
+	}
+
 	keyid = g_new0 (guchar,1);	
 	gnutls_x509_crt_get_key_id(crt, 0, keyid, &keyidsize);
 	g_free (keyid);
@@ -612,6 +767,12 @@ gchar * tls_generate_csr (TlsCreationData * creation_data,
 					       0, creation_data->cn, strlen(creation_data->cn));	
 	}
 	
+	// Add Subject Alternative Names if provided
+	if (creation_data->subject_alt_name && creation_data->subject_alt_name[0]) {
+		if (tls_add_san_to_crq(crq, creation_data->subject_alt_name) < 0) {
+			return g_strdup_printf(_("Error when setting Subject Alternative Name extension"));
+		}
+	}
 
 	if (gnutls_x509_crq_privkey_sign(crq, pkey, GNUTLS_DIG_SHA512, 0)) {
 		return g_strdup_printf(_("Error when signing self-signed csr"));
@@ -845,6 +1006,58 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 		gnutls_x509_crt_set_crl_dist_points (crt, GNUTLS_SAN_URI, creation_data->crl_distribution_point, 0);
 	else
 		gnutls_x509_crt_cpy_crl_dist_points (crt, ca_crt);
+
+	// Add Subject Alternative Names
+	// If explicitly provided in creation_data, use those; otherwise try to copy from CSR
+	if (creation_data->subject_alt_name && creation_data->subject_alt_name[0]) {
+		if (tls_add_san_to_cert(crt, creation_data->subject_alt_name) < 0) {
+			gnutls_x509_crq_deinit (csr);
+			gnutls_x509_crt_deinit (crt);
+			gnutls_x509_crt_deinit (ca_crt);
+			gnutls_x509_privkey_deinit (ca_pkey);
+			return g_strdup_printf(_("Error when setting Subject Alternative Name extension"));
+		}
+	} else {
+		// Try to copy SANs from CSR
+		gint san_idx = 0;
+		gboolean san_error = FALSE;
+		
+		while (1) {
+			// First, query the size needed
+			size_t san_size = 0;
+			guint san_type = 0;
+			gint result = gnutls_x509_crq_get_subject_alt_name(csr, san_idx, NULL, &san_size, &san_type, NULL);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || result == GNUTLS_E_UNKNOWN_ALGORITHM)
+				break;
+			
+			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				break;
+			
+			// Allocate buffer for the SAN (with null terminator for safety)
+			gchar *san_buffer = g_new0(gchar, san_size + 1);
+			size_t actual_size = san_size;
+			result = gnutls_x509_crq_get_subject_alt_name(csr, san_idx, san_buffer, &actual_size, &san_type, NULL);
+			
+			if (result < 0) {
+				g_free(san_buffer);
+				break;
+			}
+			
+			// Copy this SAN to the certificate
+			if (gnutls_x509_crt_set_subject_alt_name(crt, san_type, san_buffer, actual_size, GNUTLS_FSAN_APPEND) < 0) {
+				g_free(san_buffer);
+				san_error = TRUE;
+				break;
+			}
+			
+			g_free(san_buffer);
+			san_idx++;
+		}
+		
+		// SANs from CSR are best-effort; if none copied, that's OK
+		(void)san_error; // Suppress unused variable warning
+	}
 		
 
 	if (gnutls_x509_crt_sign2(crt, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0)) {
@@ -1179,6 +1392,83 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
         g_free (uaux);
         uaux = NULL;
 
+	// Extract Subject Alternative Names
+	{
+		GString *san_string = g_string_new(NULL);
+		gboolean first = TRUE;
+		int san_idx = 0;
+		
+		while (1) {
+			// First, query the size needed
+			size_t san_size = 0;
+			unsigned int critical = 0;
+			int result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, NULL, &san_size, &critical);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				break;
+			
+			// Allocate buffer for the SAN (with null terminator for safety)
+			gchar *san_buffer = g_new0(gchar, san_size + 1);
+			size_t actual_size = san_size;
+			result = gnutls_x509_crt_get_subject_alt_name(*cert, san_idx, san_buffer, &actual_size, &critical);
+			
+			// The result contains the SAN type when successful (>= 0)
+			if (result >= 0) {
+				if (!first)
+					g_string_append(san_string, ", ");
+				first = FALSE;
+				
+				// result is the SAN type
+				switch (result) {
+				case GNUTLS_SAN_DNSNAME:
+					g_string_append_printf(san_string, "DNS:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_RFC822NAME:
+					g_string_append_printf(san_string, "EMAIL:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_URI:
+					g_string_append_printf(san_string, "URI:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_IPADDRESS:
+					// Convert binary IP to readable format
+					if (actual_size == 4) {
+						// IPv4
+						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
+							(unsigned char)san_buffer[0], (unsigned char)san_buffer[1],
+							(unsigned char)san_buffer[2], (unsigned char)san_buffer[3]);
+					} else if (actual_size == 16) {
+						// IPv6
+						gchar ip_str[INET6_ADDRSTRLEN];
+						if (inet_ntop(AF_INET6, san_buffer, ip_str, sizeof(ip_str))) {
+							g_string_append_printf(san_string, "IP:%s", ip_str);
+						} else {
+							// Fallback to hex if conversion fails
+							g_string_append(san_string, "IP:");
+							for (int j = 0; j < 16; j += 2) {
+								if (j > 0) g_string_append(san_string, ":");
+								g_string_append_printf(san_string, "%02x%02x",
+									(unsigned char)san_buffer[j], (unsigned char)san_buffer[j+1]);
+							}
+						}
+					}
+					break;
+				}
+			}
+			
+			g_free(san_buffer);
+			san_idx++;
+		}
+		
+		if (san_string->len > 0) {
+			res->subject_alt_name = g_string_free(san_string, FALSE);
+		} else {
+			g_string_free(san_string, TRUE);
+			res->subject_alt_name = NULL;
+		}
+	}
+
 	gnutls_x509_crt_deinit (*cert);
 	g_free (cert);
 
@@ -1236,6 +1526,7 @@ void tls_cert_free (TlsCert *tlscert)
 	g_free (tlscert->md5);
 	g_free (tlscert->key_id);
         g_free (tlscert->crl_distribution_point);
+	g_free (tlscert->subject_alt_name);
 
 	g_free (tlscert);
 }
@@ -1342,6 +1633,76 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	}
 #endif
 
+	// Extract Subject Alternative Names from CSR
+	{
+		GString *san_string = g_string_new(NULL);
+		gint san_idx = 0;
+		gboolean first = TRUE;
+		
+		while (1) {
+			size_t san_size = 0;
+			guint san_type = 0;
+			gint result = gnutls_x509_crq_get_subject_alt_name(*csr, san_idx, NULL, &san_size, &san_type, NULL);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || result == GNUTLS_E_UNKNOWN_ALGORITHM)
+				break;
+			
+			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				break;
+			
+			gchar *san_buffer = g_new0(gchar, san_size + 1);
+			size_t actual_size = san_size;
+			result = gnutls_x509_crq_get_subject_alt_name(*csr, san_idx, san_buffer, &actual_size, &san_type, NULL);
+			
+			// Note: result contains the SAN type when successful (>= 0)
+			if (result >= 0) {
+				if (!first) {
+					g_string_append(san_string, ", ");
+				}
+				first = FALSE;
+				
+				// Use the san_type from the parameter, as result might be the type
+				switch (san_type) {
+				case GNUTLS_SAN_DNSNAME:
+					g_string_append_printf(san_string, "DNS:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_RFC822NAME:
+					g_string_append_printf(san_string, "EMAIL:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_URI:
+					g_string_append_printf(san_string, "URI:%s", san_buffer);
+					break;
+				case GNUTLS_SAN_IPADDRESS:
+					// Convert binary IP to string representation
+					if (actual_size == 4) {
+						// IPv4
+						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
+							(guchar)san_buffer[0], (guchar)san_buffer[1],
+							(guchar)san_buffer[2], (guchar)san_buffer[3]);
+					} else if (actual_size == 16) {
+						// IPv6
+						g_string_append(san_string, "IP:");
+						for (int i = 0; i < 16; i += 2) {
+							if (i > 0) g_string_append(san_string, ":");
+							g_string_append_printf(san_string, "%02x%02x",
+								(guchar)san_buffer[i], (guchar)san_buffer[i+1]);
+						}
+					}
+					break;
+				}
+			}
+			
+			g_free(san_buffer);
+			san_idx++;
+		}
+		
+		if (san_string->len > 0) {
+			res->subject_alt_name = g_string_free(san_string, FALSE);
+		} else {
+			g_string_free(san_string, TRUE);
+			res->subject_alt_name = NULL;
+		}
+	}
 
 	gnutls_x509_crq_deinit (*csr);
 	g_free (csr);
@@ -1379,6 +1740,10 @@ void tls_csr_free (TlsCsr *tlscsr)
 
 	if (tlscsr->key_id) {
 		g_free (tlscsr->key_id);
+	}
+
+	if (tlscsr->subject_alt_name) {
+		g_free (tlscsr->subject_alt_name);
 	}
 
 	g_free (tlscsr);
@@ -1688,8 +2053,8 @@ void tls_creation_data_free (TlsCreationData *cd)
                 g_free (cd->crl_distribution_point);
         if (cd->parent_ca_id_str)
                 g_free (cd->parent_ca_id_str);
-	if (cd->crl_distribution_point)
-		g_free (cd->crl_distribution_point);
+	if (cd->subject_alt_name)
+		g_free (cd->subject_alt_name);
 
 	g_free (cd);
 }

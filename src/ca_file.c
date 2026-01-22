@@ -1382,6 +1382,8 @@ gchar * ca_file_insert_cert (gboolean is_ca,
 	tlscert = NULL;
 
 	g_free (parent_route);
+	g_free (sql_subject_key_id);
+	g_free (sql_issuer_key_id);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
