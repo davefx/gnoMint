@@ -318,8 +318,11 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
         TlsCert * tlscert;
         GtkWidget * widget; 
 	const gchar *pem;
+	gboolean inherit_fields;
 
-        if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
+	inherit_fields = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
+
+        if (inherit_fields && gtk_tree_selection_get_selected (selection, &model, &iter)) {
 
                 gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_PEM, value);
 
@@ -385,14 +388,19 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
         }
 
         g_free (value);
