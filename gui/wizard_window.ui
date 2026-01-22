@@ -36,7 +36,7 @@
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">This wizard will create a certificate for your server with default settings.
-Enter the server name (e.g., my.server.dns.name) and the certificate will be created, signed, and exported automatically.</property>
+Enter the server name (e.g., my.server.dns.name) and select the CA to sign it.</property>
                 <property name="wrap">True</property>
               </object>
               <packing>
@@ -48,7 +48,7 @@ Enter the server name (e.g., my.server.dns.name) and the certificate will be cre
             <child>
               <object class="GtkTable" id="wizard_table">
                 <property name="visible">True</property>
-                <property name="n_rows">2</property>
+                <property name="n_rows">3</property>
                 <property name="n_columns">2</property>
                 <property name="column_spacing">10</property>
                 <property name="row_spacing">10</property>
@@ -77,14 +77,46 @@ Enter the server name (e.g., my.server.dns.name) and the certificate will be cre
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkLabel" id="signing_ca_label">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">Signing CA:</property>
+                  </object>
+                  <packing>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
+                    <property name="y_options">GTK_FILL</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBox" id="signing_ca_combo">
+                    <property name="visible">True</property>
+                    <property name="model">ca_list_model</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="ca_renderer"/>
+                      <attributes>
+                        <attribute name="text">1</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                    <property name="y_options">GTK_FILL</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkLabel" id="cert_type_label">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Certificate Type:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -104,8 +136,8 @@ Enter the server name (e.g., my.server.dns.name) and the certificate will be cre
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
                 </child>
@@ -116,22 +148,7 @@ Enter the server name (e.g., my.server.dns.name) and the certificate will be cre
                 <property name="position">2</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkLabel" id="output_label">
-                <property name="visible">True</property>
-                <property name="xalign">0</property>
-                <property name="label" translatable="yes">&lt;small&gt;Output files will be saved to ~/.gnomint/ directory:
-• &lt;i&gt;servername-cert.pem&lt;/i&gt; (public certificate)
-• &lt;i&gt;servername-key.pem&lt;/i&gt; (private key, unprotected)&lt;/small&gt;</property>
-                <property name="use_markup">True</property>
-                <property name="wrap">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
+
           </object>
           <packing>
             <property name="position">1</property>
@@ -195,5 +212,11 @@ Enter the server name (e.g., my.server.dns.name) and the certificate will be cre
         <col id="0" translatable="yes">Email Server (TLS)</col>
       </row>
     </data>
+  </object>
+  <object class="GtkListStore" id="ca_list_model">
+    <columns>
+      <column type="guint64"/>
+      <column type="gchararray"/>
+    </columns>
   </object>
 </interface>
