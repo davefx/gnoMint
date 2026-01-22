@@ -1203,6 +1203,10 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	UInt160 *serial_number;
 
 	gint i;
+	
+	// Variables for extracting SANs
+	gnutls_x509_crt_t x509_cert;
+	gnutls_datum_t cert_datum;
 
 	if (! ca_file_check_if_is_cert_id (cert_id)) {
 		dialog_error (_("The given certificate id. is not valid"));
@@ -1223,6 +1227,71 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	printf (_("Subject:\n"));
 	printf (_("\tDistinguished Name: %s\n"), (cert->dn ? cert->dn : _("None.")));
 	printf (_("\tUnique ID: %s\n"), (cert->subject_key_id ? cert->subject_key_id : _("None.")));
+	
+	// Extract and display SANs
+	gnutls_global_init();
+	gnutls_x509_crt_init(&x509_cert);
+	cert_datum.data = (unsigned char *)certificate_pem;
+	cert_datum.size = strlen(certificate_pem);
+	
+	if (gnutls_x509_crt_import(x509_cert, &cert_datum, GNUTLS_X509_FMT_PEM) >= 0) {
+		GString *san_string = g_string_new(NULL);
+		gboolean first = TRUE;
+		int san_idx = 0;
+		
+		while (1) {
+			char buffer[256];
+			size_t buffer_size = sizeof(buffer);
+			unsigned int san_type = 0;
+			int result = gnutls_x509_crt_get_subject_alt_name(x509_cert, san_idx, buffer, &buffer_size, &san_type);
+			
+			if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			if (result < 0 && result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				break;
+			
+			if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+				if (!first)
+					g_string_append(san_string, ", ");
+				first = FALSE;
+				
+				switch (san_type) {
+				case GNUTLS_SAN_DNSNAME:
+					g_string_append_printf(san_string, "DNS:%s", buffer);
+					break;
+				case GNUTLS_SAN_RFC822NAME:
+					g_string_append_printf(san_string, "EMAIL:%s", buffer);
+					break;
+				case GNUTLS_SAN_URI:
+					g_string_append_printf(san_string, "URI:%s", buffer);
+					break;
+				case GNUTLS_SAN_IPADDRESS:
+					if (buffer_size == 4) {
+						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
+							(unsigned char)buffer[0], (unsigned char)buffer[1],
+							(unsigned char)buffer[2], (unsigned char)buffer[3]);
+					} else if (buffer_size == 16) {
+						g_string_append(san_string, "IP:");
+						for (int j = 0; j < 16; j += 2) {
+							if (j > 0) g_string_append(san_string, ":");
+							g_string_append_printf(san_string, "%02x%02x",
+								(unsigned char)buffer[j], (unsigned char)buffer[j+1]);
+						}
+					}
+					break;
+				}
+			}
+			san_idx++;
+		}
+		
+		if (san_string->len > 0) {
+			printf (_("\tSubject Alternative Names: %s\n"), san_string->str);
+		}
+		g_string_free(san_string, TRUE);
+	}
+	
+	gnutls_x509_crt_deinit(x509_cert);
+	gnutls_global_deinit();
 	
 	printf (_("Issuer:\n"));
 	printf (_("\tDistinguished Name: %s\n"), (cert->i_dn ? cert->i_dn : _("None.")));
