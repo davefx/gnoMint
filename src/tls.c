@@ -500,6 +500,12 @@ gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data,
 		gnutls_x509_crt_set_issuer_dn_by_oid (crt, GNUTLS_OID_X520_COMMON_NAME,
 						      0, creation_data->cn, strlen(creation_data->cn));	
 	}
+	if (creation_data->emailAddress) {
+		gnutls_x509_crt_set_dn_by_oid (crt, GNUTLS_OID_PKCS9_EMAIL,
+					       0, creation_data->emailAddress, strlen(creation_data->emailAddress));
+		gnutls_x509_crt_set_issuer_dn_by_oid (crt, GNUTLS_OID_PKCS9_EMAIL,
+						      0, creation_data->emailAddress, strlen(creation_data->emailAddress));
+	}
 
 	
 	if (gnutls_x509_crt_set_ca_status (crt, 1) != 0) {
@@ -610,6 +616,10 @@ gchar * tls_generate_csr (TlsCreationData * creation_data,
 	if (creation_data->cn) {
 		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME,
 					       0, creation_data->cn, strlen(creation_data->cn));	
+	}
+	if (creation_data->emailAddress) {
+		gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_PKCS9_EMAIL,
+					       0, creation_data->emailAddress, strlen(creation_data->emailAddress));
 	}
 	
 
@@ -986,6 +996,16 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 	}
 
 	size = 0;
+	gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0, aux, &size);
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_issuer_dn_by_oid (*cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0, aux, &size);
+		res->i_emailAddress = g_strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
+
+	size = 0;
 	gnutls_x509_crt_get_issuer_dn (*cert, aux, &size);
 	if (size) {
 		aux = g_new0(gchar, size);
@@ -1021,6 +1041,16 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 		aux = g_new0(gchar, size);
 		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_X520_LOCALITY_NAME, 0, 0, aux, &size);
 		res->l = g_strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
+
+	size = 0;
+	gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0, aux, &size);
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crt_get_dn_by_oid (*cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0, aux, &size);
+		res->emailAddress = g_strdup (aux);
 		g_free (aux);
 		aux = NULL;
 	}
@@ -1223,6 +1253,7 @@ void tls_cert_free (TlsCert *tlscert)
 	g_free (tlscert->st);
 	g_free (tlscert->l);
 	g_free (tlscert->dn);
+	g_free (tlscert->emailAddress);
 	g_free (tlscert->i_cn);
 	g_free (tlscert->i_o);
 	g_free (tlscert->i_ou);
@@ -1230,6 +1261,7 @@ void tls_cert_free (TlsCert *tlscert)
 	g_free (tlscert->i_st);
 	g_free (tlscert->i_l);
 	g_free (tlscert->i_dn);
+	g_free (tlscert->i_emailAddress);
 	g_free (tlscert->sha1);
 	g_free (tlscert->sha256);
 	g_free (tlscert->sha512);
@@ -1321,6 +1353,16 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 	}
 
 	size = 0;
+	gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_PKCS9_EMAIL, 0, 0, aux, &size);
+	if (size) {
+		aux = g_new0(gchar, size);
+		gnutls_x509_crq_get_dn_by_oid (*csr, GNUTLS_OID_PKCS9_EMAIL, 0, 0, aux, &size);
+		res->emailAddress = g_strdup (aux);
+		g_free (aux);
+		aux = NULL;
+	}
+
+	size = 0;
 	gnutls_x509_crq_get_dn (*csr, aux, &size);
 	if (size) {
 		aux = g_new0(gchar, size);
@@ -1376,6 +1418,10 @@ void tls_csr_free (TlsCsr *tlscsr)
 	if (tlscsr->dn) {
 		g_free (tlscsr->dn);
 	}	
+
+	if (tlscsr->emailAddress) {
+		g_free (tlscsr->emailAddress);
+	}
 
 	if (tlscsr->key_id) {
 		g_free (tlscsr->key_id);

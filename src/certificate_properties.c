@@ -205,6 +205,9 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->ou);
 
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectEmailLabel");	
+	gtk_label_set_text (GTK_LABEL(widget), cert->emailAddress);
+
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_cn);
 
@@ -213,6 +216,9 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOULabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_ou);
+
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerEmailLabel");	
+	gtk_label_set_text (GTK_LABEL(widget), cert->i_emailAddress);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha1Label");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->sha1);
