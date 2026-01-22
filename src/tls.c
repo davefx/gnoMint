@@ -1573,14 +1573,17 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 				break;
 			
 			gchar *san_buffer = g_new0(gchar, san_size + 1);
-			result = gnutls_x509_crq_get_subject_alt_name(*csr, san_idx, san_buffer, &san_size, &san_type, NULL);
+			size_t actual_size = san_size;
+			result = gnutls_x509_crq_get_subject_alt_name(*csr, san_idx, san_buffer, &actual_size, &san_type, NULL);
 			
+			// Note: result contains the SAN type when successful (>= 0)
 			if (result >= 0) {
 				if (!first) {
 					g_string_append(san_string, ", ");
 				}
 				first = FALSE;
 				
+				// Use the san_type from the parameter, as result might be the type
 				switch (san_type) {
 				case GNUTLS_SAN_DNSNAME:
 					g_string_append_printf(san_string, "DNS:%s", san_buffer);
@@ -1593,12 +1596,12 @@ TlsCsr * tls_parse_csr_pem (const char * pem_csr)
 					break;
 				case GNUTLS_SAN_IPADDRESS:
 					// Convert binary IP to string representation
-					if (san_size == 4) {
+					if (actual_size == 4) {
 						// IPv4
 						g_string_append_printf(san_string, "IP:%d.%d.%d.%d",
 							(guchar)san_buffer[0], (guchar)san_buffer[1],
 							(guchar)san_buffer[2], (guchar)san_buffer[3]);
-					} else if (san_size == 16) {
+					} else if (actual_size == 16) {
 						// IPv6
 						g_string_append(san_string, "IP:");
 						for (int i = 0; i < 16; i += 2) {
