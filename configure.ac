@@ -29,6 +29,11 @@ AC_DISABLE_STATIC
 LT_INIT
 AM_PROG_CC_C_O
 
+# Enable 64-bit time_t to avoid Y2K38 problem
+# This ensures time_t is 64-bit even on 32-bit systems
+AC_DEFINE([_TIME_BITS], [64], [Use 64-bit time_t])
+AC_DEFINE([_FILE_OFFSET_BITS], [64], [Use 64-bit file offsets])
+
 # Checks for header files.
 m4_warn([obsolete],
 [The preprocessor macro 'STDC_HEADERS' is obsolete.

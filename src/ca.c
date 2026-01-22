@@ -766,38 +766,49 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 
 	selection_path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
 	
-	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
-	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+	if (cert_parent_iter) {
+		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
+		if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+			gtk_tree_path_free (parent);
+			gtk_tree_path_free (selection_path);
+			/* It's a certificate */
+			return CA_FILE_ELEMENT_TYPE_CERT;
+		}
 		gtk_tree_path_free (parent);
-		/* It's a certificate */
-		return CA_FILE_ELEMENT_TYPE_CERT;
 	}
 
-	gtk_tree_path_free (parent);
-	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
-	if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+	if (csr_parent_iter) {
+		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
+		if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
+			gtk_tree_path_free (parent);
+			gtk_tree_path_free (selection_path);
+			/* It's a CSR */
+			return CA_FILE_ELEMENT_TYPE_CSR;
+		}
 		gtk_tree_path_free (parent);
-		/* It's a CSR */
-		return CA_FILE_ELEMENT_TYPE_CSR;
 	}
 
-	gtk_tree_path_free (parent);
+	gtk_tree_path_free (selection_path);
 	return -1;
 }
 
 G_MODULE_EXPORT gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data)
 {
-	GtkTreeIter *selection_iter;
+	GtkTreeIter *selection_iter = NULL;
 	switch (__ca_selection_type (tree_view, &selection_iter)) {
 	case CA_FILE_ELEMENT_TYPE_CERT:
 		__ca_activate_certificate_selection (selection_iter);
+		gtk_tree_iter_free (selection_iter);
 		break;
 	case CA_FILE_ELEMENT_TYPE_CSR:
 		__ca_activate_csr_selection (selection_iter);
+		gtk_tree_iter_free (selection_iter);
 		break;
 	case -1:
 	default:
+		if (selection_iter)
+			gtk_tree_iter_free (selection_iter);
 		__ca_deactivate_actions();
 		break;
 	}
@@ -1081,7 +1092,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 {
 	GObject * widget = NULL;
 	//GtkDialog * dialog = NULL;
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	GtkBuilder * dialog_gtkb = NULL;
 	gboolean has_pk_in_db = FALSE;
@@ -1133,6 +1144,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 	if (!response || response == GTK_RESPONSE_CANCEL) {
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		return;
 	} 
 	
@@ -1141,6 +1153,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		__ca_export_public_pem (iter, type);
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
@@ -1150,6 +1163,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		g_free (__ca_export_private_pkcs8 (iter, type));
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
@@ -1159,6 +1173,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		__ca_export_private_pem (iter, type);
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
@@ -1168,18 +1183,20 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 		__ca_export_pkcs12 (iter, type);
 		gtk_widget_destroy (GTK_WIDGET(widget));
 		g_object_unref (G_OBJECT(dialog_gtkb));
+		gtk_tree_iter_free (iter);
 		
 		return;
 	}
 	
 	gtk_widget_destroy (GTK_WIDGET(widget));
 	g_object_unref (G_OBJECT(dialog_gtkb));
+	gtk_tree_iter_free (iter);
 	dialog_error (_("Unexpected error"));
 }
 
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type;
 	gchar *filename = NULL;
 	gint id;
@@ -1191,6 +1208,7 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 	filename = __ca_export_private_pkcs8 (iter, type);
 
 	if (! filename) {
+		gtk_tree_iter_free (iter);
 		return;
 	}
 	
@@ -1200,6 +1218,7 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 		ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CSR, filename, id);
 
 	g_free (filename);
+	gtk_tree_iter_free (iter);
 
 	dialog_refresh_list();
 }
@@ -1210,13 +1229,15 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
         gchar * errmsg = NULL;
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
 	gint id = 0;
 
-	if (type == CA_FILE_ELEMENT_TYPE_CSR)
+	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
+		gtk_tree_iter_free (iter);
 		return;
+	}
 	
 
 
@@ -1247,6 +1268,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 
 	if (response == GTK_RESPONSE_NO) {
+		gtk_tree_iter_free (iter);
 		return;
 	}
 
@@ -1256,6 +1278,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 
         }
 
+	gtk_tree_iter_free (iter);
 	dialog_refresh_list();
   
 }
@@ -1265,13 +1288,15 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
-	GtkTreeIter *iter;	
+	GtkTreeIter *iter = NULL;	
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gint response = 0;
 	gint id = 0;
 
-	if (type != CA_FILE_ELEMENT_TYPE_CSR)
+	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
+		gtk_tree_iter_free (iter);
 		return;
+	}
 	
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
@@ -1285,26 +1310,30 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 	gtk_widget_destroy (GTK_WIDGET(dialog));
 
 	if (response == GTK_RESPONSE_NO) {
+		gtk_tree_iter_free (iter);
 		return;
 	}
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
 	ca_file_remove_csr (id);
 
+	gtk_tree_iter_free (iter);
 	dialog_refresh_list();
 }
 
 G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	GtkTreeIter *iter;
+	GtkTreeIter *iter = NULL;
 
 	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
 	gchar * csr_pem;
 	gchar * csr_parent_id;
 	guint64 csr_id;
 
-	if (type != CA_FILE_ELEMENT_TYPE_CSR)
+	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
+		gtk_tree_iter_free (iter);
 		return;
+	}
 		
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &csr_id, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
 
@@ -1312,6 +1341,7 @@ G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_
 	
 	g_free (csr_pem);
         g_free (csr_parent_id);
+	gtk_tree_iter_free (iter);
 }
 
 
@@ -1334,22 +1364,26 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 guint64 ca_get_selected_row_id ()
 {
-	GtkTreeIter *iter;
-	guint64 result;
+	GtkTreeIter *iter = NULL;
+	guint64 result = 0;
 
-	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
+	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
+		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
+		gtk_tree_iter_free (iter);
+	}
 
 	return result;
 }
 
 gchar * ca_get_selected_row_pem ()
 {
-	GtkTreeIter *iter;
-	gchar * result;
+	GtkTreeIter *iter = NULL;
+	gchar * result = NULL;
 
-	__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
+	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
+		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
+		gtk_tree_iter_free (iter);
+	}
 	
 	return result;
 }
@@ -1397,65 +1431,20 @@ G_MODULE_EXPORT void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data
 
 
 
-gboolean ca_treeview_popup_timeout_program_cb (gpointer data)
-{
-	GObject *menu, *widget;
-	GtkTreeView * tree_view =  GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-	GdkEventButton *event_button = (GdkEventButton *) data;
-	GtkTreeIter *iter;
-	gboolean pk_indb, is_revoked;
-	gint selection_type;
-
-	selection_type  = __ca_selection_type (tree_view, &iter);
-	switch (selection_type) {
-		
-	case CA_FILE_ELEMENT_TYPE_CERT:
-		menu = gtk_builder_get_object (cert_popup_menu_gtkb,
-					     "certificate_popup_menu");
-		
-		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-				   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
-		
-		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
-		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-		
-		widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
-		gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
-
-		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
-		return FALSE;
-	case CA_FILE_ELEMENT_TYPE_CSR:
-		menu = gtk_builder_get_object (csr_popup_menu_gtkb,
-					     "csr_popup_menu");
-
-		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-				   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-				   -1);
-		
-		widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
-		gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-		
-		gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent *)event_button);
-		return FALSE;
-	default:
-	case -1:
-		return FALSE;
-	}
-
-}
-
-void ca_treeview_popup_timeout_program (GdkEventButton *event)
-{
-	g_timeout_add (1, ca_treeview_popup_timeout_program_cb, event); 
-
-}
-					
 
 G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 				    GdkEvent *event, gpointer user_data)
 {
 	GdkEventButton *event_button;
+	GObject *menu, *widget;
+	GtkTreeIter *iter = NULL;
+	gboolean pk_indb, is_revoked;
+	gint selection_type;
+	GdkWindow *window;
+	gint x, y;
+	GdkRectangle rect;
+	GtkTreePath *path = NULL;
+	GtkTreeSelection *selection;
 	
 	g_return_val_if_fail (event != NULL, FALSE);
 	
@@ -1463,7 +1452,117 @@ G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
 
 		event_button = (GdkEventButton *) event;
 		if (event_button->button == 3) {
-			ca_treeview_popup_timeout_program (event_button);
+			/* Select the row under cursor before showing menu */
+			if (gtk_tree_view_get_path_at_pos(tree_view, 
+							  (gint)event_button->x, 
+							  (gint)event_button->y,
+							  &path, NULL, NULL, NULL)) {
+				selection = gtk_tree_view_get_selection(tree_view);
+				gtk_tree_selection_select_path(selection, path);
+				gtk_tree_path_free(path);
+			}
+			
+			/* Handle right-click popup menu directly */
+			selection_type  = __ca_selection_type (tree_view, &iter);
+			
+			switch (selection_type) {
+				
+			case CA_FILE_ELEMENT_TYPE_CERT:
+				if (!cert_popup_menu_gtkb) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+				
+				menu = gtk_builder_get_object (cert_popup_menu_gtkb,
+							     "certificate_popup_menu");
+				
+				if (!menu) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+				
+				gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+						   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+						   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
+				
+				widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
+				if (widget)
+					gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+				
+				widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
+				if (widget)
+					gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
+
+				/* Get click position and show menu there */
+				window = gtk_widget_get_window (GTK_WIDGET(tree_view));
+				if (window) {
+					gdk_window_get_device_position (window, event_button->device, &x, &y, NULL);
+					
+					rect.x = x;
+					rect.y = y;
+					rect.width = 1;
+					rect.height = 1;
+					
+					/* Detach if already attached to avoid warning, then attach and show */
+					gtk_menu_detach (GTK_MENU(menu));
+					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
+					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
+								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, 
+								(GdkEvent *)event_button);
+				}
+				gtk_tree_iter_free (iter);
+				return TRUE;  /* Event handled */
+			case CA_FILE_ELEMENT_TYPE_CSR:
+				if (!csr_popup_menu_gtkb) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+				
+				menu = gtk_builder_get_object (csr_popup_menu_gtkb,
+							     "csr_popup_menu");
+
+				if (!menu) {
+					if (iter)
+						gtk_tree_iter_free (iter);
+					return FALSE;
+				}
+
+				gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
+						   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
+						   -1);
+				
+				widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
+				if (widget)
+					gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+				
+				/* Get click position and show menu there */
+				window = gtk_widget_get_window (GTK_WIDGET(tree_view));
+				if (window) {
+					gdk_window_get_device_position (window, event_button->device, &x, &y, NULL);
+					
+					rect.x = x;
+					rect.y = y;
+					rect.width = 1;
+					rect.height = 1;
+					
+					/* Detach if already attached to avoid warning, then attach and show */
+					gtk_menu_detach (GTK_MENU(menu));
+					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
+					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
+								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST,
+								(GdkEvent *)event_button);
+				}
+				gtk_tree_iter_free (iter);
+				return TRUE;  /* Event handled */
+			default:
+			case -1:
+				if (iter)
+					gtk_tree_iter_free (iter);
+				return FALSE;
+			}
 		}
 	}
 	

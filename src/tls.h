@@ -52,6 +52,8 @@ typedef struct {
 	gchar * password; 
 
         gchar * parent_ca_id_str;
+
+	gchar * subject_alt_name; // Comma-separated list of SANs (e.g., "DNS:example.com,DNS:*.example.com,IP:192.168.1.1")
 } TlsCreationData;
 
 typedef struct {
@@ -80,6 +82,8 @@ typedef struct {
 	gchar * crl_distribution_point;
 
 	gchar * cadb_password;
+
+	gchar * subject_alt_name; // Comma-separated list of SANs (e.g., "DNS:example.com,DNS:*.example.com,IP:192.168.1.1")
 
 } TlsCertCreationData;
 
@@ -113,6 +117,8 @@ typedef struct __TlsCert {
         gchar * issuer_key_id;
 
 	gchar * crl_distribution_point;
+	
+	gchar * subject_alt_name; // Human-readable SANs (e.g., "DNS:example.com, IP:192.168.1.1")
 
 	GList * uses;
 
@@ -130,6 +136,8 @@ typedef struct __TlsCsr {
 	gchar * dn;
 
 	gchar * key_id;
+	
+	gchar * subject_alt_name; // Human-readable SANs (e.g., "DNS:example.com, IP:192.168.1.1")
 } TlsCsr;
 
 void tls_init (void);

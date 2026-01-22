@@ -76,7 +76,9 @@ enum CaFileCAColumns {CA_FILE_CA_COLUMN_ID=0,
       CA_FILE_CA_COLUMN_DN=3,
       CA_FILE_CA_COLUMN_PARENT_DN=4,
       CA_FILE_CA_COLUMN_PEM=5,
-      CA_FILE_CA_COLUMN_NUMBER=6};
+      CA_FILE_CA_COLUMN_EXPIRATION=6,
+      CA_FILE_CA_COLUMN_SUBJECT_COUNT=7,
+      CA_FILE_CA_COLUMN_NUMBER=8};
 
 // CaFileCertColumns
 enum CaFileCertColumns {CA_FILE_CERT_COLUMN_ID=0,
@@ -136,6 +138,8 @@ gboolean ca_file_password_change(const gchar *old_password, const gchar *new_pas
 gboolean ca_file_check_if_is_ca_id (guint64 ca_id);
 gboolean ca_file_check_if_is_cert_id (guint64 cert_id);
 gboolean ca_file_check_if_is_csr_id (guint64 csr_id);
+
+gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gchar *expiration_str, const gchar *subject_count_str);
 
 
 #endif

@@ -36,7 +36,9 @@ gnomint_SOURCES = \
 	uint160.c \
 	import.c \
 	export.c \
-	wizard_window.c
+	wizard_window.c \
+	san_manager.c \
+	san_manager.h
 
 
 gnomint_LDADD = \

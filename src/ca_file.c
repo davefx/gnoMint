@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "time64_check.h"
 #include "dialog.h"
 #include "tls.h"
 #include "ca_file.h"
@@ -1381,6 +1382,8 @@ gchar * ca_file_insert_cert (gboolean is_ca,
 	tlscert = NULL;
 
 	g_free (parent_route);
+	g_free (sql_subject_key_id);
+	g_free (sql_issuer_key_id);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -2408,9 +2411,10 @@ gboolean ca_file_foreach_ca (CaFileCallbackFunc func, gpointer userdata)
 		g_free (aux);
 	} 
 
-        sql = sqlite3_mprintf ("SELECT id, serial, subject, dn, parent_dn, pem "
-                               "FROM certificates WHERE is_ca=1 AND revocation IS NULL "
-                               "ORDER BY concat(zeropad_route(parent_route, %u), zeropad(id, %u))",
+        sql = sqlite3_mprintf ("SELECT c.id, c.serial, c.subject, c.dn, c.parent_dn, c.pem, c.expiration, "
+                               "(SELECT COUNT(*) FROM certificates WHERE subject = c.subject AND is_ca=1 AND revocation IS NULL) as subject_count "
+                               "FROM certificates c WHERE c.is_ca=1 AND c.revocation IS NULL "
+                               "ORDER BY concat(zeropad_route(c.parent_route, %u), zeropad(c.id, %u))",
                                num_chars, num_chars);
 
         sqlite3_exec (ca_db, sql,
@@ -2794,4 +2798,43 @@ gboolean ca_file_check_if_is_csr_id (guint64 csr_id)
 	g_strfreev (aux);
 	return res;
 
+}
+
+gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gchar *expiration_str, const gchar *subject_count_str)
+{
+	if (!subject) {
+		return g_strdup("");
+	}
+	
+	// Only show expiration if there are multiple CAs with the same subject
+	int subject_count = 1;
+	if (subject_count_str) {
+		char *endptr;
+		long count = strtol(subject_count_str, &endptr, 10);
+		if (*endptr == '\0' && count > 0) {
+			subject_count = (int)count;
+		}
+	}
+	
+	if (subject_count <= 1 || !expiration_str) {
+		return g_strdup(subject);
+	}
+	
+	time_t expiration_timestamp = (time_t) atoll(expiration_str);
+	struct tm expiration_tm;
+	char date_str[16];  // "YYYY-MM-DD" + null terminator
+	
+#ifndef WIN32
+	if (localtime_r(&expiration_timestamp, &expiration_tm)) {
+#else
+	struct tm *exp_tm_ptr = localtime(&expiration_timestamp);
+	if (exp_tm_ptr) {
+		expiration_tm = *exp_tm_ptr;
+#endif
+		// Format as full date: "YYYY-MM-DD"
+		strftime(date_str, sizeof(date_str), "%Y-%m-%d", &expiration_tm);
+		return g_strdup_printf("%s (expires %s)", subject, date_str);
+	} else {
+		return g_strdup(subject);
+	}
 }

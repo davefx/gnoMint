@@ -283,7 +283,7 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 	gboolean change_data = FALSE;
 
 	TlsCreationData *csr_creation_data = NULL;
-	guint max_key_length;
+	guint max_key_length = 10240;  // Default for RSA keys
 
 
 	if (argc == 2) {
@@ -392,6 +392,12 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		csr_creation_data->cn = aux;
 		aux = NULL;
 
+		aux = dialog_ask_for_string (_("Enter Subject Alternative Names (SAN) [format: DNS:example.com,IP:192.168.1.1]"), csr_creation_data->subject_alt_name);
+		if (csr_creation_data->subject_alt_name)
+			g_free (csr_creation_data->subject_alt_name);
+		csr_creation_data->subject_alt_name = aux;
+		aux = NULL;
+
 		do {
 			if (aux)
 				g_free (aux);
@@ -432,6 +438,8 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		if (csr_creation_data->cn)
 			printf ("CN=%s", csr_creation_data->cn);
 		printf ("\n");
+		if (csr_creation_data->subject_alt_name && csr_creation_data->subject_alt_name[0])
+			printf (_("\tSubject Alternative Names: %s\n"), csr_creation_data->subject_alt_name);
 		printf (_("Key pair\n"));
 		printf (_("\tType: %s\n"), (csr_creation_data->key_type ? "DSA" : "RSA"));
 		printf (_("\tKey bitlength: %d\n"), csr_creation_data->key_bitlength);
@@ -522,6 +530,12 @@ int ca_cli_callback_addca (int argc, char **argv)
 		ca_creation_data->cn = aux;
 		aux = NULL;
 
+		aux = dialog_ask_for_string (_("Enter Subject Alternative Names (SAN) [format: DNS:example.com,IP:192.168.1.1]"), ca_creation_data->subject_alt_name);
+		if (ca_creation_data->subject_alt_name)
+			g_free (ca_creation_data->subject_alt_name);
+		ca_creation_data->subject_alt_name = aux;
+		aux = NULL;
+
 		do {
 			if (aux)
 				g_free (aux);
@@ -581,6 +595,8 @@ int ca_cli_callback_addca (int argc, char **argv)
 		if (ca_creation_data->cn)
 			printf ("CN=%s", ca_creation_data->cn);
 		printf ("\n");
+		if (ca_creation_data->subject_alt_name && ca_creation_data->subject_alt_name[0])
+			printf (_("\tSubject Alternative Names: %s\n"), ca_creation_data->subject_alt_name);
 		printf (_("Key pair\n"));
 		printf (_("\tType: %s\n"), (ca_creation_data->key_type ? "DSA" : "RSA"));
 		printf (_("\tKey bitlength: %d\n"), ca_creation_data->key_bitlength);
@@ -1207,6 +1223,8 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	printf (_("Subject:\n"));
 	printf (_("\tDistinguished Name: %s\n"), (cert->dn ? cert->dn : _("None.")));
 	printf (_("\tUnique ID: %s\n"), (cert->subject_key_id ? cert->subject_key_id : _("None.")));
+	if (cert->subject_alt_name && cert->subject_alt_name[0])
+		printf (_("\tSubject Alternative Names: %s\n"), cert->subject_alt_name);
 	
 	printf (_("Issuer:\n"));
 	printf (_("\tDistinguished Name: %s\n"), (cert->i_dn ? cert->i_dn : _("None.")));
@@ -1269,6 +1287,8 @@ int ca_cli_callback_showcsr (int argc, char **argv)
 
 	printf (_("Subject:\n"));
 	printf (_("\tDistinguished Name: %s\n"), csr->dn);
+	if (csr->subject_alt_name && csr->subject_alt_name[0])
+		printf (_("\tSubject Alternative Names: %s\n"), csr->subject_alt_name);
 	#ifdef ADVANCED_GNUTLS
 	printf (_("\tUnique ID: %s\n"), csr->key_id);
 	#endif

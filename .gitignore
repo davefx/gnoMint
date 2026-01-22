@@ -2,6 +2,7 @@
 *.o
 *.swp
 .deps/
+_codeql_detected_source_root
 Makefile
 Makefile.in
 aclocal.m4
@@ -15,10 +16,13 @@ config.sub
 configure
 depcomp
 gconf/gnomint.schemas
+gconf/org.gnome.gnomint.gschema.valid
 gnomint
 gnomint-cli
 gnomint.spec
 gui/gnomint.desktop
+gui/gnomint.appdata.xml
+help
 install-sh
 intltool-extract.in
 intltool-merge.in
@@ -31,6 +35,9 @@ missing
 mkinstalldirs
 po/*.gmo
 po/.intltool-merge-cache
+po/.intltool-merge-cache.lock
 po/POTFILES
 po/stamp-it
 po/Makefile.in.in
+po/.intltool-merge-cache.lock
+src/test_y2k38

@@ -23,6 +23,7 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "creation_process_window.h"
 #include "ca_file.h"
@@ -30,6 +31,7 @@
 #include "tls.h"
 #include "pkey_manage.h"
 #include "new_req_window.h"
+#include "san_manager.h"
 
 #include <glib/gi18n.h>
 
@@ -37,6 +39,7 @@ GtkBuilder * new_req_window_gtkb = NULL;
 GtkTreeStore * new_req_ca_list_model = NULL;
 gboolean new_req_ca_id_valid = FALSE;
 guint64 new_req_ca_id;
+GtkWidget *san_manager_widget1 = NULL;
 
 enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
       NEW_REQ_CA_MODEL_COLUMN_SERIAL=1,
@@ -44,7 +47,9 @@ enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
       NEW_REQ_CA_MODEL_COLUMN_DN=3,
       NEW_REQ_CA_MODEL_COLUMN_PARENT_DN=4,
       NEW_REQ_CA_MODEL_COLUMN_PEM=5,
-      NEW_REQ_CA_MODEL_COLUMN_NUMBER=6}
+      NEW_REQ_CA_MODEL_COLUMN_EXPIRATION=6,
+      NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT=7,
+      NEW_REQ_CA_MODEL_COLUMN_NUMBER=8}
         NewReqCaListModelColumns;
 
 typedef struct {
@@ -73,6 +78,13 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	GtkTreeStore * new_model = pdata->new_model;
 
         const gchar * string_value;
+	gchar *subject_with_expiration = NULL;
+
+	// Format subject with expiration year
+	subject_with_expiration = ca_file_format_subject_with_expiration(
+		argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT], 
+		argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION],
+		argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT]);
 
 	// First we check if this is the first CA, or is a self-signed certificate
 	if (! pdata->last_ca_iter || (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_DN],argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN])) ) {
@@ -131,10 +143,12 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 	gtk_tree_store_set (new_model, &iter,
 			    0, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_ID]), 
 			    1, argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL],
-			    2, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT],
+			    2, subject_with_expiration,
 			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
 			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
                             5, argv[NEW_REQ_CA_MODEL_COLUMN_PEM],
+			    6, argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION],
+			    7, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT],
 			    -1);
 	if (pdata->last_ca_iter)
 		gtk_tree_iter_free (pdata->last_ca_iter);
@@ -142,6 +156,7 @@ int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, ch
 
 	g_free (last_dn_value);
 	g_free (last_parent_dn_value);
+	g_free (subject_with_expiration);
 
 	return 0;
 }
@@ -155,7 +170,7 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
         __NewReqWindowRefreshModelAddCaUserData pdata;
 
 	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_STRING, G_TYPE_STRING,
-						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
         pdata.new_model = new_req_ca_list_model;
         pdata.last_parent_iter = NULL;
@@ -214,11 +229,15 @@ G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gp
 
 void new_req_window_display()
 {
+	GtkBuilder *san_builder;
+	GtkWidget *alignment;
+	gchar *ui_file;
+
 	new_req_window_gtkb = gtk_builder_new();
 
-	gtk_builder_add_from_file (new_req_window_gtkb,
-				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL),
-				   NULL);
+	ui_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_req_window.ui", NULL);
+	gtk_builder_add_from_file (new_req_window_gtkb, ui_file, NULL);
+	g_free(ui_file);
 	
 	gtk_builder_connect_signals (new_req_window_gtkb, NULL); 	
 	
@@ -232,6 +251,18 @@ void new_req_window_display()
 
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")), 2048);
 
+	// Initialize SAN manager widget
+	san_builder = gtk_builder_new();
+	ui_file = g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_manager_widget.ui", NULL);
+	gtk_builder_add_from_file(san_builder, ui_file, NULL);
+	g_free(ui_file);
+	san_manager_widget1 = san_manager_create(san_builder, "san_manager_vbox");
+	
+	if (san_manager_widget1) {
+		alignment = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "san_alignment1"));
+		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget1);
+		gtk_widget_show_all(san_manager_widget1);
+	}
 }
 
 void new_req_tab_activate (int tab_number)
@@ -305,8 +336,11 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
         TlsCert * tlscert;
         GtkWidget * widget; 
 	const gchar *pem;
+	gboolean inherit_fields;
 
-        if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
+	inherit_fields = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
+
+        if (inherit_fields && gtk_tree_selection_get_selected (selection, &model, &iter)) {
 
                 gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_PEM, value);
 
@@ -372,14 +406,19 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
+		gtk_entry_set_text(GTK_ENTRY(widget), "");
         }
 
         g_free (value);
@@ -479,6 +518,19 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 		csr_creation_data->cn = g_strdup (text);
 	else
 		csr_creation_data->cn = NULL;
+
+	// Get SANs from SAN manager widget
+	if (san_manager_widget1) {
+		gchar *san_string = san_manager_get_string(san_manager_widget1);
+		if (san_string && san_string[0])
+			csr_creation_data->subject_alt_name = san_string;
+		else {
+			g_free(san_string);
+			csr_creation_data->subject_alt_name = NULL;
+		}
+	} else {
+		csr_creation_data->subject_alt_name = NULL;
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));

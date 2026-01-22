@@ -30,20 +30,25 @@
 #include "tls.h"
 #include "pkey_manage.h"
 #include "country_table.h"
+#include "san_manager.h"
 
 #include <glib/gi18n.h>
 
 GtkBuilder * new_ca_window_gtkb = NULL;
+GtkWidget *san_manager_widget = NULL;
 
 
 void new_ca_window_display()
 {
 	// Workaround for libglade
+	GtkBuilder *san_builder;
+	GtkWidget *alignment;
+	gchar *ui_file;
 
 	new_ca_window_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file(new_ca_window_gtkb,
-				  g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_ca_window.ui", NULL ),
-				  NULL);
+	ui_file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_ca_window.ui", NULL);
+	gtk_builder_add_from_file(new_ca_window_gtkb, ui_file, NULL);
+	g_free(ui_file);
 	
 	gtk_builder_connect_signals (new_ca_window_gtkb, NULL); 	
 	
@@ -53,6 +58,18 @@ void new_ca_window_display()
 
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_ca_window_gtkb, "keylength_spinbutton")), 2048);
 
+	// Initialize SAN manager widget
+	san_builder = gtk_builder_new();
+	ui_file = g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_manager_widget.ui", NULL);
+	gtk_builder_add_from_file(san_builder, ui_file, NULL);
+	g_free(ui_file);
+	san_manager_widget = san_manager_create(san_builder, "san_manager_vbox");
+	
+	if (san_manager_widget) {
+		alignment = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "san_alignment"));
+		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget);
+		gtk_widget_show_all(san_manager_widget);
+	}
 }
 
 
@@ -248,6 +265,19 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 		ca_creation_data->cn = g_strdup (text);
 	else
 		ca_creation_data->cn = NULL;
+
+	// Get SANs from SAN manager widget
+	if (san_manager_widget) {
+		gchar *san_string = san_manager_get_string(san_manager_widget);
+		if (san_string && san_string[0])
+			ca_creation_data->subject_alt_name = san_string;
+		else {
+			g_free(san_string);
+			ca_creation_data->subject_alt_name = NULL;
+		}
+	} else {
+		ca_creation_data->subject_alt_name = NULL;
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "dsa_radiobutton"));
 	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
