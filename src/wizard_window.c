@@ -335,8 +335,11 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
     
     // Prepare certificate creation data
     TlsCertCreationData *cert_creation_data = g_new0 (TlsCertCreationData, 1);
-    cert_creation_data->ca = ca_id;
     cert_creation_data->key_months_before_expiration = 12; // 1 year default
+    
+    // Generated certificates should NOT be CA certificates
+    cert_creation_data->ca = FALSE;
+    cert_creation_data->crl_signing = FALSE;
     
     // Set certificate usage based on type
     if (current_wizard_type == WIZARD_CERT_TYPE_WEB_SERVER) {
@@ -436,9 +439,17 @@ void wizard_window_display (WizardCertType cert_type)
         GtkTreeIter iter;
         gchar *display_text;
         
-        // Format display text with expiration status
-        if (ca->expiration > 0 && ca->expiration < now) {
-            display_text = g_strdup_printf("%s (expired)", ca->subject);
+        // Format display text with expiration date to distinguish CAs with same name
+        if (ca->expiration > 0) {
+            struct tm *exp_tm = localtime(&ca->expiration);
+            gchar exp_date[20];
+            strftime(exp_date, sizeof(exp_date), "%Y-%m-%d", exp_tm);
+            
+            if (ca->expiration < now) {
+                display_text = g_strdup_printf("%s (exp: %s, expired)", ca->subject, exp_date);
+            } else {
+                display_text = g_strdup_printf("%s (exp: %s)", ca->subject, exp_date);
+            }
         } else {
             display_text = g_strdup(ca->subject);
         }
