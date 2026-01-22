@@ -23,6 +23,7 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 #include "tls.h"
 #include "ca_policy.h"
@@ -783,11 +784,43 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
 			break;
 		case GNUTLS_SAN_IPADDRESS:
-			hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
-			g_free(hex_buffer);
+			// Convert binary IP to readable format
+			if (buffer_size == 4) {
+				// IPv4
+				gchar ip_str[INET_ADDRSTRLEN];
+				if (inet_ntop(AF_INET, buffer, ip_str, sizeof(ip_str))) {
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, ip_str, -1);
+				} else {
+					hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+					g_free(hex_buffer);
+				}
+			} else if (buffer_size == 16) {
+				// IPv6
+				gchar ip_str[INET6_ADDRSTRLEN];
+				if (inet_ntop(AF_INET6, buffer, ip_str, sizeof(ip_str))) {
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, ip_str, -1);
+				} else {
+					hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
+					gtk_tree_store_append(store, &l, parent);
+					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
+							   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+					g_free(hex_buffer);
+				}
+			} else {
+				// Unknown format, fall back to hex
+				hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
+				gtk_tree_store_append(store, &l, parent);
+				gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
+						   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+				g_free(hex_buffer);
+			}
 			break;
 		case GNUTLS_SAN_DN:
 			hex_buffer = __certificate_properties_dump_RDNSequence (buffer, buffer_size);
