@@ -47,3 +47,4 @@ int ca_cli_callback_distribution  (int argc, char **argv);
 int ca_cli_callback_version  (int argc, char **argv);
 int ca_cli_callback_help  (int argc, char **argv);
 int ca_cli_callback_exit (int argc, char **argv);
+int ca_cli_callback_addservercert (int argc, char **argv);

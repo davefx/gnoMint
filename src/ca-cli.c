@@ -63,16 +63,17 @@ CaCommand ca_commands[] = {
 	{"setpolicy", 3, 3, N_("setpolicy <ca-id> <policy-id> <value>"), N_("Change the given CA policy"), ca_cli_callback_setpolicy}, // 21
 	{"showpreferences", 0, 0, "showpreferences", N_("Show program preferences"), ca_cli_callback_showpreferences}, // 22
 	{"setpreference", 2, 2, N_("setpreference <preference-id> <value>"), N_("Set the given program preference"), ca_cli_callback_setpreference}, // 23
-	{"about", 0, 0, "about", N_("Show about message"), ca_cli_callback_about}, // 24
-	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_cli_callback_warranty}, // 25
-	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_cli_callback_distribution}, // 26
-	{"version", 0, 0, "version", N_("Show version information"), ca_cli_callback_version}, // 27
-	{"help", 0, 0, "help", N_("Show (this) help message"),  ca_cli_callback_help}, // 28
-	{"quit", 0, 0, "quit", N_("Close database and exit program"), ca_cli_callback_exit}, // 29
-	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_cli_callback_exit}, // 30
-	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_cli_callback_exit} // 31
+	{"addservercert", 3, 3, N_("addservercert <ca-id> <cert-type> <server-name>"), N_("Quick server certificate generation (cert-type: 'web' or 'email')"), ca_cli_callback_addservercert}, // 24
+	{"about", 0, 0, "about", N_("Show about message"), ca_cli_callback_about}, // 25
+	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_cli_callback_warranty}, // 26
+	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_cli_callback_distribution}, // 27
+	{"version", 0, 0, "version", N_("Show version information"), ca_cli_callback_version}, // 28
+	{"help", 0, 0, "help", N_("Show (this) help message"),  ca_cli_callback_help}, // 29
+	{"quit", 0, 0, "quit", N_("Close database and exit program"), ca_cli_callback_exit}, // 30
+	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_cli_callback_exit}, // 31
+	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_cli_callback_exit} // 32
 };
-#define CA_COMMAND_NUMBER 32
+#define CA_COMMAND_NUMBER 33
 
 
 

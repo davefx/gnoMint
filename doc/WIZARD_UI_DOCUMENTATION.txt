@@ -1,0 +1,173 @@
+Certificate Wizard - User Interface Documentation
+================================================
+
+Main Window Toolbar (New Buttons Added):
+┌────────────────────────────────────────────────────────────────────────┐
+│ [New] [Open] │ [Add CA] [Add CSR] │ [Extract] [Revoke] [Sign] [Delete] │
+│                                                                          │
+│               │ [Web Server Wizard] [Email Server Wizard]               │
+└────────────────────────────────────────────────────────────────────────┘
+
+When clicking "Web Server Wizard" or "Email Server Wizard", this dialog appears:
+
+┌──────────────────────────────────────────────────────────────┐
+│                    Certificate Wizard                   [X]  │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Quick Certificate Generation                                │
+│                                                              │
+│  This wizard will create a certificate for your server       │
+│  with default settings. Enter the server name (e.g.,         │
+│  my.server.dns.name) and the certificate will be created,    │
+│  signed, and exported automatically.                         │
+│                                                              │
+│  ┌────────────────────────────────────────────────────┐     │
+│  │ Server Name:    [________________________]         │     │
+│  │                                                     │     │
+│  │ Certificate Type: [Web Server (TLS) ▼]            │     │
+│  └────────────────────────────────────────────────────┘     │
+│                                                              │
+│  Output files will be saved to ~/.gnomint/ directory:       │
+│    • servername-cert.pem (public certificate)               │
+│    • servername-key.pem (private key, unprotected)          │
+│                                                              │
+│                                                              │
+│                          [Cancel] [Generate Certificate]     │
+└──────────────────────────────────────────────────────────────┘
+
+Certificate Type Dropdown Options:
+┌──────────────────────────┐
+│ Web Server (TLS)        │  ← Default for Web Server Wizard
+│ Email Server (TLS)      │  ← Default for Email Server Wizard
+└──────────────────────────┘
+
+After clicking "Generate Certificate", if successful:
+
+┌────────────────────────────────────────────────────────┐
+│                     Information                        │
+├────────────────────────────────────────────────────────┤
+│                                                        │
+│  Certificate generated successfully!                   │
+│                                                        │
+│  Files saved to:                                       │
+│  • /home/user/.gnomint/my.server.dns.name-cert.pem   │
+│  • /home/user/.gnomint/my.server.dns.name-key.pem    │
+│                                                        │
+│                                   [OK]                 │
+└────────────────────────────────────────────────────────┘
+
+Error Messages (Examples):
+
+1. No Server Name:
+┌────────────────────────────────────────────────────────┐
+│                       Error                            │
+├────────────────────────────────────────────────────────┤
+│  Please enter a server name.                           │
+│                                   [OK]                 │
+└────────────────────────────────────────────────────────┘
+
+2. No CA Available:
+┌────────────────────────────────────────────────────────┐
+│                       Error                            │
+├────────────────────────────────────────────────────────┤
+│  No Certificate Authority found. Please create a CA    │
+│  first.                                                │
+│                                   [OK]                 │
+└────────────────────────────────────────────────────────┘
+
+Workflow Diagram:
+═════════════════
+
+User Action                 System Response
+───────────                 ───────────────
+Click Wizard Button   →    Display Dialog
+                           (Pre-select cert type)
+                           
+Enter Server Name     →    Enable Generate Button
+                           
+Click Generate        →    1. Validate Input
+                           ↓
+                           2. Get First CA
+                           ↓
+                           3. Generate RSA Key (2048-bit)
+                           ↓
+                           4. Create CSR
+                           ↓
+                           5. Sign CSR with CA
+                           ↓
+                           6. Export Certificate PEM
+                           ↓
+                           7. Export Private Key PEM
+                           ↓
+                           8. Show Success Message
+                           ↓
+                           Close Dialog
+
+Certificate Details Created:
+════════════════════════════
+
+Subject Distinguished Name:
+  CN = my.server.dns.name
+  (All other fields empty)
+
+Key:
+  Type: RSA
+  Size: 2048 bits
+  
+Certificate Properties:
+  Validity: 12 months (1 year)
+  Usage Flags:
+    - Digital Signature ✓
+    - Key Encipherment ✓
+    - TLS Web Server Authentication ✓  (both types)
+    - TLS Web Client Authentication ✗  (web) ✓ (email)
+    - Email Protection ✗ (web) ✓ (email)
+
+Output Files:
+═════════════
+
+Location: ~/.gnomint/
+
+1. my.server.dns.name-cert.pem
+   ┌────────────────────────────────────────────┐
+   │ -----BEGIN CERTIFICATE-----                │
+   │ MIIDXTCCAkWgAwIBAgIJAKR...                │
+   │ ... (Base64 encoded certificate) ...       │
+   │ -----END CERTIFICATE-----                  │
+   └────────────────────────────────────────────┘
+
+2. my.server.dns.name-key.pem
+   ┌────────────────────────────────────────────┐
+   │ -----BEGIN RSA PRIVATE KEY-----            │
+   │ MIIEpAIBAAKCAQEA...                        │
+   │ ... (Base64 encoded private key) ...       │
+   │ -----END RSA PRIVATE KEY-----              │
+   └────────────────────────────────────────────┘
+   
+   ⚠️  WARNING: This file is NOT password protected
+                for convenience. Secure appropriately!
+
+Integration Points:
+═══════════════════
+
+File: gui/main_window.ui
+  Line ~463-510: Two new GtkToolButton widgets added
+    - wizard_web_toolbutton
+    - wizard_email_toolbutton
+
+File: src/ca.c
+  Functions added:
+    - on_wizard_web_activate()
+    - on_wizard_email_activate()
+    
+File: src/wizard_window.c
+  Main functions:
+    - wizard_window_display() - Entry point
+    - __wizard_get_first_ca_id() - Find CA
+    - __wizard_create_csr() - Generate CSR
+    - __wizard_export_cert_and_key() - Export files
+    
+Build System:
+  - src/Makefile.am: wizard_window.c added to gnomint_SOURCES
+  - src/Makefile.am: wizard_window.h added to EXTRA_DIST
+  - gui/Makefile.am: wizard_window.ui added to gtkbuilder_DATA
