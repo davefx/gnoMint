@@ -274,7 +274,7 @@ msgstr "Aggiungi CSR"
 
 #: ../gui/gnomint.glade.h:50
 msgid "Add _Certificate Request"
-msgstr "Agiunggere Richiesta di _Certificato"
+msgstr "Aggiungi Richiesta di _Certificato"
 
 #: ../gui/gnomint.glade.h:51
 msgid "Add a new Certificate Signing Request"
@@ -559,11 +559,11 @@ msgstr "Preferenze Generali - gnoMint"
 
 #: ../gui/gnomint.glade.h:121
 msgid "Generate D_H parameters..."
-msgstr "Generare parametri D_H ..."
+msgstr "Genera parametri D_H ..."
 
 #: ../gui/gnomint.glade.h:122
 msgid "Generate _CRL"
-msgstr "Generare _CRL"
+msgstr "Genera _CRL"
 
 #: ../gui/gnomint.glade.h:123
 msgid "Generate the current Certificate Revocation List"
@@ -692,7 +692,7 @@ msgstr "Organizzazione (O)"
 
 #: ../gui/gnomint.glade.h:152
 msgid "Organization Unit:"
-msgstr "Unità organizzativa"
+msgstr "Unità organizzativa:"
 
 #: ../gui/gnomint.glade.h:153
 msgid "Organization:"
@@ -708,7 +708,7 @@ msgstr "Unità organizzativa"
 
 #: ../gui/gnomint.glade.h:156
 msgid "Password (confirm):"
-msgstr "Confermare la password"
+msgstr "Confermare la password:"
 
 #: ../gui/gnomint.glade.h:157
 msgid "Password protect"
@@ -931,7 +931,7 @@ msgstr ""
 
 #: ../gui/gnomint.glade.h:208
 msgid "_Add self-signed CA"
-msgstr ""
+msgstr "_Aggiungi CA autofirmato"
 
 #: ../gui/gnomint.glade.h:209
 msgid "_Certificates"
@@ -1324,7 +1324,7 @@ msgstr ""
 #: ../src/ca-cli.c:55
 msgid ""
 "Generate a new CRL for the given CA, saving it into the file <filename>"
-msgstr "Generare un nuovo CRL per il dato CA, salvandolo nel file <filename>"
+msgstr "Genera un nuovo CRL per il dato CA, salvandolo nel file <filename>"
 
 #. 13
 #: ../src/ca-cli.c:56
@@ -1334,7 +1334,7 @@ msgstr ""
 #: ../src/ca-cli.c:56
 msgid "Generate a new DH-parameter set, saving it into the file <filename>"
 msgstr ""
-"Generare un nuovo insieme di parametri DH, salvandolo nel file <filename>"
+"Genera un nuovo insieme di parametri DH, salvandolo nel file <filename>"
 
 #. 14
 #: ../src/ca-cli.c:57
