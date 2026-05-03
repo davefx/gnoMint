@@ -22,6 +22,8 @@ gui/new_cert_window.ui
 gui/new_crl_dialog.ui
 gui/new_req_window.ui
 gui/preferences_dialog.ui
+gui/san_editor_dialog.ui
+gui/san_manager_widget.ui
 mime/gnomint.xml.in
 src/ca.c
 src/ca-cli.c
@@ -46,5 +48,6 @@ src/preferences.c
 src/preferences-gui.c
 src/preferences-window.c
 src/pkey_manage.c
+src/san_manager.c
 src/tls.c
 src/uint160.c
