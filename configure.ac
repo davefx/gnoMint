@@ -186,9 +186,9 @@ dnl
 
 dnl
 if test "x$GCC" = "xyes"; then
-	CFLAGS+=" -Wall "
+	CFLAGS="${CFLAGS:--Wall}"
 	if test "x$use_debug" = "xYes"; then
-   	   CFLAGS+="$CFLAGS -g -O0"
+   	   CFLAGS="$CFLAGS -g -O0"
 	fi
 fi
 
@@ -202,7 +202,6 @@ AC_SUBST(LDFLAGS)
 AC_CONFIG_FILES([
 Makefile
 src/Makefile
-m4/Makefile
 gui/Makefile
 po/Makefile.in
 mime/Makefile

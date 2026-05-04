@@ -7,155 +7,121 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-11 12:13+0200\n"
+"Report-Msgid-Bugs-To: https://github.com/davefx/gnoMint/issues\n"
+"POT-Creation-Date: 2026-05-03 21:03+0800\n"
 "PO-Revision-Date: 2010-08-11 12:11+0200\n"
 "Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2009-11-08 11:12+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
-#: ../gconf/gnomint.schemas.in.h:1
-msgid "Automatic exporting of certificates for gnome-keyring"
-msgstr "Exportación automática de certificados a gnome-keyring"
-
-#: ../gconf/gnomint.schemas.in.h:2
-msgid "Certificate requests visibility"
-msgstr "Visibilidad de solicitudes de certificación"
-
-#: ../gconf/gnomint.schemas.in.h:3
-msgid "Revoked certificates visibility"
-msgstr "Visibilidad de certificados revocados"
-
-#: ../gconf/gnomint.schemas.in.h:4
-msgid ""
-"The (width,length) size gnoMint should take when started. This cannot be "
-"smaller than (320,200)."
-msgstr ""
-"El tamaño (anchura,altura) de gnoMint al iniciarse. No debe ser menor a"
-"(320,200)."
-
-#: ../gconf/gnomint.schemas.in.h:5
-msgid "Whether the certificate requests should be visible."
-msgstr "Si las solicitudes de certificado deben ser visibles."
-
-#: ../gconf/gnomint.schemas.in.h:6
-msgid ""
-"Whether the created or imported certificates are automatically exported to "
-"gnome-keyring certificate-store."
-msgstr ""
-"Si los certificados recién creados o importados son exportados "
-"automáticamente al almacén de certificados de gnome-keyring."
-
-#: ../gconf/gnomint.schemas.in.h:7
-msgid "Whether the revoked certificates should be visible."
-msgstr "Si los certificados revocados deben ser visibles"
-
-#: ../gconf/gnomint.schemas.in.h:8
-msgid "Window size"
-msgstr "Tamaño de ventana"
-
-#: ../gui/gnomint.desktop.in.h:1
-msgid "Manage X.509 certificates and CAs, easily and graphically"
-msgstr "Gestiona autoridades de certificación y certificados X.509"
-
-#: ../gui/gnomint.desktop.in.h:2
-msgid "gnoMint X.509 CA Manager"
-msgstr "gnoMint. Gestor de ACs X.509"
-
-#: ../src/ca.c:149
+#: src/ca.c:149
 msgid "<b>Certificates</b>"
 msgstr "<b>Certificados</b>"
 
-#: ../src/ca.c:287
+#: src/ca.c:287
 msgid "<b>Certificate Signing Requests</b>"
 msgstr "<b>Solicitudes de certificación</b>"
 
-#: ../src/ca.c:331 ../src/ca-cli-callbacks.c:172 ../src/ca-cli-callbacks.c:186
-#: ../src/ca-cli-callbacks.c:201 ../src/ca-cli-callbacks.c:575
-#: ../src/ca-cli-callbacks.c:584 ../src/ca-cli-callbacks.c:1202
-#: ../src/ca-cli-callbacks.c:1211 ../src/certificate_properties.c:177
-#: ../src/certificate_properties.c:187
+#: src/ca.c:330 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
+#: src/ca-cli-callbacks.c:201 src/ca-cli-callbacks.c:607
+#: src/ca-cli-callbacks.c:616 src/ca-cli-callbacks.c:1236
+#: src/ca-cli-callbacks.c:1245 src/certificate_properties.c:178
+#: src/certificate_properties.c:188
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: ../src/ca.c:334 ../src/ca-cli-callbacks.c:175 ../src/ca-cli-callbacks.c:189
-#: ../src/ca-cli-callbacks.c:204 ../src/ca-cli-callbacks.c:578
-#: ../src/ca-cli-callbacks.c:587 ../src/ca-cli-callbacks.c:1205
-#: ../src/ca-cli-callbacks.c:1214 ../src/certificate_properties.c:180
-#: ../src/certificate_properties.c:190
+#: src/ca.c:333 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
+#: src/ca-cli-callbacks.c:204 src/ca-cli-callbacks.c:610
+#: src/ca-cli-callbacks.c:619 src/ca-cli-callbacks.c:1239
+#: src/ca-cli-callbacks.c:1248 src/certificate_properties.c:181
+#: src/certificate_properties.c:191
 msgid "%m/%d/%Y %H:%M GMT"
 msgstr "%d/%m/%Y %H:%M GMT"
 
-#: ../src/ca.c:480 ../src/certificate_properties.c:563 ../src/crl.c:173
-#: ../src/new_cert.c:181 ../src/new_req_window.c:179
+#: src/ca.c:478 src/certificate_properties.c:582 src/crl.c:184
+#: src/new_cert.c:192 src/new_req_window.c:192
 msgid "Subject"
 msgstr "Titular"
 
-#: ../src/ca.c:515
+#: src/ca.c:513
 msgid "Serial"
 msgstr "Nº serie"
 
-#: ../src/ca.c:522
+#: src/ca.c:520
 msgid "Activation"
 msgstr "Activación"
 
-#: ../src/ca.c:529
+#: src/ca.c:527
 msgid "Expiration"
 msgstr "Caducidad"
 
-#: ../src/ca.c:536
+#: src/ca.c:534
 msgid "Revocation"
 msgstr "Revocación"
 
-#: ../src/ca.c:823
+#: src/ca.c:832
 msgid "Export certificate"
 msgstr "Exportar certificado"
 
-#: ../src/ca.c:830
+#: src/ca.c:835 src/ca.c:842 src/ca.c:944 src/ca.c:995 src/ca.c:1046
+#: src/ca.c:1875 src/ca.c:1971 src/ca.c:2005 src/crl.c:257 src/main.c:326
+#: src/main.c:398 src/main.c:486
+#, fuzzy
+msgid "_Cancel"
+msgstr "Francia"
+
+#: src/ca.c:836 src/ca.c:843 src/ca.c:945 src/ca.c:996 src/ca.c:1047
+#: src/ca.c:1876 src/crl.c:258
+msgid "_Save"
+msgstr ""
+
+#: src/ca.c:839
 msgid "Export certificate signing request"
 msgstr "Exportar solicitud de certificación"
 
-#: ../src/ca.c:845 ../src/ca.c:881 ../src/ca.c:891 ../src/export.c:260
+#: src/ca.c:854 src/ca.c:890 src/ca.c:900 src/export.c:278
 msgid "There was an error while exporting certificate."
 msgstr "Ocurrió un error al exportar el certificado"
 
-#: ../src/ca.c:847 ../src/ca.c:883 ../src/ca.c:893
+#: src/ca.c:856 src/ca.c:892 src/ca.c:902
 msgid "There was an error while exporting CSR."
 msgstr "Ocurrió un error al exportar la solicitud de certificación."
 
-#: ../src/ca.c:906 ../src/ca.c:1072
+#: src/ca.c:915 src/ca.c:1081
 msgid "Certificate exported successfully"
 msgstr "Certificado exportado con éxito"
 
-#: ../src/ca.c:913
+#: src/ca.c:922
 msgid "Certificate signing request exported successfully"
 msgstr "Solicitud de certificación exportada correctamente"
 
-#: ../src/ca.c:932
+#: src/ca.c:941
 msgid "Export crypted private key"
 msgstr "Exportar clave privada cifrada."
 
-#: ../src/ca.c:961 ../src/ca.c:1013
+#: src/ca.c:970 src/ca.c:1022
 msgid "Private key exported successfully"
 msgstr "Clave privada exportada con éxito"
 
-#: ../src/ca.c:983
-msgid "Export uncrypted private key"
+#: src/ca.c:992
+#, fuzzy
+msgid "Export unencrypted private key"
 msgstr "Exportar clave privada sin cifrar."
 
-#: ../src/ca.c:1034
+#: src/ca.c:1043
 msgid "Export whole certificate in PKCS#12 package"
 msgstr "Exportar todo el certificado en un paquete PKCS#12"
 
-#: ../src/ca.c:1105
+#: src/ca.c:1114
 msgid "Export CSR - gnoMint"
 msgstr "Exportar solicitud de certificación - gnoMint"
 
-#: ../src/ca.c:1110
+#: src/ca.c:1119
 msgid ""
 "Please, choose which part of the saved Certificate Signing Request you want "
 "to export:"
@@ -163,7 +129,7 @@ msgstr ""
 "Seleccione qué parte almacenada de la solicitud de certificación desea "
 "exportar:"
 
-#: ../src/ca.c:1115
+#: src/ca.c:1124
 msgid ""
 "<i>Export the Certificate Signing Request to a public file, in PEM format.</"
 "i>"
@@ -171,7 +137,7 @@ msgstr ""
 "<i>Exporta la solicitud de certificación a un fichero público en formato "
 "PEM</i>"
 
-#: ../src/ca.c:1120
+#: src/ca.c:1129
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the Certificate Signing "
@@ -181,15 +147,15 @@ msgstr ""
 "clave. Este fichero sólo debería ser accesible para el titular de la "
 "soliticud de certificación.</i>"
 
-#: ../src/ca.c:1178
+#: src/ca.c:1193
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: ../src/ca.c:1234
+#: src/ca.c:1253
 msgid "Are you sure you want to revoke this certificate?"
 msgstr "¿Está seguro de que desea revocar este certificado?"
 
-#: ../src/ca.c:1235
+#: src/ca.c:1254
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
@@ -199,11 +165,11 @@ msgstr ""
 "como no válido. Así, se impedirá cualquier uso futuro del certificado "
 "(siempre y cuando se compruebe la CRL)"
 
-#: ../src/ca.c:1243
+#: src/ca.c:1262
 msgid "Are you sure you want to revoke this CA certificate?"
 msgstr "¿Está seguro de que desea revocar este certificado de AC?"
 
-#: ../src/ca.c:1244
+#: src/ca.c:1263
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
@@ -221,15 +187,15 @@ msgstr ""
 "certificados generados con él, por lo que todos deberían regenerarse con un "
 "nuevo certificado de AC."
 
-#: ../src/ca.c:1283
+#: src/ca.c:1306
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr "¿Está seguro de que desea borrar esta solicitud de certificación?"
 
-#: ../src/ca.c:1560
+#: src/ca.c:1653
 msgid "Change CA password - gnoMint"
 msgstr "Cambiando contraseña de AC - gnoMint"
 
-#: ../src/ca.c:1578
+#: src/ca.c:1671
 msgid ""
 "The current password you have entered  doesn't match with the actual current "
 "database password."
@@ -237,94 +203,93 @@ msgstr ""
 "La contraseña actual que ha introducido no coincide con la contraseña real "
 "de la base de datos."
 
-#: ../src/ca.c:1593
+#: src/ca.c:1686
 msgid "Error while changing database password. The operation was cancelled."
 msgstr ""
 "Ocurrió un error al cambiar la contraseña de la base de datos. Se canceló la "
 "operación."
 
-#: ../src/ca.c:1602
+#: src/ca.c:1695
 msgid "Password changed successfully"
 msgstr "Contraseña cambiada con éxito"
 
-#: ../src/ca.c:1612 ../src/ca-cli-callbacks.c:1037
+#: src/ca.c:1705 src/ca-cli-callbacks.c:1069
 msgid ""
 "Error while establishing database password. The operation was cancelled."
 msgstr ""
 "Ocurrió un error al establecer la contraseña de la base de datos. Se canceló "
 "la operación."
 
-#: ../src/ca.c:1622
+#: src/ca.c:1715
 msgid "Password established successfully"
 msgstr "Contraseña establecida con éxito"
 
-#: ../src/ca.c:1632
+#: src/ca.c:1725
 msgid "Error while removing database password. The operation was cancelled."
 msgstr ""
 "Ocurrió un error al eliminar la contraseña de la base de datos. Se canceló "
 "la operación."
 
-#: ../src/ca.c:1641
+#: src/ca.c:1734
 msgid "Password removed successfully"
 msgstr "Contraseña eliminada con éxito"
 
-#: ../src/ca.c:1779
+#: src/ca.c:1872
 msgid "Save Diffie-Hellman parameters"
 msgstr "Guardar parámetros Diffie-Hellman"
 
-#: ../src/ca.c:1805
+#: src/ca.c:1898
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr "Parámetros Diffie-Hellman guardados correctamente"
 
-#. Import single file
-#: ../src/ca.c:1875
+#: src/ca.c:1968
 msgid "Select PEM file to import"
 msgstr "Seleccione fichero PEM a importar"
 
-#: ../src/ca.c:1896
+#: src/ca.c:1972 src/ca.c:2006 src/main.c:327 src/main.c:399 src/main.c:487
+msgid "_Open"
+msgstr ""
+
+#: src/ca.c:1989
 #, c-format
 msgid "Problem when importing '%s' file"
 msgstr "Hubo problemas al importar el fichero '%s'"
 
-#: ../src/ca.c:1909
+#: src/ca.c:2002
 msgid "Select directory to import"
 msgstr "Seleccione directorio a importar"
 
-#: ../src/ca-cli.c:37
+#: src/ca-cli.c:37
 msgid "newdb <filename>"
 msgstr "newdb <nombre de fichero>"
 
-#: ../src/ca-cli.c:37
+#: src/ca-cli.c:37
 msgid "Close current file and create a new database with given filename"
 msgstr ""
 "Cierra el fichero actual y crea una nueva base de datos con el nombre de "
 "fichero indicado"
 
-#. 0
-#: ../src/ca-cli.c:38
+#: src/ca-cli.c:38
 msgid "opendb <filename>"
 msgstr "opendb <nombre de fichero>"
 
-#: ../src/ca-cli.c:38
+#: src/ca-cli.c:38
 msgid "Close current file and open the file with given filename"
 msgstr "Cierra el fichero actual y abre el fichero con el nombre indicado"
 
-#. 1
-#: ../src/ca-cli.c:39
+#: src/ca-cli.c:39
 msgid "savedbas <filename>"
 msgstr "savedbas <nombre de fichero>"
 
-#: ../src/ca-cli.c:39
+#: src/ca-cli.c:39
 msgid "Save the current file with a different filename"
 msgstr "Guarda el fichero actual con un nombre de fichero distinto"
 
-#. 2
-#: ../src/ca-cli.c:40
+#: src/ca-cli.c:40
 msgid "Get current status (opened file, no. of certificates, etc...)"
 msgstr "Obtiene el estado actual (fichero abierto, nº de certificados, etc...)"
 
-#. 3
-#: ../src/ca-cli.c:41
+#: src/ca-cli.c:41
 msgid ""
 "List the certificates in database. With option --see-revoked, lists also the "
 "revoked ones"
@@ -332,33 +297,29 @@ msgstr ""
 "Lista los certificados de la base de datos. Con la opción --see-revoked, "
 "lista también los certificados revocados."
 
-#. 4
-#: ../src/ca-cli.c:43
+#: src/ca-cli.c:43
 msgid "List the CSRs in database"
 msgstr "Lista las solicitudes de certificación existentes en la base de datos"
 
-#. 5
-#: ../src/ca-cli.c:44
+#: src/ca-cli.c:44
 msgid "addcsr [ca-id-for-inherit-fields]"
 msgstr "add-csr [id-de-CA-para-heredar-campos]"
 
-#: ../src/ca-cli.c:44
+#: src/ca-cli.c:44
 msgid "Start a new CSR creation process"
 msgstr "Comienza un nuevo proceso de creación de solicitud de certificación"
 
-#. 6
-#: ../src/ca-cli.c:45
+#: src/ca-cli.c:45
 msgid "Start a new self-signed CA creation process"
 msgstr ""
 "Iniciar un nuevo proceso de creación de Autoridad de Certificación auto-"
 "firmada"
 
-#. 7
-#: ../src/ca-cli.c:46
+#: src/ca-cli.c:46
 msgid "extractcertpkey <cert-id> <filename>"
 msgstr "extractcertpkey <id. de certificado> <nombre de fichero>"
 
-#: ../src/ca-cli.c:46
+#: src/ca-cli.c:46
 msgid ""
 "Extract the private key of the certificate with the given internal id and "
 "saves it into the given file"
@@ -366,12 +327,11 @@ msgstr ""
 "Extraer clave privada del certificado con el identificador proporcionado y "
 "almacenarla en el fichero indicado"
 
-#. 8
-#: ../src/ca-cli.c:49
+#: src/ca-cli.c:49
 msgid "extractcsrpkey <csr-id> <filename>"
 msgstr "extractcsrpkey <id. de csr> <nombre de fichero>"
 
-#: ../src/ca-cli.c:49
+#: src/ca-cli.c:49
 msgid ""
 "Extract the private key of the CSR with the given internal id and saves it "
 "into the given file"
@@ -379,178 +339,156 @@ msgstr ""
 "Extraer clave privada del CSR con identificador indicado y almacenarla en el "
 "fichero proporcionado"
 
-#. 9
-#: ../src/ca-cli.c:52
+#: src/ca-cli.c:52
 msgid "revoke <cert-id>"
 msgstr "revoke <id de certificado>"
 
-#: ../src/ca-cli.c:52
+#: src/ca-cli.c:52
 msgid "Revoke the certificate with the given internal ID"
 msgstr "Revocar el certificado con identificador proporcionado"
 
-#. 10
-#: ../src/ca-cli.c:53
+#: src/ca-cli.c:53
 msgid "sign <csr-id> <ca-cert-id>"
 msgstr "sign <csr-id> <ca-cert-id>"
 
-#: ../src/ca-cli.c:53
+#: src/ca-cli.c:53
 msgid "Generate a certificate signing the given CSR with the given CA"
 msgstr "Generar certificado firmando el CSR indicado con la AC proporcionada"
 
-#. 11
-#: ../src/ca-cli.c:54
+#: src/ca-cli.c:54
 msgid "delete <csr-id>"
 msgstr "delete <id. de csr>"
 
-#: ../src/ca-cli.c:54
+#: src/ca-cli.c:54
 msgid "Delete the given CSR from the database"
 msgstr "Borrar solicitud de certificación indicada de la base de datos"
 
-#. 12
-#: ../src/ca-cli.c:55
+#: src/ca-cli.c:55
 msgid "crlgen <ca-id> <filename>"
 msgstr "crlgen <id. de ca> <nombre de fichero>"
 
-#: ../src/ca-cli.c:55
+#: src/ca-cli.c:55
 msgid "Generate a new CRL for the given CA, saving it into the file <filename>"
 msgstr ""
 "Generar un nuevo CRL para la AC indicada, almacenándolo en el fichero "
 "<nombre de fichero>"
 
-#. 13
-#: ../src/ca-cli.c:56
+#: src/ca-cli.c:56
 msgid "dhgen <prime-bitlength> <filename>"
 msgstr "dhgen <longitud en bits del nº primo><nombre de fichero>"
 
-#: ../src/ca-cli.c:56
+#: src/ca-cli.c:56
 msgid "Generate a new DH-parameter set, saving it into the file <filename>"
 msgstr ""
 "Generar un nuevo conjunto de parámetros DH, almacenándolo en el fichero "
 "<nombre de fichero>"
 
-#. 14
-#: ../src/ca-cli.c:57
+#: src/ca-cli.c:57
 msgid "Change password for the current database"
 msgstr "Cambiar contraseña de la base de datos actual"
 
-#. 15
-#: ../src/ca-cli.c:58
+#: src/ca-cli.c:58
 msgid "importfile <filename>"
 msgstr "importfile <nombre de fichero>"
 
-#: ../src/ca-cli.c:58
+#: src/ca-cli.c:58
 msgid "Import the file with the given name <filename>"
 msgstr "Importar fichero con el nombre indicado"
 
-#. 16
-#: ../src/ca-cli.c:59
+#: src/ca-cli.c:59
 msgid "importdir <dirname>"
 msgstr "importdir <nombre de directorio>"
 
-#: ../src/ca-cli.c:59
+#: src/ca-cli.c:59
 msgid "Import the given directory, as a OpenSSL-CA directory"
 msgstr ""
 "Importar el directorio proporcionado, interpretándolo como el directorio de "
 "una AC realizada con OpenSSL"
 
-#. 17
-#: ../src/ca-cli.c:60
+#: src/ca-cli.c:60
 msgid "showcert <cert-id>"
 msgstr "showcert <id de certificado>"
 
-#: ../src/ca-cli.c:60
+#: src/ca-cli.c:60
 msgid "Show properties of the given certificate"
 msgstr "Mostrar propiedades del certificado indicado"
 
-#. 18
-#: ../src/ca-cli.c:61
+#: src/ca-cli.c:61
 msgid "showcsr <csr-id>"
 msgstr "showcsr <id de solicitud de certificación>"
 
-#: ../src/ca-cli.c:61
+#: src/ca-cli.c:61
 msgid "Show properties of the given CSR"
 msgstr "Mostrar propiedades del CSR proporcionado"
 
-#. 19
-#: ../src/ca-cli.c:62
+#: src/ca-cli.c:62
 msgid "showpolicy <ca-id>"
 msgstr "showpolicy <id de certificado de AC>"
 
-#: ../src/ca-cli.c:62
+#: src/ca-cli.c:62
 msgid "Show CA policy"
 msgstr "Mostrar política de la AC"
 
-#. 20
-#: ../src/ca-cli.c:63
+#: src/ca-cli.c:63
 msgid "setpolicy <ca-id> <policy-id> <value>"
 msgstr "setpolicy <id de certificado de AC> <id de política> <valor>"
 
-#: ../src/ca-cli.c:63
+#: src/ca-cli.c:63
 msgid "Change the given CA policy"
 msgstr "Cambiar política indicada de la AC"
 
-#. 21
-#: ../src/ca-cli.c:64
+#: src/ca-cli.c:64
 msgid "Show program preferences"
 msgstr "Mostrar preferencias de programa"
 
-#. 22
-#: ../src/ca-cli.c:65
+#: src/ca-cli.c:65
 msgid "setpreference <preference-id> <value>"
 msgstr "setpreference <id de preferencia> <valor>"
 
-#: ../src/ca-cli.c:65
+#: src/ca-cli.c:65
 msgid "Set the given program preference"
 msgstr "Establece la preferencia de programa indicada"
 
-#. 23
-#: ../src/ca-cli.c:66
+#: src/ca-cli.c:66
 msgid "Show about message"
 msgstr "Mostrar mensaje de \"Acerca de...\""
 
-#. 24
-#: ../src/ca-cli.c:67
+#: src/ca-cli.c:67
 msgid "Show warranty information"
 msgstr "Mostrar información de garantía"
 
-#. 25
-#: ../src/ca-cli.c:68
+#: src/ca-cli.c:68
 msgid "Show distribution information"
 msgstr "Mostrar información sobre la distribución del programa"
 
-#. 26
-#: ../src/ca-cli.c:69
+#: src/ca-cli.c:69
 msgid "Show version information"
 msgstr "Mostrar información de versión"
 
-#. 27
-#: ../src/ca-cli.c:70
+#: src/ca-cli.c:70
 msgid "Show (this) help message"
 msgstr "Mostrar (este) mensaje de ayuda"
 
-#. 28
-#. 29
-#. 30
-#: ../src/ca-cli.c:71 ../src/ca-cli.c:72 ../src/ca-cli.c:73
+#: src/ca-cli.c:71 src/ca-cli.c:72 src/ca-cli.c:73
 msgid "Close database and exit program"
 msgstr "Cerrar base de datos y salir de programa"
 
-#: ../src/ca-cli.c:95
+#: src/ca-cli.c:95
 #, c-format
 msgid "Opening database %s..."
 msgstr "Abriendo base de datos %s..."
 
-#: ../src/ca-cli.c:99
+#: src/ca-cli.c:99
 #, c-format
 msgid " OK.\n"
 msgstr " Correcto.\n"
 
-#: ../src/ca-cli.c:101
+#: src/ca-cli.c:101
 #, c-format
 msgid " Error.\n"
 msgstr " Error.\n"
 
-#: ../src/ca-cli.c:128
+#: src/ca-cli.c:128
 #, c-format
 msgid ""
 "\n"
@@ -565,7 +503,7 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: ../src/ca-cli.c:129
+#: src/ca-cli.c:129
 #, c-format
 msgid ""
 "This program comes with ABSOLUTELY NO WARRANTY;\n"
@@ -574,7 +512,7 @@ msgstr ""
 "Este programa se proporciona SIN GARANTÍAS DE NINGÚN TIPO; para más\n"
 "detalles, teclee 'warranty'.\n"
 
-#: ../src/ca-cli.c:130
+#: src/ca-cli.c:130
 #, c-format
 msgid ""
 "This is free software, and you are welcome to redistribute it\n"
@@ -585,13 +523,12 @@ msgstr ""
 "condiciones; teclee 'distribution' para más detalles.\n"
 "\n"
 
-#. Unpaired quotes
-#: ../src/ca-cli.c:172
+#: src/ca-cli.c:172
 #, c-format
 msgid "Unpaired quotes\n"
 msgstr "Comillas desemparejadas\n"
 
-#: ../src/ca-cli.c:250
+#: src/ca-cli.c:250
 #, c-format
 msgid ""
 "Invalid command. Try 'help' for getting a list of recognized commands.\n"
@@ -599,184 +536,183 @@ msgstr ""
 "Orden no válida. Teclee 'help' para conseguir una lista de órdenes\n"
 "reconocidas.\n"
 
-#: ../src/ca-cli.c:254
+#: src/ca-cli.c:254
 #, c-format
 msgid "Incorrect number of parameters.\n"
 msgstr "Número incorrecto de parámetros.\n"
 
-#: ../src/ca-cli.c:255
+#: src/ca-cli.c:255
 #, c-format
 msgid "Syntax: %s\n"
 msgstr "Sintaxis: %s\n"
 
-#. The file already exists. We ask the user about overwriting it
-#: ../src/ca-cli-callbacks.c:57 ../src/ca-cli-callbacks.c:106
+#: src/ca-cli-callbacks.c:57 src/ca-cli-callbacks.c:106
 msgid "The file already exists, so it will be overwritten."
 msgstr "El fichero ya existe, por lo que se sobreescribirá"
 
-#: ../src/ca-cli-callbacks.c:57 ../src/ca-cli-callbacks.c:106
-#: ../src/ca-cli-callbacks.c:675
+#: src/ca-cli-callbacks.c:57 src/ca-cli-callbacks.c:106
+#: src/ca-cli-callbacks.c:707
 msgid "Are you sure? Yes/[No] "
 msgstr "¿Está seguro? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:79
+#: src/ca-cli-callbacks.c:79
 #, c-format
 msgid "Problem when opening new '%s' CA database\n"
 msgstr "Hubo problemas al abrir la nueva base de datos de la AC '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:83
+#: src/ca-cli-callbacks.c:83
 #, c-format
 msgid "File '%s' opened\n"
 msgstr "Fichero '%s' abierto\n"
 
-#: ../src/ca-cli-callbacks.c:93
+#: src/ca-cli-callbacks.c:93
 #, c-format
 msgid "Problem when opening '%s' CA database\n"
 msgstr "Hubo problemas al abrir la base de datos de la AC '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:127
+#: src/ca-cli-callbacks.c:127
 #, c-format
 msgid "Current opened file: %s\n"
 msgstr "Fichero abierto actualmente: %s\n"
 
-#: ../src/ca-cli-callbacks.c:128
+#: src/ca-cli-callbacks.c:128
 #, c-format
 msgid "Number of certificates in file: %d\n"
 msgstr "Número de certificados en fichero: %d\n"
 
-#: ../src/ca-cli-callbacks.c:129
+#: src/ca-cli-callbacks.c:129
 #, c-format
 msgid "Number of CSRs in file: %d\n"
 msgstr "Número de CSRs en fichero: %d\n"
 
-#: ../src/ca-cli-callbacks.c:144
+#: src/ca-cli-callbacks.c:144
 #, c-format
 msgid "CertList ID|%s\t"
 msgstr "%s\t"
 
-#: ../src/ca-cli-callbacks.c:147
+#: src/ca-cli-callbacks.c:147
 msgid "CertList IsCA|Y\t"
 msgstr "Sí\t"
 
-#: ../src/ca-cli-callbacks.c:149
+#: src/ca-cli-callbacks.c:149
 msgid "CertList IsCA|N\t"
 msgstr "No\t"
 
-#: ../src/ca-cli-callbacks.c:154
+#: src/ca-cli-callbacks.c:154
 #, c-format
 msgid "CertList Subject|%s\t"
 msgstr "%s\t"
 
-#: ../src/ca-cli-callbacks.c:157
+#: src/ca-cli-callbacks.c:157
 msgid "CertList PadIfSubject<16|\t"
 msgstr "\t"
 
-#: ../src/ca-cli-callbacks.c:159
+#: src/ca-cli-callbacks.c:159
 msgid "CertList PadIfSubject<8|\t"
 msgstr "\t"
 
-#: ../src/ca-cli-callbacks.c:162
+#: src/ca-cli-callbacks.c:162
 msgid "CertList PKeyInDB|Y\t\t"
 msgstr "Sí\t\t"
 
-#: ../src/ca-cli-callbacks.c:164
+#: src/ca-cli-callbacks.c:164
 msgid "CertList PKeyInDB|N\t\t"
 msgstr "No\t\t"
 
-#: ../src/ca-cli-callbacks.c:168
+#: src/ca-cli-callbacks.c:168
 msgid "CertList Activation|\t"
 msgstr " \t"
 
-#: ../src/ca-cli-callbacks.c:177
+#: src/ca-cli-callbacks.c:177
 #, c-format
 msgid "CertList Activation|%s\t"
 msgstr "%s\t"
 
-#: ../src/ca-cli-callbacks.c:182
+#: src/ca-cli-callbacks.c:182
 msgid "CertList Expiration|\t"
 msgstr "\t"
 
-#: ../src/ca-cli-callbacks.c:191
+#: src/ca-cli-callbacks.c:191
 #, c-format
 msgid "CertList Expiration|%s\t"
 msgstr "%s\t"
 
-#: ../src/ca-cli-callbacks.c:197
+#: src/ca-cli-callbacks.c:197
 msgid "CertList Revocation|\n"
 msgstr " \n"
 
-#: ../src/ca-cli-callbacks.c:206
+#: src/ca-cli-callbacks.c:206
 #, c-format
 msgid "CertList Revocation|%s\n"
 msgstr "%s\n"
 
-#: ../src/ca-cli-callbacks.c:223
+#: src/ca-cli-callbacks.c:223
 #, c-format
 msgid "Certificates in Database:\n"
 msgstr "Certificados en base de datos:\n"
 
-#: ../src/ca-cli-callbacks.c:224
+#: src/ca-cli-callbacks.c:224
 #, c-format
 msgid "Id.\tIs CA?\tCertificate Subject\tKey in DB?\tActivation\t\tExpiration"
 msgstr ""
 "Id.\t¿Es CA?\tTitular de certificado\t¿Clave en BD?\tActivación\t\tCaducidad"
 
-#: ../src/ca-cli-callbacks.c:227
+#: src/ca-cli-callbacks.c:227
 #, c-format
 msgid "\t\tRevocation\n"
 msgstr "\t\tRevocación\n"
 
-#: ../src/ca-cli-callbacks.c:237
+#: src/ca-cli-callbacks.c:237
 #, c-format
 msgid "CsrList ID|%s\t"
 msgstr "%s\t"
 
-#: ../src/ca-cli-callbacks.c:239
+#: src/ca-cli-callbacks.c:239
 #, c-format
 msgid "CsrList ParentID|%s\t"
 msgstr "%s\t"
 
-#: ../src/ca-cli-callbacks.c:239
+#: src/ca-cli-callbacks.c:239
 msgid "CsrList ParentID|\t"
 msgstr " \t"
 
-#: ../src/ca-cli-callbacks.c:244
+#: src/ca-cli-callbacks.c:244
 #, c-format
 msgid "CsrList Subject|%-24s\t"
 msgstr "%-24s\t"
 
-#: ../src/ca-cli-callbacks.c:247
+#: src/ca-cli-callbacks.c:247
 msgid "CsrList PadIfSubject<16|\t"
 msgstr " \t"
 
-#: ../src/ca-cli-callbacks.c:249
+#: src/ca-cli-callbacks.c:249
 msgid "CsrList PadIfSubject<8|\t"
 msgstr " \t"
 
-#: ../src/ca-cli-callbacks.c:252
+#: src/ca-cli-callbacks.c:252
 msgid "CsrList PKeyInDB|Y\n"
 msgstr "Sí\n"
 
-#: ../src/ca-cli-callbacks.c:254
+#: src/ca-cli-callbacks.c:254
 msgid "CsrList PKeyInDB|N\n"
 msgstr "No\n"
 
-#: ../src/ca-cli-callbacks.c:262
+#: src/ca-cli-callbacks.c:262
 #, c-format
 msgid "Certificate Requests in Database:\n"
 msgstr "Solicitudes de certificación en base de datos:\n"
 
-#: ../src/ca-cli-callbacks.c:263
+#: src/ca-cli-callbacks.c:263
 #, c-format
 msgid "Id.\tParent Id.\tCSR Subject\t\tKey in DB?\n"
 msgstr "Id.\tId. padre\tTitular CSR\t\t¿Clave en BD?\n"
 
-#: ../src/ca-cli-callbacks.c:291 ../src/ca-cli-callbacks.c:980
-#: ../src/ca-cli-callbacks.c:1363 ../src/ca-cli-callbacks.c:1392
+#: src/ca-cli-callbacks.c:293 src/ca-cli-callbacks.c:1012
+#: src/ca-cli-callbacks.c:1399 src/ca-cli-callbacks.c:1428
 msgid "The given CA id. is not valid"
 msgstr "El identificador de CA proporcionado no es válido"
 
-#: ../src/ca-cli-callbacks.c:344
+#: src/ca-cli-callbacks.c:346
 #, c-format
 msgid ""
 "Please enter data corresponding to subject of the Certificate Signing "
@@ -785,95 +721,107 @@ msgstr ""
 "Por favor: introduzca los datos correspondientes al titular de la solicitud "
 "de certificación:\n"
 
-#: ../src/ca-cli-callbacks.c:346 ../src/ca-cli-callbacks.c:473
+#: src/ca-cli-callbacks.c:349 src/ca-cli-callbacks.c:497
 msgid "Enter country (C)"
 msgstr "Introduzca país (C)"
 
-#: ../src/ca-cli-callbacks.c:352 ../src/ca-cli-callbacks.c:479
+#: src/ca-cli-callbacks.c:357 src/ca-cli-callbacks.c:503
 msgid "Enter state or province (ST)"
 msgstr "Introduzca nombre de estado o provincia (ST)"
 
-#: ../src/ca-cli-callbacks.c:358 ../src/ca-cli-callbacks.c:485
+#: src/ca-cli-callbacks.c:366 src/ca-cli-callbacks.c:509
 msgid "Enter locality or city (L)"
 msgstr "Introduzca ciudad o localidad (L)"
 
-#: ../src/ca-cli-callbacks.c:364 ../src/ca-cli-callbacks.c:491
+#: src/ca-cli-callbacks.c:374 src/ca-cli-callbacks.c:515
 msgid "Enter organization (O)"
 msgstr "Introduzca organización (O)"
 
-#: ../src/ca-cli-callbacks.c:370 ../src/ca-cli-callbacks.c:497
+#: src/ca-cli-callbacks.c:382 src/ca-cli-callbacks.c:521
 msgid "Enter organizational unit (OU)"
 msgstr "Introduzca Unidad organizativa (OU)"
 
-#: ../src/ca-cli-callbacks.c:376 ../src/ca-cli-callbacks.c:503
+#: src/ca-cli-callbacks.c:389 src/ca-cli-callbacks.c:527
 msgid "Enter common name (CN)"
 msgstr "Introduzca Nombre común (CN)"
 
-#: ../src/ca-cli-callbacks.c:386 ../src/ca-cli-callbacks.c:513
+#: src/ca-cli-callbacks.c:395 src/ca-cli-callbacks.c:533
+msgid ""
+"Enter Subject Alternative Names (SAN) [format: "
+"DNS:example.com,IP:192.168.1.1]"
+msgstr ""
+
+#: src/ca-cli-callbacks.c:405 src/ca-cli-callbacks.c:543
 msgid "Enter type of key you are going to create (RSA/DSA)"
 msgstr "Introduzca el tipo de clave que se va a crear (RSA/DSA)"
 
-#: ../src/ca-cli-callbacks.c:398 ../src/ca-cli-callbacks.c:525
+#: src/ca-cli-callbacks.c:419 src/ca-cli-callbacks.c:555
 msgid "Enter bitlength for the key (it must be a whole multiple of 1024)"
 msgstr "Introduzca tamaño de clave en bits (múltiplo de 1024)"
 
-#: ../src/ca-cli-callbacks.c:402
+#: src/ca-cli-callbacks.c:424
 #, c-format
 msgid "These are the provided CSR properties:\n"
 msgstr "Estas son las propiedades proporcionadas del CSR:\n"
 
-#: ../src/ca-cli-callbacks.c:404 ../src/ca-cli-callbacks.c:553
-#: ../src/ca-cli-callbacks.c:1191 ../src/ca-cli-callbacks.c:1254
+#: src/ca-cli-callbacks.c:426 src/ca-cli-callbacks.c:583
+#: src/ca-cli-callbacks.c:1223 src/ca-cli-callbacks.c:1288
 #, c-format
 msgid "Subject:\n"
 msgstr "Titular:\n"
 
-#: ../src/ca-cli-callbacks.c:405 ../src/ca-cli-callbacks.c:554
+#: src/ca-cli-callbacks.c:427 src/ca-cli-callbacks.c:584
 #, c-format
 msgid "\tDistinguished Name: "
 msgstr "\tNombre distintivo: "
 
-#: ../src/ca-cli-callbacks.c:419 ../src/ca-cli-callbacks.c:568
+#: src/ca-cli-callbacks.c:442 src/ca-cli-callbacks.c:599
+#: src/ca-cli-callbacks.c:1227 src/ca-cli-callbacks.c:1291
+#, fuzzy, c-format
+msgid "\tSubject Alternative Names: %s\n"
+msgstr "Nombre alternativo de titular"
+
+#: src/ca-cli-callbacks.c:443 src/ca-cli-callbacks.c:600
 #, c-format
 msgid "Key pair\n"
 msgstr "Par de claves\n"
 
-#: ../src/ca-cli-callbacks.c:420 ../src/ca-cli-callbacks.c:569
+#: src/ca-cli-callbacks.c:444 src/ca-cli-callbacks.c:601
 #, c-format
 msgid "\tType: %s\n"
 msgstr "\tTipo: %s\n"
 
-#: ../src/ca-cli-callbacks.c:421 ../src/ca-cli-callbacks.c:570
+#: src/ca-cli-callbacks.c:445 src/ca-cli-callbacks.c:602
 #, c-format
 msgid "\tKey bitlength: %d\n"
 msgstr "\tLongitud en bits: %d\n"
 
-#: ../src/ca-cli-callbacks.c:423 ../src/ca-cli-callbacks.c:591
+#: src/ca-cli-callbacks.c:447 src/ca-cli-callbacks.c:623
 msgid "Do you want to change anything? Yes/[No] "
 msgstr "¿Desea cambiar algo? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:427
+#: src/ca-cli-callbacks.c:451
 msgid ""
 "You are about to create a Certificate Signing Request with these properties."
 msgstr ""
 "Se va a proceder a crear una solicitud de certificación con estas "
 "propiedades."
 
-#: ../src/ca-cli-callbacks.c:428 ../src/ca-cli-callbacks.c:596
+#: src/ca-cli-callbacks.c:452 src/ca-cli-callbacks.c:628
 msgid "Are you sure? [Yes]/No "
 msgstr "¿Está seguro? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:433 ../src/ca-cli-callbacks.c:601
-#: ../src/ca-cli-callbacks.c:685 ../src/ca-cli-callbacks.c:816
-#: ../src/ca-cli-callbacks.c:937 ../src/ca-cli-callbacks.c:966
-#: ../src/ca-cli-callbacks.c:1032 ../src/ca-cli-callbacks.c:1059
-#: ../src/ca-cli-callbacks.c:1087 ../src/ca-cli-callbacks.c:1102
-#: ../src/ca-cli-callbacks.c:1422 ../src/ca-cli-callbacks.c:1465
+#: src/ca-cli-callbacks.c:457 src/ca-cli-callbacks.c:633
+#: src/ca-cli-callbacks.c:717 src/ca-cli-callbacks.c:848
+#: src/ca-cli-callbacks.c:969 src/ca-cli-callbacks.c:998
+#: src/ca-cli-callbacks.c:1064 src/ca-cli-callbacks.c:1091
+#: src/ca-cli-callbacks.c:1119 src/ca-cli-callbacks.c:1134
+#: src/ca-cli-callbacks.c:1458 src/ca-cli-callbacks.c:1501
 #, c-format
 msgid "Operation cancelled.\n"
 msgstr "Operación cancelada.\n"
 
-#: ../src/ca-cli-callbacks.c:471
+#: src/ca-cli-callbacks.c:495
 #, c-format
 msgid ""
 "Please enter data corresponding to subject of the new Certification "
@@ -882,7 +830,7 @@ msgstr ""
 "Por favor: introduzca los datos correspondientes al titular de la nueva "
 "autoridad de certificación:\n"
 
-#: ../src/ca-cli-callbacks.c:530
+#: src/ca-cli-callbacks.c:560
 msgid ""
 "Introduce number of months before expiration of the new certification "
 "authority"
@@ -890,218 +838,218 @@ msgstr ""
 "Introduzca el número máximo de meses antes de la caducidad de lanueva "
 "autoridad de certificación"
 
-#: ../src/ca-cli-callbacks.c:551
+#: src/ca-cli-callbacks.c:581
 #, c-format
 msgid "These are the provided new CA properties:\n"
 msgstr "Estas son las propiedades proporcionadas para la nueva AC:\n"
 
-#: ../src/ca-cli-callbacks.c:571
+#: src/ca-cli-callbacks.c:603
 #, c-format
 msgid "Validity\n"
 msgstr "Validez\n"
 
-#: ../src/ca-cli-callbacks.c:572 ../src/ca-cli-callbacks.c:1199
+#: src/ca-cli-callbacks.c:604 src/ca-cli-callbacks.c:1233
 #, c-format
 msgid "Validity:\n"
 msgstr "Validez:\n"
 
-#: ../src/ca-cli-callbacks.c:580 ../src/ca-cli-callbacks.c:1207
+#: src/ca-cli-callbacks.c:612 src/ca-cli-callbacks.c:1241
 #, c-format
 msgid "\tActivated on: %s\n"
 msgstr "\tActivado el: %s\n"
 
-#: ../src/ca-cli-callbacks.c:589 ../src/ca-cli-callbacks.c:1216
+#: src/ca-cli-callbacks.c:621 src/ca-cli-callbacks.c:1250
 #, c-format
 msgid "\tExpires on: %s\n"
 msgstr "\tCaduca el: %s\n"
 
-#: ../src/ca-cli-callbacks.c:595
+#: src/ca-cli-callbacks.c:627
 msgid ""
 "You are about to create a new Certification Authority with these properties."
 msgstr ""
 "Se va a proceder a crear una nueva autoridad de certificación con "
 "estaspropiedades."
 
-#: ../src/ca-cli-callbacks.c:621 ../src/ca-cli-callbacks.c:669
-#: ../src/ca-cli-callbacks.c:1176
+#: src/ca-cli-callbacks.c:653 src/ca-cli-callbacks.c:701
+#: src/ca-cli-callbacks.c:1208
 msgid "The given certificate id. is not valid"
 msgstr "El identificador de certificado proporcionado no es válido"
 
-#: ../src/ca-cli-callbacks.c:628 ../src/ca-cli-callbacks.c:652
+#: src/ca-cli-callbacks.c:660 src/ca-cli-callbacks.c:684
 #, c-format
 msgid "Private key extracted successfully into file '%s'\n"
 msgstr "Clave privada extraída con éxito al fichero '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:645 ../src/ca-cli-callbacks.c:797
-#: ../src/ca-cli-callbacks.c:950 ../src/ca-cli-callbacks.c:1243
+#: src/ca-cli-callbacks.c:677 src/ca-cli-callbacks.c:829
+#: src/ca-cli-callbacks.c:982 src/ca-cli-callbacks.c:1277
 msgid "The given CSR id. is not valid"
 msgstr "El identificador de CSR proporcionado no es válido"
 
-#: ../src/ca-cli-callbacks.c:675
+#: src/ca-cli-callbacks.c:707
 msgid "This certificate will be revoked."
 msgstr "Este certificado será revocado."
 
-#: ../src/ca-cli-callbacks.c:681
+#: src/ca-cli-callbacks.c:713
 #, c-format
 msgid "Certificate revoked.\n"
 msgstr "Certificado revocado.\n"
 
-#: ../src/ca-cli-callbacks.c:695 ../src/ca-cli-callbacks.c:1224
+#: src/ca-cli-callbacks.c:727 src/ca-cli-callbacks.c:1258
 #, c-format
 msgid "Certificate uses:\n"
 msgstr "Usos del certificado:\n"
 
-#: ../src/ca-cli-callbacks.c:698
+#: src/ca-cli-callbacks.c:730
 #, c-format
 msgid "* Certification Authority use enabled.\n"
 msgstr "* Uso como Autoridad de Certificación habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:700
+#: src/ca-cli-callbacks.c:732
 #, c-format
 msgid "* Certification Authority use disabled.\n"
 msgstr "* Uso como Autoridad de Certificación deshabilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:704
+#: src/ca-cli-callbacks.c:736
 #, c-format
 msgid "* CRL signing use enabled.\n"
 msgstr "* Uso para firma de CRLs habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:706
+#: src/ca-cli-callbacks.c:738
 #, c-format
 msgid "* CRL signing use disabled.\n"
 msgstr "* Uso para firma de CRLs deshabilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:710
+#: src/ca-cli-callbacks.c:742
 #, c-format
 msgid "* Digital Signature use enabled.\n"
 msgstr "* Uso para firma digital habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:712
+#: src/ca-cli-callbacks.c:744
 #, c-format
 msgid "* Digital Signature use disabled.\n"
 msgstr "* Uso para firma digital deshabilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:716 ../src/ca-cli-callbacks.c:718
+#: src/ca-cli-callbacks.c:748 src/ca-cli-callbacks.c:750
 #, c-format
 msgid "* Data Encipherment use enabled.\n"
 msgstr "Uso para cifrado de datos habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:722
+#: src/ca-cli-callbacks.c:754
 #, c-format
 msgid "* Key Encipherment use enabled.\n"
 msgstr "* Uso para cifrado de claves habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:724
+#: src/ca-cli-callbacks.c:756
 #, c-format
 msgid "* Key Encipherment use disabled.\n"
 msgstr "* Uso para cifrado de claves deshabilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:728
+#: src/ca-cli-callbacks.c:760
 #, c-format
 msgid "* Non Repudiation use enabled.\n"
 msgstr "* Uso para no repudio habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:730
+#: src/ca-cli-callbacks.c:762
 #, c-format
 msgid "* Non Repudiation use disabled.\n"
 msgstr "* Uso para no repudio deshabilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:734
+#: src/ca-cli-callbacks.c:766
 #, c-format
 msgid "* Key Agreement use enabled.\n"
 msgstr "* Uso para negociación de claves habilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:736
+#: src/ca-cli-callbacks.c:768
 #, c-format
 msgid "* Key Agreement use disabled.\n"
 msgstr "* Uso para negociación de claves deshabilitado.\n"
 
-#: ../src/ca-cli-callbacks.c:739
+#: src/ca-cli-callbacks.c:771
 #, c-format
 msgid "Certificate purposes:\n"
 msgstr "Finalidades del certificado:\n"
 
-#: ../src/ca-cli-callbacks.c:742
+#: src/ca-cli-callbacks.c:774
 #, c-format
 msgid "* Email Protection purpose enabled.\n"
 msgstr "* Finalidad para protección de correo electrónico habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:744
+#: src/ca-cli-callbacks.c:776
 #, c-format
 msgid "* Email Protection purpose disabled.\n"
 msgstr "* Finalidad para protección de correo electrónico deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:748
+#: src/ca-cli-callbacks.c:780
 #, c-format
 msgid "* Code Signing purpose enabled.\n"
 msgstr "* Finalidad de firma de código habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:750
+#: src/ca-cli-callbacks.c:782
 #, c-format
 msgid "* Code Signing purpose disabled.\n"
 msgstr "* Finalidad de firma de código deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:754
+#: src/ca-cli-callbacks.c:786
 #, c-format
 msgid "* TLS Web Client purpose enabled.\n"
 msgstr "* Finalidad de cliente web TLS habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:756
+#: src/ca-cli-callbacks.c:788
 #, c-format
 msgid "* TLS Web Client purpose disabled.\n"
 msgstr "* Finalidad de cliente web TLS deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:760
+#: src/ca-cli-callbacks.c:792
 #, c-format
 msgid "* TLS Web Server purpose enabled.\n"
 msgstr "* Finalidad de servidor web TLS habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:762
+#: src/ca-cli-callbacks.c:794
 #, c-format
 msgid "* TLS Web Server purpose disabled.\n"
 msgstr "* Finalidad de servidor web TLS deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:766
+#: src/ca-cli-callbacks.c:798
 #, c-format
 msgid "* Time Stamping purpose enabled.\n"
 msgstr "* Finalidad de sellado de tiempo habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:768
+#: src/ca-cli-callbacks.c:800
 #, c-format
 msgid "* Time Stamping purpose disabled.\n"
 msgstr "* Finalidad de sellado de tiempo deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:772
+#: src/ca-cli-callbacks.c:804
 #, c-format
 msgid "* OCSP Signing purpose enabled.\n"
 msgstr "* Finalidad de firma de OCSP habilitada\n"
 
-#: ../src/ca-cli-callbacks.c:774
+#: src/ca-cli-callbacks.c:806
 #, c-format
 msgid "* OCSP Signing purpose disabled.\n"
 msgstr "* Finalidad de firma de OCSP deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:778
+#: src/ca-cli-callbacks.c:810
 #, c-format
 msgid "* Any purpose enabled.\n"
 msgstr "* Cualquier finalidad habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:780
+#: src/ca-cli-callbacks.c:812
 #, c-format
 msgid "* Any purpose disabled.\n"
 msgstr "* Cualquier finalidad deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:804
+#: src/ca-cli-callbacks.c:836
 #, c-format
 msgid "You are about to sign the following Certificate Signing Request:\n"
 msgstr "Se va a proceder a firmar la siguiente solicitud de certificación:\n"
 
-#: ../src/ca-cli-callbacks.c:806
+#: src/ca-cli-callbacks.c:838
 #, c-format
 msgid "with the certificate corresponding to the next CA:\n"
 msgstr "con el certificado correspondiente a esta AC:\n"
 
-#: ../src/ca-cli-callbacks.c:809
+#: src/ca-cli-callbacks.c:841
 msgid ""
 "Introduce number of months before expiration of the new certificate (0 to "
 "cancel)"
@@ -1109,197 +1057,197 @@ msgstr ""
 "Máximo número de meses antes de la caducidad del nuevo certificado (0 para "
 "cancelar):"
 
-#: ../src/ca-cli-callbacks.c:835 ../src/ca-cli-callbacks.c:923
+#: src/ca-cli-callbacks.c:867 src/ca-cli-callbacks.c:955
 #, c-format
 msgid ""
 "The new certificate will be created with the following uses and purposes:\n"
 msgstr ""
 "El nuevo certificado se validará para los siguientes usos y finalidades:\n"
 
-#: ../src/ca-cli-callbacks.c:838
+#: src/ca-cli-callbacks.c:870
 msgid "Do you want to change any property of the new certificate? Yes/[No] "
 msgstr "¿Desea cambiar alguna propiedad del nuevo certificado? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:841
+#: src/ca-cli-callbacks.c:873
 msgid "* Enable Certification Authority use? [Yes]/No "
 msgstr "* ¿Habilitar uso como Autoridad de certificación? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:843
+#: src/ca-cli-callbacks.c:875
 #, c-format
 msgid "* Certification Authority use disabled by policy\n"
 msgstr "* Uso como Autoridad de Certificación deshabilitado por política\n"
 
-#: ../src/ca-cli-callbacks.c:847
+#: src/ca-cli-callbacks.c:879
 msgid "* Enable CRL Signing? [Yes]/No "
 msgstr "* ¿Habilitar uso para firma de CRL? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:849
+#: src/ca-cli-callbacks.c:881
 #, c-format
 msgid "* CRL signing use disabled by policy\n"
 msgstr "* Uso para firmado de CRL deshabilitado por política\n"
 
-#: ../src/ca-cli-callbacks.c:853
+#: src/ca-cli-callbacks.c:885
 msgid "* Enable Digital Signature use? [Yes]/No "
 msgstr "* ¿Habilitar uso para firma digital? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:855
+#: src/ca-cli-callbacks.c:887
 #, c-format
 msgid "* Digital Signature use disabled by policy\n"
 msgstr "* Uso para firma digital deshabilitado por política\n"
 
-#: ../src/ca-cli-callbacks.c:859
+#: src/ca-cli-callbacks.c:891
 msgid "Enable Data Encipherment use? [Yes]/No "
 msgstr "¿Habilitar uso para cifrado de datos? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:861
+#: src/ca-cli-callbacks.c:893
 #, c-format
 msgid "* Data Encipherment use disabled by policy\n"
 msgstr "* Uso para cifrado de datos deshabilitado por política\n"
 
-#: ../src/ca-cli-callbacks.c:865
+#: src/ca-cli-callbacks.c:897
 msgid "Enable Key Encipherment use? [Yes]/No "
 msgstr "¿Habilitar uso para cifrado de claves? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:867
+#: src/ca-cli-callbacks.c:899
 #, c-format
 msgid "* Key Encipherment use disabled by policy\n"
 msgstr "* Uso para cifrado de claves deshabilitado por política\n"
 
-#: ../src/ca-cli-callbacks.c:871
+#: src/ca-cli-callbacks.c:903
 msgid "Enable Non Repudiation use? [Yes]/No "
 msgstr "¿Habilitar uso para no repudio? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:873
+#: src/ca-cli-callbacks.c:905
 #, c-format
 msgid "* Non Repudiation use disabled by policy\n"
 msgstr "* Uso para no repudio deshabilitado por política\n"
 
-#: ../src/ca-cli-callbacks.c:877
+#: src/ca-cli-callbacks.c:909
 msgid "Enable Key Agreement use? [Yes]/No "
 msgstr "¿Habilitar uso para negociación de claves? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:879
+#: src/ca-cli-callbacks.c:911
 #, c-format
 msgid "* Key Agreement use disabled by policy\n"
 msgstr "Uso para negociación de claves deshabilitado por politica\n"
 
-#: ../src/ca-cli-callbacks.c:883
+#: src/ca-cli-callbacks.c:915
 msgid "Enable Email Protection purpose? [Yes]/No "
 msgstr "¿Habilitar finalidad de protección de correo electrónico? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:885
+#: src/ca-cli-callbacks.c:917
 #, c-format
 msgid "* Email Protection purpose disabled by policy\n"
 msgstr ""
 "* Finalidad de protección de correo electrónico deshabilitada por política.\n"
 
-#: ../src/ca-cli-callbacks.c:889
+#: src/ca-cli-callbacks.c:921
 msgid "Enable Code Signing purpose? [Yes]/No "
 msgstr "¿Habilitar finalidad de firma de código? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:891
+#: src/ca-cli-callbacks.c:923
 #, c-format
 msgid "* Code Signing purpose disabled by policy\n"
 msgstr "* Finalidad de firma de código deshabilitada por política\n"
 
-#: ../src/ca-cli-callbacks.c:895
+#: src/ca-cli-callbacks.c:927
 msgid "Enable TLS Web Client purpose? [Yes]/No "
 msgstr "¿Habilitar finalidad de cliente web TLS? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:897
+#: src/ca-cli-callbacks.c:929
 #, c-format
 msgid "* TLS Web Client purpose disabled by policy\n"
 msgstr "* Finalidad de cliente web TLS deshabilitada por política\n"
 
-#: ../src/ca-cli-callbacks.c:901
+#: src/ca-cli-callbacks.c:933
 msgid "Enable TLS Web Server purpose? [Yes]/No "
 msgstr "¿Habilitar finalidad de servidor web TLS? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:903
+#: src/ca-cli-callbacks.c:935
 #, c-format
 msgid "* TLS Web Server purpose disabled by policy\n"
 msgstr "* Finalidad de servidor web TLS deshabilitada por política\n"
 
-#: ../src/ca-cli-callbacks.c:907
+#: src/ca-cli-callbacks.c:939
 msgid "Enable Time Stamping purpose? [Yes]/No "
 msgstr "¿Habilitar finalidad de sellado de tiempo? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:909
+#: src/ca-cli-callbacks.c:941
 #, c-format
 msgid "* Time Stamping purpose disabled by policy\n"
 msgstr "* Finalidad de sellado de tiempo deshabilitada por política\n"
 
-#: ../src/ca-cli-callbacks.c:913
+#: src/ca-cli-callbacks.c:945
 msgid "Enable OCSP Signing purpose? [Yes]/No "
 msgstr "¿Habilitar finalidad para firma de OCSP? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:914
+#: src/ca-cli-callbacks.c:946
 #, c-format
 msgid "* OCSP Signing purpose disabled by policy\n"
 msgstr "* Finalidad para firma de OCSP deshabilitada por política\n"
 
-#: ../src/ca-cli-callbacks.c:918
+#: src/ca-cli-callbacks.c:950
 msgid "Enable any purpose? [Yes]/No "
 msgstr "¿Habilitar uso para cualquier finalidad? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:920
+#: src/ca-cli-callbacks.c:952
 #, c-format
 msgid "* Any purpose disabled by policy\n"
 msgstr "* Uso para cualquier finalidad deshabilitado por política.\n"
 
-#: ../src/ca-cli-callbacks.c:928
+#: src/ca-cli-callbacks.c:960
 msgid ""
 "All the mandatory data for the certificate generation has been gathered."
 msgstr ""
 "Ya se cuenta con todos los datos necesarios para la generación del "
 "certificado."
 
-#: ../src/ca-cli-callbacks.c:928
+#: src/ca-cli-callbacks.c:960
 msgid "Do you want to proceed with the signing? [Yes]/No "
 msgstr "¿Desea continuar con la firma y generación del certificado? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:934
+#: src/ca-cli-callbacks.c:966
 #, c-format
 msgid "Certificate signed.\n"
 msgstr "Certificado firmado.\n"
 
-#: ../src/ca-cli-callbacks.c:956
+#: src/ca-cli-callbacks.c:988
 msgid "This Certificate Signing Request will be deleted."
 msgstr "Se borrará esta solicitud de certificación."
 
-#: ../src/ca-cli-callbacks.c:956
+#: src/ca-cli-callbacks.c:988
 msgid "This operation cannot be undone. Are you sure? Yes/[No] "
 msgstr "Esta operación no puede deshacerse. ¿Está seguro? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:962
+#: src/ca-cli-callbacks.c:994
 #, c-format
 msgid "Certificate Signing Request deleted.\n"
 msgstr "Solicitud de certificación borrada.\n"
 
-#: ../src/ca-cli-callbacks.c:987
+#: src/ca-cli-callbacks.c:1019
 #, c-format
 msgid "CRL generated successfully into file '%s'\n"
 msgstr "CRL generada con éxito y guardada en fichero '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:1004
+#: src/ca-cli-callbacks.c:1036
 msgid "The bit-length of the prime number must be whole multiple of 1024"
 msgstr "La longitud en bits del número primo debe ser múltiplo entero de 1024"
 
-#: ../src/ca-cli-callbacks.c:1013
+#: src/ca-cli-callbacks.c:1045
 #, c-format
 msgid "Diffie-Hellman parameters created and saved successfully in file '%s'\n"
 msgstr ""
 "Parámetros Diffie-Hellman creados y guardados correctamente en fichero '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:1025
+#: src/ca-cli-callbacks.c:1057
 msgid "Currently, the database is not password-protected."
 msgstr "En estos momentos, la base de datos no está protegida con clave."
 
-#: ../src/ca-cli-callbacks.c:1025
+#: src/ca-cli-callbacks.c:1057
 msgid "Do you want to password protect it? [Yes]/No "
 msgstr "¿Desea protegerlo con contraseña? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1026
+#: src/ca-cli-callbacks.c:1058
 msgid ""
 "OK. You need to supply a password for protecting the private keys in the\n"
 "database, so nobody else but authorized people can use them. This password\n"
@@ -1310,37 +1258,37 @@ msgstr ""
 "hacer uso de ellas. Esta contraseña será solicitada siempre que gnoMint\n"
 "requiera emplear cualquier clave privada de la base de datos."
 
-#: ../src/ca-cli-callbacks.c:1029
+#: src/ca-cli-callbacks.c:1061
 msgid "Insert password:"
 msgstr "Introduzca contraseña:"
 
-#: ../src/ca-cli-callbacks.c:1029
+#: src/ca-cli-callbacks.c:1061
 msgid "Insert password (confirm):"
 msgstr "Introduzca contraseña (confirmación):"
 
-#: ../src/ca-cli-callbacks.c:1030 ../src/ca-cli-callbacks.c:1100
+#: src/ca-cli-callbacks.c:1062 src/ca-cli-callbacks.c:1132
 msgid "The introduced passwords are distinct."
 msgstr "Las contraseñas introducidas son distintas."
 
-#: ../src/ca-cli-callbacks.c:1041
+#: src/ca-cli-callbacks.c:1073
 #, c-format
 msgid "Password established successfully.\n"
 msgstr "Contraseña establecida con éxito.\n"
 
-#: ../src/ca-cli-callbacks.c:1048
+#: src/ca-cli-callbacks.c:1080
 #, c-format
 msgid "Nothing done.\n"
 msgstr "No se ha hecho nada.\n"
 
-#: ../src/ca-cli-callbacks.c:1052
+#: src/ca-cli-callbacks.c:1084
 msgid "Currently, the database IS password-protected."
 msgstr "En estos momentos, la base de datos ESTÁ protegida con contraseña."
 
-#: ../src/ca-cli-callbacks.c:1052
+#: src/ca-cli-callbacks.c:1084
 msgid "Do you want to remove this password protection? Yes/[No] "
 msgstr "¿Desea eliminar esta protección con contraseña? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:1056
+#: src/ca-cli-callbacks.c:1088
 #, c-format
 msgid ""
 "For removing the password-protection, the current database password\n"
@@ -1349,12 +1297,12 @@ msgstr ""
 "Para eliminar la protección mediante clave, debe proporcionar la \n"
 "contraseña actual.\n"
 
-#: ../src/ca-cli-callbacks.c:1057 ../src/ca-cli-callbacks.c:1085
+#: src/ca-cli-callbacks.c:1089 src/ca-cli-callbacks.c:1117
 msgid "Please, insert the current database password (Empty to cancel): "
 msgstr ""
 "Introduzca la contrase_ña actual de la base de datos (Vacía para cancelar): "
 
-#: ../src/ca-cli-callbacks.c:1064 ../src/ca-cli-callbacks.c:1092
+#: src/ca-cli-callbacks.c:1096 src/ca-cli-callbacks.c:1124
 msgid ""
 "The current password you have entered\n"
 "doesn't match with the actual current database password."
@@ -1362,7 +1310,7 @@ msgstr ""
 "La contraseña actual que ha introducido\n"
 "no coincide con la contraseña real de la base de datos."
 
-#: ../src/ca-cli-callbacks.c:1069
+#: src/ca-cli-callbacks.c:1101
 msgid ""
 "Error while removing database password. \n"
 "The operation was cancelled."
@@ -1370,12 +1318,12 @@ msgstr ""
 "Ocurrió un error al eliminar la contraseña de la base de \n"
 "datos. Se canceló la operación."
 
-#: ../src/ca-cli-callbacks.c:1074
+#: src/ca-cli-callbacks.c:1106
 #, c-format
 msgid "Password removed successfully.\n"
 msgstr "Contraseña eliminada con éxito.\n"
 
-#: ../src/ca-cli-callbacks.c:1084
+#: src/ca-cli-callbacks.c:1116
 #, c-format
 msgid ""
 "You must supply the current database password before changing the password.\n"
@@ -1383,7 +1331,7 @@ msgstr ""
 "Debe proporcionar la contraseña actual de la base de datos antes de "
 "cambiarla.\n"
 
-#: ../src/ca-cli-callbacks.c:1096
+#: src/ca-cli-callbacks.c:1128
 msgid ""
 "OK. Now you must supply a new password for protecting the private keys in "
 "the\n"
@@ -1396,15 +1344,15 @@ msgstr ""
 "solicitada siempre que gnoMint vaya a hacer uso de cualquier\n"
 "clave privada de la base de datos."
 
-#: ../src/ca-cli-callbacks.c:1099
+#: src/ca-cli-callbacks.c:1131
 msgid "Insert new password:"
 msgstr "Introduzca la nueva contraseña:"
 
-#: ../src/ca-cli-callbacks.c:1099
+#: src/ca-cli-callbacks.c:1131
 msgid "Insert new password (confirm):"
 msgstr "Introduzca contraseña (confirmación):"
 
-#: ../src/ca-cli-callbacks.c:1108
+#: src/ca-cli-callbacks.c:1140
 msgid ""
 "Error while changing database password. \n"
 "The operation was cancelled."
@@ -1412,237 +1360,237 @@ msgstr ""
 "Ocurrió un error al cambiar la contraseña de la base de datos. \n"
 "Se canceló la operación."
 
-#: ../src/ca-cli-callbacks.c:1114
+#: src/ca-cli-callbacks.c:1146
 #, c-format
 msgid "Password changed successfully.\n"
 msgstr "Contraseña cambiada con éxito.\n"
 
-#: ../src/ca-cli-callbacks.c:1132
+#: src/ca-cli-callbacks.c:1164
 msgid "Problem when importing the given file."
 msgstr "Hubo problemas al importar el fichero indicado."
 
-#: ../src/ca-cli-callbacks.c:1135
+#: src/ca-cli-callbacks.c:1167
 #, c-format
 msgid "File imported successfully.\n"
 msgstr "Fichero importado con éxito.\n"
 
-#: ../src/ca-cli-callbacks.c:1151
+#: src/ca-cli-callbacks.c:1183
 #, c-format
 msgid "Directory imported successfully.\n"
 msgstr "Directorio importado con éxito.\n"
 
-#: ../src/ca-cli-callbacks.c:1184
+#: src/ca-cli-callbacks.c:1216
 #, c-format
 msgid "Certificate:\n"
 msgstr "Certificado:\n"
 
-#: ../src/ca-cli-callbacks.c:1188
+#: src/ca-cli-callbacks.c:1220
 #, c-format
 msgid "\tSerial number: %s\n"
 msgstr "\tNº de serie: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1192 ../src/ca-cli-callbacks.c:1196
-#: ../src/ca-cli-callbacks.c:1255
+#: src/ca-cli-callbacks.c:1224 src/ca-cli-callbacks.c:1230
+#: src/ca-cli-callbacks.c:1289
 #, c-format
 msgid "\tDistinguished Name: %s\n"
 msgstr "\tNombre distintivo: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1192 ../src/ca-cli-callbacks.c:1193
-#: ../src/ca-cli-callbacks.c:1196 ../src/ca-cli-callbacks.c:1197
+#: src/ca-cli-callbacks.c:1224 src/ca-cli-callbacks.c:1225
+#: src/ca-cli-callbacks.c:1230 src/ca-cli-callbacks.c:1231
 msgid "None."
 msgstr "Ninguno."
 
-#: ../src/ca-cli-callbacks.c:1193 ../src/ca-cli-callbacks.c:1197
-#: ../src/ca-cli-callbacks.c:1257
+#: src/ca-cli-callbacks.c:1225 src/ca-cli-callbacks.c:1231
+#: src/ca-cli-callbacks.c:1293
 #, c-format
 msgid "\tUnique ID: %s\n"
 msgstr "\tIdentificador único: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1195
+#: src/ca-cli-callbacks.c:1229
 #, c-format
 msgid "Issuer:\n"
 msgstr "Emisor:\n"
 
-#: ../src/ca-cli-callbacks.c:1218
+#: src/ca-cli-callbacks.c:1252
 #, c-format
 msgid "Fingerprints:\n"
 msgstr "Huellas digitales:\n"
 
-#: ../src/ca-cli-callbacks.c:1219
+#: src/ca-cli-callbacks.c:1253
 #, c-format
 msgid "\tSHA1 fingerprint: %s\n"
 msgstr "\tHuella digital SHA1: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1220
+#: src/ca-cli-callbacks.c:1254
 #, c-format
 msgid "\tMD5 fingerprint: %s\n"
 msgstr "\tHuella digital MD5: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1221
+#: src/ca-cli-callbacks.c:1255
 #, c-format
 msgid "\tSHA256 fingerprint: %s\n"
 msgstr "\tHuella digital SHA256: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1252
+#: src/ca-cli-callbacks.c:1286
 #, c-format
 msgid "Certificate Signing Request:\n"
 msgstr "Solicitud de certificación:\n"
 
-#: ../src/ca-cli-callbacks.c:1327
+#: src/ca-cli-callbacks.c:1363
 msgid "Generated certs inherit Country from CA                           "
 msgstr ""
 "Los certificados generados heredan país de la AC                           "
 
-#: ../src/ca-cli-callbacks.c:1328
+#: src/ca-cli-callbacks.c:1364
 msgid "Generated certs inherit State from CA                             "
 msgstr ""
 "Los certificados generados heredan estado/provincia de la "
 "AC                             "
 
-#: ../src/ca-cli-callbacks.c:1329
+#: src/ca-cli-callbacks.c:1365
 msgid "Generated certs inherit Locality from CA                          "
 msgstr ""
 "Los certificados generados heredan localidad o ciudad de la "
 "AC                          "
 
-#: ../src/ca-cli-callbacks.c:1330
+#: src/ca-cli-callbacks.c:1366
 msgid "Generated certs inherit Organization from CA                      "
 msgstr ""
 "Los certificados generados heredan Organización de la "
 "AC                      "
 
-#: ../src/ca-cli-callbacks.c:1331
+#: src/ca-cli-callbacks.c:1367
 msgid "Generated certs inherit Organizational Unit from CA               "
 msgstr ""
 "Los certificados generados heredan unidad organizacional de la "
 "AC               "
 
-#: ../src/ca-cli-callbacks.c:1332
+#: src/ca-cli-callbacks.c:1368
 msgid "Country in generated certs must be the same than in CA            "
 msgstr ""
 "El país de los certificados generados debe coincidir con la AC            "
 
-#: ../src/ca-cli-callbacks.c:1333
+#: src/ca-cli-callbacks.c:1369
 msgid "State in generated certs must be the same than in CA              "
 msgstr ""
 "Estado o provincia de certif. generados debe coincidir con la "
 "AC              "
 
-#: ../src/ca-cli-callbacks.c:1334
+#: src/ca-cli-callbacks.c:1370
 msgid "Locality in generated certs must be the same than in CA           "
 msgstr ""
 "Localidad o ciudad de certif. generados debe coincidir con la AC           "
 
-#: ../src/ca-cli-callbacks.c:1335
+#: src/ca-cli-callbacks.c:1371
 msgid "Organization in generated certs must be the same than in CA       "
 msgstr ""
 "Organización de certif. generados debe coincidir con la de la AC       "
 
-#: ../src/ca-cli-callbacks.c:1336
+#: src/ca-cli-callbacks.c:1372
 msgid "Organizational Unit in generated certs must be the same than in CA"
 msgstr "Unidad organizativa de certif. debe coincidir con la de la AC"
 
-#: ../src/ca-cli-callbacks.c:1337
+#: src/ca-cli-callbacks.c:1373
 msgid "Maximum number of hours between CRL updates                       "
 msgstr ""
 "Número máximo de horas entre actualizaciones de CRLs                       "
 
-#: ../src/ca-cli-callbacks.c:1338
+#: src/ca-cli-callbacks.c:1374
 msgid "CRL distribution point (URL where CRL is published)               "
 msgstr "Punto de distribución de CRL (URL donde se publica la CRL)"
 
-#: ../src/ca-cli-callbacks.c:1339
+#: src/ca-cli-callbacks.c:1375
 msgid "Maximum number of months before expiration of new certs           "
 msgstr ""
 "Máximo nº de meses antes de caducidad de nuevos certificados           "
 
-#: ../src/ca-cli-callbacks.c:1340
+#: src/ca-cli-callbacks.c:1376
 msgid "CA use enabled in generated certs                                 "
 msgstr ""
 "Habilitar uso como AC en certificados "
 "generados                                 "
 
-#: ../src/ca-cli-callbacks.c:1341
+#: src/ca-cli-callbacks.c:1377
 msgid "CRL Sign use enabled in generated certs                           "
 msgstr ""
 "Habilitar uso para firma de CRLs en certificados "
 "generados                           "
 
-#: ../src/ca-cli-callbacks.c:1342
+#: src/ca-cli-callbacks.c:1378
 msgid "Non reputation use enabled in generated certs                     "
 msgstr ""
 "Habilitar uso para no repudio en certificados generados                     "
 
-#: ../src/ca-cli-callbacks.c:1343
+#: src/ca-cli-callbacks.c:1379
 msgid "Digital signature use enabled in generated certs                  "
 msgstr ""
 "Habilitar uso para firma digital en certificados generados                  "
 
-#: ../src/ca-cli-callbacks.c:1344
+#: src/ca-cli-callbacks.c:1380
 msgid "Key encipherment use enabled in generated certs                   "
 msgstr ""
 "Habilitar uso para cifrado de claves en certificados "
 "generados                   "
 
-#: ../src/ca-cli-callbacks.c:1345
+#: src/ca-cli-callbacks.c:1381
 msgid "Key agreement use enabled in generated certs                      "
 msgstr ""
 "Habilitar uso para negociación de claves en certificados "
 "generados                      "
 
-#: ../src/ca-cli-callbacks.c:1346
+#: src/ca-cli-callbacks.c:1382
 msgid "Data encipherment use enabled in generated certs                  "
 msgstr ""
 "Habilitar uso para cifrado de datos en certificados "
 "generados                  "
 
-#: ../src/ca-cli-callbacks.c:1347
+#: src/ca-cli-callbacks.c:1383
 msgid "TLS web server purpose enabled in generated certs                 "
 msgstr ""
 "Habilitar finalidad de servidor web TLS para certific. "
 "generados                 "
 
-#: ../src/ca-cli-callbacks.c:1348
+#: src/ca-cli-callbacks.c:1384
 msgid "TLS web client purpose enabled in generated certs                 "
 msgstr ""
 "Habilitar finalidad para cliente web TLS en certific. "
 "generados                 "
 
-#: ../src/ca-cli-callbacks.c:1349
+#: src/ca-cli-callbacks.c:1385
 msgid "Time stamping purpose enabled in generated certs                  "
 msgstr ""
 "Habilitar finalidad para sellado de tiempo en certific. "
 "generados                  "
 
-#: ../src/ca-cli-callbacks.c:1350
+#: src/ca-cli-callbacks.c:1386
 msgid "Code signing server purpose enabled in generated certs            "
 msgstr ""
 "Habilitar finalidad de firma de código en certificados generados            "
 
-#: ../src/ca-cli-callbacks.c:1351
+#: src/ca-cli-callbacks.c:1387
 msgid "Email protection purpose enabled in generated certs               "
 msgstr ""
 "Habilitar finalidad para protección de correo-e en cert. "
 "generados               "
 
-#: ../src/ca-cli-callbacks.c:1352
+#: src/ca-cli-callbacks.c:1388
 msgid "OCSP signing purpose enabled in generated certs                   "
 msgstr ""
 "Habilitar finalidad de firma de OCSP en certificados "
 "generados                   "
 
-#: ../src/ca-cli-callbacks.c:1353
+#: src/ca-cli-callbacks.c:1389
 msgid "Any purpose enabled in generated certs                            "
 msgstr ""
 "Habilitar cualquier finalidad en certificados "
 "generados                            "
 
-#: ../src/ca-cli-callbacks.c:1367
+#: src/ca-cli-callbacks.c:1403
 #, c-format
 msgid "Showing policies of the following certificate:\n"
 msgstr "Mostrando políticas del siguiente certificado:\n"
 
-#: ../src/ca-cli-callbacks.c:1369
+#: src/ca-cli-callbacks.c:1405
 #, c-format
 msgid ""
 "\n"
@@ -1651,16 +1599,16 @@ msgstr ""
 "\n"
 "Políticas:\n"
 
-#: ../src/ca-cli-callbacks.c:1371
+#: src/ca-cli-callbacks.c:1407
 #, c-format
 msgid "Id.\tDescription\t\t\t\t\t\t\t\tValue\n"
 msgstr "Id.\tDescripción\t\t\t\t\t\t\t\tValor\n"
 
-#: ../src/ca-cli-callbacks.c:1397
+#: src/ca-cli-callbacks.c:1433
 msgid "The given policy id is not valid"
 msgstr "El identificador de política proporcionado no es válido"
 
-#: ../src/ca-cli-callbacks.c:1409
+#: src/ca-cli-callbacks.c:1445
 #, c-format
 msgid ""
 "You are about to assign to the policy\n"
@@ -1669,35 +1617,35 @@ msgstr ""
 "Se va a asignar a la política\n"
 "'%s' el nuevo valor '%s'."
 
-#: ../src/ca-cli-callbacks.c:1413 ../src/ca-cli-callbacks.c:1457
+#: src/ca-cli-callbacks.c:1449 src/ca-cli-callbacks.c:1493
 msgid "Are you sure? Yes/[No] : "
 msgstr "¿Está seguro? Sí/[No] : "
 
-#: ../src/ca-cli-callbacks.c:1418
+#: src/ca-cli-callbacks.c:1454
 #, c-format
 msgid "Policy set correctly to '%s'.\n"
 msgstr "Política establecida correctamente a '%s'.\n"
 
-#: ../src/ca-cli-callbacks.c:1432
+#: src/ca-cli-callbacks.c:1468
 #, c-format
 msgid "gnoMint-cli current preferences:\n"
 msgstr "Preferencias actuales de gnoMint-cli:\n"
 
-#: ../src/ca-cli-callbacks.c:1434
+#: src/ca-cli-callbacks.c:1470
 #, c-format
 msgid "Id.\tName\t\t\tValue\n"
 msgstr "Id.\tNombre\t\t\tValor\n"
 
-#: ../src/ca-cli-callbacks.c:1435
+#: src/ca-cli-callbacks.c:1471
 #, c-format
 msgid "0\tGnome keyring support\t%d\n"
 msgstr "0\tSoporte de gnome-keyring\t%d\n"
 
-#: ../src/ca-cli-callbacks.c:1447
+#: src/ca-cli-callbacks.c:1483
 msgid "The given preference id is not valid"
 msgstr "El identificador de preferencia proporcionado no es válido"
 
-#: ../src/ca-cli-callbacks.c:1453
+#: src/ca-cli-callbacks.c:1489
 #, c-format
 msgid ""
 "You are about to assign to the preference 'Gnome keyring support' the new "
@@ -1705,7 +1653,7 @@ msgid ""
 msgstr ""
 "Va a asignar a la preferencia 'Soporte de gnome-keyring' el nuevo valor '%d'."
 
-#: ../src/ca-cli-callbacks.c:1475
+#: src/ca-cli-callbacks.c:1511
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -1714,7 +1662,7 @@ msgstr ""
 "%s versión %s\n"
 "%s\n"
 
-#: ../src/ca-cli-callbacks.c:1476
+#: src/ca-cli-callbacks.c:1512
 #, c-format
 msgid ""
 "\n"
@@ -1727,8 +1675,7 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: ../src/ca-cli-callbacks.c:1477 ../src/ca-cli-callbacks.c:1478
-#: ../src/main.c:509
+#: src/ca-cli-callbacks.c:1513 src/ca-cli-callbacks.c:1514 src/main.c:540
 msgid "translator-credits"
 msgstr ""
 "David Marín Carreño <davefx@gmail.com>\n"
@@ -1739,7 +1686,7 @@ msgstr ""
 "  Sergio Oller https://launchpad.net/~zeehio\n"
 "  Victor Herrero https://launchpad.net/~victorhera"
 
-#: ../src/ca-cli-callbacks.c:1478
+#: src/ca-cli-callbacks.c:1514
 #, c-format
 msgid ""
 "Translators:\n"
@@ -1748,7 +1695,7 @@ msgstr ""
 "Traductores:\n"
 "%s\n"
 
-#: ../src/ca-cli-callbacks.c:1485
+#: src/ca-cli-callbacks.c:1521
 msgid ""
 "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
 "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
@@ -1783,7 +1730,7 @@ msgstr ""
 "<http://www.gnu.org/licenses/>.\n"
 "\n"
 
-#: ../src/ca-cli-callbacks.c:1503
+#: src/ca-cli-callbacks.c:1539
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -1814,65 +1761,65 @@ msgstr ""
 "con este programa; si no es así, visite <http://www.gnu.org/licenses/>.\n"
 "\n"
 
-#: ../src/ca-cli-callbacks.c:1518
+#: src/ca-cli-callbacks.c:1554
 #, c-format
 msgid "%s version %s\n"
 msgstr "%s versión %s\n"
 
-#: ../src/ca-cli-callbacks.c:1527
+#: src/ca-cli-callbacks.c:1563
 #, c-format
 msgid "Available commands:\n"
 msgstr "Órdenes disponibles:\n"
 
-#: ../src/ca-cli-callbacks.c:1528
+#: src/ca-cli-callbacks.c:1564
 #, c-format
 msgid "===================\n"
 msgstr "====================\n"
 
-#: ../src/ca-cli-callbacks.c:1538
+#: src/ca-cli-callbacks.c:1574
 #, c-format
 msgid "Exiting gnomint-cli...\n"
 msgstr "Saliendo de gnomint-cli...\n"
 
-#: ../src/ca_creation.c:53 ../src/csr_creation.c:55
+#: src/ca_creation.c:53 src/csr_creation.c:55
 msgid "Generating new RSA key pair"
 msgstr "Generando nuevo par de claves RSA"
 
-#: ../src/ca_creation.c:62 ../src/ca_creation.c:86 ../src/csr_creation.c:64
-#: ../src/csr_creation.c:87
+#: src/ca_creation.c:62 src/ca_creation.c:86 src/csr_creation.c:64
+#: src/csr_creation.c:87
 msgid "Key generation failed"
 msgstr "Error en generación de claves"
 
-#: ../src/ca_creation.c:76 ../src/csr_creation.c:77
+#: src/ca_creation.c:76 src/csr_creation.c:77
 msgid "Generating new DSA key pair"
 msgstr "Generando nuevo par de claves DSA"
 
-#: ../src/ca_creation.c:101
+#: src/ca_creation.c:101
 msgid "Generating self-signed CA-Root cert"
 msgstr "Generando el certificado auto-firmado raíz de la AC"
 
-#: ../src/ca_creation.c:109
+#: src/ca_creation.c:109
 msgid "Certificate generation failed"
 msgstr "Error en generación del certificado"
 
-#: ../src/ca_creation.c:121
+#: src/ca_creation.c:121
 msgid "Creating CA database"
 msgstr "Creando base de datos de la AC"
 
-#: ../src/ca_creation.c:130
+#: src/ca_creation.c:130
 msgid "CA database creation failed"
 msgstr "Error al crear base de datos de la AC"
 
-#: ../src/ca_creation.c:142
+#: src/ca_creation.c:142
 msgid "CA generated successfully"
 msgstr "AC generada con éxito"
 
-#: ../src/ca_file.c:203
+#: src/ca_file.c:204
 #, c-format
 msgid "Error opening filename '%s'"
 msgstr "Error al abrir fichero '%s'"
 
-#: ../src/ca_file.c:306
+#: src/ca_file.c:307
 msgid ""
 "The selected database has been created with a newer version of gnoMint than "
 "the currently installed."
@@ -1880,22 +1827,22 @@ msgstr ""
 "La base de datos seleccionada fue creada mediante una versión de gnoMint más "
 "reciente que la que se está ejecutando."
 
-#: ../src/ca_file.c:1138
+#: src/ca_file.c:1139
 msgid "Cannot find last assigned serial number"
 msgstr "No se pudo encontrar el último número de serie asignado"
 
-#: ../src/ca_file.c:1327
+#: src/ca_file.c:1328
 msgid "Cannot find parent CA in database"
 msgstr "No se pudo encontrar la AC padre en la base de datos"
 
-#: ../src/ca_file.c:1515
+#: src/ca_file.c:1518
 msgid ""
 "This certificate already exists in the database: cannot insert it twice."
 msgstr ""
 "Este certificado ya existe en la base de datos: no se puede insertar de "
 "nuevo."
 
-#: ../src/ca_file.c:1946
+#: src/ca_file.c:1947
 msgid ""
 "The given file contains a valid private key. However, it has not been "
 "imported to the database because it doesn't match any key-less certificate "
@@ -1905,7 +1852,7 @@ msgstr ""
 "ha sido importada a la base de datos porque no encaja con ninguno de los "
 "certificados o solicitudes de certificación existentes sin clave privada."
 
-#: ../src/ca_file.c:1949
+#: src/ca_file.c:1950
 msgid ""
 "The given file contains a valid private key. However, it has not been "
 "imported to the database because it doesn't match any key-less certificate "
@@ -1915,336 +1862,348 @@ msgstr ""
 "ha sido importada a la base de datos porque no encaja con ninguno de los "
 "certificadosexistentes sin clave privada."
 
-#: ../src/certificate_properties.c:357 ../src/tls.c:1068
+#: src/certificate_properties.c:316
+#, fuzzy
+msgid "Unknown"
+msgstr "(desconocido)"
+
+#: src/certificate_properties.c:376 src/tls.c:1299
 msgid "Digital signature"
 msgstr "Firma digital"
 
-#: ../src/certificate_properties.c:359 ../src/tls.c:1070
+#: src/certificate_properties.c:378 src/tls.c:1301
 msgid "Non repudiation"
 msgstr "No repudio"
 
-#: ../src/certificate_properties.c:361 ../src/tls.c:1072
+#: src/certificate_properties.c:380 src/tls.c:1303
 msgid "Key encipherment"
 msgstr "Cifrado de claves"
 
-#: ../src/certificate_properties.c:363 ../src/tls.c:1074
+#: src/certificate_properties.c:382 src/tls.c:1305
 msgid "Data encipherment"
 msgstr "Cifrado de datos"
 
-#: ../src/certificate_properties.c:365 ../src/tls.c:1076
+#: src/certificate_properties.c:384 src/tls.c:1307
 msgid "Key agreement"
 msgstr "Negociación de claves"
 
-#: ../src/certificate_properties.c:367 ../src/tls.c:1078
+#: src/certificate_properties.c:386 src/tls.c:1309
 msgid "Certificate signing"
 msgstr "Firma de certificados"
 
-#: ../src/certificate_properties.c:369 ../src/tls.c:1080
+#: src/certificate_properties.c:388 src/tls.c:1311
 msgid "CRL signing"
 msgstr "Firma de CRLs"
 
-#: ../src/certificate_properties.c:371
+#: src/certificate_properties.c:390
 msgid "Key encipherment only"
 msgstr "Clave de sólo cifrado"
 
-#: ../src/certificate_properties.c:373
+#: src/certificate_properties.c:392
 msgid "Key decipherment only"
 msgstr "Clave de sólo descifrado"
 
-#: ../src/certificate_properties.c:387
+#: src/certificate_properties.c:406
 msgid "Version"
 msgstr "Versión"
 
-#: ../src/certificate_properties.c:422
+#: src/certificate_properties.c:441
 msgid "Serial Number"
 msgstr "Nº de serie"
 
-#: ../src/certificate_properties.c:438 ../src/certificate_properties.c:1092
+#: src/certificate_properties.c:457 src/certificate_properties.c:1142
 msgid "Signature"
 msgstr "Firma"
 
-#: ../src/certificate_properties.c:441 ../src/certificate_properties.c:590
-#: ../src/certificate_properties.c:593 ../src/certificate_properties.c:1059
+#: src/certificate_properties.c:460 src/certificate_properties.c:609
+#: src/certificate_properties.c:612 src/certificate_properties.c:1109
 msgid "Algorithm"
 msgstr "Algoritmo"
 
-#: ../src/certificate_properties.c:444 ../src/certificate_properties.c:598
-#: ../src/certificate_properties.c:626 ../src/certificate_properties.c:654
-#: ../src/certificate_properties.c:1062
+#: src/certificate_properties.c:463 src/certificate_properties.c:617
+#: src/certificate_properties.c:645 src/certificate_properties.c:673
+#: src/certificate_properties.c:1112
 msgid "Parameters"
 msgstr "Parámetros"
 
-#: ../src/certificate_properties.c:444 ../src/certificate_properties.c:598
-#: ../src/certificate_properties.c:654 ../src/certificate_properties.c:656
-#: ../src/certificate_properties.c:667 ../src/certificate_properties.c:676
-#: ../src/certificate_properties.c:1063
+#: src/certificate_properties.c:463 src/certificate_properties.c:617
+#: src/certificate_properties.c:673 src/certificate_properties.c:675
+#: src/certificate_properties.c:686 src/certificate_properties.c:695
+#: src/certificate_properties.c:1113
 msgid "(unknown)"
 msgstr "(desconocido)"
 
-#: ../src/certificate_properties.c:476
+#: src/certificate_properties.c:495
 msgid "Issuer"
 msgstr "Emisor"
 
-#: ../src/certificate_properties.c:525
+#: src/certificate_properties.c:544
 msgid "Validity"
 msgstr "Validez"
 
-#: ../src/certificate_properties.c:528
+#: src/certificate_properties.c:547
 msgid "Not Before"
 msgstr "No antes de"
 
-#: ../src/certificate_properties.c:531
+#: src/certificate_properties.c:550
 msgid "Not After"
 msgstr "No después de"
 
-#: ../src/certificate_properties.c:587
+#: src/certificate_properties.c:606
 msgid "Subject Public Key Info"
 msgstr "Datos de clave pública de titular"
 
-#: ../src/certificate_properties.c:600
+#: src/certificate_properties.c:619
 msgid "RSA PublicKey"
 msgstr "Clave pública RSA"
 
-#: ../src/certificate_properties.c:610
+#: src/certificate_properties.c:629
 msgid "Modulus"
 msgstr "Módulo"
 
-#: ../src/certificate_properties.c:616
+#: src/certificate_properties.c:635
 msgid "Public Exponent"
 msgstr "Exponente público"
 
-#: ../src/certificate_properties.c:649
+#: src/certificate_properties.c:668
 msgid "DSA PublicKey"
 msgstr "Clave pública DSA"
 
-#: ../src/certificate_properties.c:656
+#: src/certificate_properties.c:675
 msgid "Subject Public Key"
 msgstr "Clave pública de titular"
 
-#: ../src/certificate_properties.c:667
+#: src/certificate_properties.c:686
 msgid "Issuer Unique ID"
 msgstr "Id. único de emisor"
 
-#: ../src/certificate_properties.c:676
+#: src/certificate_properties.c:695
 msgid "Subject Unique ID"
 msgstr "Id. único de titular"
 
-#: ../src/certificate_properties.c:698 ../src/certificate_properties.c:721
-#: ../src/certificate_properties.c:790 ../src/certificate_properties.c:894
-#: ../src/certificate_properties.c:922 ../src/certificate_properties.c:962
-#: ../src/certificate_properties.c:1019 ../src/certificate_properties.c:1144
+#: src/certificate_properties.c:717 src/certificate_properties.c:740
+#: src/certificate_properties.c:840 src/certificate_properties.c:945
+#: src/certificate_properties.c:973 src/certificate_properties.c:1013
+#: src/certificate_properties.c:1069 src/certificate_properties.c:1194
 msgid "Value"
 msgstr "Valor"
 
-#: ../src/certificate_properties.c:760 ../src/certificate_properties.c:864
+#: src/certificate_properties.c:778 src/certificate_properties.c:915
 msgid "DNS Name"
 msgstr "Nombre DNS"
 
-#: ../src/certificate_properties.c:765 ../src/certificate_properties.c:869
+#: src/certificate_properties.c:783 src/certificate_properties.c:920
 msgid "RFC822 Name"
 msgstr "Nombre RFC822"
 
-#: ../src/certificate_properties.c:770 ../src/certificate_properties.c:874
+#: src/certificate_properties.c:788 src/certificate_properties.c:925
 msgid "URI"
 msgstr "URI"
 
-#: ../src/certificate_properties.c:776
-msgid "IP"
-msgstr "IP"
-
-#: ../src/certificate_properties.c:783 ../src/certificate_properties.c:887
-msgid "Directory Name"
-msgstr "Nombre de directorio"
-
-#: ../src/certificate_properties.c:817 ../src/certificate_properties.c:1002
-msgid "TRUE"
-msgstr "VERDADERO"
-
-#: ../src/certificate_properties.c:817 ../src/certificate_properties.c:1002
-msgid "FALSE"
-msgstr "FALSO"
-
-#: ../src/certificate_properties.c:822
-msgid "CA"
-msgstr "AC"
-
-#: ../src/certificate_properties.c:826
-msgid "Path Length Constraint"
-msgstr "Restricción de longitud de ruta"
-
-#: ../src/certificate_properties.c:880
+#: src/certificate_properties.c:798 src/certificate_properties.c:812
+#: src/certificate_properties.c:931
 msgid "IP Address"
 msgstr "Dirección IP"
 
-#: ../src/certificate_properties.c:995
+#: src/certificate_properties.c:803 src/certificate_properties.c:817
+#: src/certificate_properties.c:825
+msgid "IP"
+msgstr "IP"
+
+#: src/certificate_properties.c:833 src/certificate_properties.c:938
+msgid "Directory Name"
+msgstr "Nombre de directorio"
+
+#: src/certificate_properties.c:868 src/certificate_properties.c:1053
+msgid "TRUE"
+msgstr "VERDADERO"
+
+#: src/certificate_properties.c:868 src/certificate_properties.c:1053
+msgid "FALSE"
+msgstr "FALSO"
+
+#: src/certificate_properties.c:873
+msgid "CA"
+msgstr "AC"
+
+#: src/certificate_properties.c:877
+msgid "Path Length Constraint"
+msgstr "Restricción de longitud de ruta"
+
+#: src/certificate_properties.c:1046
 msgid "Extensions"
 msgstr "Extensiones"
 
-#: ../src/certificate_properties.c:1004
+#: src/certificate_properties.c:1055
 msgid "Critical"
 msgstr "Es crítica"
 
-#: ../src/certificate_properties.c:1032
+#: src/certificate_properties.c:1082
 msgid "Certificate"
 msgstr "Certificado"
 
-#: ../src/certificate_properties.c:1057
+#: src/certificate_properties.c:1107
 msgid "Signature Algorithm"
 msgstr "Algoritmo de firma"
 
-#: ../src/certificate_properties.c:1140
+#: src/certificate_properties.c:1190
 msgid "Name"
 msgstr "Nombre"
 
-#: ../src/certificate_properties.c:1156 ../src/tls.c:1094
+#: src/certificate_properties.c:1206 src/tls.c:1325
 msgid "TLS WWW Server"
 msgstr "Servidor TLS WWW"
 
-#: ../src/certificate_properties.c:1157
+#: src/certificate_properties.c:1207
 msgid "TLS WWW Client"
 msgstr "Cliente TLS WWW"
 
-#: ../src/certificate_properties.c:1158 ../src/tls.c:1098
+#: src/certificate_properties.c:1208 src/tls.c:1329
 msgid "Code signing"
 msgstr "Firma de código"
 
-#: ../src/certificate_properties.c:1159 ../src/tls.c:1100
+#: src/certificate_properties.c:1209 src/tls.c:1331
 msgid "Email protection"
 msgstr "Protección de correo electrónico"
 
-#: ../src/certificate_properties.c:1160 ../src/tls.c:1102
+#: src/certificate_properties.c:1210 src/tls.c:1333
 msgid "Time stamping"
 msgstr "Sellado de tiempo"
 
-#: ../src/certificate_properties.c:1161 ../src/tls.c:1104
+#: src/certificate_properties.c:1211 src/tls.c:1335
 msgid "OCSP signing"
 msgstr "Firma de OCSP"
 
-#: ../src/certificate_properties.c:1162 ../src/tls.c:1106
+#: src/certificate_properties.c:1212 src/tls.c:1337
 msgid "Any purpose"
 msgstr "Cualquier propósito"
 
-#: ../src/certificate_properties.c:1163
+#: src/certificate_properties.c:1213
 msgid "Subject Directory Attributes"
 msgstr "Atributos de directorio de titular"
 
-#: ../src/certificate_properties.c:1164
+#: src/certificate_properties.c:1214
 msgid "Subject Key Identifier"
 msgstr "Clave identificadora de titular"
 
-#: ../src/certificate_properties.c:1165
+#: src/certificate_properties.c:1215
 msgid "Key Usage"
 msgstr "Uso de clave"
 
-#: ../src/certificate_properties.c:1166
+#: src/certificate_properties.c:1216
 msgid "Private Key Usage Period"
 msgstr "Período de uso de clave privada"
 
-#: ../src/certificate_properties.c:1167
+#: src/certificate_properties.c:1217
 msgid "Subject Alternative Name"
 msgstr "Nombre alternativo de titular"
 
-#: ../src/certificate_properties.c:1168
+#: src/certificate_properties.c:1218
 msgid "Basic Constraints"
 msgstr "Restricciones básicas"
 
-#: ../src/certificate_properties.c:1169
+#: src/certificate_properties.c:1219
 msgid "Name Constraints"
 msgstr "Restricciones de nombre"
 
-#: ../src/certificate_properties.c:1170
+#: src/certificate_properties.c:1220
 msgid "CRL Distribution Points"
 msgstr "Puntos de distribución de CRLs"
 
-#: ../src/certificate_properties.c:1171
+#: src/certificate_properties.c:1221
 msgid "Certificate Policies"
 msgstr "Políticas de certificado"
 
-#: ../src/certificate_properties.c:1172
+#: src/certificate_properties.c:1222
 msgid "Policy Mappings"
 msgstr "Relación de políticas"
 
-#: ../src/certificate_properties.c:1173
+#: src/certificate_properties.c:1223
 msgid "Authority Key Identifier"
 msgstr "Clave identificadora de autoridad"
 
-#: ../src/certificate_properties.c:1174
+#: src/certificate_properties.c:1224
 msgid "Policy Constraints"
 msgstr "Restricciones de política"
 
-#: ../src/certificate_properties.c:1175
+#: src/certificate_properties.c:1225
 msgid "Extended Key Usage"
 msgstr "Uso extendido de clave"
 
-#: ../src/certificate_properties.c:1176
+#: src/certificate_properties.c:1226
 msgid "Delta CRL Distribution Point"
 msgstr "Punto de distribución de Delta CRLs"
 
-#: ../src/certificate_properties.c:1177
+#: src/certificate_properties.c:1227
 msgid "Inhibit Any-Policy"
 msgstr "Restringir «Any-Policy»"
 
-#: ../src/creation_process_window.c:81
+#: src/creation_process_window.c:81
 msgid "CA creation process finished"
 msgstr "Proceso de creación de la AC finalizado"
 
-#: ../src/creation_process_window.c:181
+#: src/creation_process_window.c:214
 msgid "Creation process cancelled"
 msgstr "Proceso de creación cancelado"
 
-#: ../src/creation_process_window.c:209
+#: src/creation_process_window.c:242
 msgid "CSR creation process finished"
 msgstr "Proceso de creación de solicitud finalizado"
 
-#: ../src/creation_process_window.c:272
+#: src/creation_process_window.c:316
 msgid "Creating Certificate Signing Request"
 msgstr "Creando solicitud de certificación"
 
-#: ../src/crl.c:243
+#: src/crl.c:254
 msgid "Export Certificate Revocation List"
 msgstr "Exportar lista de certificados revocados (CRL)"
 
-#: ../src/crl.c:273
+#: src/crl.c:284
 msgid "CRL generated successfully"
 msgstr "CRL generada con éxito"
 
-#: ../src/crl.c:302 ../src/crl.c:364 ../src/crl.c:375
+#: src/crl.c:313 src/crl.c:375 src/crl.c:386
 msgid "There was an error while exporting CRL."
 msgstr "Ocurrió un error al exportar la CRL"
 
-#: ../src/crl.c:313
+#: src/crl.c:324
 msgid "There was an error while getting revoked certificates."
 msgstr "Ocurrió un error al obtener los certificados revocados."
 
-#: ../src/crl.c:329 ../src/crl.c:348
+#: src/crl.c:340 src/crl.c:359
 msgid "There was an error while generating CRL."
 msgstr "Ocurrió un error al generar la CRL."
 
-#: ../src/crl.c:356
+#: src/crl.c:367
 msgid "There was an error while writing CRL."
 msgstr "Ocurrió un error al escribir la CRL."
 
-#: ../src/csr_creation.c:101
+#: src/csr_creation.c:101
 msgid "Generating CSR"
 msgstr "Generando solicitud de certificación"
 
-#: ../src/csr_creation.c:110
+#: src/csr_creation.c:110
 msgid "CSR generation failed"
 msgstr "Error en generación de solicitud"
 
-#: ../src/csr_creation.c:121
+#: src/csr_creation.c:121
 msgid "Saving CSR in database"
 msgstr "Guardando solicitud de certificación en base de datos"
 
-#: ../src/csr_creation.c:139
+#: src/csr_creation.c:139
 msgid "CSR couldn't be saved"
 msgstr "La solicitud no se pudo guardar"
 
-#: ../src/csr_creation.c:150
+#: src/csr_creation.c:150
 msgid "CSR generated successfully"
 msgstr "Solicitud de certificación generada con éxito"
 
-#: ../src/csr_properties.c:72
+#: src/csr_properties.c:74 src/new_cert.c:273
+#, fuzzy
+msgid "None"
+msgstr "Ninguno."
+
+#: src/csr_properties.c:79
 msgid ""
 "<b>This Certificate Signing Request has its corresponding private key saved "
 "in a external file.</b>"
@@ -2252,7 +2211,7 @@ msgstr ""
 "<b>La clave privada correspondiente a esta petición de certificación está "
 "almacenada en un fichero externo.</b>"
 
-#: ../src/dialog.c:103
+#: src/dialog.c:103
 #, c-format
 msgid ""
 "\n"
@@ -2261,36 +2220,36 @@ msgstr ""
 "\n"
 "La contraseña debe tener, al menos, %d caracteres\n"
 
-#: ../src/dialog.c:127
+#: src/dialog.c:127
 msgid "List of affirmative answers, separated with #|Yes#yes#Y#y"
 msgstr "Sí#Si#SI#SÍ#S#s#si#sí"
 
-#: ../src/dialog.c:128
+#: src/dialog.c:128
 msgid "List of negative answers, separated with #|No#no#N#n"
 msgstr "No#no#N#n"
 
-#: ../src/dialog.c:396
+#: src/dialog.c:396
 msgid "To do. Feature not implemented yet."
 msgstr "Por hacer. Funcionalidad aún no implementada."
 
-#: ../src/export.c:40 ../src/export.c:45 ../src/export.c:50
+#: src/export.c:40 src/export.c:45 src/export.c:50
 msgid "There was an error while saving Diffie-Hellman parameters."
 msgstr "Ocurrió un error al guardar los parámetros Diffie-Hellman."
 
-#: ../src/export.c:73 ../src/export.c:124 ../src/export.c:132
-#: ../src/export.c:152 ../src/export.c:180 ../src/export.c:188
+#: src/export.c:74 src/export.c:133 src/export.c:141 src/export.c:163
+#: src/export.c:198 src/export.c:206
 msgid "There was an error while exporting private key."
 msgstr "Error al exportar clave privada."
 
-#: ../src/export.c:91 ../src/export.c:166
+#: src/export.c:94 src/export.c:179
 msgid "There was an error while getting private key."
 msgstr "Hubo un problema al obtener la clave privada."
 
-#: ../src/export.c:100
+#: src/export.c:105
 msgid "There was an error while uncrypting private key."
 msgstr "Error al descifrar clave privada."
 
-#: ../src/export.c:103
+#: src/export.c:108
 msgid ""
 "You need to supply a passphrase for protecting the exported private key, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
@@ -2301,37 +2260,37 @@ msgstr ""
 "ella. Esta contraseña será solicitada por cualquier aplicación que vaya a "
 "hacer uso de la clave privada."
 
-#: ../src/export.c:106 ../src/export.c:236
+#: src/export.c:111 src/export.c:254
 msgid "Insert passphrase (8 characters or more):"
 msgstr "Introduzca contraseña (8 o más caracteres):"
 
-#: ../src/export.c:106 ../src/export.c:236
+#: src/export.c:111 src/export.c:254
 msgid "Insert passphrase (confirm):"
 msgstr "Introduzca contraseña (confirmación):"
 
-#: ../src/export.c:107 ../src/export.c:237
+#: src/export.c:112 src/export.c:255
 msgid "The introduced passphrases are distinct."
 msgstr "Las contraseñas introducidas son distintas."
 
-#: ../src/export.c:110
+#: src/export.c:115
 msgid "Operation cancelled."
 msgstr "Operación cancelada."
 
-#: ../src/export.c:118
+#: src/export.c:125
 msgid "There was an error while password-protecting private key."
 msgstr "Hubo un error al proteger con contraseña la clave privada."
 
-#: ../src/export.c:175
+#: src/export.c:190
 msgid "There was an error while decrypting private key."
 msgstr "Error al descifrar clave privada."
 
-#: ../src/export.c:213
+#: src/export.c:231
 msgid "Unsupported operation: you cannot generate a PKCS#12 for a CSR."
 msgstr ""
 "Operación no soporta: no se puede generar un PKCS#12 para una solicitud de "
 "certificación."
 
-#: ../src/export.c:221 ../src/export.c:230
+#: src/export.c:239 src/export.c:248
 msgid ""
 "There was an error while getting the certificate and private key from the "
 "internal database."
@@ -2339,7 +2298,7 @@ msgstr ""
 "Hubo un problema al obtener el certificado y la clave privada de la base de "
 "datos interna."
 
-#: ../src/export.c:233
+#: src/export.c:251
 msgid ""
 "You need to supply a passphrase for protecting the exported certificate, so "
 "nobody else but authorized people can use it. This passphrase will be asked "
@@ -2350,42 +2309,42 @@ msgstr ""
 "ella. Esta contraseña será solicitada por cualquier aplicación que vaya a "
 "importar el certificado."
 
-#: ../src/export.c:255
+#: src/export.c:273
 msgid "There was an error while generating the PKCS#12 package."
 msgstr "Hubo un problema al generar el fichero PKCS#12"
 
-#: ../src/export.c:269 ../src/export.c:278
+#: src/export.c:287 src/export.c:296
 msgid "There was an error while exporting the certificate."
 msgstr "Ocurrió un error al exportar el certificado."
 
-#: ../src/gnomint-cli.c:56
+#: src/gnomint-cli.c:57
 msgid "- A Certification Authority manager"
 msgstr "-Un gestor de Autoridades de Certificación"
 
-#: ../src/gnomint-cli.c:59 ../src/main.c:128
+#: src/gnomint-cli.c:60 src/main.c:128
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr "Fallo al inicializar: %s\n"
 
-#: ../src/import.c:82
-#, c-format
+#: src/import.c:82
+#, fuzzy, c-format
 msgid ""
 "The whole selected file, or some of its elements, seems to\n"
 "be cyphered using a password or passphrase. For importing\n"
 "the file into gnoMint database, you must provide an \n"
-"appropiate password.\n"
+"appropriate password.\n"
 msgstr ""
 "Todo el fichero seleccionado, o alguno de los elementos que\n"
 "lo conforman, parece haber sido cifrado empleando una \n"
 "contraseña. Para importar el fichero en la base de datos \n"
 "de gnoMint, deberá proporcionar una contraseña adecuada.\n"
 
-#: ../src/import.c:87
+#: src/import.c:87
 #, c-format
 msgid "Please introduce password for `%s'"
 msgstr "Introduzca la contraseña para '%s'"
 
-#: ../src/import.c:129
+#: src/import.c:129
 #, c-format
 msgid ""
 "Couldn't import the certificate request. \n"
@@ -2398,7 +2357,7 @@ msgstr ""
 "\n"
 "'%s'"
 
-#: ../src/import.c:206
+#: src/import.c:206
 #, c-format
 msgid ""
 "Couldn't import the certificate. \n"
@@ -2411,22 +2370,21 @@ msgstr ""
 "\n"
 "'%s'"
 
-#. We launch a window for asking the password.
-#: ../src/import.c:562 ../src/import.c:748
+#: src/import.c:562 src/import.c:748
 msgid "PKCS#8 crypted private key"
 msgstr "Clave privada PKCS#8 cifrada"
 
-#: ../src/import.c:573 ../src/import.c:758
+#: src/import.c:573 src/import.c:758
 msgid "The given password doesn't match the one used for crypting this part"
 msgstr ""
 "La contraseña que ha introducido no coincide con la contraseña empleada para "
 "cifrar este elemento"
 
-#: ../src/import.c:667
+#: src/import.c:667
 msgid "Encrypted PKCS#12 bag"
 msgstr "Contenedor PKCS#12 cifrado"
 
-#: ../src/import.c:684
+#: src/import.c:684
 msgid ""
 "The given password doesn't match with the password used for encrypting this "
 "part."
@@ -2434,35 +2392,35 @@ msgstr ""
 "La contraseña que ha introducido no coincide con la contraseña empleada para "
 "cifrar este elemento."
 
-#: ../src/import.c:895
+#: src/import.c:895
 msgid "Couldn't find any supported format in the given file"
 msgstr "No se encontró ningún formato soportado en el fichero proporcionado"
 
-#: ../src/import.c:908 ../src/import.c:1259
+#: src/import.c:908 src/import.c:1259
 #, c-format
 msgid "Couldn't open %s file. Check permissions."
 msgstr "No se pudo abrir el fichero %s. Compruebe los permisos."
 
-#: ../src/import.c:935
+#: src/import.c:935
 #, c-format
 msgid "Couldn't recognize the file %s as a RSA or DSA private key."
 msgstr "No se ha reconocido el fichero %s como clave privada RSA o DSA."
 
-#: ../src/import.c:951
+#: src/import.c:951
 #, c-format
 msgid "Private key for %s"
 msgstr "Clave privada para %s"
 
-#: ../src/import.c:953
+#: src/import.c:953
 #, c-format
 msgid "Private key %s"
 msgstr "Clave privada %s"
 
-#: ../src/import.c:988
+#: src/import.c:988
 msgid "Problem while calling to openssl for decyphering private key."
 msgstr "Error al llamar a openssl para descifrar la clave privada."
 
-#: ../src/import.c:996
+#: src/import.c:996
 #, c-format
 msgid ""
 "OpenSSL has returned the following error while trying to decypher the "
@@ -2475,15 +2433,15 @@ msgstr ""
 "\n"
 "%s"
 
-#: ../src/import.c:1107
+#: src/import.c:1107
 msgid "There was a problem while importing the public CA root certificate"
 msgstr "Ocurrió un error al importar el certificado raíz público de la AC."
 
-#: ../src/import.c:1121
+#: src/import.c:1121
 msgid "CA Root certificate"
 msgstr "Certificado raíz de la AC"
 
-#: ../src/import.c:1123
+#: src/import.c:1123
 msgid ""
 "There was a problem while importing the private key corresponding to CA root "
 "certificate"
@@ -2491,41 +2449,41 @@ msgstr ""
 "Hubo un problema al importar la clave privada correspondiente al certificado "
 "raíz de la AC."
 
-#: ../src/import.c:1133
+#: src/import.c:1133
 msgid "There was a problem while opening the directory certs/."
 msgstr "Ocurrió un error al abrir el directorio certs/."
 
-#: ../src/import.c:1157
+#: src/import.c:1157
 msgid "There was a problem while opening the directory newcerts/."
 msgstr "Ocurrió un error al abrir el directorio newcerts/."
 
-#: ../src/import.c:1184
+#: src/import.c:1184
 msgid "There was a problem while opening the directory req."
 msgstr "Ocurrió un error al abrir el directorio req."
 
-#: ../src/import.c:1210
+#: src/import.c:1210
 msgid "There was a problem while opening the directory crl/."
 msgstr "Ocurrió un error al abrir el directorio crl."
 
-#: ../src/import.c:1232
+#: src/import.c:1232
 msgid "There was a problem while opening the directory keys/."
 msgstr "Ocurrió un error al abrir el directorio keys."
 
-#: ../src/import.c:1290
+#: src/import.c:1290
 msgid "Files in the directory don't belong to any supported CA format."
 msgstr ""
 "Los ficheros existentes en el directorio no pertenecen a ningún formato "
 "soportado de Autoridad de Certificación."
 
-#: ../src/main.c:125
+#: src/main.c:125
 msgid "- A graphical Certification Authority manager"
 msgstr "- Un gestor gráfico de Autoridades de Certificación"
 
-#: ../src/main.c:292
+#: src/main.c:323
 msgid "Create new CA database"
 msgstr "Crear nueva base de datos de AC"
 
-#: ../src/main.c:330
+#: src/main.c:361
 #, c-format
 msgid ""
 "Problem when creating '%s' CA database:\n"
@@ -2534,25 +2492,25 @@ msgstr ""
 "Hubo problemas al crear la base de datos de la AC '%s':\n"
 "%s"
 
-#: ../src/main.c:343
+#: src/main.c:374
 #, c-format
 msgid "Problem when opening new '%s' CA database"
 msgstr "Hubo problemas al abrir la nueva base de datos de la AC '%s'"
 
-#: ../src/main.c:364
+#: src/main.c:395
 msgid "Open CA database"
 msgstr "Abrir base de datos de AC"
 
-#: ../src/main.c:387 ../src/main.c:427
+#: src/main.c:418 src/main.c:458
 #, c-format
 msgid "Problem when opening '%s' CA database"
 msgstr "Hubo problemas al abrir la base de datos de la AC '%s'"
 
-#: ../src/main.c:452
+#: src/main.c:483
 msgid "Save CA database as..."
 msgstr "Guardar base de datos de AC como..."
 
-#: ../src/main.c:504
+#: src/main.c:535
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
@@ -2560,7 +2518,7 @@ msgstr ""
 "gnoMint es un programa diseñado para crear y gestionar Autoridades de "
 "Certificación, así como sus certificados"
 
-#: ../src/main.c:505
+#: src/main.c:536
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -2590,7 +2548,7 @@ msgstr ""
 "con este programa; si no es así, escriba a la Free Software Foundation, "
 "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
 
-#: ../src/new_cert.c:325
+#: src/new_cert.c:343
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
 "the same as the one in the CA cert."
@@ -2598,7 +2556,7 @@ msgstr ""
 "La política de esta AC obliga a que los campos \"país\" de los certificados "
 "expedidos seanigual al del certificado de la AC."
 
-#: ../src/new_cert.c:331
+#: src/new_cert.c:349
 msgid ""
 "The policy of this CA obligue the state/province field of the certificates "
 "to be the same as the one in the CA cert."
@@ -2606,7 +2564,7 @@ msgstr ""
 "La política de esta AC obliga a que los campos \"estado/provincia\" de los "
 "certificados expedidos seanigual al del certificado de la AC."
 
-#: ../src/new_cert.c:337
+#: src/new_cert.c:355
 msgid ""
 "The policy of this CA obligue the locality/city field of the certificates to "
 "be the same as the one in the CA cert."
@@ -2614,7 +2572,7 @@ msgstr ""
 "La política de esta AC obliga a que los campos \"localidad/ciudad\" de los "
 "certificados expedidos seanigual al del certificado de la AC."
 
-#: ../src/new_cert.c:343
+#: src/new_cert.c:361
 msgid ""
 "The policy of this CA obligue the organization field of the certificates to "
 "be the same as the one in the CA cert."
@@ -2622,7 +2580,7 @@ msgstr ""
 "La política de esta AC obliga a que los campos \"organización\" de los "
 "certificados expedidos seanigual al del certificado de la AC."
 
-#: ../src/new_cert.c:349
+#: src/new_cert.c:367
 msgid ""
 "The policy of this CA obligue the organizational unit field of the "
 "certificates to be the same as the one in the CA cert."
@@ -2630,7 +2588,7 @@ msgstr ""
 "La política de esta AC obliga a que los campos \"unidad organizativa\" de "
 "los certificados expedidos seanigual al del certificado de la AC."
 
-#: ../src/new_cert.c:803
+#: src/new_cert.c:824
 msgid ""
 "The expiration date of the new certificate is after the expiration date of "
 "the CA certificate.\n"
@@ -2645,11 +2603,11 @@ msgstr ""
 "que el nuevo certificado se creará con la misma fecha de caducidad que la "
 "del certificado de la AC."
 
-#: ../src/new_cert.c:819
+#: src/new_cert.c:840
 msgid "Error while signing CSR."
 msgstr "Error al firmar CSR."
 
-#: ../src/pkey_manage.c:81
+#: src/pkey_manage.c:81
 #, c-format
 msgid ""
 "The file that holds private key for certificate '%s' is password-protected.\n"
@@ -2660,7 +2618,7 @@ msgstr ""
 "con contraseña.Por favor, introduzca la contraseña correspondiente a este "
 "fichero."
 
-#: ../src/pkey_manage.c:126
+#: src/pkey_manage.c:126
 #, c-format
 msgid ""
 "The file that holds private key for certificate\n"
@@ -2671,15 +2629,14 @@ msgstr ""
 "'%s' está protegido con contraseña\n"
 "\n"
 
-#: ../src/pkey_manage.c:172
+#: src/pkey_manage.c:172
 msgid ""
 "The given password doesn't match with the one used while crypting the file."
 msgstr ""
 "La contraseña que ha introducido no coincide con la empleada para cifrar "
 "este fichero."
 
-#. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:188
+#: src/pkey_manage.c:188
 msgid ""
 "The file designated in database contains a private key, but it is not the "
 "private key corresponding to the certificate."
@@ -2687,31 +2644,28 @@ msgstr ""
 "El fichero indicado en base de datos contiene una clave privada,pero dicha "
 "clave no se corresponde con el certificado."
 
-#. The file could be opened, but it didn't contain any recognized private key
-#: ../src/pkey_manage.c:192
+#: src/pkey_manage.c:192
 msgid ""
 "The file designated in database doesn't contain any recognized private key."
 msgstr ""
 "El fichero indicado en la base de datos no contiene ninguna clave privada "
 "reconocible."
 
-#. The file cannot be opened
-#: ../src/pkey_manage.c:197
+#: src/pkey_manage.c:197
 msgid "The file designated in database couldn't be opened."
 msgstr "No se pudo abrir el fichero indicado en la base de datos."
 
-#. The file doesn't exist
-#: ../src/pkey_manage.c:202
+#: src/pkey_manage.c:202
 msgid "The file designated in database doesn't exist."
 msgstr "El fichero indicado en la base de datos no existe."
 
-#: ../src/pkey_manage.c:766 ../src/pkey_manage.c:817
+#: src/pkey_manage.c:766 src/pkey_manage.c:817
 msgid "The given password doesn't match the one used in the database"
 msgstr ""
 "La contraseña que ha introducido no coincide con la contraseña de la base de "
 "datos."
 
-#: ../src/pkey_manage.c:804
+#: src/pkey_manage.c:804
 #, c-format
 msgid ""
 "This action requires using one or more private keys saved in the database.\n"
@@ -2719,125 +2673,1165 @@ msgstr ""
 "Esta acción necesita emplear una o más claves privadas almacenadas en la "
 "base de datos de la AC.\n"
 
-#: ../src/pkey_manage.c:805
+#: src/pkey_manage.c:805
 msgid "Please insert the database password:"
 msgstr "Introduzca la contrase_ña de la base de datos:"
 
-#: ../src/tls.c:43 ../src/tls.c:77
-#, c-format
+#: src/tls.c:191 src/tls.c:224
 msgid "Error initializing private key structure."
 msgstr "Error al inicializar estructura de clave privada."
 
-#: ../src/tls.c:49 ../src/tls.c:83
+#: src/tls.c:197 src/tls.c:230
 #, c-format
 msgid "Error creating private key: %d"
 msgstr "Error al crear clave privada: %d"
 
-#: ../src/tls.c:61 ../src/tls.c:95 ../src/tls.c:557 ../src/tls.c:865
-#, c-format
+#: src/tls.c:208 src/tls.c:241 src/tls.c:708 src/tls.c:1083
 msgid "Error exporting private key to PEM structure."
 msgstr "Error al exportar clave privada a estructura PEM."
 
-#: ../src/tls.c:435
-#, c-format
+#: src/tls.c:578
 msgid "Error when initializing certificate structure"
 msgstr "Error al inicializar estructura de certificado"
 
-#: ../src/tls.c:441 ../src/tls.c:693
-#, c-format
+#: src/tls.c:584 src/tls.c:859
 msgid "Error when setting certificate version"
 msgstr "Error al establecer versión de certificado"
 
-#: ../src/tls.c:451 ../src/tls.c:706
-#, c-format
+#: src/tls.c:594 src/tls.c:872
 msgid "Error when setting certificate serial number"
 msgstr "Error al establecer número de serie del certificado"
 
-#: ../src/tls.c:460 ../src/tls.c:715
-#, c-format
+#: src/tls.c:603 src/tls.c:881
 msgid "Error when setting activation time"
 msgstr "Error al establecer fecha de activación"
 
-#: ../src/tls.c:465 ../src/tls.c:723
-#, c-format
+#: src/tls.c:608 src/tls.c:889
 msgid "Error when setting expiration time"
 msgstr "Error al establecer fecha y hora de caducidad"
 
-#: ../src/tls.c:511 ../src/tls.c:772
-#, c-format
+#: src/tls.c:654 src/tls.c:938
 msgid "Error when setting basicConstraint extension"
 msgstr "Error al establecer extensión basicConstraint"
 
-#: ../src/tls.c:516 ../src/tls.c:814
-#, c-format
+#: src/tls.c:659 src/tls.c:980
 msgid "Error when setting keyUsage extension"
 msgstr "Error al establecer extensión keyUsage"
 
-#: ../src/tls.c:531 ../src/tls.c:788
-#, c-format
+#: src/tls.c:670 src/tls.c:773 src/tls.c:1018
+#, fuzzy
+msgid "Error when setting Subject Alternative Name extension"
+msgstr "Error al establecer extensión identificadora de titular"
+
+#: src/tls.c:682 src/tls.c:954
 msgid "Error when setting subject key identifier extension"
 msgstr "Error al establecer extensión identificadora de titular"
 
-#: ../src/tls.c:535 ../src/tls.c:762
-#, c-format
+#: src/tls.c:686 src/tls.c:928
 msgid "Error when setting authority key identifier extension"
 msgstr "Error al establecer extensión identificadora de autoridad"
 
-#: ../src/tls.c:545
-#, c-format
+#: src/tls.c:696
 msgid "Error when signing self-signed certificate"
 msgstr "Error al firmar certificado autofirmado"
 
-#: ../src/tls.c:575
-#, c-format
+#: src/tls.c:727
+#, fuzzy
+msgid "Error when initializing privkey structure"
+msgstr "Error al inicializar estructura de solicitud"
+
+#: src/tls.c:731
+#, fuzzy
+msgid "Error when importing private key into privkey structure"
+msgstr "Error al exportar clave privada a estructura PEM."
+
+#: src/tls.c:735
 msgid "Error when initializing csr structure"
 msgstr "Error al inicializar estructura de solicitud"
 
-#: ../src/tls.c:579
-#, c-format
+#: src/tls.c:739
 msgid "Error when setting csr version"
 msgstr "Error al establecer versión de solicitud"
 
-#: ../src/tls.c:612
-#, c-format
+#: src/tls.c:778
 msgid "Error when signing self-signed csr"
 msgstr "Error al firmar solicitud autofirmada"
 
-#: ../src/tls.c:623
-#, c-format
+#: src/tls.c:789
 msgid "Error exporting CSR to PEM structure."
 msgstr "Error al exportar solicitud de certificación a estructura PEM."
 
-#: ../src/tls.c:677
-#, c-format
+#: src/tls.c:843
 msgid "Error when initializing crt structure"
 msgstr "Error al inicializar estructura de solicitud"
 
-#: ../src/tls.c:685
-#, c-format
+#: src/tls.c:851
 msgid "Error when copying data from CSR to certificate structure"
 msgstr "Error al copiar datos de solicitud a la estructura del certificado"
 
-#: ../src/tls.c:850
-#, c-format
+#: src/tls.c:1068
 msgid "Error when signing certificate"
 msgstr "Error al firmar certificado"
 
-#: ../src/tls.c:1063
+#: src/tls.c:1294
 msgid "Certification Authority"
 msgstr "Autoridad de certificación"
 
-#: ../src/tls.c:1082
+#: src/tls.c:1313
 msgid "Key encipher only"
 msgstr "Clave de sólo cifrado"
 
-#: ../src/tls.c:1084
+#: src/tls.c:1315
 msgid "Key decipher only"
 msgstr "Clave de sólo descifrado"
 
-#: ../src/tls.c:1096
+#: src/tls.c:1327
 msgid "TLS WWW Client."
 msgstr "Cliente TLS WWW"
+
+#: gui/certificate_popup_menu.ui
+msgid "Shows the certificate properties window"
+msgstr "Muestra la ventana de propiedades del certificado"
+
+#: gui/certificate_popup_menu.ui gui/csr_popup_menu.ui gui/main_window.ui
+msgid "E_xport"
+msgstr "E_xportar"
+
+#: gui/certificate_popup_menu.ui
+msgid "Exports the certificate so it can be imported by any other application"
+msgstr ""
+"Exporta el certificado de modo que pueda ser importado por cualquier otra "
+"aplicación"
+
+#: gui/certificate_popup_menu.ui gui/csr_popup_menu.ui gui/main_window.ui
+msgid "Extrac_t private key"
+msgstr "Ex_traer clave privada"
+
+#: gui/certificate_popup_menu.ui
+msgid ""
+"Extracts the private key of the selected \n"
+"certificate from the database to an \n"
+"external file. This file must be provided \n"
+"each time the certificate will be used"
+msgstr ""
+"Extrae de la base de datos la clave privada del certificado seleccionado, "
+"almacenándola en un fichero externo. Este fichero deberá proporcionarse cada "
+"vez que se emplee el certificado"
+
+#: gui/certificate_popup_menu.ui gui/main_window.ui
+msgid "Revo_ke"
+msgstr "Revo_car"
+
+#: gui/certificate_popup_menu.ui
+msgid "Revokes the selected certificate"
+msgstr "Revoca el certificado seleccionado"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Certificate properties - gnoMint"
+msgstr "Propiedades del certificado - gnoMint"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;b&gt;This certificate has been verified for the following uses:&lt;/b&gt;"
+msgstr "<b>Este certificado ha sido validado para los siguientes usos:</b>"
+
+#: gui/certificate_properties_dialog.ui
+msgid "MD5FINGERPRINT"
+msgstr "MD5FINGERPRINT"
+
+#: gui/certificate_properties_dialog.ui
+msgid "SHA1FINGERPRINT"
+msgstr "SHA1FINGERPRINT"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CertExpirationDate"
+msgstr "Fecha de caducidad"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CertActivationDate"
+msgstr "Fecha de activación"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CAOU"
+msgstr "CAOU"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CAO"
+msgstr "CAO"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CACN"
+msgstr "CACN"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CertSN"
+msgstr "Núm de serie"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "SubjectOU"
+msgstr "UnidadOrganizativaTitular"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "SubjectO"
+msgstr "OrganizaciónTitular"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "SubjectCN"
+msgstr "NombreTitular"
+
+#: gui/certificate_properties_dialog.ui
+msgid "MD5 fingerprint"
+msgstr "Huella digital MD5"
+
+#: gui/certificate_properties_dialog.ui
+msgid "SHA1 fingerprint"
+msgstr "Huella digital SHA1"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Fingerprints&lt;/b&gt;"
+msgstr "<b>Huellas digitales</b>"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Expires on"
+msgstr "Caduca el"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Activated on"
+msgstr "Activado el"
+
+#: gui/certificate_properties_dialog.ui
+msgid "&lt;b&gt;Validity&lt;/b&gt;"
+msgstr ""
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "Organizational Unit (OU)"
+msgstr "Unidad organizativa (OU)"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "Organization (O)"
+msgstr "Organización (O)"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "Common Name (CN)"
+msgstr "Nombre común (CN)"
+
+#: gui/certificate_properties_dialog.ui
+msgid "&lt;b&gt;Emmited by&lt;/b&gt;"
+msgstr ""
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "Subject Alternative Names"
+msgstr "Nombre alternativo de titular"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Serial number"
+msgstr "Nº de serie"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Certificate subject&lt;/b&gt;"
+msgstr "<b>Titular del certificado</b>"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "SHA256FINGERPRINT"
+msgstr "SHA1FINGERPRINT"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "SHA256 fingerprint"
+msgstr "Huella digital SHA1"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "SHA512FINGERPRINT"
+msgstr "SHA1FINGERPRINT"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "SHA512 fingerprint"
+msgstr "Huella digital SHA1"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "General"
+msgstr "General"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Certificate hierarchy&lt;/b&gt;"
+msgstr "<b>Jerarquía de certificados</b>"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Certificate fields&lt;/b&gt;"
+msgstr "<b>Campos de certificado</b>"
+
+#: gui/certificate_properties_dialog.ui gui/csr_properties_dialog.ui
+msgid "Details"
+msgstr "Detalles"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;small&gt;&lt;i&gt;\n"
+"It is recommended that all the certificates generated by a CA\n"
+"share the same properties.\n"
+"If you want to generate certificates with different properties, you\n"
+"should create a hierarchy of CAs, each one with its own policy for\n"
+"certificate generation.&lt;/i&gt;\n"
+"&lt;/small&gt;\n"
+"Please, define the maximum set of properties for the\n"
+"certificates that this CA will be able to generate:"
+msgstr ""
+"<small><i>\n"
+"Se recomienda que todos los certificados generados por una AC compartan las "
+"mismas propiedades.\n"
+"Si desea generar certificados con propiedades distintas, sería aconsejable "
+"crear una jerarquía de ACs, cada una con su propia política para la "
+"generación de certificados.</i>\n"
+"</small>\n"
+"Defina el conjunto máximo de propiedades para los certificados que la "
+"presente Autoridad de Certificación podrá otorgar:\n"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid ""
+"Maximum number of months before\n"
+"expiration of the new generated certificates:"
+msgstr ""
+"Máximo número de meses antes de la caducidad de los nuevos certificados:"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Hours between CRL updates:"
+msgstr "Nº de horas entre actualizaciones consecutivas de CRL:"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "CRL distribution URL:"
+msgstr "Puntos de distribución de CRLs"
+
+#: gui/certificate_properties_dialog.ui
+msgid "&lt;b&gt;CRL Properties&lt;/b&gt;"
+msgstr ""
+
+#: gui/certificate_properties_dialog.ui
+msgid "Country"
+msgstr "País"
+
+#: gui/certificate_properties_dialog.ui
+msgid "State or Province name"
+msgstr "Nombre de estado o provincia"
+
+#: gui/certificate_properties_dialog.ui
+msgid "must be the same"
+msgstr "debe coincidir"
+
+#: gui/certificate_properties_dialog.ui
+msgid "may differ"
+msgstr "puede variar"
+
+#: gui/certificate_properties_dialog.ui
+msgid "City"
+msgstr "Ciudad"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Organization"
+msgstr "Organización"
+
+#: gui/certificate_properties_dialog.ui
+msgid "Organizational unit"
+msgstr "Unidad organizativa"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Inherited fields from CA subject&lt;/b&gt;"
+msgstr "<b>Campos heredados del titular de la AC</b>"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Uses of new generated certificates&lt;/b&gt;"
+msgstr "<b>Usos posibles de los nuevos certificados</b>"
+
+#: gui/certificate_properties_dialog.ui gui/new_cert_window.ui
+msgid "TLS Web client"
+msgstr "Cliente WWW TLS"
+
+#: gui/certificate_properties_dialog.ui gui/new_cert_window.ui
+msgid "TLS Web server"
+msgstr "Servidor web TLS"
+
+#: gui/certificate_properties_dialog.ui
+#, fuzzy
+msgid "&lt;b&gt;Purposes of new generated certificates&lt;/b&gt;"
+msgstr "<b>Finalidades posibles de los nuevos certificados</b>"
+
+#: gui/certificate_properties_dialog.ui
+msgid "CA Policy"
+msgstr "Política de la AC"
+
+#: gui/change_password_dialog.ui
+msgid "Database password protection - gnoMint"
+msgstr "Protección de contraseña de base de datos - gnoMint"
+
+#: gui/change_password_dialog.ui
+msgid "_Yes"
+msgstr "_Sí"
+
+#: gui/change_password_dialog.ui
+msgid "_No"
+msgstr "_No"
+
+#: gui/change_password_dialog.ui
+msgid ""
+"Enter new password again \n"
+"for confirmation:"
+msgstr ""
+"Introduzca la nueva contraseña \n"
+"otra vez para confirmar:"
+
+#: gui/change_password_dialog.ui
+msgid ""
+"Please, enter new \n"
+"password:"
+msgstr ""
+"Introduzca la nueva \n"
+"contraseña:"
+
+#: gui/change_password_dialog.ui
+msgid ""
+"Please, enter current\n"
+"password:"
+msgstr ""
+"Introduzca la contraseña \n"
+"actual:"
+
+#: gui/change_password_dialog.ui
+#, fuzzy
+msgid ""
+"Protect CA database private\n"
+"keys with password:"
+msgstr ""
+"Proteger con contraseña las claves privadas de la base de datos de la AC:"
+
+#: gui/creation_process_window.ui
+msgid "Creating new CA - gnoMint"
+msgstr "Creando nueva AC - gnoMint"
+
+#: gui/creation_process_window.ui
+msgid "Creating CA Root Certificate"
+msgstr "Creando certificado raíz de la AC"
+
+#: gui/csr_popup_menu.ui
+msgid "Shows the CSR properties window"
+msgstr "Mostrar ventana de propiedades de la solicitud de certificación"
+
+#: gui/csr_popup_menu.ui
+msgid "Exports the CSR so it can be imported by any other application"
+msgstr ""
+"Exporta la solicitud de certificación de modo que pueda ser importada por "
+"cualquier otra aplicación"
+
+#: gui/csr_popup_menu.ui
+msgid ""
+"Extracts the private key of the selected \n"
+"certificate from the database to an \n"
+"external file. This file must be provided \n"
+"each time the CSR will be used"
+msgstr ""
+"Extrae de la base de datos la clave privada del certificado seleccionado, "
+"almacenándola en un fichero externo. Este fichero deberá proporcionarse cada "
+"vez que se emplee la solicitud de certificación"
+
+#: gui/csr_popup_menu.ui gui/main_window.ui
+msgid "_Sign"
+msgstr "_Firmar"
+
+#: gui/csr_properties_dialog.ui
+msgid "CSR properties - gnoMint"
+msgstr "Propiedades de la solicitud - gnoMint"
+
+#: gui/csr_properties_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;b&gt;This Certificate Signing Request has its corresponding private key "
+"saved in the internal database.&lt;/b&gt;"
+msgstr ""
+"<b>La clave privada correspondiente a esta petición de certificación está "
+"almacenada en la base de datos interna.</b>"
+
+#: gui/csr_properties_dialog.ui
+#, fuzzy
+msgid "Subject Alternative Name (SAN)"
+msgstr "Nombre alternativo de titular"
+
+#: gui/csr_properties_dialog.ui
+msgid "&lt;b&gt;CSR subject&lt;/b&gt;"
+msgstr ""
+
+#: gui/dh_parameters_dialog.ui
+msgid "New Diffie-Hellman parameters - gnoMint"
+msgstr "Nuevos parámetros Diffie-Hellman - gnoMint"
+
+#: gui/dh_parameters_dialog.ui
+#, fuzzy
+msgid ""
+"You are about to create and export a set of\n"
+"Diffie·Hellman parameters into a PKCS#3 structure file."
+msgstr ""
+"Se va a crear y exportar un conjunto de parámetros Diffie-Hellman a un "
+"fichero con formato PKCS#3."
+
+#: gui/dh_parameters_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;small&gt;&lt;i&gt;PKCS#3 files containing Diffie·Hellman parameters are "
+"used by some cryptographic\n"
+"applications for a secure interchange of their keys over insecure "
+"channels.&lt;/i&gt;&lt;/small&gt;"
+msgstr ""
+"<small><i>Los ficheros PKCS#3·con parámetros·Diffie Hellman·son usados por "
+"ciertas aplicaciones \n"
+"criptográficas para realizar intercambios seguros de sus claves a través de "
+"canales inseguros.</i></small>"
+
+#: gui/dh_parameters_dialog.ui
+msgid "Please, enter the prime size, in bits:"
+msgstr "Introduzca el tamaño del número primo, en bits:"
+
+#: gui/export_certificate_dialog.ui
+msgid "Export certificate - gnoMint"
+msgstr "Exportar certificado - gnoMint"
+
+#: gui/export_certificate_dialog.ui
+#, fuzzy
+msgid ""
+"Please, choose which part of the\n"
+"saved certificate you want to export:"
+msgstr "Seleccione qué parte almacenada del certificado desea exportar:"
+
+#: gui/export_certificate_dialog.ui
+msgid "Only the pu_blic part."
+msgstr "Sólo la parte pú_blica."
+
+#: gui/export_certificate_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;i&gt;Export only the certificate to a public file, in PEM format.&lt;/"
+"i&gt;"
+msgstr "<i>Exporta sólo el certificado a un fichero público en formato PEM</i>"
+
+#: gui/export_certificate_dialog.ui
+msgid "Only the private key (crypted)."
+msgstr "Sólo la clave privada (cifrada)."
+
+#: gui/export_certificate_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;i&gt;Export the saved private key to a PKCS#8 password-\n"
+"protected file. This file should only be accessed by the\n"
+"subject of the certificate.&lt;/i&gt;"
+msgstr ""
+"<i>Exporta la clave privada almacenada a un fichero PKCS#8 protegido con "
+"clave. Este fichero sólo debería ser accesible para el titular del "
+"certificado.</i>"
+
+#: gui/export_certificate_dialog.ui
+msgid "Only the private key (uncrypted)."
+msgstr "Sólo la clave privada (sin cifrar)."
+
+#: gui/export_certificate_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;i&gt;Export the saved private key to a PEM file. This option\n"
+"should only be used for exporting certificates that will be\n"
+"used in unattended servers.&lt;/i&gt;"
+msgstr ""
+"<i>Exporta la clave privada almacenada a un fichero PEM. Esta opción sólo "
+"debería ser empleada para exportar certificados que vayan a ser usados en "
+"servidores no atendidos.</i>"
+
+#: gui/export_certificate_dialog.ui
+msgid "Both parts."
+msgstr "Ambas partes."
+
+#: gui/export_certificate_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;i&gt;Export both (private and public) parts to a password-\n"
+"protected PKCS#12 file. This kind of file can be imported\n"
+"by other common programs, such as web or mail clients.&lt;/i&gt;"
+msgstr ""
+"<i>Exporta·ambas partes (pública y privada) a un fichero PKCS#12 protegido "
+"con clave. Esta clase de ficheros puede ser importada por otros programas "
+"comúnes, tales como clientes web o de correo electrónico.</i>"
+
+#: gui/get_db_password_dialog.ui gui/get_password_dialog.ui
+#: gui/import_password_dialog.ui
+msgid "Enter password - gnoMint"
+msgstr "Introduzca contraseña - gnoMint"
+
+#: gui/get_db_password_dialog.ui
+msgid ""
+"This action requires using one or more private keys saved in the CA "
+"database.\n"
+"\n"
+"Please insert the database password."
+msgstr ""
+"Esta acción necesita emplear una o más claves privadas almacenadas en la "
+"base de datos de la AC.\n"
+"\n"
+"Por favor, introduzca la contraseña de la base de datos."
+
+#: gui/get_db_password_dialog.ui gui/get_password_dialog.ui
+#: gui/import_password_dialog.ui
+msgid "Password:"
+msgstr "Contraseña:"
+
+#: gui/get_db_password_dialog.ui
+msgid "Remember this password during this gnoMint session"
+msgstr "Recordar esta contraseña durante toda esta sesión de gnoMint"
+
+#: gui/get_password_dialog.ui
+msgid "Please, enter password"
+msgstr "Introduzca la contraseña"
+
+#: gui/get_password_dialog.ui
+msgid "Password (confirm):"
+msgstr "Contraseña (confirmar):"
+
+#: gui/get_pkey_dialog.ui
+msgid "Choose private key file. gnoMint"
+msgstr "Seleccione fichero con clave privada. gnoMint"
+
+#: gui/get_pkey_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;big&gt;Choose private key file&lt;/big&gt;\n"
+"\n"
+"For doing the selected operation, you must provide the\n"
+"file where resides the private key corresponding to the\n"
+"certificate:"
+msgstr ""
+"<big>Seleccione fichero con clave privada</big>\n"
+"\n"
+"Para realizar la operación seleccionada, deberá proporcionar el fichero "
+"donde reside la clave privada correspondiente al certificado:"
+
+#: gui/get_pkey_dialog.ui
+msgid "Certificate DN"
+msgstr "Descriptor del certificado"
+
+#: gui/get_pkey_dialog.ui
+msgid "Please, choose the file:"
+msgstr "Seleccione el fichero:"
+
+#: gui/get_pkey_dialog.ui
+msgid "_Save filename in the database for automatic loading"
+msgstr ""
+"_Guardar nombre de fichero en base de datos para cargarlo automáticamente"
+
+#: gui/import_file_or_directory_dialog.ui
+msgid "Import selection - gnoMint"
+msgstr "Selección de importación - gnoMint"
+
+#: gui/import_file_or_directory_dialog.ui
+#, fuzzy
+msgid ""
+"Please, choose the more suitable option for\n"
+"what you want to import:"
+msgstr ""
+"Seleccione la opción más adecuada que represente lo que desea importar:"
+
+#: gui/import_file_or_directory_dialog.ui
+msgid "Import a single file."
+msgstr "Importar un único fichero."
+
+#: gui/import_file_or_directory_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;i&gt;Import a single file, encoded in DER or PEM format, containing\n"
+"certificates, private keys (encrypted or plain), signing\n"
+"requests (CSRs), revocation lists (CRLs) or PKCS#12\n"
+"packages.&lt;/i&gt;"
+msgstr ""
+"<i>Importar un único fichero, en formato DER o PEM, que contiene "
+"certificados, claves privadas (cifradas o en claro), solicitudes de "
+"certificación (CSRs), listas de revocación (CRLs) o paquetes PKCS#12.</i>"
+
+#: gui/import_file_or_directory_dialog.ui
+msgid "Import a whole directory."
+msgstr "Importar un directorio completo."
+
+#: gui/import_file_or_directory_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;i&gt;Import a directory containing the structure of\n"
+"a whole CA made with OpenSSL .&lt;/i&gt;"
+msgstr ""
+"<i>Importar directorio que contenga la estructura\n"
+"completa de una AC producida con OpenSSL.</i>"
+
+#: gui/import_password_dialog.ui
+#, fuzzy
+msgid ""
+"The whole selected file, or some of its elements, seems to\n"
+"be cyphered using a password or passphrase.\n"
+"\n"
+"For importing the file into gnoMint database, you must\n"
+"provide an appropiate password."
+msgstr ""
+"Todo el fichero seleccionado, o alguno de los elementos que lo conforman, "
+"parece haber sido cifrado empleando una contraseña.\n"
+"\n"
+"Para importar el fichero en la base de datos de gnoMint, deberá proporcionar "
+"una contraseña adecuada."
+
+#: gui/import_password_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;small&gt;&lt;i&gt;The part that is being imported has the "
+"description:&lt;/i&gt;&lt;/small&gt;"
+msgstr ""
+"<small><i>La parte a ser importada tiene la siguiente descripción:</i></"
+"small>"
+
+#: gui/import_password_dialog.ui
+msgid "&lt;small&gt;&lt;i&gt;#Description#&lt;/i&gt;&lt;/small&gt;"
+msgstr ""
+
+#: gui/main_window.ui
+msgid "gnoMint"
+msgstr "gnoMint"
+
+#: gui/main_window.ui
+msgid "_Certificates"
+msgstr "Certificados"
+
+#: gui/main_window.ui
+msgid "_New certificate database"
+msgstr "_Nueva base de datos de certificados"
+
+#: gui/main_window.ui
+msgid "_Open certificate database"
+msgstr "Abrir base de datos de certificados"
+
+#: gui/main_window.ui
+msgid "Open _recents"
+msgstr "Abrir _recientes"
+
+#: gui/main_window.ui
+msgid "_Save certificate database as..."
+msgstr "_Guardar base de datos de certificados como..."
+
+#: gui/main_window.ui
+msgid "_Add self-signed CA"
+msgstr "_Añadir autoridad de certificación auto-firmada"
+
+#: gui/main_window.ui
+msgid "Add _Certificate Request"
+msgstr "Añadir _solicitud de certificación"
+
+#: gui/main_window.ui
+msgid "Extract the saved private key to an external file or device"
+msgstr "Extrae la clave privada almacenada a un fichero o dispositivo externo"
+
+#: gui/main_window.ui
+msgid "Generate the current Certificate Revocation List"
+msgstr "Generar lista actual de certificados revocados (CRL)"
+
+#: gui/main_window.ui
+msgid "Generate _CRL"
+msgstr "Generar _CRL"
+
+#: gui/main_window.ui
+msgid "Generate D_H parameters..."
+msgstr "Generar parámetros D_H..."
+
+#: gui/main_window.ui
+msgid "Change database pass_word"
+msgstr "Cambiar contrase_ña de base de datos"
+
+#: gui/main_window.ui
+msgid "_Import"
+msgstr "I_mportar"
+
+#: gui/main_window.ui
+msgid "_Edit"
+msgstr "_Editar"
+
+#: gui/main_window.ui
+msgid "_View"
+msgstr "_Ver"
+
+#: gui/main_window.ui
+msgid "Certificate _Signing Requests"
+msgstr "_Solicitudes de firma de certificados"
+
+#: gui/main_window.ui
+msgid "_Revoked Certificates"
+msgstr "Certificados _revocados"
+
+#: gui/main_window.ui
+msgid "_Help"
+msgstr "Ay_uda"
+
+#: gui/main_window.ui
+msgid "Create a new database"
+msgstr "Crear nueva base de datos"
+
+#: gui/main_window.ui
+msgid "Open an existing database"
+msgstr "Abrir base de datos existente"
+
+#: gui/main_window.ui
+msgid "Add an autosigned CA"
+msgstr "Añadir autoridad de certificación auto-firmada"
+
+#: gui/main_window.ui
+msgid "Add autosigned CA certificate"
+msgstr "Añadir certificado de AC autofirmado"
+
+#: gui/main_window.ui
+msgid "Add a new Certificate Signing Request"
+msgstr "Añadir nueva solicitud de certificación"
+
+#: gui/main_window.ui
+msgid "Add CSR"
+msgstr "Añadir CSR"
+
+#: gui/main_window.ui
+msgid "Extract the private key of the selected item into a external file"
+msgstr "Extrae la clave privada del elemento seleccionado a un fichero externo"
+
+#: gui/main_window.ui
+msgid "Extract Private Key"
+msgstr "Extraer clave privada"
+
+#: gui/main_window.ui
+msgid "Revoke the selected certificate"
+msgstr "Revocar el certificado seleccionado"
+
+#: gui/main_window.ui
+msgid "Revoke"
+msgstr "Revocar"
+
+#: gui/main_window.ui
+msgid "Sign the selected Certificate Signing Request"
+msgstr "Firmar la solicitud de certificación seleccionada"
+
+#: gui/main_window.ui
+msgid "Sign"
+msgstr "Firmar"
+
+#: gui/main_window.ui
+msgid "Delete the selected Certificate Signing Request"
+msgstr "Borrar la solicitud de certificación seleccionada"
+
+#: gui/new_ca_window.ui
+msgid "New CA - gnoMint"
+msgstr "Nueva AC - gnoMint"
+
+#: gui/new_ca_window.ui
+msgid "&lt;big&gt;CA Subject Properties&lt;/big&gt;"
+msgstr ""
+
+#: gui/new_ca_window.ui gui/new_cert_window.ui gui/new_req_window.ui
+msgid "Organization:"
+msgstr "Organización:"
+
+#: gui/new_ca_window.ui gui/new_cert_window.ui gui/new_req_window.ui
+msgid "Organization Unit:"
+msgstr "Unidad organizativa:"
+
+#: gui/new_ca_window.ui gui/new_cert_window.ui gui/new_req_window.ui
+msgid "Country:"
+msgstr "País"
+
+#: gui/new_ca_window.ui gui/new_cert_window.ui gui/new_req_window.ui
+#, fuzzy
+msgid "State or Province name:"
+msgstr "Nombre de estado o provincia: "
+
+#: gui/new_ca_window.ui gui/new_cert_window.ui gui/new_req_window.ui
+#, fuzzy
+msgid "City:"
+msgstr "Ciudad "
+
+#: gui/new_ca_window.ui
+msgid ""
+"CA Root Certificate \n"
+"Common Name (CN):"
+msgstr ""
+"Nombre común (CN) del\n"
+"certificado raiz de la AC:"
+
+#: gui/new_ca_window.ui gui/new_req_window.ui
+#, fuzzy
+msgid "&lt;b&gt;Subject Alternative Names (SAN)&lt;/b&gt;"
+msgstr "Nombre alternativo de titular"
+
+#: gui/new_ca_window.ui gui/new_cert_window.ui gui/new_req_window.ui
+msgid "CA properties"
+msgstr "Propiedades de la AC"
+
+#: gui/new_ca_window.ui
+#, fuzzy
+msgid "&lt;big&gt;CA Root certificate properties&lt;/big&gt;"
+msgstr "<big>Propiedades del certificado raiz de la AC</big>\n"
+
+#: gui/new_ca_window.ui
+msgid "Months before root certificate expiration:"
+msgstr "Meses antes de la caducidad del certificado raíz:"
+
+#: gui/new_ca_window.ui gui/new_req_window.ui
+msgid "RSA"
+msgstr "RSA"
+
+#: gui/new_ca_window.ui gui/new_req_window.ui
+msgid "DSA"
+msgstr "DSA"
+
+#: gui/new_ca_window.ui gui/new_req_window.ui
+msgid "Private key bit length:"
+msgstr "Longitud en bits de la clave privada:"
+
+#: gui/new_ca_window.ui gui/new_req_window.ui
+msgid "Private key type:"
+msgstr "Tipo de clave privada:"
+
+#: gui/new_ca_window.ui gui/new_req_window.ui
+msgid "Root certificate prop"
+msgstr "Prop. de certificado raíz"
+
+#: gui/new_ca_window.ui
+#, fuzzy
+msgid "&lt;big&gt;CA properties&lt;/big&gt;"
+msgstr "<big>Propiedades de la AC</big>\n"
+
+#: gui/new_ca_window.ui
+#, fuzzy
+msgid "CRL Distribution Point:"
+msgstr "Puntos de distribución de CRLs"
+
+#: gui/new_ca_window.ui
+msgid ""
+"&lt;small&gt;Please, in this field enter an URL where the CRL for this CA "
+"will be available. \n"
+"You can leave it blank. In this case, no CRL Distribution Point will be set "
+"in the CA \n"
+"Certificate, and you will be able to set it as a new CA property. \n"
+"This value will be copied into the certificates generated by this CA.\n"
+"&lt;/small&gt;"
+msgstr ""
+
+#: gui/new_ca_window.ui
+msgid "Password protect"
+msgstr "Proteger con contraseña"
+
+#: gui/new_cert_window.ui
+msgid "New Certificate - gnoMint"
+msgstr "Nuevo certificado - gnoMint"
+
+#: gui/new_cert_window.ui
+#, fuzzy
+msgid "&lt;big&gt;New Certificate Properties&lt;/big&gt;"
+msgstr "<big>Propiedades del nuevo certificado</big>\n"
+
+#: gui/new_cert_window.ui
+#, fuzzy
+msgid ""
+"You are about to sign a Certificate Signing Request,\n"
+"and this way, creating a new certificate. Please\n"
+"check the certificate properties."
+msgstr ""
+"Se va a proceder a la firma de una solicitud de certificación, creándose así "
+"un nuevo certificado. Por favor, compruebe las propiedades de éste."
+
+#: gui/new_cert_window.ui
+msgid "label"
+msgstr "etiqueta"
+
+#: gui/new_cert_window.ui
+msgid ""
+"New certificate \n"
+"Common Name (CN):"
+msgstr ""
+"Nombre común (CN) del\n"
+"nuevo certificado:"
+
+#: gui/new_cert_window.ui
+#, fuzzy
+msgid "Subject Alternative Names:"
+msgstr "Nombre alternativo de titular"
+
+#: gui/new_cert_window.ui
+#, fuzzy
+msgid ""
+"You are about to sign a Certificate Signing Request.\n"
+"Please, choose the Certification Authority you are\n"
+"going to use for signing it."
+msgstr ""
+"Se va a proceder a la firma de una solicitud de certificación. Por favor, "
+"seleccione la autoridad de certificación que se va a emplear para firmarlo."
+
+#: gui/new_cert_window.ui
+msgid "Choose CA for signing the CSR"
+msgstr "Seleccione autoridad que firmará la solicitud"
+
+#: gui/new_cert_window.ui
+msgid "Months before certificate expiration:"
+msgstr "Meses antes de la caducidad del certificado:"
+
+#: gui/new_cert_window.ui
+#, fuzzy
+msgid "&lt;b&gt;Certificate uses&lt;/b&gt;"
+msgstr "<b>Usos del certificado</b>"
+
+#: gui/new_cert_window.ui
+#, fuzzy
+msgid "&lt;b&gt;Certificate purposes&lt;/b&gt;"
+msgstr "<b>Finalidad del certificado</b>"
+
+#: gui/new_cert_window.ui
+msgid "Certificate properties"
+msgstr "Propiedades del certificado"
+
+#: gui/new_crl_dialog.ui
+msgid "New CRL - gnoMint"
+msgstr "Nueva CRL - gnoMint"
+
+#: gui/new_crl_dialog.ui
+#, fuzzy
+msgid ""
+"&lt;big&gt;&lt;b&gt;New Certificate Revocation List&lt;/b&gt;&lt;/big&gt;"
+msgstr "<big><b>Nueva lista de certificados revocados</b></big>"
+
+#: gui/new_crl_dialog.ui
+msgid ""
+"Please, select the CA for which a Certificate \n"
+"Revocation List is going to be created:"
+msgstr ""
+"Seleccione la autoridad de certificación para la\n"
+"que se va a crear una CRL (lista de certificados \n"
+"revocados):"
+
+#: gui/new_req_window.ui
+msgid "New certificate request - gnoMint"
+msgstr "Nueva solicitud de certificación - gnoMint"
+
+#: gui/new_req_window.ui
+#, fuzzy
+msgid "&lt;big&gt;Certificate Request Properties&lt;/big&gt;"
+msgstr "<big>Propiedades de la solicitud</big>\n"
+
+#: gui/new_req_window.ui
+#, fuzzy
+msgid ""
+"&lt;small&gt;The subject of the new certificate request can inherit "
+"information\n"
+"from one of the existing Certification Authorities. This is a must if the\n"
+"policy of the CA you are going to use is defined to force some fields\n"
+"of a certificate subject to be the same as the ones in the CA cert\n"
+"subject.&lt;/small&gt;"
+msgstr ""
+"<small>El titular de la nueva solicitud de certificado puede heredar "
+"información de una de las autoridades de certificación existentes. Esto es "
+"necesario si la política de la AC que va a utilizar para firmar el "
+"certificado obliga a que ciertos campos sean iguales en el certificado de la "
+"autoridad y en sus certificados hijos.</small>"
+
+#: gui/new_req_window.ui
+msgid "Don't inherit any fields from existing Certification Authorities"
+msgstr "No heredar ningún campo de autoridades de certificación existentes"
+
+#: gui/new_req_window.ui
+msgid ""
+"Inherit fields according to selected Certification Authority and its policy."
+msgstr ""
+"Heredar campos según la política de la autoridad de certificación "
+"seleccionada."
+
+#: gui/new_req_window.ui
+#, fuzzy
+msgid ""
+"Certificate \n"
+" Common Name (CN):"
+msgstr ""
+"Nombre común (CN) del\n"
+"certificado:"
+
+#: gui/new_req_window.ui
+msgid "page 3"
+msgstr "página 3"
+
+#: gui/preferences_dialog.ui
+msgid "General Preferences - gnoMint"
+msgstr "Preferencias generales - gnoMint"
+
+#: gui/preferences_dialog.ui
+msgid ""
+"Automatically export created certificates to \n"
+"Gnome-keyring certificate store"
+msgstr ""
+"Exportar automáticamente los certificados creados a\n"
+"el almacén de certificados de Gnome-keyring"
+
+#: gui/preferences_dialog.ui
+msgid "Export options"
+msgstr "Opciones de exportación"
+
+#: gconf/gnomint.schemas.in
+msgid "Window size"
+msgstr "Tamaño de ventana"
+
+#: gconf/gnomint.schemas.in
+msgid "Revoked certificates visibility"
+msgstr "Visibilidad de certificados revocados"
+
+#: gconf/gnomint.schemas.in
+msgid "Certificate requests visibility"
+msgstr "Visibilidad de solicitudes de certificación"
+
+#: gconf/gnomint.schemas.in
+msgid "Automatic exporting of certificates for gnome-keyring"
+msgstr "Exportación automática de certificados a gnome-keyring"
+
+#: gconf/gnomint.schemas.in
+#, fuzzy
+msgid ""
+"The (width,length) size\n"
+"        gnoMint should take when started. This cannot be smaller than\n"
+"        (320,200)."
+msgstr ""
+"El tamaño (anchura,altura) de gnoMint al iniciarse. No debe ser menor "
+"a(320,200)."
+
+#: gconf/gnomint.schemas.in
+msgid "Whether the revoked certificates should be visible."
+msgstr "Si los certificados revocados deben ser visibles"
+
+#: gconf/gnomint.schemas.in
+msgid "Whether the certificate requests should be visible."
+msgstr "Si las solicitudes de certificado deben ser visibles."
+
+#: gconf/gnomint.schemas.in
+#, fuzzy
+msgid ""
+"Whether the created or imported certificates are\n"
+"        automatically exported to gnome-keyring certificate-store."
+msgstr ""
+"Si los certificados recién creados o importados son exportados "
+"automáticamente al almacén de certificados de gnome-keyring."
+
+#: gui/gnomint.desktop.in
+msgid "gnoMint X.509 CA Manager"
+msgstr "gnoMint. Gestor de ACs X.509"
+
+#~ msgid "Manage X.509 certificates and CAs, easily and graphically"
+#~ msgstr "Gestiona autoridades de certificación y certificados X.509"
 
 #~ msgid " "
 #~ msgstr " "
@@ -2845,546 +3839,23 @@ msgstr "Cliente TLS WWW"
 #~ msgid "<b>CSR subject</b>"
 #~ msgstr "<b>Titular de la solicitud</b>"
 
-#~ msgid "<b>Certificate fields</b>"
-#~ msgstr "<b>Campos de certificado</b>"
-
-#~ msgid "<b>Certificate hierarchy</b>"
-#~ msgstr "<b>Jerarquía de certificados</b>"
-
-#~ msgid "<b>Certificate purposes</b>"
-#~ msgstr "<b>Finalidad del certificado</b>"
-
-#~ msgid "<b>Certificate subject</b>"
-#~ msgstr "<b>Titular del certificado</b>"
-
-#~ msgid "<b>Certificate uses</b>"
-#~ msgstr "<b>Usos del certificado</b>"
-
 #~ msgid "<b>Emmited by</b>"
 #~ msgstr "<b>Emitido por</b>"
-
-#~ msgid "<b>Fingerprints</b>"
-#~ msgstr "<b>Huellas digitales</b>"
-
-#~ msgid "<b>Inherited fields from CA subject</b>"
-#~ msgstr "<b>Campos heredados del titular de la AC</b>"
-
-#~ msgid "<b>Purposes of new generated certificates</b>"
-#~ msgstr "<b>Finalidades posibles de los nuevos certificados</b>"
-
-#~ msgid ""
-#~ "<b>This Certificate Signing Request has its corresponding private key "
-#~ "saved in the internal database.</b>"
-#~ msgstr ""
-#~ "<b>La clave privada correspondiente a esta petición de certificación está "
-#~ "almacenada en la base de datos interna.</b>"
-
-#~ msgid "<b>This certificate has been verified for the following uses:</b>"
-#~ msgstr "<b>Este certificado ha sido validado para los siguientes usos:</b>"
-
-#~ msgid "<b>Uses of new generated certificates</b>"
-#~ msgstr "<b>Usos posibles de los nuevos certificados</b>"
 
 #~ msgid "<b>Validity</b>"
 #~ msgstr "<b>Validez</b>"
 
-#~ msgid "<big><b>New Certificate Revocation List</b></big>"
-#~ msgstr "<big><b>Nueva lista de certificados revocados</b></big>"
-
-#~ msgid "<big>CA Properties</big>\n"
-#~ msgstr "<big>Propiedades de la AC</big>\n"
-
-#~ msgid "<big>CA Root certificate properties</big>\n"
-#~ msgstr "<big>Propiedades del certificado raiz de la AC</big>\n"
-
-#~ msgid "<big>Certificate Request Properties</big>\n"
-#~ msgstr "<big>Propiedades de la solicitud</big>\n"
-
-#~ msgid ""
-#~ "<big>Choose private key file</big>\n"
-#~ "\n"
-#~ "For doing the selected operation, you must provide the file where resides "
-#~ "the private key corresponding to the certificate:"
-#~ msgstr ""
-#~ "<big>Seleccione fichero con clave privada</big>\n"
-#~ "\n"
-#~ "Para realizar la operación seleccionada, deberá proporcionar el fichero "
-#~ "donde reside la clave privada correspondiente al certificado:"
-
-#~ msgid "<big>New Certificate Properties</big>\n"
-#~ msgstr "<big>Propiedades del nuevo certificado</big>\n"
-
 #~ msgid "<big>Password protection</big>\n"
 #~ msgstr "<big>Cifrado con contraseña</big>\n"
-
-#~ msgid ""
-#~ "<i>Export both (private and public) parts to a password-protected PKCS#12 "
-#~ "file. This kind of file can be imported by other common programs, such as "
-#~ "web or mail clients.</i>"
-#~ msgstr ""
-#~ "<i>Exporta·ambas partes (pública y privada) a un fichero PKCS#12 "
-#~ "protegido con clave. Esta clase de ficheros puede ser importada por otros "
-#~ "programas comúnes, tales como clientes web o de correo electrónico.</i>"
-
-#~ msgid "<i>Export only the certificate to a public file, in PEM format.</i>"
-#~ msgstr ""
-#~ "<i>Exporta sólo el certificado a un fichero público en formato PEM</i>"
-
-#~ msgid ""
-#~ "<i>Export the saved private key to a PEM file. This option should only be "
-#~ "used for exporting certificates that will be used in unattended servers.</"
-#~ "i>"
-#~ msgstr ""
-#~ "<i>Exporta la clave privada almacenada a un fichero PEM. Esta opción sólo "
-#~ "debería ser empleada para exportar certificados que vayan a ser usados en "
-#~ "servidores no atendidos.</i>"
-
-#~ msgid ""
-#~ "<i>Export the saved private key to a PKCS#8 password-protected file. This "
-#~ "file should only be accessed by the subject of the certificate.</i>"
-#~ msgstr ""
-#~ "<i>Exporta la clave privada almacenada a un fichero PKCS#8 protegido con "
-#~ "clave. Este fichero sólo debería ser accesible para el titular del "
-#~ "certificado.</i>"
-
-#~ msgid ""
-#~ "<i>Import a directory containing the structure of\n"
-#~ "a whole CA made with OpenSSL .</i>"
-#~ msgstr ""
-#~ "<i>Importar directorio que contenga la estructura\n"
-#~ "completa de una AC producida con OpenSSL.</i>"
-
-#~ msgid ""
-#~ "<i>Import a single file, encoded in DER or PEM format, containing "
-#~ "certificates, private keys (encrypted or plain), signing requests (CSRs), "
-#~ "revocation lists (CRLs) or PKCS#12 packages.</i>"
-#~ msgstr ""
-#~ "<i>Importar un único fichero, en formato DER o PEM, que contiene "
-#~ "certificados, claves privadas (cifradas o en claro), solicitudes de "
-#~ "certificación (CSRs), listas de revocación (CRLs) o paquetes PKCS#12.</i>"
-
-#~ msgid ""
-#~ "<small><i>\n"
-#~ "It is recommended that all the certificates generated by a CA share the "
-#~ "same properties.\n"
-#~ "If you want to generate certificates with different properties, you "
-#~ "should create a hierarchy of CAs, each one with its own policy for "
-#~ "certificate generation.</i>\n"
-#~ "</small>\n"
-#~ "Please, define the maximum set of properties for the certificates that "
-#~ "this CA will be able to generate:\n"
-#~ msgstr ""
-#~ "<small><i>\n"
-#~ "Se recomienda que todos los certificados generados por una AC compartan "
-#~ "las mismas propiedades.\n"
-#~ "Si desea generar certificados con propiedades distintas, sería "
-#~ "aconsejable crear una jerarquía de ACs, cada una con su propia política "
-#~ "para la generación de certificados.</i>\n"
-#~ "</small>\n"
-#~ "Defina el conjunto máximo de propiedades para los certificados que la "
-#~ "presente Autoridad de Certificación podrá otorgar:\n"
 
 #~ msgid "<small><i>#Description#</i></small>"
 #~ msgstr "<small><i>#Descripción#</i></small>"
 
-#~ msgid ""
-#~ "<small><i>PKCS#3 files containing Diffie&#xB7;Hellman parameters are used "
-#~ "by some cryptographic \n"
-#~ "applications for a secure interchange of their keys over insecure "
-#~ "channels.</i></small>"
-#~ msgstr ""
-#~ "<small><i>Los ficheros PKCS#3·con parámetros·Diffie Hellman·son usados "
-#~ "por ciertas aplicaciones \n"
-#~ "criptográficas para realizar intercambios seguros de sus claves a través "
-#~ "de canales inseguros.</i></small>"
-
-#~ msgid ""
-#~ "<small><i>The part that is being imported has the description:</i></small>"
-#~ msgstr ""
-#~ "<small><i>La parte a ser importada tiene la siguiente descripción:</i></"
-#~ "small>"
-
-#~ msgid ""
-#~ "<small>The subject of the new certificate request can inherit information "
-#~ "from one of the existing Certification Authorities. This is a must if the "
-#~ "policy of the CA you are going to use is defined to force some fields of "
-#~ "a certificate subject to be the same as the ones in the CA cert subject.</"
-#~ "small>"
-#~ msgstr ""
-#~ "<small>El titular de la nueva solicitud de certificado puede heredar "
-#~ "información de una de las autoridades de certificación existentes. Esto "
-#~ "es necesario si la política de la AC que va a utilizar para firmar el "
-#~ "certificado obliga a que ciertos campos sean iguales en el certificado de "
-#~ "la autoridad y en sus certificados hijos.</small>"
-
-#~ msgid "Activated on"
-#~ msgstr "Activado el"
-
-#~ msgid "Add CSR"
-#~ msgstr "Añadir CSR"
-
-#~ msgid "Add _Certificate Request"
-#~ msgstr "Añadir _solicitud de certificación"
-
-#~ msgid "Add a new Certificate Signing Request"
-#~ msgstr "Añadir nueva solicitud de certificación"
-
-#~ msgid "Add an autosigned CA"
-#~ msgstr "Añadir autoridad de certificación auto-firmada"
-
-#~ msgid "Add autosigned CA certificate"
-#~ msgstr "Añadir certificado de AC autofirmado"
-
-#~ msgid ""
-#~ "Automatically export created certificates to \n"
-#~ "Gnome-keyring certificate store"
-#~ msgstr ""
-#~ "Exportar automáticamente los certificados creados a\n"
-#~ "el almacén de certificados de Gnome-keyring"
-
-#~ msgid "Both parts."
-#~ msgstr "Ambas partes."
-
-#~ msgid "CA Policy"
-#~ msgstr "Política de la AC"
-
-#~ msgid ""
-#~ "CA Root Certificate \n"
-#~ "Common Name (CN):"
-#~ msgstr ""
-#~ "Nombre común (CN) del\n"
-#~ "certificado raiz de la AC:"
-
-#~ msgid "CA properties"
-#~ msgstr "Propiedades de la AC"
-
-#~ msgid "CACN"
-#~ msgstr "CACN"
-
-#~ msgid "CAO"
-#~ msgstr "CAO"
-
-#~ msgid "CAOU"
-#~ msgstr "CAOU"
-
-#~ msgid "CSR properties - gnoMint"
-#~ msgstr "Propiedades de la solicitud - gnoMint"
-
-#~ msgid "CertActivationDate"
-#~ msgstr "Fecha de activación"
-
-#~ msgid "CertExpirationDate"
-#~ msgstr "Fecha de caducidad"
-
-#~ msgid "CertSN"
-#~ msgstr "Núm de serie"
-
-#~ msgid ""
-#~ "Certificate \n"
-#~ "Common Name (CN):"
-#~ msgstr ""
-#~ "Nombre común (CN) del\n"
-#~ "certificado:"
-
-#~ msgid "Certificate DN"
-#~ msgstr "Descriptor del certificado"
-
-#~ msgid "Certificate _Signing Requests"
-#~ msgstr "_Solicitudes de firma de certificados"
-
-#~ msgid "Certificate properties"
-#~ msgstr "Propiedades del certificado"
-
-#~ msgid "Certificate properties - gnoMint"
-#~ msgstr "Propiedades del certificado - gnoMint"
-
-#~ msgid "Change database pass_word"
-#~ msgstr "Cambiar contrase_ña de base de datos"
-
-#~ msgid "Choose CA for signing the CSR"
-#~ msgstr "Seleccione autoridad que firmará la solicitud"
-
-#~ msgid "Choose private key file. gnoMint"
-#~ msgstr "Seleccione fichero con clave privada. gnoMint"
-
-#~ msgid "City"
-#~ msgstr "Ciudad"
-
-#~ msgid "City: "
-#~ msgstr "Ciudad "
-
-#~ msgid "Common Name (CN)"
-#~ msgstr "Nombre común (CN)"
-
-#~ msgid "Country"
-#~ msgstr "País"
-
-#~ msgid "Country:"
-#~ msgstr "País"
-
-#~ msgid "Create a new database"
-#~ msgstr "Crear nueva base de datos"
-
-#~ msgid "Creating CA Root Certificate"
-#~ msgstr "Creando certificado raíz de la AC"
-
-#~ msgid "Creating new CA - gnoMint"
-#~ msgstr "Creando nueva AC - gnoMint"
-
-#~ msgid "DSA"
-#~ msgstr "DSA"
-
-#~ msgid "Database password protection - gnoMint"
-#~ msgstr "Protección de contraseña de base de datos - gnoMint"
-
-#~ msgid "Delete the selected Certificate Signing Request"
-#~ msgstr "Borrar la solicitud de certificación seleccionada"
-
-#~ msgid "Details"
-#~ msgstr "Detalles"
-
-#~ msgid "Don't inherit any fields from existing Certification Authorities"
-#~ msgstr "No heredar ningún campo de autoridades de certificación existentes"
-
-#~ msgid "E_xport"
-#~ msgstr "E_xportar"
-
-#~ msgid ""
-#~ "Enter new password again \n"
-#~ "for confirmation:"
-#~ msgstr ""
-#~ "Introduzca la nueva contraseña \n"
-#~ "otra vez para confirmar:"
-
-#~ msgid "Enter password - gnoMint"
-#~ msgstr "Introduzca contraseña - gnoMint"
-
 #~ msgid "Enter password again for confirmation:"
 #~ msgstr "Introduzca otra vez la contraseña para confirmar:"
 
-#~ msgid "Expires on"
-#~ msgstr "Caduca el"
-
-#~ msgid "Export certificate - gnoMint"
-#~ msgstr "Exportar certificado - gnoMint"
-
-#~ msgid "Export options"
-#~ msgstr "Opciones de exportación"
-
-#~ msgid "Exports the CSR so it can be imported by any other application"
-#~ msgstr ""
-#~ "Exporta la solicitud de certificación de modo que pueda ser importada por "
-#~ "cualquier otra aplicación"
-
-#~ msgid ""
-#~ "Exports the certificate so it can be imported by any other application"
-#~ msgstr ""
-#~ "Exporta el certificado de modo que pueda ser importado por cualquier otra "
-#~ "aplicación"
-
-#~ msgid "Extrac_t private key"
-#~ msgstr "Ex_traer clave privada"
-
-#~ msgid "Extract Private Key"
-#~ msgstr "Extraer clave privada"
-
-#~ msgid "Extract the private key of the selected item into a external file"
-#~ msgstr ""
-#~ "Extrae la clave privada del elemento seleccionado a un fichero externo"
-
-#~ msgid "Extract the saved private key to an external file or device"
-#~ msgstr ""
-#~ "Extrae la clave privada almacenada a un fichero o dispositivo externo"
-
-#~ msgid ""
-#~ "Extracts the private key of the selected \n"
-#~ "certificate from the database to an \n"
-#~ "external file. This file must be provided \n"
-#~ "each time the CSR will be used"
-#~ msgstr ""
-#~ "Extrae de la base de datos la clave privada del certificado seleccionado, "
-#~ "almacenándola en un fichero externo. Este fichero deberá proporcionarse "
-#~ "cada vez que se emplee la solicitud de certificación"
-
-#~ msgid ""
-#~ "Extracts the private key of the selected \n"
-#~ "certificate from the database to an \n"
-#~ "external file. This file must be provided \n"
-#~ "each time the certificate will be used"
-#~ msgstr ""
-#~ "Extrae de la base de datos la clave privada del certificado seleccionado, "
-#~ "almacenándola en un fichero externo. Este fichero deberá proporcionarse "
-#~ "cada vez que se emplee el certificado"
-
-#~ msgid "General"
-#~ msgstr "General"
-
-#~ msgid "General Preferences - gnoMint"
-#~ msgstr "Preferencias generales - gnoMint"
-
-#~ msgid "Generate D_H parameters..."
-#~ msgstr "Generar parámetros D_H..."
-
-#~ msgid "Generate _CRL"
-#~ msgstr "Generar _CRL"
-
-#~ msgid "Generate the current Certificate Revocation List"
-#~ msgstr "Generar lista actual de certificados revocados (CRL)"
-
-#~ msgid "Hours between CRL updates:"
-#~ msgstr "Nº de horas entre actualizaciones consecutivas de CRL:"
-
-#~ msgid "Import a single file."
-#~ msgstr "Importar un único fichero."
-
-#~ msgid "Import a whole directory."
-#~ msgstr "Importar un directorio completo."
-
-#~ msgid "Import selection - gnoMint"
-#~ msgstr "Selección de importación - gnoMint"
-
-#~ msgid ""
-#~ "Inherit fields according to selected Certification Authority and its "
-#~ "policy."
-#~ msgstr ""
-#~ "Heredar campos según la política de la autoridad de certificación "
-#~ "seleccionada."
-
-#~ msgid "MD5 fingerprint"
-#~ msgstr "Huella digital MD5"
-
-#~ msgid "MD5FINGERPRINT"
-#~ msgstr "MD5FINGERPRINT"
-
-#~ msgid ""
-#~ "Maximum number of months before expiration of the new generated "
-#~ "certificates:"
-#~ msgstr ""
-#~ "Máximo número de meses antes de la caducidad de los nuevos certificados:"
-
-#~ msgid "Months before certificate expiration:"
-#~ msgstr "Meses antes de la caducidad del certificado:"
-
-#~ msgid "Months before root certificate expiration:"
-#~ msgstr "Meses antes de la caducidad del certificado raíz:"
-
-#~ msgid "New CA - gnoMint"
-#~ msgstr "Nueva AC - gnoMint"
-
-#~ msgid "New CRL - gnoMint"
-#~ msgstr "Nueva CRL - gnoMint"
-
-#~ msgid "New Certificate - gnoMint"
-#~ msgstr "Nuevo certificado - gnoMint"
-
-#~ msgid "New Diffie-Hellman parameters - gnoMint"
-#~ msgstr "Nuevos parámetros Diffie-Hellman - gnoMint"
-
-#~ msgid ""
-#~ "New certificate \n"
-#~ "Common Name (CN):"
-#~ msgstr ""
-#~ "Nombre común (CN) del\n"
-#~ "nuevo certificado:"
-
-#~ msgid "New certificate request - gnoMint"
-#~ msgstr "Nueva solicitud de certificación - gnoMint"
-
-#~ msgid "Only the private key (crypted)."
-#~ msgstr "Sólo la clave privada (cifrada)."
-
-#~ msgid "Only the private key (uncrypted)."
-#~ msgstr "Sólo la clave privada (sin cifrar)."
-
-#~ msgid "Only the pu_blic part."
-#~ msgstr "Sólo la parte pú_blica."
-
-#~ msgid "Open _recents"
-#~ msgstr "Abrir _recientes"
-
-#~ msgid "Open an existing database"
-#~ msgstr "Abrir base de datos existente"
-
-#~ msgid "Organization"
-#~ msgstr "Organización"
-
-#~ msgid "Organization (O)"
-#~ msgstr "Organización (O)"
-
-#~ msgid "Organization Unit:"
-#~ msgstr "Unidad organizativa:"
-
-#~ msgid "Organization:"
-#~ msgstr "Organización:"
-
-#~ msgid "Organizational Unit (OU)"
-#~ msgstr "Unidad organizativa (OU)"
-
-#~ msgid "Organizational unit"
-#~ msgstr "Unidad organizativa"
-
-#~ msgid "Password (confirm):"
-#~ msgstr "Contraseña (confirmar):"
-
-#~ msgid "Password protect"
-#~ msgstr "Proteger con contraseña"
-
-#~ msgid "Password:"
-#~ msgstr "Contraseña:"
-
-#~ msgid "Please, choose the file:"
-#~ msgstr "Seleccione el fichero:"
-
-#~ msgid "Please, choose the more suitable option for what you want to import:"
-#~ msgstr ""
-#~ "Seleccione la opción más adecuada que represente lo que desea importar:"
-
-#~ msgid ""
-#~ "Please, choose which part of the saved certificate you want to export:"
-#~ msgstr "Seleccione qué parte almacenada del certificado desea exportar:"
-
-#~ msgid ""
-#~ "Please, enter current\n"
-#~ "password:"
-#~ msgstr ""
-#~ "Introduzca la contraseña \n"
-#~ "actual:"
-
-#~ msgid ""
-#~ "Please, enter new \n"
-#~ "password:"
-#~ msgstr ""
-#~ "Introduzca la nueva \n"
-#~ "contraseña:"
-
-#~ msgid "Please, enter password"
-#~ msgstr "Introduzca la contraseña"
-
 #~ msgid "Please, enter password:"
 #~ msgstr "Introduzca la contraseña:"
-
-#~ msgid "Please, enter the prime size, in bits:"
-#~ msgstr "Introduzca el tamaño del número primo, en bits:"
-
-#~ msgid ""
-#~ "Please, select the CA for which a Certificate \n"
-#~ "Revocation List is going to be created:"
-#~ msgstr ""
-#~ "Seleccione la autoridad de certificación para la\n"
-#~ "que se va a crear una CRL (lista de certificados \n"
-#~ "revocados):"
-
-#~ msgid "Private key bit length:"
-#~ msgstr "Longitud en bits de la clave privada:"
-
-#~ msgid "Private key type:"
-#~ msgstr "Tipo de clave privada:"
-
-#~ msgid ""
-#~ "Protect CA database private \n"
-#~ "keys with password:"
-#~ msgstr ""
-#~ "Proteger con contraseña las claves privadas de la base de datos de la AC:"
 
 #~ msgid ""
 #~ "Protect CA database private keys\n"
@@ -3392,178 +3863,11 @@ msgstr "Cliente TLS WWW"
 #~ msgstr ""
 #~ "Proteger con contraseña las claves privadas de la base de datos de la AC:"
 
-#~ msgid "RSA"
-#~ msgstr "RSA"
-
-#~ msgid "Remember this password during this gnoMint session"
-#~ msgstr "Recordar esta contraseña durante toda esta sesión de gnoMint"
-
-#~ msgid "Revo_ke"
-#~ msgstr "Revo_car"
-
-#~ msgid "Revoke"
-#~ msgstr "Revocar"
-
-#~ msgid "Revoke the selected certificate"
-#~ msgstr "Revocar el certificado seleccionado"
-
-#~ msgid "Revokes the selected certificate"
-#~ msgstr "Revoca el certificado seleccionado"
-
-#~ msgid "Root certificate prop"
-#~ msgstr "Prop. de certificado raíz"
-
-#~ msgid "SHA1 fingerprint"
-#~ msgstr "Huella digital SHA1"
-
-#~ msgid "SHA1FINGERPRINT"
-#~ msgstr "SHA1FINGERPRINT"
-
-#~ msgid "Serial number"
-#~ msgstr "Nº de serie"
-
-#~ msgid "Shows the CSR properties window"
-#~ msgstr "Mostrar ventana de propiedades de la solicitud de certificación"
-
-#~ msgid "Shows the certificate properties window"
-#~ msgstr "Muestra la ventana de propiedades del certificado"
-
-#~ msgid "Sign"
-#~ msgstr "Firmar"
-
-#~ msgid "Sign the selected Certificate Signing Request"
-#~ msgstr "Firmar la solicitud de certificación seleccionada"
-
-#~ msgid "State or Province name"
-#~ msgstr "Nombre de estado o provincia"
-
-#~ msgid "State or Province name: "
-#~ msgstr "Nombre de estado o provincia: "
-
-#~ msgid "SubjectCN"
-#~ msgstr "NombreTitular"
-
-#~ msgid "SubjectO"
-#~ msgstr "OrganizaciónTitular"
-
-#~ msgid "SubjectOU"
-#~ msgstr "UnidadOrganizativaTitular"
-
-#~ msgid "TLS Web client"
-#~ msgstr "Cliente WWW TLS"
-
-#~ msgid "TLS Web server"
-#~ msgstr "Servidor web TLS"
-
-#~ msgid ""
-#~ "The whole selected file, or some of its elements, seems to be cyphered "
-#~ "using a password or passphrase.\n"
-#~ "\n"
-#~ "For importing the file into gnoMint database, you must provide an "
-#~ "appropiate password."
-#~ msgstr ""
-#~ "Todo el fichero seleccionado, o alguno de los elementos que lo conforman, "
-#~ "parece haber sido cifrado empleando una contraseña.\n"
-#~ "\n"
-#~ "Para importar el fichero en la base de datos de gnoMint, deberá "
-#~ "proporcionar una contraseña adecuada."
-
-#~ msgid ""
-#~ "This action requires using one or more private keys saved in the CA "
-#~ "database.\n"
-#~ "\n"
-#~ "Please insert the database password."
-#~ msgstr ""
-#~ "Esta acción necesita emplear una o más claves privadas almacenadas en la "
-#~ "base de datos de la AC.\n"
-#~ "\n"
-#~ "Por favor, introduzca la contraseña de la base de datos."
-
-#~ msgid ""
-#~ "You are about to create and export a set of Diffie&#xB7;Hellman "
-#~ "parameters into a PKCS#3 structure file."
-#~ msgstr ""
-#~ "Se va a crear y exportar un conjunto de parámetros Diffie-Hellman a un "
-#~ "fichero con formato PKCS#3."
-
-#~ msgid ""
-#~ "You are about to sign a Certificate Signing Request, and this way, "
-#~ "creating a new certificate. Please check the certificate properties."
-#~ msgstr ""
-#~ "Se va a proceder a la firma de una solicitud de certificación, creándose "
-#~ "así un nuevo certificado. Por favor, compruebe las propiedades de éste."
-
-#~ msgid ""
-#~ "You are about to sign a Certificate Signing Request. Please, choose the "
-#~ "Certification Authority you are going to use for signing it."
-#~ msgstr ""
-#~ "Se va a proceder a la firma de una solicitud de certificación. Por favor, "
-#~ "seleccione la autoridad de certificación que se va a emplear para "
-#~ "firmarlo."
-
-#~ msgid "_Add self-signed CA"
-#~ msgstr "_Añadir autoridad de certificación auto-firmada"
-
-#~ msgid "_Certificates"
-#~ msgstr "Certificados"
-
-#~ msgid "_Edit"
-#~ msgstr "_Editar"
-
-#~ msgid "_Help"
-#~ msgstr "Ay_uda"
-
-#~ msgid "_Import"
-#~ msgstr "I_mportar"
-
-#~ msgid "_New certificate database"
-#~ msgstr "_Nueva base de datos de certificados"
-
-#~ msgid "_No"
-#~ msgstr "_No"
-
-#~ msgid "_Open certificate database"
-#~ msgstr "Abrir base de datos de certificados"
-
-#~ msgid "_Revoked Certificates"
-#~ msgstr "Certificados _revocados"
-
-#~ msgid "_Save certificate database as..."
-#~ msgstr "_Guardar base de datos de certificados como..."
-
-#~ msgid "_Save filename in the database for automatic loading"
-#~ msgstr ""
-#~ "_Guardar nombre de fichero en base de datos para cargarlo automáticamente"
-
-#~ msgid "_Sign"
-#~ msgstr "_Firmar"
-
-#~ msgid "_View"
-#~ msgstr "_Ver"
-
-#~ msgid "_Yes"
-#~ msgstr "_Sí"
-
-#~ msgid "gnoMint"
-#~ msgstr "gnoMint"
-
 #~ msgid "gtk-cancel"
 #~ msgstr "gtk-cancel"
 
 #~ msgid "gtk-ok"
 #~ msgstr "gtk-ok"
-
-#~ msgid "label"
-#~ msgstr "etiqueta"
-
-#~ msgid "may differ"
-#~ msgstr "puede variar"
-
-#~ msgid "must be the same"
-#~ msgstr "debe coincidir"
-
-#~ msgid "page 3"
-#~ msgstr "página 3"
 
 #~ msgid ""
 #~ "The certificate will be generated with the following uses and purposes:\n"
@@ -3835,9 +4139,6 @@ msgstr "Cliente TLS WWW"
 
 #~ msgid "Finland"
 #~ msgstr "Finlandia"
-
-#~ msgid "France"
-#~ msgstr "Francia"
 
 #~ msgid "French Guiana"
 #~ msgstr "Guyana Francesa"
