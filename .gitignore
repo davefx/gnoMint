@@ -44,6 +44,7 @@ po/gnomint.pot
 src/test_y2k38
 test-driver
 tests/check_ui_consistency
+tests/check_workflows
 tests/check_y2k38
 tests/*.log
 tests/*.trs

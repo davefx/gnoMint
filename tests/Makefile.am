@@ -1,14 +1,23 @@
 ## tests/Makefile.am — make check harness
 ##
-## Two stages are planned; this file implements stage 1 (see issue #42).
-##
+## Stage 1 — static checks, no display needed (issue #42, landed):
 ##   check_y2k38             Standalone Y2K38 verification (was src/test_y2k38.c)
 ##   check_ui_consistency    Static .ui consistency checker
 ##
-## Stage 2 (issue #43) will add check_workflows running under Xvfb.
+## Stage 2A — runtime checks under headless Wayland (issue #43):
+##   check_workflows         GTK workflow regression tests, run via
+##                           run-headless.sh which spawns weston with
+##                           the headless backend. Gnomint's primary
+##                           user environment is Wayland.
 
-TESTS = check_y2k38 check_ui_consistency
+TESTS = check_y2k38 check_ui_consistency check_workflows
 check_PROGRAMS = $(TESTS)
+
+# Per-test wrapper: only check_workflows runs under a headless Wayland
+# compositor. The static tests stay display-free.
+check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
+
+EXTRA_DIST = run-headless.sh
 
 # ---------------------------------------------------------------
 # Y2K38 verification — no GUI dependencies, just stdio + time.h.
@@ -85,4 +94,62 @@ check_ui_consistency_LDADD = \
 	-ldl
 
 check_ui_consistency_LDFLAGS = \
+	-export-dynamic
+
+# ---------------------------------------------------------------
+# check_workflows — runtime GTK workflow tests under headless Wayland.
+# Links the same GUI object files as check_ui_consistency so populate
+# functions and global builders are reachable. Run by run-headless.sh
+# which manages a weston subprocess.
+# ---------------------------------------------------------------
+
+check_workflows_SOURCES = \
+	check_workflows.c \
+	$(top_srcdir)/src/main.c \
+	$(top_srcdir)/src/country_table.c \
+	$(top_srcdir)/src/new_ca_window.c \
+	$(top_srcdir)/src/new_req_window.c \
+	$(top_srcdir)/src/new_cert.c \
+	$(top_srcdir)/src/creation_process_window.c \
+	$(top_srcdir)/src/dialog.c \
+	$(top_srcdir)/src/ca.c \
+	$(top_srcdir)/src/ca_creation.c \
+	$(top_srcdir)/src/tls.c \
+	$(top_srcdir)/src/ca_file.c \
+	$(top_srcdir)/src/certificate_properties.c \
+	$(top_srcdir)/src/ca_policy.c \
+	$(top_srcdir)/src/csr_creation.c \
+	$(top_srcdir)/src/csr_properties.c \
+	$(top_srcdir)/src/pkey_manage.c \
+	$(top_srcdir)/src/preferences-gui.c \
+	$(top_srcdir)/src/preferences-window.c \
+	$(top_srcdir)/src/crl.c \
+	$(top_srcdir)/src/uint160.c \
+	$(top_srcdir)/src/import.c \
+	$(top_srcdir)/src/export.c \
+	$(top_srcdir)/src/san_manager.c
+
+check_workflows_CFLAGS = \
+	-I$(top_srcdir) \
+	-I$(top_builddir) \
+	-I$(top_srcdir)/src \
+	$(GNOMINT_CFLAGS) \
+	$(LIBGNUTLS_CFLAGS) \
+	$(LIBGCRYPT_CFLAGS) \
+	$(SQLITE_CFLAGS) \
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
+	-DGNOMINT_UI_DIR=\""$(abs_top_srcdir)/gui"\" \
+	-DTEST_PEM_PATH=\""$(abs_top_srcdir)/certs/davefx.pem"\" \
+	-DCOMPILATION_DATE=`date +%s` \
+	-DHAVE_CONFIG_H \
+	-DGNOMINT_UI_TEST
+
+check_workflows_LDADD = \
+	$(GNOMINT_LIBS) \
+	$(LIBGCRYPT_LIBS) \
+	$(LIBGNUTLS_LIBS) \
+	$(SQLITE_LIBS) \
+	$(LTLIBINTL)
+
+check_workflows_LDFLAGS = \
 	-export-dynamic

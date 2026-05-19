@@ -35,7 +35,8 @@ jobs:
             libgdk-pixbuf2.0-dev \
             gettext \
             intltool \
-            iso-codes
+            iso-codes \
+            weston
       
       - name: Verify dependencies
         run: |
