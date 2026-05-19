@@ -13,6 +13,7 @@ gui/export_certificate_dialog.ui
 gui/get_db_password_dialog.ui
 gui/get_password_dialog.ui
 gui/get_pkey_dialog.ui
+gui/gnomint.appdata.xml.in
 gui/gnomint.desktop.in
 gui/import_file_or_directory_dialog.ui
 gui/import_password_dialog.ui
@@ -32,6 +33,7 @@ src/ca_creation.c
 src/ca_file.c
 src/ca_policy.c
 src/certificate_properties.c
+src/country_table.c
 src/creation_process_window.c
 src/crl.c
 src/csr_creation.c

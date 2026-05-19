@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
-SUBDIRS = src po gui mime gconf
+SUBDIRS = src po gui mime gconf tests
 
-DIST_SUBDIRS = src po gui mime gconf
+DIST_SUBDIRS = src po gui mime gconf tests
 
 
 AM_CPPFLAGS = \
