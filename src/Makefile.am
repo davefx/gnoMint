@@ -37,7 +37,8 @@ gnomint_SOURCES = \
 	import.c \
 	export.c \
 	san_manager.c \
-	san_manager.h
+	san_manager.h \
+	wizard_window.c
 
 
 gnomint_LDADD = \
@@ -117,4 +118,5 @@ EXTRA_DIST = \
 	uint160.h \
 	import.h \
 	ca-cli.h \
-	ca-cli-callbacks.h
+	ca-cli-callbacks.h \
+	wizard_window.h

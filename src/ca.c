@@ -44,6 +44,7 @@
 #include "preferences-gui.h"
 #include "preferences-window.h"
 #include "import.h"
+#include "wizard_window.h"
 
 #ifndef GNOMINTCLI
 
@@ -1926,6 +1927,16 @@ G_MODULE_EXPORT void on_add_csr_activate  (GtkMenuItem *menuitem, gpointer     u
 {
 	new_req_window_display();
 	
+}
+
+G_MODULE_EXPORT void on_wizard_web_activate  (GtkToolButton *toolbutton, gpointer user_data)
+{
+	wizard_window_display(WIZARD_CERT_TYPE_WEB_SERVER);
+}
+
+G_MODULE_EXPORT void on_wizard_email_activate  (GtkToolButton *toolbutton, gpointer user_data)
+{
+	wizard_window_display(WIZARD_CERT_TYPE_EMAIL_SERVER);
 }
 
 
