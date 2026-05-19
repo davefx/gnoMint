@@ -140,6 +140,7 @@ check_workflows_CFLAGS = \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DGNOMINT_UI_DIR=\""$(abs_top_srcdir)/gui"\" \
 	-DTEST_PEM_PATH=\""$(abs_top_srcdir)/certs/davefx.pem"\" \
+	-DTEST_FIXTURE_PATH=\""$(abs_top_srcdir)/certs/example-ca.gnomint"\" \
 	-DCOMPILATION_DATE=`date +%s` \
 	-DHAVE_CONFIG_H \
 	-DGNOMINT_UI_TEST
