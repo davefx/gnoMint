@@ -117,4 +117,5 @@ EXTRA_DIST = \
 	uint160.h \
 	import.h \
 	ca-cli.h \
-	ca-cli-callbacks.h
+	ca-cli-callbacks.h \
+	time64_check.h

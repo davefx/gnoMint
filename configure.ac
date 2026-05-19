@@ -1,6 +1,6 @@
 AC_PREREQ([2.69])
 
-AC_INIT([gnoMint],[1.3.0],[<davefx@gmail.com>],[gnomint])
+AC_INIT([gnoMint],[1.4.0],[<davefx@gmail.com>],[gnomint])
 
 PACKAGE_COPYRIGHT="(c) 2006-2016 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="http://gnomint.sourceforge.net"

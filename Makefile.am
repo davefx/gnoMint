@@ -17,7 +17,9 @@ EXTRA_DIST =  \
 	TODO \
 	intltool-extract.in \
 	intltool-merge.in \
-	intltool-update.in 
+	intltool-update.in \
+	certs/davefx.pem \
+	certs/example-ca.gnomint
 
 pkgconfigdir=$(libdir)/pkgconfig
 pkgconfig_DATA = 
@@ -41,4 +43,5 @@ dist-hook: gnomint.spec
 DISTCLEANFILES = \
 	intltool-extract \
 	intltool-merge \
-	intltool-update
+	intltool-update \
+	po/.intltool-merge-cache.lock

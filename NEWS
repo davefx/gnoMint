@@ -1,3 +1,278 @@
+* Version 1.4.0 "Lazarus" (2026.05.19)
+
+After a decade-long hiatus since 1.3.0, gnoMint returns. This
+release accumulates ten years of patches from the Debian downstream
+community, modernizes the build for current toolchains, and adds a
+test suite to keep regressions out of the next release.
+
+- FEATURE: Subject Alternative Name (SAN) support throughout the
+  workflow: a SAN editor when creating a CA or CSR, SAN display in
+  certificate and CSR property dialogs, and proper parsing of SANs
+  from existing certificates.
+
+- FEATURE: Year 2038 (Y2K38) safe handling of certificate dates. The
+  build now forces 64-bit time_t even on 32-bit systems, so
+  certificates with validity periods decades past 2038 work
+  correctly.
+
+- FEATURE: XDG Base Directory Specification compliance. The default
+  database lives under $XDG_DATA_HOME/gnomint/ instead of
+  ~/.gnomint/. Existing databases at the old location are migrated
+  automatically on first run.
+
+- FEATURE: AppData file for software-center integration, and
+  improved gnomint.desktop entry (Exec=gnomint %f so .gnomint files
+  open from file managers).
+
+- FEATURE: New test suite runnable via "make check". Includes a
+  static .ui consistency checker (catches GtkBuilder layout files
+  that fail to load, GtkGrid cell collisions, and orphan signal
+  handlers) plus a runtime workflow regression test that exercises
+  GUI callbacks under a headless Wayland compositor.
+
+- FEATURE: Devcontainer configuration for VS Code Dev Containers
+  with all build dependencies pre-installed, plus a GitHub Actions
+  workflow for build verification.
+
+- FIX: Crash when exporting a certificate's private key on 64-bit
+  systems, caused by passing a gint pointer to gtk_tree_model_get
+  for a G_TYPE_UINT64 column.
+
+- FIX: Segmentation fault when right-clicking a CA certificate in
+  the tree view.
+
+- FIX: Latent layout collision in the certificate properties dialog
+  where the "Validity" header overlapped the issuer's OU row.
+
+- FIX: CSR field inheritance now correctly respects CA policy using
+  an integer check rather than a string comparison.
+
+- FIX: Memory leak in ca_file_insert_cert_in_db.
+
+- FIX: Various uninitialized-variable warnings cleaned up.
+
+- FIX: User-facing spelling errors corrected ("Emmited" -> "Emitted",
+  "appropiate" -> "appropriate", and others).
+
+- FIX: Build system now respects external CFLAGS instead of
+  hardcoding -Wall, and configure.ac no longer references a
+  non-existent m4/Makefile that caused autoreconf failures.
+
+- FIX: All GtkBuilder .ui files ported to the GTK 3 widget set
+  (GtkVBox/HBox/Table/Alignment/HButtonBox -> GtkBox/Grid/ButtonBox).
+  Forward-port from the Debian community gtk3-port.patch.
+
+- I18N: New Italian translation. POT template regenerated (456 ->
+  617 msgids); all 12 existing translation files updated.
+
+
+* Version 1.3.0 "Sha Sha dance" (2016.03.15)
+
+- FEATURE: New certificates are now signed with SHA512 by default,
+  upgraded from SHA1.
+
+- FEATURE: SHA256 support, including SHA256 fingerprint display in
+  the certificate properties dialog.
+
+- FIX: Bug #2931708 — invalid DSA key lengths can no longer be
+  entered when creating a CA or CSR.
+
+- FIX: "make dist" works correctly again.
+
+- FIX: Compilation on Ubuntu 15.04 and other modern toolchains.
+
+- BUILD: -Werror removed; deprecated GnuTLS functions cleaned up;
+  autotools and .gitignore tidied.
+
+- I18N: Spanish translation completed.
+
+
+* Version 1.2.1 "All you need is a giant pacifier" (2010.08.11)
+
+- FIX: Crash when revoking a CA certificate if revoked certificates
+  were hidden in the tree view.
+
+- FIX: Use-after-free in ca-cli-callbacks.c (RedHat Bugzilla #584069).
+
+- FEATURE: Distinct warning message when revoking a CA certificate
+  versus a leaf certificate.
+
+- I18N: New Occitan (oc) translation; all translations updated.
+
+
+* Version 1.2.0 (2010.08.10)
+
+- FEATURE: Microsoft Windows support, by Jaroslav Imrich.
+
+- FEATURE: CRL distribution points can be configured per-CA and
+  embedded in issued certificates.
+
+- FIX: Bug #3006946 — CA policies could no longer be established.
+
+- FIX: Export-from-menu action.
+
+- I18N: New Slovak translation, by Jaroslav Imrich.
+
+
+* Version 1.1.0 (2009.11.08)
+
+- FEATURE: Hierarchical tree built using node routes instead of
+  subject-name matching, so CAs with identical common names work
+  correctly.
+
+- FIX: Bug #2890061 — gnomint-cli showpolicy failed with "invalid
+  ca-id".
+
+- BUILD: libgcrypt is now explicitly checked in configure
+  (Debian bug #554669).
+
+- I18N: Translations updated; gettext comments preserved.
+
+
+* Version 1.0.0 (2009.06.05)
+
+- FEATURE: When creating a certificate whose expiration date is past
+  the CA's, gnoMint clamps the expiration to the CA's and shows an
+  informational message.
+
+- FEATURE: New dialog_info helper for informational messages.
+
+- BUILD: Compiles cleanly with GnuTLS 2.8.0.
+
+- FIX: gnomint-cli's crlgen subcommand was missing from the CLI
+  dispatch table.
+
+- I18N: New Russian and Finnish translations.
+
+
+* Version 0.9.9 (2009.04.18)
+
+- FEATURE: Functional toolbar with proper action sensitivity
+  (Extract private key correctly disables when there's no selection,
+  etc.).
+
+- FEATURE: New password-ciphering scheme with a unique initialisation
+  vector and counter per encrypted key, replacing the previous
+  scheme that reused both.
+
+- FIX: Encrypted private key exports produced incorrect output.
+
+- FIX: Attempting to export a CSR as PKCS#12 is no longer possible
+  (PKCS#12 is certificate-only).
+
+- FIX: Extracting a CSR's private key was returning the certificate's
+  key instead.
+
+- FIX: While importing a CA certificate, the grand-children's
+  parent-route is correctly updated alongside the children's.
+
+- FIX: uint160_write is now platform-independent.
+
+- FIX: When the database is password-unprotected, the password entry
+  is reset and the old password property is deleted.
+
+- FIX: PKCS#12 export works against password-less databases.
+
+- BUILD: libgnomeui dependency removed.
+
+- I18N: Translations updated.
+
+
+* Version 0.9.1 (2008.12.18)
+
+- FIX: Missing include that prevented compilation on OpenSUSE.
+
+
+* Version 0.9.0 (2008.12.16)
+
+- FEATURE: New gnomint-cli command-line interface using readline,
+  with commands addca, addcsr, delete, crlgen, dhgen,
+  changepassword, and informational commands.
+
+
+* Version 0.6.0 (2008.12.01)
+
+- FEATURE: OpenSSL CA import — full CA hierarchies with certificates,
+  private keys, and last-serial state can be imported from an
+  on-disk OpenSSL CA directory.
+
+- FEATURE: PKCS#12 import and export.
+
+- FEATURE: PKCS#8 import.
+
+- FEATURE: PKCS#7 import (untested at release time — no PKCS#7 file
+  found in the wild yet).
+
+- FEATURE: --enable-debug configure option for building with -g -O0.
+
+- FIX: Buffer overrun in uint160_read_escaped.
+
+- FIX: Architecture-dependent value saved in the database (now
+  serialised portably).
+
+- FIX: Serial-number display from imported certificates.
+
+- I18N: New German and Italian translations.
+
+
+* Version 0.5.4 (2008.10.02)
+
+- FEATURE: Certificate import: single files and entire OpenSSL CA
+  directories, including hierarchies.
+
+- FEATURE: CSR import, including the corresponding private key.
+
+- FEATURE: CRL import.
+
+- FEATURE: Full hierarchical view of CAs and their issued
+  certificates and CSRs.
+
+- FEATURE: Subject fields inherited from the parent CA when
+  creating a CSR; the CA used to generate a CSR is remembered as
+  the default when signing it later.
+
+- FEATURE: 20-byte (160-bit) certificate serial numbers, with a new
+  uint160 type for portable handling.
+
+- FEATURE: Database password protection covering all private keys
+  in the database.
+
+- FEATURE: Dependences between certificate uses (key usage) and
+  certificate purposes (extended key usage).
+
+- FEATURE: RFC 5280-compliant Authority Key Identifier and Subject
+  Key Identifier extensions, including reuse of an existing AKI
+  when the signing CA has one.
+
+- FEATURE: gconf-backed preferences (window size, view options,
+  optional export of new certificates to gnome-keyring-manager).
+
+- FEATURE: Recent-files menu.
+
+- FEATURE: Pop-up context menus for certificates and CSRs.
+
+- FEATURE: Diffie-Hellman parameter generation.
+
+- FIX: Several segmentation faults (during CRL generation; when
+  CSR/CA fields are NULL; when sorting more than 10 certificates).
+
+- FIX: Race condition assigning serial numbers when multiple CAs
+  share a database.
+
+- FIX: Bug #2100270 — CRLs can now be generated for every CA in
+  a hierarchy.
+
+- FIX: DSA-keyed CSR generation.
+
+- FIX: i18n setup for languages other than Spanish (patch from
+  Staněk Luboš).
+
+- FIX: Permissions on newly-created database files (now 0600).
+
+- I18N: New French translation (Ahmed Baizid); new Czech
+  translation (Staněk Luboš); new Swedish translation.
+
+
 * Version 0.3.2 (2007.11.03)
 
 - FIX: Fixing database upgrading from version 3 (gnoMint 0.1.5 or
