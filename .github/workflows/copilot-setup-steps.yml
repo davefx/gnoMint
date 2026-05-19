@@ -78,7 +78,11 @@ jobs:
       - name: Build project
         run: |
           make
-      
+
+      - name: Run test suite
+        run: |
+          make check
+
       - name: Display build summary
         run: |
           echo "==================================="

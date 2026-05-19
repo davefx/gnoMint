@@ -40,4 +40,11 @@ po/POTFILES
 po/stamp-it
 po/Makefile.in.in
 po/.intltool-merge-cache.lock
+po/gnomint.pot
 src/test_y2k38
+test-driver
+tests/check_ui_consistency
+tests/check_y2k38
+tests/*.log
+tests/*.trs
+tests/test-suite.log

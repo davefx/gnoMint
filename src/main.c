@@ -91,6 +91,7 @@ GtkWidget * __recent_create_menu (void)
 }
 
 
+#ifndef GNOMINT_UI_TEST
 int main (int   argc,
 	  char *argv[])
 {
@@ -233,6 +234,7 @@ int main (int   argc,
 
 	return 0;
 }
+#endif /* GNOMINT_UI_TEST */
 
 
 

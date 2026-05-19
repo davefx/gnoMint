@@ -206,6 +206,7 @@ gui/Makefile
 po/Makefile.in
 mime/Makefile
 gconf/Makefile
+tests/Makefile
 gnomint.spec
 ])
 AC_OUTPUT
