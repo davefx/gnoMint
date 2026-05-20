@@ -22,7 +22,6 @@
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h>
 #include <time.h>
 
 #include "wizard_window.h"
@@ -38,106 +37,98 @@
 GtkBuilder * wizard_window_gtkb = NULL;
 static WizardCertType current_wizard_type = WIZARD_CERT_TYPE_WEB_SERVER;
 
-// External declaration of ca_db from ca_file.c
-extern sqlite3 *ca_db;
-
 typedef struct {
     guint64 ca_id;
     gchar *subject;
     time_t expiration;
 } CAInfo;
 
-// Helper function to get CA list (non-expired first)
+/* sqlite3 callback used by ca_file_foreach_ca (signature dictated by
+ * CaFileCallbackFunc). Collects each row into the GList passed via
+ * user_data. ca_file_foreach_ca already filters is_ca=1 AND
+ * revocation IS NULL — see src/ca_file.c. */
+static int
+__wizard_collect_ca_cb (void *pArg, int argc, char **argv,
+                        char **columnNames G_GNUC_UNUSED)
+{
+    GList **list = (GList **) pArg;
+    if (argc > CA_FILE_CA_COLUMN_EXPIRATION &&
+        argv[CA_FILE_CA_COLUMN_ID] && argv[CA_FILE_CA_COLUMN_SUBJECT]) {
+        CAInfo *ca = g_new0 (CAInfo, 1);
+        ca->ca_id = g_ascii_strtoull (argv[CA_FILE_CA_COLUMN_ID], NULL, 10);
+        ca->subject = g_strdup (argv[CA_FILE_CA_COLUMN_SUBJECT]);
+        ca->expiration = argv[CA_FILE_CA_COLUMN_EXPIRATION]
+            ? (time_t) g_ascii_strtoull (argv[CA_FILE_CA_COLUMN_EXPIRATION], NULL, 10)
+            : 0;
+        *list = g_list_append (*list, ca);
+    }
+    return 0;
+}
+
+/* sqlite3 callback used by ca_file_foreach_policy. The policy rows
+ * are (ca_id, name, value); name/value are argv[1] and argv[2]. */
+static int
+__wizard_collect_policy_cb (void *pArg, int argc, char **argv,
+                            char **columnNames G_GNUC_UNUSED)
+{
+    GHashTable *table = (GHashTable *) pArg;
+    if (argc >= 3 && argv[1] && argv[2]) {
+        g_hash_table_insert (table, g_strdup (argv[1]), g_strdup (argv[2]));
+    }
+    return 0;
+}
+
+// Helper function to get CA list (CAs are returned in the same
+// hierarchical order ca_file_foreach_ca uses everywhere else in gnoMint).
 static GList * __wizard_get_ca_list (void)
 {
     GList *ca_list = NULL;
-    gchar *query = "SELECT id, subject, expiration FROM certificates WHERE is_ca=1 AND revocation IS NULL ORDER BY expiration DESC;";
-    gchar *error = NULL;
-    
-    int callback(void *data, int argc, char **argv, char **columnNames) {
-        if (argc >= 3 && argv[0] && argv[1]) {
-            GList **list = (GList **)data;
-            CAInfo *ca = g_new0(CAInfo, 1);
-            ca->ca_id = g_ascii_strtoull(argv[0], NULL, 10);
-            ca->subject = g_strdup(argv[1]);
-            ca->expiration = argv[2] ? (time_t)g_ascii_strtoull(argv[2], NULL, 10) : 0;
-            *list = g_list_append(*list, ca);
-        }
-        return 0;
-    }
-    
-    sqlite3_exec (ca_db, query, callback, &ca_list, &error);
-    
-    if (error) {
-        g_free (error);
-    }
-    
+    ca_file_foreach_ca (__wizard_collect_ca_cb, &ca_list);
     return ca_list;
 }
 
 // Helper function to get selected CA from main window or first non-expired
 static guint64 __wizard_get_default_ca_id (void)
 {
-    guint64 selected_ca = ca_get_selected_row_id();
-    
-    // Check if selected item is a CA
+    GList *cas = __wizard_get_ca_list ();
+    guint64 selected_ca = ca_get_selected_row_id ();
+    guint64 result = 0;
+    time_t now = time (NULL);
+
+    /* If the user has a non-revoked CA selected in the main view, prefer that. */
     if (selected_ca > 0) {
-        gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE id=%" G_GUINT64_FORMAT " AND is_ca=1 AND revocation IS NULL;", selected_ca);
-        gchar *error = NULL;
-        guint64 result = 0;
-        
-        int callback(void *data, int argc, char **argv, char **columnNames) {
-            if (argc > 0 && argv[0]) {
-                guint64 *id = (guint64 *)data;
-                *id = g_ascii_strtoull(argv[0], NULL, 10);
+        for (GList *l = cas; l; l = l->next) {
+            CAInfo *ca = l->data;
+            if (ca->ca_id == selected_ca) {
+                result = selected_ca;
+                break;
             }
-            return 0;
-        }
-        
-        sqlite3_exec (ca_db, query, callback, &result, &error);
-        g_free(query);
-        
-        if (error) {
-            g_free (error);
-        }
-        
-        if (result > 0) {
-            return result;
         }
     }
-    
-    // Get first non-expired CA
-    time_t now = time(NULL);
-    gchar *query = g_strdup_printf("SELECT id FROM certificates WHERE is_ca=1 AND revocation IS NULL AND expiration > %ld ORDER BY expiration DESC LIMIT 1;", (long)now);
-    gchar *error = NULL;
-    guint64 ca_id = 0;
-    
-    int callback(void *data, int argc, char **argv, char **columnNames) {
-        if (argc > 0 && argv[0]) {
-            guint64 *id = (guint64 *)data;
-            *id = g_ascii_strtoull(argv[0], NULL, 10);
-        }
-        return 0;
-    }
-    
-    sqlite3_exec (ca_db, query, callback, &ca_id, &error);
-    g_free(query);
-    
-    if (error) {
-        g_free (error);
-    }
-    
-    // If no non-expired CA found, get any CA
-    if (ca_id == 0) {
-        query = "SELECT id FROM certificates WHERE is_ca=1 AND revocation IS NULL LIMIT 1;";
-        sqlite3_exec (ca_db, query, callback, &ca_id, &error);
-        
-        if (error) {
-            g_free (error);
+
+    /* Otherwise pick the first non-expired CA; if all are expired, the
+     * first CA in the list (which is sorted hierarchically). */
+    if (result == 0) {
+        for (GList *l = cas; l; l = l->next) {
+            CAInfo *ca = l->data;
+            if (ca->expiration > now) {
+                result = ca->ca_id;
+                break;
+            }
         }
     }
-    
-    return ca_id;
+    if (result == 0 && cas) {
+        CAInfo *first = cas->data;
+        result = first->ca_id;
+    }
+
+    for (GList *l = cas; l; l = l->next) {
+        CAInfo *ca = l->data;
+        g_free (ca->subject);
+        g_free (ca);
+    }
+    g_list_free (cas);
+    return result;
 }
 
 // Helper function to get CA fields for inheritance
@@ -145,16 +136,8 @@ static void __wizard_get_ca_fields (guint64 ca_id, TlsCreationData *creation_dat
 {
     // Get CA policy settings
     GHashTable *policy_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-    
-    int policy_callback(void *pArg, int argc, char **argv, char **columnNames) {
-        GHashTable *table = (GHashTable *)pArg;
-        if (argc >= 3 && argv[1] && argv[2]) {
-            g_hash_table_insert (table, g_strdup(argv[1]), g_strdup(argv[2]));
-        }
-        return 0;
-    }
-    
-    ca_file_foreach_policy (policy_callback, ca_id, policy_table);
+
+    ca_file_foreach_policy (__wizard_collect_policy_cb, ca_id, policy_table);
     
     // Get CA certificate fields
     gchar *ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
@@ -239,26 +222,28 @@ static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cer
     creation_data->org = g_strdup(""); // Empty organization
     creation_data->ou = g_strdup(""); // Empty organizational unit
     creation_data->cn = g_strdup(server_name); // Server name as CN
-    creation_data->emailAddress = g_strdup("");
+    creation_data->emailAddress = NULL;        // wizard doesn't ask for an email
     creation_data->parent_ca_id_str = g_strdup_printf("'%" G_GUINT64_FORMAT "'", ca_id);
-    
+
     // Apply CA field inheritance based on CA policy
     __wizard_get_ca_fields (ca_id, creation_data);
-    
+
     // Generate RSA key pair
     error_message = tls_generate_rsa_keys (creation_data, &private_key, &csr_key);
-    
+
     if (error_message) {
         dialog_error (g_strdup_printf (_("Key generation failed:\n%s"), error_message));
+        g_free (error_message);
         tls_creation_data_free(creation_data);
         return 0;
     }
-    
+
     // Generate CSR
     error_message = tls_generate_csr (creation_data, csr_key, &certificate_sign_request);
-    
+
     if (error_message) {
         dialog_error (g_strdup_printf (_("CSR generation failed:\n%s"), error_message));
+        g_free (error_message);
         g_free(private_key);
         tls_creation_data_free(creation_data);
         return 0;

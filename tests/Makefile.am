@@ -70,7 +70,8 @@ check_ui_consistency_SOURCES = \
 	$(top_srcdir)/src/uint160.c \
 	$(top_srcdir)/src/import.c \
 	$(top_srcdir)/src/export.c \
-	$(top_srcdir)/src/san_manager.c
+	$(top_srcdir)/src/san_manager.c \
+	$(top_srcdir)/src/wizard_window.c
 
 check_ui_consistency_CFLAGS = \
 	-I$(top_srcdir) \
@@ -128,7 +129,8 @@ check_workflows_SOURCES = \
 	$(top_srcdir)/src/uint160.c \
 	$(top_srcdir)/src/import.c \
 	$(top_srcdir)/src/export.c \
-	$(top_srcdir)/src/san_manager.c
+	$(top_srcdir)/src/san_manager.c \
+	$(top_srcdir)/src/wizard_window.c
 
 check_workflows_CFLAGS = \
 	-I$(top_srcdir) \
