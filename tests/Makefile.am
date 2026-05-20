@@ -10,14 +10,15 @@
 ##                           the headless backend. Gnomint's primary
 ##                           user environment is Wayland.
 
-TESTS = check_y2k38 check_ui_consistency check_workflows
-check_PROGRAMS = $(TESTS)
+TESTS = check_y2k38 check_ui_consistency check_workflows check_cli_email.sh
+check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 
 # Per-test wrapper: only check_workflows runs under a headless Wayland
-# compositor. The static tests stay display-free.
+# compositor. The static tests stay display-free. check_cli_email.sh
+# spawns gnomint-cli directly so it needs no display either.
 check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
 
-EXTRA_DIST = run-headless.sh
+EXTRA_DIST = run-headless.sh check_cli_email.sh
 
 # ---------------------------------------------------------------
 # Y2K38 verification — no GUI dependencies, just stdio + time.h.

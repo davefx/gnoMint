@@ -97,6 +97,7 @@ typedef struct __TlsCert {
 	gchar * st;
 	gchar * l;
 	gchar * dn;
+	gchar * emailAddress;
 
 	gchar * i_cn;
 	gchar * i_o;
@@ -105,6 +106,7 @@ typedef struct __TlsCert {
 	gchar * i_st;
 	gchar * i_l;
 	gchar * i_dn;
+	gchar * i_emailAddress;
 
 	gchar * sha1;
 	gchar * md5;
@@ -126,7 +128,7 @@ typedef struct __TlsCert {
 	time_t activation_time;
 } TlsCert;
 
-typedef struct __TlsCsr {	
+typedef struct __TlsCsr {
 	gchar * cn;
 	gchar * o;
 	gchar * ou;
@@ -134,6 +136,7 @@ typedef struct __TlsCsr {
 	gchar * st;
 	gchar * l;
 	gchar * dn;
+	gchar * emailAddress;
 
 	gchar * key_id;
 	

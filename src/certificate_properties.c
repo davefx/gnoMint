@@ -203,8 +203,11 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOLabel");	
 	gtk_label_set_text (GTK_LABEL(widget), cert->o);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");
 	gtk_label_set_text (GTK_LABEL(widget), cert->ou);
+
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectEmailLabel");
+	gtk_label_set_text (GTK_LABEL(widget), cert->emailAddress ? cert->emailAddress : "");
 
 	// Display Subject Alternative Names if present
 	if (cert->subject_alt_name && cert->subject_alt_name[0]) {
@@ -212,16 +215,19 @@ void __certificate_properties_populate (const char *certificate_pem)
 		gtk_label_set_text (GTK_LABEL(widget), cert->subject_alt_name);
 	}
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerCNLabel");
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_cn);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOLabel");
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_o);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOULabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerOULabel");
 	gtk_label_set_text (GTK_LABEL(widget), cert->i_ou);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha1Label");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certIssuerEmailLabel");
+	gtk_label_set_text (GTK_LABEL(widget), cert->i_emailAddress ? cert->i_emailAddress : "");
+
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha1Label");
 	gtk_label_set_text (GTK_LABEL(widget), cert->sha1);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "md5Label");	

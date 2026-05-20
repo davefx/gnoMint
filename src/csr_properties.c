@@ -64,10 +64,13 @@ void __csr_properties_populate (const char *csr_pem, gboolean privkey_in_db)
 	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectOLabel1");	
 	gtk_label_set_text (GTK_LABEL(widget), csr->o);
 
-	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectOULabel1");	
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectOULabel1");
 	gtk_label_set_text (GTK_LABEL(widget), csr->ou);
 
-	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectSANLabel1");	
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectEmailLabel1");
+	gtk_label_set_text (GTK_LABEL(widget), csr->emailAddress ? csr->emailAddress : "");
+
+	widget = gtk_builder_get_object (csr_properties_window_gtkb, "certSubjectSANLabel1");
 	if (csr->subject_alt_name && csr->subject_alt_name[0]) {
 		gtk_label_set_text (GTK_LABEL(widget), csr->subject_alt_name);
 	} else {

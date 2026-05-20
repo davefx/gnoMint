@@ -392,6 +392,17 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		csr_creation_data->cn = aux;
 		aux = NULL;
 
+		aux = dialog_ask_for_string (_("Enter email address (leave blank for none)"), csr_creation_data->emailAddress);
+		if (csr_creation_data->emailAddress)
+			g_free (csr_creation_data->emailAddress);
+		if (aux && aux[0])
+			csr_creation_data->emailAddress = aux;
+		else {
+			g_free (aux);
+			csr_creation_data->emailAddress = NULL;
+		}
+		aux = NULL;
+
 		aux = dialog_ask_for_string (_("Enter Subject Alternative Names (SAN) [format: DNS:example.com,IP:192.168.1.1]"), csr_creation_data->subject_alt_name);
 		if (csr_creation_data->subject_alt_name)
 			g_free (csr_creation_data->subject_alt_name);
@@ -528,6 +539,17 @@ int ca_cli_callback_addca (int argc, char **argv)
 		if (ca_creation_data->cn)
 			g_free (ca_creation_data->cn);
 		ca_creation_data->cn = aux;
+		aux = NULL;
+
+		aux = dialog_ask_for_string (_("Enter email address (leave blank for none)"), ca_creation_data->emailAddress);
+		if (ca_creation_data->emailAddress)
+			g_free (ca_creation_data->emailAddress);
+		if (aux && aux[0])
+			ca_creation_data->emailAddress = aux;
+		else {
+			g_free (aux);
+			ca_creation_data->emailAddress = NULL;
+		}
 		aux = NULL;
 
 		aux = dialog_ask_for_string (_("Enter Subject Alternative Names (SAN) [format: DNS:example.com,IP:192.168.1.1]"), ca_creation_data->subject_alt_name);

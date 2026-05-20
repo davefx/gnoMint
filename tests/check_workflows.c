@@ -49,6 +49,9 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
+#include "tls.h"
 
 #ifndef GNOMINT_UI_DIR
 # error "GNOMINT_UI_DIR must be set at compile time (path to gui/)"
@@ -90,6 +93,15 @@ extern void ca_on_sign1_activate (GtkMenuItem *, gpointer);
 extern void ca_on_revoke_activate (GtkMenuItem *, gpointer);
 extern gboolean ca_treeview_row_activated (GtkTreeView *, GtkTreePath *,
                                            GtkTreeViewColumn *, gpointer);
+
+/* TLS helpers exercised by the email scenario. */
+extern void    tls_init (void);
+extern gchar * tls_generate_rsa_keys (TlsCreationData *cd,
+                                      gchar **private_key,
+                                      gnutls_x509_privkey_t **key);
+extern gchar * tls_generate_self_signed_certificate (TlsCreationData *cd,
+                                                     gnutls_x509_privkey_t *key,
+                                                     gchar **certificate);
 
 /* ------------------------------------------------------------------ */
 /*  Failure tracking + critical-log capture                           */
@@ -804,6 +816,115 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario 8 (issue #19): emailAddress round-trips through cert     */
+/*                          generation, parsing, and properties UI    */
+/* ------------------------------------------------------------------ */
+
+static int
+scenario_email_address (void)
+{
+    const char  *expected_email = "test@example.com";
+    int          rc = 1;
+    gchar       *private_key = NULL;
+    gchar       *cert_pem = NULL;
+    gchar       *err = NULL;
+    gchar       *ui_path = NULL;
+    TlsCreationData *cd = NULL;
+    gnutls_x509_privkey_t *key = NULL;
+
+    fprintf (stderr, "==> scenario: emailAddress round-trip (issue #19)\n");
+
+    tls_init ();
+
+    cd = g_new0 (TlsCreationData, 1);
+    cd->cn = g_strdup ("Email Address Test CA");
+    cd->emailAddress = g_strdup (expected_email);
+    cd->key_type = 0;             /* 0 = RSA, 1 = DSA */
+    cd->key_bitlength = 1024;     /* small for speed; never use in production */
+    cd->activation = time (NULL);
+    cd->expiration = cd->activation + 86400;
+
+    err = tls_generate_rsa_keys (cd, &private_key, &key);
+    if (err) {
+        fail_test ("email-address", "tls_generate_rsa_keys failed: %s", err);
+        g_free (err);
+        goto out;
+    }
+
+    err = tls_generate_self_signed_certificate (cd, key, &cert_pem);
+    if (err) {
+        fail_test ("email-address",
+                   "tls_generate_self_signed_certificate failed: %s", err);
+        g_free (err);
+        goto out;
+    }
+
+    /* The cert is self-signed so subject email == issuer email. Parse it
+     * through the production code path and assert both labels populate. */
+    certificate_properties_window_gtkb = gtk_builder_new ();
+    ui_path = g_build_filename (GNOMINT_UI_DIR,
+                                "certificate_properties_dialog.ui", NULL);
+    GError *gerr = NULL;
+    if (gtk_builder_add_from_file (certificate_properties_window_gtkb,
+                                   ui_path, &gerr) == 0) {
+        fail_test ("email-address", "cannot load %s: %s", ui_path,
+                   gerr ? gerr->message : "?");
+        g_clear_error (&gerr);
+        goto out;
+    }
+
+    __certificate_properties_populate (cert_pem);
+
+    GObject *subj = gtk_builder_get_object (certificate_properties_window_gtkb,
+                                            "certSubjectEmailLabel");
+    if (!subj || !GTK_IS_LABEL (subj)) {
+        fail_test ("email-address", "certSubjectEmailLabel missing");
+        goto out;
+    }
+    const gchar *subj_text = gtk_label_get_text (GTK_LABEL (subj));
+    if (!subj_text || g_strcmp0 (subj_text, expected_email) != 0) {
+        fail_test ("email-address",
+                   "certSubjectEmailLabel = \"%s\", expected \"%s\"",
+                   subj_text ? subj_text : "(null)", expected_email);
+        goto out;
+    }
+    fprintf (stderr, "    subject email = \"%s\" OK\n", subj_text);
+
+    GObject *iss = gtk_builder_get_object (certificate_properties_window_gtkb,
+                                           "certIssuerEmailLabel");
+    if (!iss || !GTK_IS_LABEL (iss)) {
+        fail_test ("email-address", "certIssuerEmailLabel missing");
+        goto out;
+    }
+    const gchar *iss_text = gtk_label_get_text (GTK_LABEL (iss));
+    if (!iss_text || g_strcmp0 (iss_text, expected_email) != 0) {
+        fail_test ("email-address",
+                   "certIssuerEmailLabel = \"%s\", expected \"%s\"",
+                   iss_text ? iss_text : "(null)", expected_email);
+        goto out;
+    }
+    fprintf (stderr, "    issuer  email = \"%s\" OK\n", iss_text);
+
+    rc = 0;
+
+out:;
+    int crits = critical_messages_check_and_reset ("email-address");
+    if (crits != 0)
+        rc = 1;
+
+    if (certificate_properties_window_gtkb) {
+        g_object_unref (certificate_properties_window_gtkb);
+        certificate_properties_window_gtkb = NULL;
+    }
+    g_free (ui_path);
+    g_free (cert_pem);
+    g_free (private_key);
+    if (cd)
+        tls_creation_data_free (cd);
+    return rc;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -828,6 +949,7 @@ main (int argc, char **argv)
     /* Phase 2A scenarios — work without any install. */
     scenario_all_ui_files_load ();
     scenario_cert_properties_populate ();
+    scenario_email_address ();
 
     /* Phase 2B scenarios drive production code paths that load .ui
      * files from PACKAGE_DATA_DIR (new_ca_window.c et al). That path
