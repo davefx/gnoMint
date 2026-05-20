@@ -52,6 +52,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include "tls.h"
+#include "wizard_window.h"
 
 #ifndef GNOMINT_UI_DIR
 # error "GNOMINT_UI_DIR must be set at compile time (path to gui/)"
@@ -925,6 +926,52 @@ out:;
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario 9 (issue #15 / PR #16): certificate wizard opens cleanly */
+/* ------------------------------------------------------------------ */
+
+/* Drives wizard_window_display directly. The wizard is a GtkWindow
+ * (not a GtkDialog) that auto-dismiss destroys via gtk_widget_destroy.
+ * Assertion: the wizard's UI loads, the CA combobox populates from
+ * ca_file_foreach_ca, and the window is dismissed without any
+ * GTK/GLib CRITICAL emissions. */
+static int
+scenario_wizard_window (void)
+{
+    int rc = 1;
+
+    fprintf (stderr, "==> scenario: certificate_wizard\n");
+    if (!test_init_main_window () || !fixture_setup ())
+        return 1;
+
+    if (!ca_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("certificate-wizard", "ca_open(%s) failed", fixture_path);
+        goto out;
+    }
+
+    auto_dismiss_start (GTK_RESPONSE_CANCEL);
+    wizard_window_display (WIZARD_CERT_TYPE_WEB_SERVER);
+    drain_events ();
+    int dismissed = auto_dismiss_stop ();
+    drain_events ();
+
+    int crits = critical_messages_check_and_reset ("certificate-wizard");
+    fprintf (stderr, "    dismissed %d new toplevel(s); %d crit logs\n",
+             dismissed, crits);
+
+    if (dismissed == 0) {
+        fail_test ("certificate-wizard",
+                   "expected wizard_window_display to create a new toplevel");
+        goto out;
+    }
+    rc = (crits == 0) ? 0 : 1;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    return rc;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -969,6 +1016,7 @@ main (int argc, char **argv)
         scenario_extract_private_key ();
         scenario_sign_csr ();
         scenario_revoke_cert ();
+        scenario_wizard_window ();
     } else {
         fprintf (stderr,
                  "==> Phase 2B scenarios skipped: %s not found.\n"
