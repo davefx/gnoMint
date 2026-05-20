@@ -265,7 +265,14 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 
 	object = gtk_builder_get_object (new_cert_window_gtkb, "cn_label");
 	gtk_label_set_text (GTK_LABEL(object), csr_info->cn);
-	
+
+	object = gtk_builder_get_object (new_cert_window_gtkb, "email_label");
+	if (csr_info->emailAddress && csr_info->emailAddress[0]) {
+		gtk_label_set_text (GTK_LABEL(object), csr_info->emailAddress);
+	} else {
+		gtk_label_set_text (GTK_LABEL(object), _("None"));
+	}
+
 	object = gtk_builder_get_object (new_cert_window_gtkb, "san_label");
 	if (csr_info->subject_alt_name && csr_info->subject_alt_name[0]) {
 		gtk_label_set_text (GTK_LABEL(object), csr_info->subject_alt_name);

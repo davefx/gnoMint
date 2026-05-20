@@ -241,7 +241,7 @@ Common Name (CN):</property>
                     </object>
                     <packing>
                       <property name="left_attach">0</property>
-                      <property name="top_attach">6</property>
+                      <property name="top_attach">7</property>
                     </packing>
                   </child>
                   <child>
@@ -256,10 +256,37 @@ Common Name (CN):</property>
                     </object>
                     <packing>
                       <property name="left_attach">1</property>
+                      <property name="top_attach">7</property>
+                    </packing>
+                  </child>
+                                <child>
+                    <object class="GtkLabel" id="label_email_cert">
+                      <property name="visible">True</property>
+                      <property name="can_focus">False</property>
+                      <property name="label" translatable="yes">Email address:</property>
+                      <property name="xalign">0</property>
+                      <property name="yalign">0</property>
+                    </object>
+                    <packing>
+                      <property name="left_attach">0</property>
                       <property name="top_attach">6</property>
                     </packing>
                   </child>
-              </object>
+                  <child>
+                    <object class="GtkLabel" id="email_label">
+                      <property name="visible">True</property>
+                      <property name="can_focus">False</property>
+                      <property name="label" translatable="yes">None</property>
+                      <property name="selectable">True</property>
+                      <property name="xalign">0</property>
+                      <property name="yalign">0</property>
+                    </object>
+                    <packing>
+                      <property name="left_attach">1</property>
+                      <property name="top_attach">6</property>
+                    </packing>
+                  </child>
+</object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>

@@ -519,6 +519,13 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 	else
 		csr_creation_data->cn = NULL;
 
+	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "email_entry1"));
+	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	if (strlen (text))
+		csr_creation_data->emailAddress = g_strdup (text);
+	else
+		csr_creation_data->emailAddress = NULL;
+
 	// Get SANs from SAN manager widget
 	if (san_manager_widget1) {
 		gchar *san_string = san_manager_get_string(san_manager_widget1);
