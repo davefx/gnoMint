@@ -1598,6 +1598,20 @@ int ca_cli_callback_exit (int argc, char **argv)
         return 0;
 }
 
+/* sqlite3-style callback consumed by ca_file_foreach_policy in
+ * ca_cli_callback_addservercert. Policy rows arrive as
+ * (ca_id, name, value); we store name -> value in the supplied GHashTable. */
+static int
+__cli_addservercert_collect_policy_cb (void *pArg, int argc, char **argv,
+                                       char **columnNames G_GNUC_UNUSED)
+{
+	GHashTable *table = (GHashTable *) pArg;
+	if (argc >= 3 && argv[1] && argv[2]) {
+		g_hash_table_insert (table, g_strdup (argv[1]), g_strdup (argv[2]));
+	}
+	return 0;
+}
+
 int ca_cli_callback_addservercert (int argc, char **argv)
 {
 	guint64 ca_id;
@@ -1618,8 +1632,8 @@ int ca_cli_callback_addservercert (int argc, char **argv)
 	cert_type_str = argv[2];
 	server_name = argv[3];
 
-	// Validate CA ID
-	if (!ca_file_check_if_is_cert_id(ca_id)) {
+	// Validate CA ID: must reference a non-revoked CA, not just any cert.
+	if (!ca_file_check_if_is_ca_id(ca_id)) {
 		dialog_error(_("The given CA id is not valid"));
 		return -1;
 	}
@@ -1656,21 +1670,13 @@ int ca_cli_callback_addservercert (int argc, char **argv)
 	creation_data->org = g_strdup("");
 	creation_data->ou = g_strdup("");
 	creation_data->cn = g_strdup(server_name);
-	creation_data->emailAddress = g_strdup("");
+	creation_data->emailAddress = NULL;
 	creation_data->parent_ca_id_str = g_strdup_printf("'%" G_GUINT64_FORMAT "'", ca_id);
 
 	// Apply CA field inheritance
 	GHashTable *policy_table = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-	
-	int policy_callback(void *pArg, int argc, char **argv, char **columnNames) {
-		GHashTable *table = (GHashTable *)pArg;
-		if (argc >= 3 && argv[1] && argv[2]) {
-			g_hash_table_insert(table, g_strdup(argv[1]), g_strdup(argv[2]));
-		}
-		return 0;
-	}
-	
-	ca_file_foreach_policy(policy_callback, ca_id, policy_table);
+
+	ca_file_foreach_policy(__cli_addservercert_collect_policy_cb, ca_id, policy_table);
 
 	// Get CA certificate fields for inheritance
 	gchar *ca_pem = ca_file_get_public_pem_from_id(CA_FILE_ELEMENT_TYPE_CERT, ca_id);
