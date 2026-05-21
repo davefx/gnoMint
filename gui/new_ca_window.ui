@@ -466,14 +466,45 @@ Common Name (CN):</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="keylength_spinbutton">
+                  <object class="GtkBox" id="keylength_hbox">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="adjustment">adjustmentCAKeyLength</property>
-                    <property name="snap_to_ticks">True</property>
-                    <property name="numeric">True</property>
-                    <property name="wrap">True</property>
-                    <property name="update_policy">if-valid</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">horizontal</property>
+                    <child>
+                      <object class="GtkSpinButton" id="keylength_spinbutton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="adjustment">adjustmentCAKeyLength</property>
+                        <property name="snap_to_ticks">True</property>
+                        <property name="numeric">True</property>
+                        <property name="wrap">True</property>
+                        <property name="update_policy">if-valid</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="ecdsa_curve_combo">
+                        <property name="visible">False</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <property name="active_id">256</property>
+                        <items>
+                          <item id="256" translatable="yes">P-256 (256 bits)</item>
+                          <item id="384" translatable="yes">P-384 (384 bits)</item>
+                          <item id="521" translatable="yes">P-521 (521 bits)</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -511,6 +542,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
+                        <signal name="toggled" handler="on_new_ca_privkey_type_toggle" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -527,6 +559,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
+                        <signal name="toggled" handler="on_new_ca_privkey_type_toggle" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -543,6 +576,7 @@ Common Name (CN):</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton</property>
+                        <signal name="toggled" handler="on_new_ca_privkey_type_toggle" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

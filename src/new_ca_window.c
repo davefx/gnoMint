@@ -38,6 +38,9 @@ GtkBuilder * new_ca_window_gtkb = NULL;
 GtkWidget *san_manager_widget = NULL;
 
 
+G_MODULE_EXPORT void on_new_ca_privkey_type_toggle (GtkToggleButton *button,
+                                                    gpointer        user_data);
+
 void new_ca_window_display()
 {
 	// Workaround for libglade
@@ -70,6 +73,11 @@ void new_ca_window_display()
 		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget);
 		gtk_widget_show_all(san_manager_widget);
 	}
+
+	/* Force initial spinbutton/curve-combo visibility to match the
+	 * active radio (gtk_widget_show_all elsewhere ignores the .ui's
+	 * visible=False on the curve combo). */
+	on_new_ca_privkey_type_toggle (NULL, NULL);
 }
 
 
@@ -87,19 +95,46 @@ void new_ca_tab_activate (int tab_number)
 G_MODULE_EXPORT void on_new_ca_privkey_type_toggle (GtkToggleButton *button,
 						     gpointer        user_data)
 {
-	GtkToggleButton *rsatoggle = GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "rsa_radiobutton"));
-	GtkAdjustment *adj = GTK_ADJUSTMENT(gtk_builder_get_object (new_ca_window_gtkb, "adjustmentCAKeyLength"));
-	gdouble value = gtk_spin_button_get_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_ca_window_gtkb, "keylength_spinbutton")));
+	GtkToggleButton *rsatoggle   = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_ca_window_gtkb, "rsa_radiobutton"));
+	GtkToggleButton *dsatoggle   = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_ca_window_gtkb, "dsa_radiobutton"));
+	GtkToggleButton *ecdsatoggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_ca_window_gtkb, "ecdsa_radiobutton"));
+	GtkToggleButton *eddsatoggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_ca_window_gtkb, "eddsa_radiobutton"));
 
-	if (gtk_toggle_button_get_active(rsatoggle)) {
-		// RSA is active
+	GtkAdjustment *adj = GTK_ADJUSTMENT (gtk_builder_get_object (new_ca_window_gtkb, "adjustmentCAKeyLength"));
+	GtkWidget *spin    = GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb, "keylength_spinbutton"));
+	GtkWidget *combo   = GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb, "ecdsa_curve_combo"));
+	GtkLabel  *label   = GTK_LABEL  (gtk_builder_get_object (new_ca_window_gtkb, "label21"));
+	gdouble    value   = gtk_spin_button_get_value (GTK_SPIN_BUTTON (spin));
+
+	if (rsatoggle && gtk_toggle_button_get_active (rsatoggle)) {
 		gtk_adjustment_set_upper (adj, 10240);
-	} else {
-		// DSA is active
+		gtk_widget_show (spin);
+		if (combo) gtk_widget_hide (combo);
+		if (label) {
+			gtk_label_set_text (label, _("Private key bit length:"));
+			gtk_widget_show (GTK_WIDGET (label));
+		}
+	} else if (dsatoggle && gtk_toggle_button_get_active (dsatoggle)) {
 		gtk_adjustment_set_upper (adj, 3072);
 		if (value > 3072)
-			gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_ca_window_gtkb, "keylength_spinbutton")), 
-						   3072);
+			gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), 3072);
+		gtk_widget_show (spin);
+		if (combo) gtk_widget_hide (combo);
+		if (label) {
+			gtk_label_set_text (label, _("Private key bit length:"));
+			gtk_widget_show (GTK_WIDGET (label));
+		}
+	} else if (ecdsatoggle && gtk_toggle_button_get_active (ecdsatoggle)) {
+		gtk_widget_hide (spin);
+		if (combo) gtk_widget_show (combo);
+		if (label) {
+			gtk_label_set_text (label, _("ECDSA curve:"));
+			gtk_widget_show (GTK_WIDGET (label));
+		}
+	} else if (eddsatoggle && gtk_toggle_button_get_active (eddsatoggle)) {
+		gtk_widget_hide (spin);
+		if (combo) gtk_widget_hide (combo);
+		if (label) gtk_widget_hide (GTK_WIDGET (label));
 	}
 }
 
@@ -305,9 +340,20 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 			ca_creation_data->key_type = 0; /* RSA */
 	}
 
-	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "keylength_spinbutton"));
-	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));
-	ca_creation_data->key_bitlength = active;
+	if (ca_creation_data->key_type == 2 /* ECDSA */) {
+		/* Read the curve from the ECDSA combo. The combo's active_id is
+		 * the bit-length of the curve as a string (256/384/521). */
+		GtkComboBoxText *combo = GTK_COMBO_BOX_TEXT (
+			gtk_builder_get_object (new_ca_window_gtkb, "ecdsa_curve_combo"));
+		const gchar *id = combo ? gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo)) : NULL;
+		ca_creation_data->key_bitlength = id ? atoi (id) : 256;
+	} else if (ca_creation_data->key_type == 3 /* EdDSA */) {
+		ca_creation_data->key_bitlength = 0;  /* fixed by the curve */
+	} else {
+		widget = GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb, "keylength_spinbutton"));
+		active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+		ca_creation_data->key_bitlength = active;
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "months_before_expiration_spinbutton"));
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));

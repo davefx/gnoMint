@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 12:42+0200\n"
+"POT-Creation-Date: 2026-05-21 18:10+0200\n"
 "PO-Revision-Date: 2010-08-11 12:11+0200\n"
 "Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -2866,6 +2866,15 @@ msgstr ""
 "con este programa; si no es así, escriba a la Free Software Foundation, "
 "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, EE.UU."
 
+#: ../src/new_ca_window.c:114 ../src/new_ca_window.c:124
+#: ../src/new_req_window.c:302 ../src/new_req_window.c:312
+msgid "Private key bit length:"
+msgstr "Longitud en bits de la clave privada:"
+
+#: ../src/new_ca_window.c:131 ../src/new_req_window.c:319
+msgid "ECDSA curve:"
+msgstr "Curva ECDSA:"
+
 #: ../src/new_cert.c:350
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
@@ -3925,9 +3934,6 @@ msgstr ""
 
 #~ msgid "DSA"
 #~ msgstr "DSA"
-
-#~ msgid "Private key bit length:"
-#~ msgstr "Longitud en bits de la clave privada:"
 
 #~ msgid "Private key type:"
 #~ msgstr "Tipo de clave privada:"
