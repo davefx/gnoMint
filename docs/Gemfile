@@ -1,0 +1,10 @@
+source "https://rubygems.org"
+
+# Track the github-pages gem so locally-rendered previews match what
+# GitHub publishes.
+gem "github-pages", group: :jekyll_plugins
+
+group :jekyll_plugins do
+  gem "jekyll-remote-theme"
+  gem "jekyll-seo-tag"
+end

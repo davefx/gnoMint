@@ -1,0 +1,39 @@
+title: gnoMint
+description: >-
+  A graphical Certification Authority manager for GTK 3, GnuTLS, and SQLite.
+  Bootstrap CAs, sign CSRs, issue and revoke certificates, all from a
+  desktop app — or driven from the readline CLI.
+baseurl: "/gnomint"
+url: "https://davefx.github.io"
+
+remote_theme: pages-themes/minimal@v0.2.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+
+show_downloads: false
+github:
+  is_project_page: true
+  repository_url: https://github.com/davefx/gnoMint
+  repository_nwo: davefx/gnoMint
+  owner_name: davefx
+  owner_url: https://github.com/davefx
+  project_title: gnoMint
+  project_tagline: A GTK 3 Certification Authority manager
+
+header_pages:
+  - features.md
+  - install.md
+  - manual.md
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
