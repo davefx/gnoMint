@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnoMint 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 11:12+0200\n"
+"POT-Creation-Date: 2026-05-21 11:47+0200\n"
 "PO-Revision-Date: 2010-08-11 12:11+0200\n"
 "Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -82,15 +82,15 @@ msgstr "Abrir base de datos de certificados"
 msgid "Base de datos de certificados de gnoMint"
 msgstr ""
 
-#: src/ca.c:223
+#: src/ca.c:227
 msgid "<b>Certificates</b>"
 msgstr "<b>Certificados</b>"
 
-#: src/ca.c:361
+#: src/ca.c:390
 msgid "<b>Certificate Signing Requests</b>"
 msgstr "<b>Solicitudes de certificación</b>"
 
-#: src/ca.c:404 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
+#: src/ca.c:433 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
 #: src/ca-cli-callbacks.c:201 src/ca-cli-callbacks.c:629
 #: src/ca-cli-callbacks.c:638 src/ca-cli-callbacks.c:1258
 #: src/ca-cli-callbacks.c:1267 src/certificate_properties.c:178
@@ -98,7 +98,7 @@ msgstr "<b>Solicitudes de certificación</b>"
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: src/ca.c:407 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
+#: src/ca.c:436 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
 #: src/ca-cli-callbacks.c:204 src/ca-cli-callbacks.c:632
 #: src/ca-cli-callbacks.c:641 src/ca-cli-callbacks.c:1261
 #: src/ca-cli-callbacks.c:1270 src/certificate_properties.c:181
@@ -106,85 +106,85 @@ msgstr "%d/%m/%Y %R GMT"
 msgid "%m/%d/%Y %H:%M GMT"
 msgstr "%d/%m/%Y %H:%M GMT"
 
-#: src/ca.c:556 src/certificate_properties.c:588 src/crl.c:184
+#: src/ca.c:586 src/certificate_properties.c:588 src/crl.c:184
 #: src/new_cert.c:192 src/new_req_window.c:192
 msgid "Subject"
 msgstr "Titular"
 
-#: src/ca.c:591
+#: src/ca.c:622
 msgid "Serial"
 msgstr "Nº serie"
 
-#: src/ca.c:598
+#: src/ca.c:630
 msgid "Activation"
 msgstr "Activación"
 
-#: src/ca.c:605
+#: src/ca.c:640
 msgid "Expiration"
 msgstr "Caducidad"
 
-#: src/ca.c:612
+#: src/ca.c:650
 msgid "Revocation"
 msgstr "Revocación"
 
-#: src/ca.c:910
+#: src/ca.c:951
 msgid "Export certificate"
 msgstr "Exportar certificado"
 
-#: src/ca.c:913 src/ca.c:920 src/ca.c:1022 src/ca.c:1073 src/ca.c:1124
-#: src/ca.c:1970 src/ca.c:2076 src/ca.c:2110 src/crl.c:257 src/main.c:330
+#: src/ca.c:954 src/ca.c:961 src/ca.c:1063 src/ca.c:1114 src/ca.c:1165
+#: src/ca.c:2011 src/ca.c:2117 src/ca.c:2151 src/crl.c:257 src/main.c:330
 #: src/main.c:402 src/main.c:490 gui/san_editor_dialog.ui.h:9
 #, fuzzy
 msgid "_Cancel"
 msgstr "Francia"
 
-#: src/ca.c:914 src/ca.c:921 src/ca.c:1023 src/ca.c:1074 src/ca.c:1125
-#: src/ca.c:1971 src/crl.c:258
+#: src/ca.c:955 src/ca.c:962 src/ca.c:1064 src/ca.c:1115 src/ca.c:1166
+#: src/ca.c:2012 src/crl.c:258
 msgid "_Save"
 msgstr ""
 
-#: src/ca.c:917
+#: src/ca.c:958
 msgid "Export certificate signing request"
 msgstr "Exportar solicitud de certificación"
 
-#: src/ca.c:932 src/ca.c:968 src/ca.c:978 src/export.c:278
+#: src/ca.c:973 src/ca.c:1009 src/ca.c:1019 src/export.c:278
 msgid "There was an error while exporting certificate."
 msgstr "Ocurrió un error al exportar el certificado"
 
-#: src/ca.c:934 src/ca.c:970 src/ca.c:980
+#: src/ca.c:975 src/ca.c:1011 src/ca.c:1021
 msgid "There was an error while exporting CSR."
 msgstr "Ocurrió un error al exportar la solicitud de certificación."
 
-#: src/ca.c:993 src/ca.c:1159
+#: src/ca.c:1034 src/ca.c:1200
 msgid "Certificate exported successfully"
 msgstr "Certificado exportado con éxito"
 
-#: src/ca.c:1000
+#: src/ca.c:1041
 msgid "Certificate signing request exported successfully"
 msgstr "Solicitud de certificación exportada correctamente"
 
-#: src/ca.c:1019
+#: src/ca.c:1060
 msgid "Export crypted private key"
 msgstr "Exportar clave privada cifrada."
 
-#: src/ca.c:1048 src/ca.c:1100
+#: src/ca.c:1089 src/ca.c:1141
 msgid "Private key exported successfully"
 msgstr "Clave privada exportada con éxito"
 
-#: src/ca.c:1070
+#: src/ca.c:1111
 #, fuzzy
 msgid "Export unencrypted private key"
 msgstr "Exportar clave privada sin cifrar."
 
-#: src/ca.c:1121
+#: src/ca.c:1162
 msgid "Export whole certificate in PKCS#12 package"
 msgstr "Exportar todo el certificado en un paquete PKCS#12"
 
-#: src/ca.c:1192
+#: src/ca.c:1233
 msgid "Export CSR - gnoMint"
 msgstr "Exportar solicitud de certificación - gnoMint"
 
-#: src/ca.c:1197
+#: src/ca.c:1238
 msgid ""
 "Please, choose which part of the saved Certificate Signing Request you want "
 "to export:"
@@ -192,7 +192,7 @@ msgstr ""
 "Seleccione qué parte almacenada de la solicitud de certificación desea "
 "exportar:"
 
-#: src/ca.c:1202
+#: src/ca.c:1243
 msgid ""
 "<i>Export the Certificate Signing Request to a public file, in PEM format.</"
 "i>"
@@ -200,7 +200,7 @@ msgstr ""
 "<i>Exporta la solicitud de certificación a un fichero público en formato "
 "PEM</i>"
 
-#: src/ca.c:1207
+#: src/ca.c:1248
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the Certificate Signing "
@@ -210,15 +210,15 @@ msgstr ""
 "clave. Este fichero sólo debería ser accesible para el titular de la "
 "soliticud de certificación.</i>"
 
-#: src/ca.c:1271
+#: src/ca.c:1312
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: src/ca.c:1331
+#: src/ca.c:1372
 msgid "Are you sure you want to revoke this certificate?"
 msgstr "¿Está seguro de que desea revocar este certificado?"
 
-#: src/ca.c:1332
+#: src/ca.c:1373
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
@@ -228,11 +228,11 @@ msgstr ""
 "como no válido. Así, se impedirá cualquier uso futuro del certificado "
 "(siempre y cuando se compruebe la CRL)"
 
-#: src/ca.c:1340
+#: src/ca.c:1381
 msgid "Are you sure you want to revoke this CA certificate?"
 msgstr "¿Está seguro de que desea revocar este certificado de AC?"
 
-#: src/ca.c:1341
+#: src/ca.c:1382
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
@@ -250,15 +250,15 @@ msgstr ""
 "certificados generados con él, por lo que todos deberían regenerarse con un "
 "nuevo certificado de AC."
 
-#: src/ca.c:1384
+#: src/ca.c:1425
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr "¿Está seguro de que desea borrar esta solicitud de certificación?"
 
-#: src/ca.c:1748
+#: src/ca.c:1789
 msgid "Change CA password - gnoMint"
 msgstr "Cambiando contraseña de AC - gnoMint"
 
-#: src/ca.c:1766
+#: src/ca.c:1807
 msgid ""
 "The current password you have entered  doesn't match with the actual current "
 "database password."
@@ -266,60 +266,60 @@ msgstr ""
 "La contraseña actual que ha introducido no coincide con la contraseña real "
 "de la base de datos."
 
-#: src/ca.c:1781
+#: src/ca.c:1822
 msgid "Error while changing database password. The operation was cancelled."
 msgstr ""
 "Ocurrió un error al cambiar la contraseña de la base de datos. Se canceló la "
 "operación."
 
-#: src/ca.c:1790
+#: src/ca.c:1831
 msgid "Password changed successfully"
 msgstr "Contraseña cambiada con éxito"
 
-#: src/ca.c:1800 src/ca-cli-callbacks.c:1091
+#: src/ca.c:1841 src/ca-cli-callbacks.c:1091
 msgid ""
 "Error while establishing database password. The operation was cancelled."
 msgstr ""
 "Ocurrió un error al establecer la contraseña de la base de datos. Se canceló "
 "la operación."
 
-#: src/ca.c:1810
+#: src/ca.c:1851
 msgid "Password established successfully"
 msgstr "Contraseña establecida con éxito"
 
-#: src/ca.c:1820
+#: src/ca.c:1861
 msgid "Error while removing database password. The operation was cancelled."
 msgstr ""
 "Ocurrió un error al eliminar la contraseña de la base de datos. Se canceló "
 "la operación."
 
-#: src/ca.c:1829
+#: src/ca.c:1870
 msgid "Password removed successfully"
 msgstr "Contraseña eliminada con éxito"
 
-#: src/ca.c:1967
+#: src/ca.c:2008
 msgid "Save Diffie-Hellman parameters"
 msgstr "Guardar parámetros Diffie-Hellman"
 
-#: src/ca.c:1993
+#: src/ca.c:2034
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr "Parámetros Diffie-Hellman guardados correctamente"
 
 #. Import single file
-#: src/ca.c:2073
+#: src/ca.c:2114
 msgid "Select PEM file to import"
 msgstr "Seleccione fichero PEM a importar"
 
-#: src/ca.c:2077 src/ca.c:2111 src/main.c:331 src/main.c:403 src/main.c:491
+#: src/ca.c:2118 src/ca.c:2152 src/main.c:331 src/main.c:403 src/main.c:491
 msgid "_Open"
 msgstr ""
 
-#: src/ca.c:2094
+#: src/ca.c:2135
 #, c-format
 msgid "Problem when importing '%s' file"
 msgstr "Hubo problemas al importar el fichero '%s'"
 
-#: src/ca.c:2107
+#: src/ca.c:2148
 msgid "Select directory to import"
 msgstr "Seleccione directorio a importar"
 
@@ -3806,10 +3806,10 @@ msgid ""
 "issuing CAs has expired, so an expired CA's whole subtree is hidden "
 "alongside it."
 msgstr ""
-"Si se desmarca, los certificados cuya validez ya ha terminado se ocultan "
-"del árbol. Un certificado también se considera caducado si lo está alguna "
-"de sus autoridades emisoras, de modo que un AC caducado oculta también "
-"todo su subárbol."
+"Si se desmarca, los certificados cuya validez ya ha terminado se ocultan del "
+"árbol. Un certificado también se considera caducado si lo está alguna de sus "
+"autoridades emisoras, de modo que un AC caducado oculta también todo su "
+"subárbol."
 
 #: gui/main_window.ui.h:29
 msgid "_Help"

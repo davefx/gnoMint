@@ -302,12 +302,28 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	
 	gtk_tree_store_append (new_model, &iter, (last_parent_iter ? last_parent_iter: cert_parent_iter));
 
-	/* Grey out the row if the certificate's effective validity has
-	 * ended. effective_expiration was computed above with cascade
-	 * through any parent CAs. */
-	const gchar *row_foreground =
-	    (effective_expiration > 0 && effective_expiration < time (NULL))
-	        ? "gray" : NULL;
+	/* Three-state row foreground based on effective_expiration
+	 * (which already cascades through parent CAs):
+	 *   - gray   : already expired
+	 *   - #cc7700: expires within `expire-warning-days` days (amber)
+	 *   - NULL   : healthy
+	 *
+	 * The warning window is a preference; 0 disables the amber state. */
+	const gchar *row_foreground = NULL;
+	if (effective_expiration > 0) {
+		time_t now = time (NULL);
+		if (effective_expiration < now) {
+			row_foreground = "gray";
+		} else {
+			gint warn_days = preferences_get_expire_warning_days ();
+			if (warn_days > 0) {
+				time_t threshold = now +
+				    (time_t) warn_days * 86400;
+				if (effective_expiration < threshold)
+					row_foreground = "#cc7700";
+			}
+		}
+	}
 
         if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])
                 gtk_tree_store_set (new_model, &iter,

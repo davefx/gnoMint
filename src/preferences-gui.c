@@ -122,6 +122,22 @@ void preferences_set_expired_visible (gboolean new_value)
         g_settings_set_boolean (preferences_settings, "expired-visible", new_value);
 }
 
+gint preferences_get_expire_warning_days ()
+{
+        /* Defensive: this getter is called from __ca_refresh_model_add_certificate
+         * which the workflow test suite exercises without going through
+         * preferences_init (it builds only the GTK builders, not the whole
+         * application state). Fall back to the schema default of 30. */
+        if (! preferences_settings)
+                return 30;
+        return g_settings_get_int (preferences_settings, "expire-warning-days");
+}
+
+void preferences_set_expire_warning_days (gint new_value)
+{
+        g_settings_set_int (preferences_settings, "expire-warning-days", new_value);
+}
+
 gboolean preferences_get_crq_visible ()
 {
         return g_settings_get_boolean (preferences_settings, "crq-visible");

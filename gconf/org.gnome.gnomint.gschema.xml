@@ -30,6 +30,18 @@
       </description>
     </key>
 
+    <key name="expire-warning-days" type="i">
+      <default>30</default>
+      <summary>Days before expiration to highlight certificates in amber</summary>
+      <description>
+        Certificates whose effective validity ends within this many days
+        are shown in amber in the certificates tree, as a heads-up that
+        they should be renewed soon. Setting this to 0 disables the
+        amber highlight (certificates appear either normally or in gray
+        for already-expired).
+      </description>
+    </key>
+
     <key name="crq-visible" type="b">
       <default>true</default>
       <summary>Certificate requests visibility</summary>
