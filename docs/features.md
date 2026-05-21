@@ -51,7 +51,7 @@ modernised codebase, a test suite, and a batch of new conveniences.
 ECDSA and Ed25519 support [landed in 1.4.0](https://github.com/davefx/gnoMint/issues/49)
 and is available from both the New-CA and New-CSR dialogs.
 
-![Key-algorithm selection in the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-key-algorithm.png)
+![Key-algorithm selection in the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-key-ecdsa.png)
 
 
 ---

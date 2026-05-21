@@ -66,9 +66,16 @@ CA to see what it has signed.
      names.
    - **OU / O / L / ST / C**: optional organisational metadata.
    - **emailAddress**: optional; goes into the subject DN.
-3. Pick a **key algorithm**:
+3. Pick a **key algorithm**. The bit-length / curve selector below
+   swaps to match: a spinbutton for RSA/DSA, a P-256/P-384/P-521
+   dropdown for ECDSA, and nothing for Ed25519 (key size is fixed by
+   the curve).
 
-   ![Key algorithm step]({{ site.baseurl }}/assets/screenshots/new-ca-key-algorithm.png)
+   ![Key algorithm — RSA]({{ site.baseurl }}/assets/screenshots/new-ca-key-rsa.png)
+
+   ![Key algorithm — ECDSA]({{ site.baseurl }}/assets/screenshots/new-ca-key-ecdsa.png)
+
+   ![Key algorithm — Ed25519]({{ site.baseurl }}/assets/screenshots/new-ca-key-eddsa.png)
 
    - **RSA** with 4096 bits is the safe default for a long-lived root.
    - **ECDSA P-384** is shorter, faster, and widely supported.

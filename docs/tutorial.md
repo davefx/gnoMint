@@ -79,7 +79,7 @@ properties" dialog appears.
   modern hardware **ECDSA P-384** or **Ed25519** give equivalent
   security at smaller sizes.
 
-  ![Key-algorithm step of the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-key-algorithm.png)
+  ![Key-algorithm step of the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-key-ecdsa.png)
 
 - Set the **validity period**. For a root CA, 20 years (240 months) is
   reasonable. gnoMint is Y2K38-safe, so dates past 2038 work correctly.
