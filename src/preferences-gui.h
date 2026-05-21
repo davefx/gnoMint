@@ -39,6 +39,9 @@ void preferences_set_revoked_visible (gboolean new_value);
 gboolean preferences_get_expired_visible(void);
 void preferences_set_expired_visible (gboolean new_value);
 
+gint preferences_get_expire_warning_days(void);
+void preferences_set_expire_warning_days (gint new_value);
+
 gboolean preferences_get_crq_visible(void);
 void preferences_set_crq_visible (gboolean new_value);
 
