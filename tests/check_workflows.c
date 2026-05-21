@@ -1351,6 +1351,115 @@ scenario_ecdsa_eddsa_keygen (void)
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario: key-length selector swaps with algorithm                */
+/* ------------------------------------------------------------------ */
+
+/* Opens new_ca_window_display and asserts:
+ *   RSA selected: keylength_spinbutton visible, ecdsa_curve_combo hidden.
+ *   ECDSA selected: spinbutton hidden, combo visible, active id "256".
+ *   Ed25519 selected: both hidden.
+ * Catches regressions where the toggle handler forgets to swap widgets. */
+extern GtkBuilder *new_ca_window_gtkb;
+extern void new_ca_window_display (void);
+
+static int
+scenario_keylength_selector (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: key-length selector swaps with algorithm\n");
+
+    if (!test_init_main_window ())
+        return 1;
+
+    /* Don't auto-dismiss — we need the dialog up to poke its widgets. */
+    new_ca_window_display ();
+    drain_events ();
+
+    if (!new_ca_window_gtkb) {
+        fail_test ("keylength-selector", "new_ca_window_gtkb is NULL");
+        goto out;
+    }
+
+    GtkWidget *spin = GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb,
+                                                           "keylength_spinbutton"));
+    GtkWidget *combo = GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb,
+                                                            "ecdsa_curve_combo"));
+    GtkToggleButton *rsa = GTK_TOGGLE_BUTTON (gtk_builder_get_object (
+        new_ca_window_gtkb, "rsa_radiobutton"));
+    GtkToggleButton *ecdsa = GTK_TOGGLE_BUTTON (gtk_builder_get_object (
+        new_ca_window_gtkb, "ecdsa_radiobutton"));
+    GtkToggleButton *eddsa = GTK_TOGGLE_BUTTON (gtk_builder_get_object (
+        new_ca_window_gtkb, "eddsa_radiobutton"));
+
+    if (!spin || !combo || !rsa || !ecdsa || !eddsa) {
+        fail_test ("keylength-selector", "missing widget(s) in builder");
+        goto out;
+    }
+
+    /* RSA (default): spin visible, combo hidden. */
+    gtk_toggle_button_set_active (rsa, TRUE);
+    drain_events ();
+    if (!gtk_widget_get_visible (spin)) {
+        fail_test ("keylength-selector", "RSA: spinbutton should be visible");
+        goto out;
+    }
+    if (gtk_widget_get_visible (combo)) {
+        fail_test ("keylength-selector", "RSA: combo should be hidden");
+        goto out;
+    }
+    fprintf (stderr, "    RSA: spin shown, combo hidden OK\n");
+
+    /* ECDSA: combo shown, spin hidden, active id = "256". */
+    gtk_toggle_button_set_active (ecdsa, TRUE);
+    drain_events ();
+    if (gtk_widget_get_visible (spin)) {
+        fail_test ("keylength-selector", "ECDSA: spinbutton should be hidden");
+        goto out;
+    }
+    if (!gtk_widget_get_visible (combo)) {
+        fail_test ("keylength-selector", "ECDSA: combo should be visible");
+        goto out;
+    }
+    const gchar *id = gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo));
+    if (!id || g_strcmp0 (id, "256") != 0) {
+        fail_test ("keylength-selector",
+                   "ECDSA: combo active_id = \"%s\", expected \"256\"",
+                   id ? id : "(null)");
+        goto out;
+    }
+    fprintf (stderr, "    ECDSA: combo shown (default %s), spin hidden OK\n", id);
+
+    /* Ed25519: both hidden. */
+    gtk_toggle_button_set_active (eddsa, TRUE);
+    drain_events ();
+    if (gtk_widget_get_visible (spin)) {
+        fail_test ("keylength-selector", "Ed25519: spinbutton should be hidden");
+        goto out;
+    }
+    if (gtk_widget_get_visible (combo)) {
+        fail_test ("keylength-selector", "Ed25519: combo should be hidden");
+        goto out;
+    }
+    fprintf (stderr, "    Ed25519: both hidden OK\n");
+
+    rc = 0;
+
+out:
+    /* Destroy the dialog so subsequent scenarios start clean. */
+    if (new_ca_window_gtkb) {
+        GObject *win = gtk_builder_get_object (new_ca_window_gtkb,
+                                                "new_ca_window");
+        if (win && GTK_IS_WIDGET (win))
+            gtk_widget_destroy (GTK_WIDGET (win));
+        g_object_unref (new_ca_window_gtkb);
+        new_ca_window_gtkb = NULL;
+    }
+    drain_events ();
+    int crits = critical_messages_check_and_reset ("keylength-selector");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1400,6 +1509,7 @@ main (int argc, char **argv)
         scenario_sign_csr ();
         scenario_revoke_cert ();
         scenario_wizard_window ();
+        scenario_keylength_selector ();
     } else {
         fprintf (stderr,
                  "==> Phase 2B scenarios skipped: %s not found.\n"

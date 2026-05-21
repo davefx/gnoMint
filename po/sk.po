@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 12:42+0200\n"
+"POT-Creation-Date: 2026-05-21 18:10+0200\n"
 "PO-Revision-Date: 2010-04-02 04:51+0000\n"
 "Last-Translator: David Marín <Unknown>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -2608,6 +2608,15 @@ msgid ""
 "You should have received a copy of the GNU General Public License along with "
 "this program; if not, write to the Free Software Foundation, Inc., 51 "
 "Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
+msgstr ""
+
+#: ../src/new_ca_window.c:114 ../src/new_ca_window.c:124
+#: ../src/new_req_window.c:302 ../src/new_req_window.c:312
+msgid "Private key bit length:"
+msgstr ""
+
+#: ../src/new_ca_window.c:131 ../src/new_req_window.c:319
+msgid "ECDSA curve:"
 msgstr ""
 
 #: ../src/new_cert.c:350

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 12:42+0200\n"
+"POT-Creation-Date: 2026-05-21 18:10+0200\n"
 "PO-Revision-Date: 2010-04-02 04:45+0000\n"
 "Last-Translator: Mario Blättermann <mariobl@freenet.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -2736,6 +2736,15 @@ msgid ""
 "Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
 msgstr ""
 
+#: ../src/new_ca_window.c:114 ../src/new_ca_window.c:124
+#: ../src/new_req_window.c:302 ../src/new_req_window.c:312
+msgid "Private key bit length:"
+msgstr "Länge des geheimen Schlüssels in Bit"
+
+#: ../src/new_ca_window.c:131 ../src/new_req_window.c:319
+msgid "ECDSA curve:"
+msgstr ""
+
 #: ../src/new_cert.c:350
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
@@ -3592,9 +3601,6 @@ msgstr ""
 
 #~ msgid "DSA"
 #~ msgstr "DSA"
-
-#~ msgid "Private key bit length:"
-#~ msgstr "Länge des geheimen Schlüssels in Bit"
 
 #~ msgid "Private key type:"
 #~ msgstr "Typ des geheimen Schlüssels:"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 12:42+0200\n"
+"POT-Creation-Date: 2026-05-21 18:10+0200\n"
 "PO-Revision-Date: 2009-10-12 03:55+0000\n"
 "Last-Translator: David Marín <Unknown>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -2842,6 +2842,15 @@ msgstr ""
 "Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA "
 "02111-1307, USA."
 
+#: ../src/new_ca_window.c:114 ../src/new_ca_window.c:124
+#: ../src/new_req_window.c:302 ../src/new_req_window.c:312
+msgid "Private key bit length:"
+msgstr "Длина в битах закрытого ключа:"
+
+#: ../src/new_ca_window.c:131 ../src/new_req_window.c:319
+msgid "ECDSA curve:"
+msgstr ""
+
 #: ../src/new_cert.c:350
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
@@ -3851,9 +3860,6 @@ msgstr "* Использование Центра Сертификации вк�
 
 #~ msgid "DSA"
 #~ msgstr "DSA"
-
-#~ msgid "Private key bit length:"
-#~ msgstr "Длина в битах закрытого ключа:"
 
 #~ msgid "Private key type:"
 #~ msgstr "Тип закрытого ключа:"

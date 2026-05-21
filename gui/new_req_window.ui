@@ -640,17 +640,48 @@ subject.&lt;/small&gt;</property>
                 <property name="border_width">6</property>
                 <property name="column_homogeneous">True</property>
                 <child>
-                  <object class="GtkSpinButton" id="keylength_spinbutton1">
+                  <object class="GtkBox" id="keylength_hbox1">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="editable">False</property>
-                    <property name="max_length">5</property>
-                    <property name="invisible_char">•</property>
-                    <property name="adjustment">AdjustmentKeyLengthSpinButton1</property>
-                    <property name="climb_rate">1024</property>
-                    <property name="snap_to_ticks">True</property>
-                    <property name="numeric">True</property>
-                    <property name="update_policy">if-valid</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">horizontal</property>
+                    <child>
+                      <object class="GtkSpinButton" id="keylength_spinbutton1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="editable">False</property>
+                        <property name="max_length">5</property>
+                        <property name="invisible_char">•</property>
+                        <property name="adjustment">AdjustmentKeyLengthSpinButton1</property>
+                        <property name="climb_rate">1024</property>
+                        <property name="snap_to_ticks">True</property>
+                        <property name="numeric">True</property>
+                        <property name="update_policy">if-valid</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="ecdsa_curve_combo1">
+                        <property name="visible">False</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <property name="active_id">256</property>
+                        <items>
+                          <item id="256" translatable="yes">P-256 (256 bits)</item>
+                          <item id="384" translatable="yes">P-384 (384 bits)</item>
+                          <item id="521" translatable="yes">P-521 (521 bits)</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -689,6 +720,7 @@ subject.&lt;/small&gt;</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton1</property>
+                        <signal name="toggled" handler="on_new_req_privkey_type_toggle" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -705,6 +737,7 @@ subject.&lt;/small&gt;</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton1</property>
+                        <signal name="toggled" handler="on_new_req_privkey_type_toggle" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -721,6 +754,7 @@ subject.&lt;/small&gt;</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">rsa_radiobutton1</property>
+                        <signal name="toggled" handler="on_new_req_privkey_type_toggle" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
