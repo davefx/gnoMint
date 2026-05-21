@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 06:28+0200\n"
+"POT-Creation-Date: 2026-05-21 11:12+0200\n"
 "PO-Revision-Date: 2010-04-05 14:02+0000\n"
 "Last-Translator: Sergio Oller <Unknown>\n"
 "Language-Team: Catalan <ca@li.org>\n"
@@ -81,15 +81,15 @@ msgstr "_Obre una base de dades de certificats"
 msgid "Base de datos de certificados de gnoMint"
 msgstr ""
 
-#: src/ca.c:150
+#: src/ca.c:223
 msgid "<b>Certificates</b>"
 msgstr "<b>Certificats</b>"
 
-#: src/ca.c:288
+#: src/ca.c:361
 msgid "<b>Certificate Signing Requests</b>"
 msgstr "<b>Sol·licituds de signatura de certificats</b>"
 
-#: src/ca.c:331 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
+#: src/ca.c:404 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
 #: src/ca-cli-callbacks.c:201 src/ca-cli-callbacks.c:629
 #: src/ca-cli-callbacks.c:638 src/ca-cli-callbacks.c:1258
 #: src/ca-cli-callbacks.c:1267 src/certificate_properties.c:178
@@ -97,7 +97,7 @@ msgstr "<b>Sol·licituds de signatura de certificats</b>"
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: src/ca.c:334 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
+#: src/ca.c:407 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
 #: src/ca-cli-callbacks.c:204 src/ca-cli-callbacks.c:632
 #: src/ca-cli-callbacks.c:641 src/ca-cli-callbacks.c:1261
 #: src/ca-cli-callbacks.c:1270 src/certificate_properties.c:181
@@ -106,86 +106,86 @@ msgstr "%d/%m/%Y %R GMT"
 msgid "%m/%d/%Y %H:%M GMT"
 msgstr "%d/%m/%Y %R GMT"
 
-#: src/ca.c:479 src/certificate_properties.c:588 src/crl.c:184
+#: src/ca.c:556 src/certificate_properties.c:588 src/crl.c:184
 #: src/new_cert.c:192 src/new_req_window.c:192
 msgid "Subject"
 msgstr "Persona certificada"
 
-#: src/ca.c:514
+#: src/ca.c:591
 msgid "Serial"
 msgstr "Núm. de sèrie"
 
-#: src/ca.c:521
+#: src/ca.c:598
 msgid "Activation"
 msgstr "Activació"
 
-#: src/ca.c:528
+#: src/ca.c:605
 msgid "Expiration"
 msgstr "Venciment"
 
-#: src/ca.c:535
+#: src/ca.c:612
 msgid "Revocation"
 msgstr "Revocació"
 
-#: src/ca.c:833
+#: src/ca.c:910
 msgid "Export certificate"
 msgstr "Exporta certificat"
 
-#: src/ca.c:836 src/ca.c:843 src/ca.c:945 src/ca.c:996 src/ca.c:1047
-#: src/ca.c:1876 src/ca.c:1982 src/ca.c:2016 src/crl.c:257 src/main.c:328
-#: src/main.c:400 src/main.c:488 gui/san_editor_dialog.ui.h:9
+#: src/ca.c:913 src/ca.c:920 src/ca.c:1022 src/ca.c:1073 src/ca.c:1124
+#: src/ca.c:1970 src/ca.c:2076 src/ca.c:2110 src/crl.c:257 src/main.c:330
+#: src/main.c:402 src/main.c:490 gui/san_editor_dialog.ui.h:9
 msgid "_Cancel"
 msgstr ""
 
-#: src/ca.c:837 src/ca.c:844 src/ca.c:946 src/ca.c:997 src/ca.c:1048
-#: src/ca.c:1877 src/crl.c:258
+#: src/ca.c:914 src/ca.c:921 src/ca.c:1023 src/ca.c:1074 src/ca.c:1125
+#: src/ca.c:1971 src/crl.c:258
 msgid "_Save"
 msgstr ""
 
-#: src/ca.c:840
+#: src/ca.c:917
 msgid "Export certificate signing request"
 msgstr "Exporta sol·licitud de signatura de certificat"
 
-#: src/ca.c:855 src/ca.c:891 src/ca.c:901 src/export.c:278
+#: src/ca.c:932 src/ca.c:968 src/ca.c:978 src/export.c:278
 msgid "There was an error while exporting certificate."
 msgstr "Hi ha hagut un error al exportar el certificat."
 
-#: src/ca.c:857 src/ca.c:893 src/ca.c:903
+#: src/ca.c:934 src/ca.c:970 src/ca.c:980
 msgid "There was an error while exporting CSR."
 msgstr ""
 "Ha hagut un error al exportar la sol·licitud de signatura de certificat "
 "(CSR),"
 
-#: src/ca.c:916 src/ca.c:1082
+#: src/ca.c:993 src/ca.c:1159
 msgid "Certificate exported successfully"
 msgstr "Certificat exportat amb èxit."
 
-#: src/ca.c:923
+#: src/ca.c:1000
 msgid "Certificate signing request exported successfully"
 msgstr "Sol·licitud de signatura de certificat exportada amb èxit."
 
-#: src/ca.c:942
+#: src/ca.c:1019
 msgid "Export crypted private key"
 msgstr "Exporta la clau privada xifrada"
 
-#: src/ca.c:971 src/ca.c:1023
+#: src/ca.c:1048 src/ca.c:1100
 msgid "Private key exported successfully"
 msgstr "Clau privada exportada amb èxit."
 
-#: src/ca.c:993
+#: src/ca.c:1070
 #, fuzzy
 msgid "Export unencrypted private key"
 msgstr "Exporta la clau privada sense xifrar"
 
-#: src/ca.c:1044
+#: src/ca.c:1121
 msgid "Export whole certificate in PKCS#12 package"
 msgstr "Exporta tot el certificat en un paquet PKCS#12"
 
-#: src/ca.c:1115
+#: src/ca.c:1192
 msgid "Export CSR - gnoMint"
 msgstr "Exporta sol·licitud de signatura de certificat (CSR) - gnoMint"
 
-#: src/ca.c:1120
+#: src/ca.c:1197
 msgid ""
 "Please, choose which part of the saved Certificate Signing Request you want "
 "to export:"
@@ -193,7 +193,7 @@ msgstr ""
 "Seleccioneu quina part de la sol·licitud de signatura de certificat (CSR) "
 "voleu exportar:"
 
-#: src/ca.c:1125
+#: src/ca.c:1202
 msgid ""
 "<i>Export the Certificate Signing Request to a public file, in PEM format.</"
 "i>"
@@ -201,7 +201,7 @@ msgstr ""
 "<i>Exporta la sol·licitud de signatura de certificat a un fitxer públic en "
 "format PEM</i>"
 
-#: src/ca.c:1130
+#: src/ca.c:1207
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the Certificate Signing "
@@ -211,27 +211,27 @@ msgstr ""
 "contrasenya. Aquest fitxer només ha de ser accessible pel titular de la "
 "sol·licitud de signatura del certificat.</i>"
 
-#: src/ca.c:1194
+#: src/ca.c:1271
 msgid "Unexpected error"
 msgstr "Error inesperat"
 
-#: src/ca.c:1254
+#: src/ca.c:1331
 msgid "Are you sure you want to revoke this certificate?"
 msgstr "Esteu segur que voleu revocar aquest certificat?"
 
-#: src/ca.c:1255
+#: src/ca.c:1332
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
 "as the CRL is checked)."
 msgstr ""
 
-#: src/ca.c:1263
+#: src/ca.c:1340
 #, fuzzy
 msgid "Are you sure you want to revoke this CA certificate?"
 msgstr "Esteu segur que voleu revocar aquest certificat?"
 
-#: src/ca.c:1264
+#: src/ca.c:1341
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
@@ -242,17 +242,17 @@ msgid ""
 "certificate."
 msgstr ""
 
-#: src/ca.c:1307
+#: src/ca.c:1384
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr ""
 "Esteu segur que voleu eliminar aquesta sol·licitud de signatura de "
 "certificat (CSR)?"
 
-#: src/ca.c:1654
+#: src/ca.c:1748
 msgid "Change CA password - gnoMint"
 msgstr "Canvia la contrasenya de la CA - gnoMint"
 
-#: src/ca.c:1672
+#: src/ca.c:1766
 msgid ""
 "The current password you have entered  doesn't match with the actual current "
 "database password."
@@ -260,60 +260,60 @@ msgstr ""
 "La contrasenya introduïda no es correspon amb la contrasenya real de la base "
 "de dades."
 
-#: src/ca.c:1687
+#: src/ca.c:1781
 msgid "Error while changing database password. The operation was cancelled."
 msgstr ""
 "S'ha produït un error al canviar la contrasenya de la base de dades. S'ha "
 "cancel·lat la operació."
 
-#: src/ca.c:1696
+#: src/ca.c:1790
 msgid "Password changed successfully"
 msgstr "Contrasenya canviada correctament"
 
-#: src/ca.c:1706 src/ca-cli-callbacks.c:1091
+#: src/ca.c:1800 src/ca-cli-callbacks.c:1091
 msgid ""
 "Error while establishing database password. The operation was cancelled."
 msgstr ""
 "S'ha produït un error al establir la contrasenya de la base de dades. S'ha "
 "cancel·lat la operació."
 
-#: src/ca.c:1716
+#: src/ca.c:1810
 msgid "Password established successfully"
 msgstr "La contrasenya s'ha establert amb èxit"
 
-#: src/ca.c:1726
+#: src/ca.c:1820
 msgid "Error while removing database password. The operation was cancelled."
 msgstr ""
 "S'ha produït un error al eliminar la contrasenya de la base de dades. S'ha "
 "cancel·lat la operació."
 
-#: src/ca.c:1735
+#: src/ca.c:1829
 msgid "Password removed successfully"
 msgstr "La contrasenya s'ha eliminat amb èxit"
 
-#: src/ca.c:1873
+#: src/ca.c:1967
 msgid "Save Diffie-Hellman parameters"
 msgstr "Desa paràmetres Diffie-Hellman"
 
-#: src/ca.c:1899
+#: src/ca.c:1993
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr "Paràmetres Diffie-Hellman desats correctament"
 
 #. Import single file
-#: src/ca.c:1979
+#: src/ca.c:2073
 msgid "Select PEM file to import"
 msgstr "Seleccioneu el fitxer PEM a importar"
 
-#: src/ca.c:1983 src/ca.c:2017 src/main.c:329 src/main.c:401 src/main.c:489
+#: src/ca.c:2077 src/ca.c:2111 src/main.c:331 src/main.c:403 src/main.c:491
 msgid "_Open"
 msgstr ""
 
-#: src/ca.c:2000
+#: src/ca.c:2094
 #, c-format
 msgid "Problem when importing '%s' file"
 msgstr "S'han produït problemes al importar el fitxer '%s'"
 
-#: src/ca.c:2013
+#: src/ca.c:2107
 msgid "Select directory to import"
 msgstr "Seleccioneu el directori a importar"
 
@@ -1770,7 +1770,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/ca-cli-callbacks.c:1535 src/ca-cli-callbacks.c:1536 src/main.c:542
+#: src/ca-cli-callbacks.c:1535 src/ca-cli-callbacks.c:1536 src/main.c:544
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -2443,7 +2443,7 @@ msgstr ""
 msgid "- A Certification Authority manager"
 msgstr ""
 
-#: src/gnomint-cli.c:60 src/main.c:129
+#: src/gnomint-cli.c:60 src/main.c:130
 #, c-format
 msgid "Failed to initialize: %s\n"
 msgstr ""
@@ -2579,46 +2579,46 @@ msgstr ""
 msgid "Files in the directory don't belong to any supported CA format."
 msgstr ""
 
-#: src/main.c:126
+#: src/main.c:127
 msgid "- A graphical Certification Authority manager"
 msgstr ""
 
-#: src/main.c:325
+#: src/main.c:327
 msgid "Create new CA database"
 msgstr ""
 
-#: src/main.c:363
+#: src/main.c:365
 #, c-format
 msgid ""
 "Problem when creating '%s' CA database:\n"
 "%s"
 msgstr ""
 
-#: src/main.c:376
+#: src/main.c:378
 #, c-format
 msgid "Problem when opening new '%s' CA database"
 msgstr ""
 
-#: src/main.c:397
+#: src/main.c:399
 msgid "Open CA database"
 msgstr ""
 
-#: src/main.c:420 src/main.c:460
+#: src/main.c:422 src/main.c:462
 #, c-format
 msgid "Problem when opening '%s' CA database"
 msgstr ""
 
-#: src/main.c:485
+#: src/main.c:487
 msgid "Save CA database as..."
 msgstr ""
 
-#: src/main.c:537
+#: src/main.c:539
 msgid ""
 "gnoMint is a program for creating and managing Certification Authorities, "
 "and their certificates"
 msgstr ""
 
-#: src/main.c:538
+#: src/main.c:540
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -3649,77 +3649,90 @@ msgid "_Revoked Certificates"
 msgstr "Certificats _revocats"
 
 #: gui/main_window.ui.h:27
+#, fuzzy
+msgid "E_xpired Certificates"
+msgstr "Exporta certificat"
+
+#: gui/main_window.ui.h:28
+msgid ""
+"When unchecked, certificates whose validity has already ended are hidden "
+"from the tree. A certificate is also considered expired if any of its "
+"issuing CAs has expired, so an expired CA's whole subtree is hidden "
+"alongside it."
+msgstr ""
+
+#: gui/main_window.ui.h:29
 msgid "_Help"
 msgstr "A_juda"
 
-#: gui/main_window.ui.h:28
+#: gui/main_window.ui.h:30
 msgid "Create a new database"
 msgstr "Crea una base de dades nova"
 
-#: gui/main_window.ui.h:29
+#: gui/main_window.ui.h:31
 msgid "Open an existing database"
 msgstr "Obrir una base de dades existent"
 
-#: gui/main_window.ui.h:30
+#: gui/main_window.ui.h:32
 msgid "Add an autosigned CA"
 msgstr "Afegir una entitat certificadora (CA) auto-signada"
 
-#: gui/main_window.ui.h:31
+#: gui/main_window.ui.h:33
 #, fuzzy
 msgid "Add autosigned CA certificate"
 msgstr "Afegir una entitat certificadora (CA) auto-signada"
 
-#: gui/main_window.ui.h:32
+#: gui/main_window.ui.h:34
 #, fuzzy
 msgid "Add a new Certificate Signing Request"
 msgstr "Sol·licitud de signatura de certificat:\n"
 
-#: gui/main_window.ui.h:33
+#: gui/main_window.ui.h:35
 msgid "Add CSR"
 msgstr "Afegir CSR"
 
-#: gui/main_window.ui.h:34
+#: gui/main_window.ui.h:36
 msgid "Extract the private key of the selected item into a external file"
 msgstr "Extreu la clau privada de l'element sel·leccionat a un fitxer extern"
 
-#: gui/main_window.ui.h:35
+#: gui/main_window.ui.h:37
 msgid "Extract Private Key"
 msgstr "Extreure clau privada"
 
-#: gui/main_window.ui.h:36
+#: gui/main_window.ui.h:38
 msgid "Revoke the selected certificate"
 msgstr "Revoca el certificat seleccionat"
 
-#: gui/main_window.ui.h:37
+#: gui/main_window.ui.h:39
 msgid "Revoke"
 msgstr "Revoca"
 
-#: gui/main_window.ui.h:38
+#: gui/main_window.ui.h:40
 msgid "Sign the selected Certificate Signing Request"
 msgstr "Signa la sol·licitud de certificació seleccionada"
 
-#: gui/main_window.ui.h:39
+#: gui/main_window.ui.h:41
 msgid "Sign"
 msgstr "Signa"
 
-#: gui/main_window.ui.h:40
+#: gui/main_window.ui.h:42
 msgid "Delete the selected Certificate Signing Request"
 msgstr "Esborra la sol·licitud de signatura de certificat sel·leccionada"
 
-#: gui/main_window.ui.h:41
+#: gui/main_window.ui.h:43
 msgid "Quick certificate generation for web server"
 msgstr ""
 
-#: gui/main_window.ui.h:42
+#: gui/main_window.ui.h:44
 #, fuzzy
 msgid "Web Server Wizard"
 msgstr "Servidor web TLS"
 
-#: gui/main_window.ui.h:43
+#: gui/main_window.ui.h:45
 msgid "Quick certificate generation for email server"
 msgstr ""
 
-#: gui/main_window.ui.h:44
+#: gui/main_window.ui.h:46
 #, fuzzy
 msgid "Email Server Wizard"
 msgstr "Servidor web TLS"

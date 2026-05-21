@@ -30,6 +30,7 @@ static GSettings * preferences_settings;
 
 PreferencesGuiChangeCallback csr_visible_callback = NULL;
 PreferencesGuiChangeCallback revoked_visible_callback = NULL;
+PreferencesGuiChangeCallback expired_visible_callback = NULL;
 
 void preferences_gui_set_csr_visible_callback (PreferencesGuiChangeCallback callback)
 {
@@ -39,6 +40,11 @@ void preferences_gui_set_csr_visible_callback (PreferencesGuiChangeCallback call
 void preferences_gui_set_revoked_visible_callback (PreferencesGuiChangeCallback callback)
 {
 	revoked_visible_callback = callback;
+}
+
+void preferences_gui_set_expired_visible_callback (PreferencesGuiChangeCallback callback)
+{
+	expired_visible_callback = callback;
 }
 
 
@@ -57,6 +63,11 @@ void preferences_changed_callback(GSettings* settings,
                 revoked_visible_callback (value, TRUE);
         }
 
+        if (! strcmp (key, "expired-visible") && expired_visible_callback) {
+                gboolean value = g_settings_get_boolean (settings, key);
+                expired_visible_callback (value, TRUE);
+        }
+
 }
 
 
@@ -70,6 +81,10 @@ void preferences_init (int argc, char ** argv)
                           NULL);
 
         g_signal_connect (preferences_settings, "changed::crq-visible",
+                          G_CALLBACK (preferences_changed_callback),
+                          NULL);
+
+        g_signal_connect (preferences_settings, "changed::expired-visible",
                           G_CALLBACK (preferences_changed_callback),
                           NULL);
 
@@ -95,6 +110,16 @@ gboolean preferences_get_revoked_visible ()
 void preferences_set_revoked_visible (gboolean new_value)
 {
         g_settings_set_boolean (preferences_settings, "revoked-visible", new_value);
+}
+
+gboolean preferences_get_expired_visible ()
+{
+        return g_settings_get_boolean (preferences_settings, "expired-visible");
+}
+
+void preferences_set_expired_visible (gboolean new_value)
+{
+        g_settings_set_boolean (preferences_settings, "expired-visible", new_value);
 }
 
 gboolean preferences_get_crq_visible ()

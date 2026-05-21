@@ -18,7 +18,18 @@
         Whether the revoked certificates should be visible.
       </description>
     </key>
-    
+
+    <key name="expired-visible" type="b">
+      <default>true</default>
+      <summary>Expired certificates visibility</summary>
+      <description>
+        Whether already-expired certificates should be visible in the
+        certificates tree. CAs are always visible regardless of this
+        setting so that any still-valid certificates they signed remain
+        reachable.
+      </description>
+    </key>
+
     <key name="crq-visible" type="b">
       <default>true</default>
       <summary>Certificate requests visibility</summary>
