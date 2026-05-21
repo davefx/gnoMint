@@ -64,8 +64,12 @@ The main window opens with the default database
 (`~/.local/share/gnomint/default.gnomint` on current versions, the
 legacy `~/.gnomint/default.gnomint` on older).
 
+![Main window after opening a database]({{ site.baseurl }}/assets/screenshots/main-window.png)
+
 Choose **Certificates → Add → Add self-signed CA**. The "new CA
 properties" dialog appears.
+
+![Subject step of the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-subject.png)
 
 - Fill in the **subject** fields (CN, OU, O, L, ST, C).
 - Press **Next**.
@@ -74,6 +78,9 @@ properties" dialog appears.
   2008 tutorial chose RSA 4096 (or 5120) for a long-lived root — for
   modern hardware **ECDSA P-384** or **Ed25519** give equivalent
   security at smaller sizes.
+
+  ![Key-algorithm step of the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-key-algorithm.png)
+
 - Set the **validity period**. For a root CA, 20 years (240 months) is
   reasonable. gnoMint is Y2K38-safe, so dates past 2038 work correctly.
 
@@ -106,6 +113,8 @@ this tutorial we'll take the simpler option (in-database with
 passphrase). Choose **Certificates → Change Database Password**, set a
 new passphrase, confirm, and the database is protected.
 
+![Database password dialog]({{ site.baseurl }}/assets/screenshots/database-password.png)
+
 ---
 
 ## Establishing Root-CA policies
@@ -137,6 +146,8 @@ requests) — one per subordinate CA. Each CSR will be signed by the Root
 CA to produce the subordinate's certificate.
 
 Choose **Certificates → Add → Add Certificate Request**.
+
+![Inherit-from-CA step of the New-CSR wizard]({{ site.baseurl }}/assets/screenshots/new-csr-subject.png)
 
 - In the first step, pick the parent (Root CA) so the subject fields
   are inherited.

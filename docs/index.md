@@ -10,6 +10,8 @@ title: gnoMint
 A graphical Certification Authority manager for the Linux desktop, with
 a matching readline CLI for scripting and CI.
 
+![gnoMint main window]({{ site.baseurl }}/assets/screenshots/main-window.png)
+
 gnoMint is a GTK 3 application (with a parallel `gnomint-cli` readline
 front-end) that lets you bootstrap a Certificate Authority, issue and
 revoke certificates, manage CSRs, publish CRLs, and import/export keys

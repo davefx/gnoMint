@@ -28,6 +28,9 @@ modernised codebase, a test suite, and a batch of new conveniences.
 - **Hierarchical CAs.** Build a root CA, sign intermediate CAs under it,
   and sign leaf certificates under those. The hierarchy is rendered as a
   tree view; every column is sortable.
+
+![Main window with a sample CA hierarchy]({{ site.baseurl }}/assets/screenshots/main-window.png)
+
 - **Per-CA policies.** Default key length, expiration period and signing
   policy are stored on each CA, so creating subordinate certs uses sane
   defaults without you re-typing them.
@@ -47,6 +50,9 @@ modernised codebase, a test suite, and a batch of new conveniences.
 
 ECDSA and Ed25519 support [landed in 1.4.0](https://github.com/davefx/gnoMint/issues/49)
 and is available from both the New-CA and New-CSR dialogs.
+
+![Key-algorithm selection in the New-CA wizard]({{ site.baseurl }}/assets/screenshots/new-ca-key-algorithm.png)
+
 
 ---
 

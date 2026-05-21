@@ -58,12 +58,18 @@ CA to see what it has signed.
 
 1. **File → New** (or Ctrl-N). Pick a path for your `.gnomint` database.
 2. The "New CA" dialog opens. Fill in the subject fields:
+
+   ![New CA subject step]({{ site.baseurl }}/assets/screenshots/new-ca-subject.png)
+
    - **CN (Common Name)**: a human-readable name (e.g. "Example Org
      Root CA"). This is what shows up in tools that display issuer
      names.
    - **OU / O / L / ST / C**: optional organisational metadata.
    - **emailAddress**: optional; goes into the subject DN.
 3. Pick a **key algorithm**:
+
+   ![Key algorithm step]({{ site.baseurl }}/assets/screenshots/new-ca-key-algorithm.png)
+
    - **RSA** with 4096 bits is the safe default for a long-lived root.
    - **ECDSA P-384** is shorter, faster, and widely supported.
    - **Ed25519** is the smallest and fastest, but a few legacy clients
@@ -83,6 +89,8 @@ gnoMint asks for an optional passphrase when you create a CA; if you
 set one, private keys are stored PKCS#8-encrypted with PKCS#12 3DES.
 You can also add/change/remove the passphrase later from **File →
 Database password**.
+
+![Database password dialog]({{ site.baseurl }}/assets/screenshots/database-password.png)
 
 ---
 
@@ -180,6 +188,8 @@ Right-click a certificate and choose **Export certificate**. Picks of:
 - DER (binary)
 - PKCS#12 (with the private key, passphrase-protected)
 
+![Export certificate dialog]({{ site.baseurl }}/assets/screenshots/export-certificate.png)
+
 ### Private key
 
 Right-click and choose **Extract private key**. The key is exported
@@ -268,6 +278,8 @@ will reject the second writer).
 ---
 
 ## Preferences
+
+![Preferences dialog]({{ site.baseurl }}/assets/screenshots/preferences.png)
 
 **Edit → Preferences** controls:
 
