@@ -53,6 +53,7 @@
 #include <gnutls/x509.h>
 #include "tls.h"
 #include "wizard_window.h"
+#include "ca.h"
 
 #ifndef GNOMINT_UI_DIR
 # error "GNOMINT_UI_DIR must be set at compile time (path to gui/)"
@@ -979,6 +980,65 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario 10 (issue #51): expire-warning amber state               */
+/* ------------------------------------------------------------------ */
+
+/* Pure-function exercise of ca_compute_row_foreground across the
+ * matrix of (effective_expiration, warning_days) combinations. The
+ * helper drives the three-state tree foreground; nailing it down here
+ * means a future refactor that breaks the boundaries (off-by-one on
+ * the warning threshold, wrong color string, accidentally amber-ing
+ * already-expired rows, etc.) fails the test rather than silently
+ * shipping. */
+static int
+scenario_expire_warning_foreground (void)
+{
+    fprintf (stderr,
+             "==> scenario: expire-warning foreground (issue #51)\n");
+
+    const time_t now = 1700000000;          /* fixed reference, ~2023 */
+    const time_t day = 86400;
+
+    struct {
+        const char *name;
+        time_t      effective_expiration;
+        gint        warn_days;
+        const char *expected;               /* NULL or string literal */
+    } cases[] = {
+        { "no expiration / no warning",    0,                30, NULL },
+        { "no expiration / 0-day warning", 0,                 0, NULL },
+        { "expired yesterday",             now - day,        30, "gray" },
+        { "expired 5 years ago",           now - 5 * 365 * day, 30, "gray" },
+        { "expires today + epsilon",       now + 1,          30, "#cc7700" },
+        { "expires in 5 days",             now + 5 * day,    30, "#cc7700" },
+        { "expires in 29 days",            now + 29 * day,   30, "#cc7700" },
+        { "expires exactly at threshold",  now + 30 * day,   30, NULL },
+        { "expires in 60 days",            now + 60 * day,   30, NULL },
+        { "expires in 60 days, 90d warn",  now + 60 * day,   90, "#cc7700" },
+        { "warn_days = 0 disables amber",  now + 5 * day,     0, NULL },
+        { "warn_days < 0 treated as off",  now + 5 * day,    -1, NULL },
+    };
+    int failures = 0;
+
+    for (size_t i = 0; i < G_N_ELEMENTS (cases); i++) {
+        const gchar *got = ca_compute_row_foreground (
+            cases[i].effective_expiration, now, cases[i].warn_days);
+        if (g_strcmp0 (got, cases[i].expected) != 0) {
+            fail_test ("expire-warning-foreground",
+                       "%s: expected %s, got %s",
+                       cases[i].name,
+                       cases[i].expected ? cases[i].expected : "(null)",
+                       got ? got : "(null)");
+            failures++;
+        }
+    }
+
+    fprintf (stderr, "    %zu cases, %d failures\n",
+             G_N_ELEMENTS (cases), failures);
+    return failures == 0 ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1004,6 +1064,7 @@ main (int argc, char **argv)
     scenario_all_ui_files_load ();
     scenario_cert_properties_populate ();
     scenario_email_address ();
+    scenario_expire_warning_foreground ();
 
     /* Phase 2B scenarios drive production code paths that load .ui
      * files from PACKAGE_DATA_DIR (new_ca_window.c et al). That path

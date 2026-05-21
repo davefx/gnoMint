@@ -25,6 +25,10 @@
 
 #ifndef GNOMINTCLI
 #include <gtk/gtk.h>
+#include <time.h>
+
+const gchar *ca_compute_row_foreground (time_t effective_expiration,
+                                        time_t now, gint warn_days);
 
 gboolean ca_refresh_model_callback ();
 gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
