@@ -113,6 +113,7 @@ gboolean ca_file_get_id_from_serial_issuer_id (const UInt160 *serial, const guin
 gboolean ca_file_get_id_from_dn (CaFileElementType type, const gchar *dn, guint64 *db_id);
 gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id);
+gchar * ca_file_get_chain_pem_from_id (guint64 cert_id);
 gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id);
 gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id);
 

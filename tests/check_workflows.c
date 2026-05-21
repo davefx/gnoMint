@@ -87,6 +87,8 @@ extern gboolean ca_open (gchar *filename, gboolean create);
 extern void   ca_file_close (void);
 extern gint   ca_file_get_number_of_certs (void);
 extern guint64 ca_get_selected_row_id (void);
+extern gchar * ca_file_get_chain_pem_from_id (guint64 cert_id);
+extern gboolean ca_file_open (gchar *file_name, gboolean create);
 
 /* Callbacks under test. All are G_MODULE_EXPORT in the production code. */
 extern void on_add_self_signed_ca_activate (GtkMenuItem *, gpointer);
@@ -1039,6 +1041,97 @@ scenario_expire_warning_foreground (void)
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario 11 (issue #52): full certificate-chain export            */
+/* ------------------------------------------------------------------ */
+
+/* Exercises ca_file_get_chain_pem_from_id against the bundled fixture:
+ *   - cert id 3 ("gnoMint program") has parent_route ":1:2:" so the
+ *     chain must contain exactly 3 BEGIN CERTIFICATE markers (leaf +
+ *     intermediate + root) in the right order.
+ *   - cert id 1 ("DFX Root CA") is a self-signed root with no
+ *     ancestors; chain returns 1 PEM.
+ *   - a bogus id returns NULL.
+ */
+static int
+scenario_chain_export (void)
+{
+    int rc = 1;
+
+    fprintf (stderr, "==> scenario: chain export (issue #52)\n");
+    if (!fixture_setup ())
+        return 1;
+
+    if (! ca_file_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("chain-export", "ca_file_open(%s) failed", fixture_path);
+        goto out;
+    }
+
+    /* Bogus id: NULL chain. */
+    gchar *bogus = ca_file_get_chain_pem_from_id (999999);
+    if (bogus) {
+        fail_test ("chain-export", "expected NULL for non-existent id");
+        g_free (bogus);
+        goto out;
+    }
+
+    /* Root cert: one BEGIN marker. */
+    gchar *root_chain = ca_file_get_chain_pem_from_id (1);
+    if (! root_chain) {
+        fail_test ("chain-export", "chain for root (id=1) is NULL");
+        goto out;
+    }
+    int root_count = 0;
+    for (const gchar *p = root_chain;
+         (p = strstr (p, "-----BEGIN CERTIFICATE-----")); p++)
+        root_count++;
+    if (root_count != 1) {
+        fail_test ("chain-export",
+                   "root chain: expected 1 BEGIN marker, got %d", root_count);
+        g_free (root_chain);
+        goto out;
+    }
+    fprintf (stderr, "    root chain: 1 BEGIN marker OK\n");
+    g_free (root_chain);
+
+    /* Three-deep leaf: leaf + intermediate + root = 3 markers. */
+    gchar *leaf_chain = ca_file_get_chain_pem_from_id (3);
+    if (! leaf_chain) {
+        fail_test ("chain-export", "chain for id=3 is NULL");
+        goto out;
+    }
+    int leaf_count = 0;
+    for (const gchar *p = leaf_chain;
+         (p = strstr (p, "-----BEGIN CERTIFICATE-----")); p++)
+        leaf_count++;
+    if (leaf_count != 3) {
+        fail_test ("chain-export",
+                   "leaf chain: expected 3 BEGIN markers, got %d", leaf_count);
+        g_free (leaf_chain);
+        goto out;
+    }
+    /* And exactly the same count of END markers, so PEMs are well-formed. */
+    int end_count = 0;
+    for (const gchar *p = leaf_chain;
+         (p = strstr (p, "-----END CERTIFICATE-----")); p++)
+        end_count++;
+    if (end_count != 3) {
+        fail_test ("chain-export",
+                   "leaf chain: 3 BEGINs but %d ENDs", end_count);
+        g_free (leaf_chain);
+        goto out;
+    }
+    fprintf (stderr, "    leaf chain (id=3): 3 BEGIN + 3 END markers OK\n");
+    g_free (leaf_chain);
+
+    rc = 0;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    return rc;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1065,6 +1158,7 @@ main (int argc, char **argv)
     scenario_cert_properties_populate ();
     scenario_email_address ();
     scenario_expire_warning_foreground ();
+    scenario_chain_export ();
 
     /* Phase 2B scenarios drive production code paths that load .ui
      * files from PACKAGE_DATA_DIR (new_ca_window.c et al). That path
