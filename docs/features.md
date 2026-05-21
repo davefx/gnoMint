@@ -12,6 +12,15 @@ publish CRLs, and export anything as PEM or PKCS#12. The 1.4.0 release
 ("Lazarus", May 2026) brought it back from a decade-long hiatus with a
 modernised codebase, a test suite, and a batch of new conveniences.
 
+> **Why gnoMint exists.** From the original 2006 announcement: *"Its
+> development was started due to the lack of a 'just-works' CA software:
+> creating a CA from zero, through open-source command-line utilities,
+> was possible, but was uncomfortable. You had to remember all the
+> necessary parameters and create a difficult configuration file. So
+> here is gnoMint, to help system and network administrators deploy a
+> Certification Authority very easily."* Two decades on, that's still
+> what gnoMint is for.
+
 ---
 
 ## Certificate Authority management

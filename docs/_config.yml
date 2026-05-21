@@ -25,6 +25,8 @@ header_pages:
   - features.md
   - install.md
   - manual.md
+  - tutorial.md
+  - releases.md
 
 exclude:
   - Gemfile

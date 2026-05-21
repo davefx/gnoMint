@@ -5,7 +5,10 @@ title: gnoMint
 
 # gnoMint
 
-**A graphical Certification Authority manager for the Linux desktop.**
+**Certification Authority management made easy.**
+
+A graphical Certification Authority manager for the Linux desktop, with
+a matching readline CLI for scripting and CI.
 
 gnoMint is a GTK 3 application (with a parallel `gnomint-cli` readline
 front-end) that lets you bootstrap a Certificate Authority, issue and
@@ -51,5 +54,7 @@ file you can carry around or back up like any other document.
 - [Features overview]({{ site.baseurl }}/features) — what gnoMint can do
 - [Install guide]({{ site.baseurl }}/install) — packages and building from source
 - [User manual]({{ site.baseurl }}/manual) — task-oriented walkthrough
+- [Tutorial]({{ site.baseurl }}/tutorial) — set up a CA for a small firm + OpenVPN
+- [Release history]({{ site.baseurl }}/releases) — every release since 2006
 - [Report a bug](https://github.com/davefx/gnoMint/issues) on GitHub
 - [Send a patch](https://github.com/davefx/gnoMint/pulls) — pull requests welcome
