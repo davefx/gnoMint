@@ -315,6 +315,34 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkSeparatorMenuItem" id="bulk_separator">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="bulk_revoke1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Revoke _all selected...</property>
+                        <property name="use_underline">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_text" translatable="yes">Revoke every selected certificate. Use Ctrl-click / Shift-click in the tree to build a multi-selection. CSRs in the selection are skipped.</property>
+                        <signal name="activate" handler="ca_on_bulk_revoke_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="bulk_delete_csrs1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Delete all selected _CSRs...</property>
+                        <property name="use_underline">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_text" translatable="yes">Delete every selected Certificate Signing Request. Certificates in the selection are not affected; use Revoke for those.</property>
+                        <signal name="activate" handler="ca_on_bulk_delete_csrs_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -666,7 +694,9 @@
                 <signal name="cursor-changed" handler="ca_treeview_selection_change" swapped="no"/>
                 <signal name="row-activated" handler="ca_treeview_row_activated" swapped="no"/>
                 <child internal-child="selection">
-                  <object class="GtkTreeSelection"/>
+                  <object class="GtkTreeSelection">
+                    <property name="mode">multiple</property>
+                  </object>
                 </child>
               </object>
             </child>

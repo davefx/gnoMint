@@ -39,6 +39,10 @@ gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data);
 void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_export_chain_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_bulk_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_bulk_delete_csrs_activate (GtkMenuItem *menuitem, gpointer user_data);
+gint ca_bulk_revoke_ids (GSList *cert_ids, gchar **error_out);
+gint ca_bulk_delete_csr_ids (GSList *csr_ids, gchar **error_out);
 void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data);
