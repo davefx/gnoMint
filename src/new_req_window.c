@@ -539,9 +539,22 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 		csr_creation_data->subject_alt_name = NULL;
 	}
 
-	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
-	active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(widget));
-	csr_creation_data->key_type = active;
+	{
+		GtkWidget *eddsa = GTK_WIDGET (
+		    gtk_builder_get_object (new_req_window_gtkb, "eddsa_radiobutton1"));
+		GtkWidget *ecdsa = GTK_WIDGET (
+		    gtk_builder_get_object (new_req_window_gtkb, "ecdsa_radiobutton1"));
+		GtkWidget *dsa   = GTK_WIDGET (
+		    gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
+		if (eddsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eddsa)))
+			csr_creation_data->key_type = 3; /* EdDSA */
+		else if (ecdsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (ecdsa)))
+			csr_creation_data->key_type = 2; /* ECDSA */
+		else if (dsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dsa)))
+			csr_creation_data->key_type = 1; /* DSA */
+		else
+			csr_creation_data->key_type = 0; /* RSA */
+	}
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "keylength_spinbutton1"));
 	active = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(widget));

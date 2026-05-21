@@ -153,6 +153,23 @@ gchar * tls_generate_dsa_keys (TlsCreationData *creation_data,
 			       gchar ** private_key,
 			       gnutls_x509_privkey_t **key);
 
+gchar * tls_generate_ecdsa_keys (TlsCreationData *creation_data,
+			        gchar ** private_key,
+			        gnutls_x509_privkey_t **key);
+
+gchar * tls_generate_eddsa_keys (TlsCreationData *creation_data,
+			        gchar ** private_key,
+			        gnutls_x509_privkey_t **key);
+
+/* key_type enum values used in TlsCreationData (consumed by the
+ * dispatchers in ca_creation.c / csr_creation.c). */
+typedef enum {
+	TLS_KEY_TYPE_RSA   = 0,
+	TLS_KEY_TYPE_DSA   = 1,
+	TLS_KEY_TYPE_ECDSA = 2,
+	TLS_KEY_TYPE_EDDSA = 3,
+} TlsKeyType;
+
 gchar * tls_generate_pkcs8_encrypted_private_key (gchar *private_key, gchar *passphrase);
 gchar * tls_load_pkcs8_private_key (gchar *pem, gchar *passphrase, const gchar * key_id, gint *tls_error);
 

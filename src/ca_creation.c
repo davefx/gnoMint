@@ -78,21 +78,57 @@ gpointer ca_creation_thread (gpointer data)
 
  		error_message = tls_generate_dsa_keys (creation_data, &private_key, &ca_key);
 
-		if (error_message) { 
+		if (error_message) {
 			printf ("%s\n\n", error_message);
 
- 			g_mutex_lock(&ca_creation_thread_status_mutex); 
+ 			g_mutex_lock(&ca_creation_thread_status_mutex);
 
-			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message); 
- 			ca_creation_thread_status = -1; 
+			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message);
+ 			ca_creation_thread_status = -1;
 
- 			g_mutex_unlock (&ca_creation_thread_status_mutex); 
+ 			g_mutex_unlock (&ca_creation_thread_status_mutex);
 
-
- 			//return error_message; 
 			tls_creation_data_free (creation_data);
 			return ca_creation_message;
- 		} 
+ 		}
+
+		break;
+
+	case 2: /* ECDSA */
+		g_mutex_lock(&ca_creation_thread_status_mutex);
+		ca_creation_message = _("Generating new ECDSA key pair");
+		g_mutex_unlock (&ca_creation_thread_status_mutex);
+
+		error_message = tls_generate_ecdsa_keys (creation_data, &private_key, &ca_key);
+
+		if (error_message) {
+			printf ("%s\n\n", error_message);
+			g_mutex_lock(&ca_creation_thread_status_mutex);
+			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message);
+			ca_creation_thread_status = -1;
+			g_mutex_unlock (&ca_creation_thread_status_mutex);
+			tls_creation_data_free (creation_data);
+			return ca_creation_message;
+		}
+
+		break;
+
+	case 3: /* EdDSA */
+		g_mutex_lock(&ca_creation_thread_status_mutex);
+		ca_creation_message = _("Generating new Ed25519 key pair");
+		g_mutex_unlock (&ca_creation_thread_status_mutex);
+
+		error_message = tls_generate_eddsa_keys (creation_data, &private_key, &ca_key);
+
+		if (error_message) {
+			printf ("%s\n\n", error_message);
+			g_mutex_lock(&ca_creation_thread_status_mutex);
+			ca_creation_message = g_strdup_printf ("%s:\n%s",_("Key generation failed"), error_message);
+			ca_creation_thread_status = -1;
+			g_mutex_unlock (&ca_creation_thread_status_mutex);
+			tls_creation_data_free (creation_data);
+			return ca_creation_message;
+		}
 
 		break;
 	}

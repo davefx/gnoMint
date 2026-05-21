@@ -245,6 +245,75 @@ gchar * tls_generate_dsa_keys (TlsCreationData *creation_data,
 
 }
 
+/* ECDSA keypair on a NIST prime curve. creation_data->key_bitlength
+ * selects the curve: 256 → SECP256R1 (P-256), 384 → SECP384R1 (P-384),
+ * 521 → SECP521R1 (P-521). Anything else falls back to P-256. */
+gchar *
+tls_generate_ecdsa_keys (TlsCreationData *creation_data,
+                         gchar **private_key,
+                         gnutls_x509_privkey_t **key)
+{
+	size_t private_key_len = 0;
+	gint   error;
+	gnutls_ecc_curve_t curve;
+
+	switch (creation_data->key_bitlength) {
+	case 384: curve = GNUTLS_ECC_CURVE_SECP384R1; break;
+	case 521: curve = GNUTLS_ECC_CURVE_SECP521R1; break;
+	case 256:
+	default:  curve = GNUTLS_ECC_CURVE_SECP256R1; break;
+	}
+
+	*key = g_new0 (gnutls_x509_privkey_t, 1);
+	if (gnutls_x509_privkey_init (*key) < 0)
+		return g_strdup_printf (_("Error initializing private key structure."));
+
+	error = gnutls_x509_privkey_generate (**key, GNUTLS_PK_ECDSA,
+	                                      GNUTLS_CURVE_TO_BITS (curve), 0);
+	if (error < 0)
+		return g_strdup_printf (_("Error creating private key: %d"), error);
+
+	*private_key = NULL;
+	gnutls_x509_privkey_export (**key, GNUTLS_X509_FMT_PEM,
+	                            *private_key, &private_key_len);
+	*private_key = g_new0 (gchar, private_key_len);
+	if (gnutls_x509_privkey_export (**key, GNUTLS_X509_FMT_PEM,
+	                                *private_key, &private_key_len) < 0)
+		return g_strdup_printf (_("Error exporting private key to PEM structure."));
+
+	return NULL;
+}
+
+/* Ed25519 keypair. key_bitlength is ignored — Ed25519 is a fixed
+ * 256-bit curve; we always pick it. Ed448 is rarely useful in practice
+ * and there's no UI knob for it yet. */
+gchar *
+tls_generate_eddsa_keys (TlsCreationData *creation_data G_GNUC_UNUSED,
+                         gchar **private_key,
+                         gnutls_x509_privkey_t **key)
+{
+	size_t private_key_len = 0;
+	gint   error;
+
+	*key = g_new0 (gnutls_x509_privkey_t, 1);
+	if (gnutls_x509_privkey_init (*key) < 0)
+		return g_strdup_printf (_("Error initializing private key structure."));
+
+	error = gnutls_x509_privkey_generate (**key, GNUTLS_PK_EDDSA_ED25519, 0, 0);
+	if (error < 0)
+		return g_strdup_printf (_("Error creating private key: %d"), error);
+
+	*private_key = NULL;
+	gnutls_x509_privkey_export (**key, GNUTLS_X509_FMT_PEM,
+	                            *private_key, &private_key_len);
+	*private_key = g_new0 (gchar, private_key_len);
+	if (gnutls_x509_privkey_export (**key, GNUTLS_X509_FMT_PEM,
+	                                *private_key, &private_key_len) < 0)
+		return g_strdup_printf (_("Error exporting private key to PEM structure."));
+
+	return NULL;
+}
+
 gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar *passphrase)
 {
 	gnutls_datum_t pem_datum;
