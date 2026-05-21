@@ -745,9 +745,16 @@ G_MODULE_EXPORT gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 		
                 if (gtk_tree_selection_count_selected_rows (selection) != 1)
                         return FALSE;
-		
-                gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
+
+                /* Tree-view selection mode is GTK_SELECTION_MULTIPLE since
+                 * #54; the single-row helpers must use _get_selected_rows
+                 * even when exactly one row is selected. */
+                GtkTreeModel *_m = NULL;
+                GList *_rows = gtk_tree_selection_get_selected_rows (selection, &_m);
+                if (! _rows) return FALSE;
+                gtk_tree_model_get_iter (_m, &selection_iter, _rows->data);
                 path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
+                g_list_free_full (_rows, (GDestroyNotify) gtk_tree_path_free);
 
 			
 	}
@@ -893,7 +900,14 @@ gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
 	if (gtk_tree_selection_count_selected_rows (selection) != 1)
 		return -1;
 
-	gtk_tree_selection_get_selected (selection, NULL, &selection_iter); 
+	/* GTK_SELECTION_MULTIPLE; _get_selected_rows works for any count. */
+	{
+		GtkTreeModel *_m = NULL;
+		GList *_rows = gtk_tree_selection_get_selected_rows (selection, &_m);
+		if (! _rows) return -1;
+		gtk_tree_model_get_iter (_m, &selection_iter, _rows->data);
+		g_list_free_full (_rows, (GDestroyNotify) gtk_tree_path_free);
+	}
 	if (iter)
 		(*iter) = gtk_tree_iter_copy (&selection_iter);
 
@@ -1412,6 +1426,209 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_U
 	g_free (chain_pem);
 	g_free (filename);
 	g_free (cn);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Bulk operations (issue #54)                                       */
+/* ------------------------------------------------------------------ */
+
+/* Revoke every certificate whose id is in `cert_ids`. Skips entries
+ * that aren't certs or are already revoked. Returns the count of
+ * actually-revoked entries; if `error_out` is non-NULL, the first
+ * underlying error is stored there (caller frees with g_free). */
+gint
+ca_bulk_revoke_ids (GSList *cert_ids, gchar **error_out)
+{
+	gint count = 0;
+	if (error_out)
+		*error_out = NULL;
+	for (GSList *l = cert_ids; l; l = l->next) {
+		guint64 id = GPOINTER_TO_UINT (l->data);
+		if (id == 0)
+			continue;
+		if (! ca_file_check_if_is_cert_id (id))
+			continue;
+		gchar *err = ca_file_revoke_crt (id);
+		if (err) {
+			if (error_out && ! *error_out)
+				*error_out = err;
+			else
+				g_free (err);
+			continue;
+		}
+		count++;
+	}
+	return count;
+}
+
+/* Delete every CSR whose id is in `csr_ids`. Skips entries that aren't
+ * CSRs. Returns the count of actually-deleted entries. */
+gint
+ca_bulk_delete_csr_ids (GSList *csr_ids, gchar **error_out)
+{
+	gint count = 0;
+	if (error_out)
+		*error_out = NULL;
+	for (GSList *l = csr_ids; l; l = l->next) {
+		guint64 id = GPOINTER_TO_UINT (l->data);
+		if (id == 0)
+			continue;
+		if (! ca_file_check_if_is_csr_id (id))
+			continue;
+		gchar *err = ca_file_remove_csr (id);
+		if (err) {
+			if (error_out && ! *error_out)
+				*error_out = err;
+			else
+				g_free (err);
+			continue;
+		}
+		count++;
+	}
+	return count;
+}
+
+/* Helper: walk the tree selection, partitioning selected rows into a
+ * list of cert ids and a list of CSR ids. The returned GSLists are
+ * caller-owned (free with g_slist_free; no per-element free needed
+ * since each element is a GUINT-boxed pointer). */
+static void
+__ca_collect_selected_ids (GSList **cert_ids_out, GSList **csr_ids_out)
+{
+	*cert_ids_out = NULL;
+	*csr_ids_out = NULL;
+
+	GtkTreeView *tv = GTK_TREE_VIEW (
+	    gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
+	GtkTreeSelection *sel = gtk_tree_view_get_selection (tv);
+	GtkTreeModel *model = NULL;
+	GList *rows = gtk_tree_selection_get_selected_rows (sel, &model);
+
+	for (GList *l = rows; l; l = l->next) {
+		GtkTreePath *path = l->data;
+		GtkTreeIter iter;
+		if (! gtk_tree_model_get_iter (model, &iter, path))
+			continue;
+		guint64 id = 0;
+		gint item_type = 0;
+		gtk_tree_model_get (model, &iter,
+		                    CA_MODEL_COLUMN_ID, &id,
+		                    CA_MODEL_COLUMN_ITEM_TYPE, &item_type, -1);
+		if (id == 0)
+			continue;
+		gpointer boxed = GUINT_TO_POINTER ((guint) id);
+		if (item_type == 1)
+			*csr_ids_out = g_slist_prepend (*csr_ids_out, boxed);
+		else
+			*cert_ids_out = g_slist_prepend (*cert_ids_out, boxed);
+	}
+	g_list_free_full (rows, (GDestroyNotify) gtk_tree_path_free);
+}
+
+/* GUI handler: ask for confirmation, then bulk-revoke every selected
+ * cert (and skip CSRs / non-certs in the selection). Visible from the
+ * Certificates menu and the right-click popup. */
+G_MODULE_EXPORT void
+ca_on_bulk_revoke_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+                            gpointer user_data G_GNUC_UNUSED)
+{
+	GSList *cert_ids = NULL, *csr_ids = NULL;
+	__ca_collect_selected_ids (&cert_ids, &csr_ids);
+	g_slist_free (csr_ids);
+
+	gint n = (gint) g_slist_length (cert_ids);
+	if (n == 0) {
+		g_slist_free (cert_ids);
+		dialog_error (_("Please select one or more certificates to revoke."));
+		return;
+	}
+
+	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	gchar *msg = g_strdup_printf (
+	    ngettext ("Are you sure you want to revoke %d certificate?",
+	              "Are you sure you want to revoke %d certificates?", n),
+	    n);
+	GtkWidget *dialog = gtk_message_dialog_new_with_markup (
+	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
+	    GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+	    "<b>%s</b>\n\n<span font_size='small'>%s</span>", msg,
+	    _("Revoking a certificate will include it in the next CRL, marking "
+	      "it as invalid. CSRs in the selection (if any) are not affected; "
+	      "use \"Delete selected CSRs\" for those."));
+	g_free (msg);
+	gint resp = gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+
+	if (resp != GTK_RESPONSE_YES) {
+		g_slist_free (cert_ids);
+		return;
+	}
+
+	gchar *err = NULL;
+	gint done = ca_bulk_revoke_ids (cert_ids, &err);
+	g_slist_free (cert_ids);
+
+	if (err) {
+		dialog_error (g_strdup_printf (
+		    _("Bulk revoke completed with errors. First error: %s"), err));
+		g_free (err);
+	}
+	gchar *summary = g_strdup_printf (
+	    ngettext ("%d certificate revoked.",
+	              "%d certificates revoked.", done), done);
+	GtkWidget *info = gtk_message_dialog_new (
+	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
+	    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", summary);
+	g_free (summary);
+	gtk_dialog_run (GTK_DIALOG (info));
+	gtk_widget_destroy (info);
+
+	dialog_refresh_list ();
+}
+
+/* GUI handler: bulk-delete CSRs from the current selection. */
+G_MODULE_EXPORT void
+ca_on_bulk_delete_csrs_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+                                 gpointer user_data G_GNUC_UNUSED)
+{
+	GSList *cert_ids = NULL, *csr_ids = NULL;
+	__ca_collect_selected_ids (&cert_ids, &csr_ids);
+	g_slist_free (cert_ids);
+
+	gint n = (gint) g_slist_length (csr_ids);
+	if (n == 0) {
+		g_slist_free (csr_ids);
+		dialog_error (_("Please select one or more CSRs to delete."));
+		return;
+	}
+
+	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	gchar *msg = g_strdup_printf (
+	    ngettext ("Are you sure you want to delete %d Certificate Signing Request?",
+	              "Are you sure you want to delete %d Certificate Signing Requests?", n),
+	    n);
+	GtkWidget *dialog = gtk_message_dialog_new_with_markup (
+	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
+	    GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "<b>%s</b>", msg);
+	g_free (msg);
+	gint resp = gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+
+	if (resp != GTK_RESPONSE_YES) {
+		g_slist_free (csr_ids);
+		return;
+	}
+
+	gchar *err = NULL;
+	gint done = ca_bulk_delete_csr_ids (csr_ids, &err);
+	g_slist_free (csr_ids);
+
+	if (err) {
+		dialog_error (g_strdup_printf (
+		    _("Bulk delete completed with errors. First error: %s"), err));
+		g_free (err);
+	}
+	dialog_refresh_list ();
 }
 
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)

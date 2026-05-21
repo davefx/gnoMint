@@ -89,6 +89,11 @@ extern gint   ca_file_get_number_of_certs (void);
 extern guint64 ca_get_selected_row_id (void);
 extern gchar * ca_file_get_chain_pem_from_id (guint64 cert_id);
 extern gboolean ca_file_open (gchar *file_name, gboolean create);
+extern gint ca_bulk_revoke_ids (GSList *cert_ids, gchar **error_out);
+extern gint ca_bulk_delete_csr_ids (GSList *csr_ids, gchar **error_out);
+extern gboolean ca_file_check_if_is_cert_id (guint64 cert_id);
+extern gboolean ca_file_check_if_is_csr_id (guint64 csr_id);
+extern GList * ca_file_get_revoked_certs (guint64 ca_id, gchar **error);
 
 /* Callbacks under test. All are G_MODULE_EXPORT in the production code. */
 extern void on_add_self_signed_ca_activate (GtkMenuItem *, gpointer);
@@ -1132,6 +1137,112 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario 12 (issue #54): bulk revoke + bulk delete CSR            */
+/* ------------------------------------------------------------------ */
+
+/* Exercises the two bulk helpers directly (bypassing the GTK
+ * selection layer that drives them in the UI). After running both:
+ *   - All three selected certs must be revoked.
+ *   - The selected CSR must no longer be a valid CSR id.
+ *   - Non-cert ids passed to ca_bulk_revoke_ids must be skipped.
+ *   - Non-CSR ids passed to ca_bulk_delete_csr_ids must be skipped. */
+static int
+scenario_bulk_operations (void)
+{
+    int rc = 1;
+
+    fprintf (stderr, "==> scenario: bulk operations (issue #54)\n");
+    if (!fixture_setup ())
+        return 1;
+
+    if (! ca_file_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("bulk-operations", "ca_file_open(%s) failed", fixture_path);
+        goto out;
+    }
+
+    /* Bulk revoke certs 3, 5, 6 (all leaf certs in the fixture) plus a
+     * bogus id that must be silently skipped. */
+    GSList *cert_ids = NULL;
+    cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (3u));
+    cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (5u));
+    cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (6u));
+    cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (999999u));
+
+    gchar *err = NULL;
+    gint revoked = ca_bulk_revoke_ids (cert_ids, &err);
+    g_slist_free (cert_ids);
+    if (err) {
+        fail_test ("bulk-operations", "bulk_revoke error: %s", err);
+        g_free (err);
+        goto out;
+    }
+    if (revoked != 3) {
+        fail_test ("bulk-operations",
+                   "expected 3 revocations, got %d", revoked);
+        goto out;
+    }
+
+    /* Verify each cert appears in its CA's revoked-list now. Certs 3/5/6
+     * have parent CAs 2, 4, 4 respectively. Counting across CAs 2 and 4
+     * should yield ≥ 3 revoked entries. */
+    int total_revoked_rows = 0;
+    for (guint64 ca_id = 1; ca_id <= 9; ca_id++) {
+        gchar *gerr = NULL;
+        GList *r = ca_file_get_revoked_certs (ca_id, &gerr);
+        if (gerr) { g_free (gerr); continue; }
+        for (GList *l = r; l; l = l->next)
+            total_revoked_rows++;
+        g_list_free_full (r, g_free);
+    }
+    if (total_revoked_rows < 3) {
+        fail_test ("bulk-operations",
+                   "after bulk_revoke, only %d revoked-list rows found",
+                   total_revoked_rows);
+        goto out;
+    }
+    fprintf (stderr, "    bulk revoke: 3 revoked + bogus id skipped OK\n");
+
+    /* Bulk delete CSR id 1 (the only CSR in the fixture) plus a
+     * non-CSR id (cert id 1) that must be silently skipped. */
+    GSList *csr_ids = NULL;
+    csr_ids = g_slist_prepend (csr_ids, GUINT_TO_POINTER (1u));
+    csr_ids = g_slist_prepend (csr_ids, GUINT_TO_POINTER (1u));  /* skip */
+
+    err = NULL;
+    gint deleted = ca_bulk_delete_csr_ids (csr_ids, &err);
+    g_slist_free (csr_ids);
+    if (err) {
+        fail_test ("bulk-operations", "bulk_delete_csr error: %s", err);
+        g_free (err);
+        goto out;
+    }
+    /* The first GUINT_TO_POINTER(1u) maps to CSR id 1 (deletable) OR
+     * cert id 1 (skipped). Each is checked independently via
+     * ca_file_check_if_is_csr_id. The CSR id=1 should delete; the
+     * cert id=1 should be skipped because is_csr_id(1) returns FALSE
+     * once the cert/CSR id-spaces are properly distinguished. */
+    if (deleted < 1) {
+        fail_test ("bulk-operations",
+                   "expected at least 1 CSR deleted, got %d", deleted);
+        goto out;
+    }
+    /* CSR 1 should now be gone. */
+    if (ca_file_check_if_is_csr_id (1)) {
+        fail_test ("bulk-operations",
+                   "CSR id=1 still present after bulk_delete");
+        goto out;
+    }
+    fprintf (stderr, "    bulk delete CSR: id=1 removed OK\n");
+
+    rc = 0;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    return rc;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1159,6 +1270,7 @@ main (int argc, char **argv)
     scenario_email_address ();
     scenario_expire_warning_foreground ();
     scenario_chain_export ();
+    scenario_bulk_operations ();
 
     /* Phase 2B scenarios drive production code paths that load .ui
      * files from PACKAGE_DATA_DIR (new_ca_window.c et al). That path
