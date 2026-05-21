@@ -950,7 +950,14 @@ scenario_wizard_window (void)
 
     auto_dismiss_start (GTK_RESPONSE_CANCEL);
     wizard_window_display (WIZARD_CERT_TYPE_WEB_SERVER);
-    drain_events ();
+    /* wizard_window_display ends with gtk_widget_show_all and returns
+     * immediately — no nested main loop to spin our 50ms dismiss timer.
+     * Pump events with a short sleep loop until the timer has had a
+     * chance to fire. */
+    for (int i = 0; i < 10; i++) {
+        g_usleep (10000);            /* 10 ms */
+        drain_events ();
+    }
     int dismissed = auto_dismiss_stop ();
     drain_events ();
 
