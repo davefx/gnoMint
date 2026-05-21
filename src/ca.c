@@ -780,8 +780,11 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
 	widget = gtk_builder_get_object (main_window_gtkb, "export1");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-			   CA_MODEL_COLUMN_IS_CA, &is_ca, 
+	widget = gtk_builder_get_object (main_window_gtkb, "export_chain1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
+
+	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter,
+			   CA_MODEL_COLUMN_IS_CA, &is_ca,
 			   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
 			   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
 
@@ -849,8 +852,11 @@ void __ca_activate_csr_selection (GtkTreeIter *iter)
 void __ca_deactivate_actions ()
 {
 	GObject *widget;
-	
+
 	widget = gtk_builder_get_object (main_window_gtkb, "export1");
+	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+
+	widget = gtk_builder_get_object (main_window_gtkb, "export_chain1");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
 	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
@@ -1319,6 +1325,93 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 	g_object_unref (G_OBJECT(dialog_gtkb));
 	gtk_tree_iter_free (iter);
 	dialog_error (_("Unexpected error"));
+}
+
+/* Export the full certificate chain (leaf + intermediates + root) as a
+ * single PEM bundle. Intended use: deploy the bundle as a web server's
+ * SSLCertificateChainFile / ssl_certificate. See #52. */
+G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+                                                  gpointer user_data G_GNUC_UNUSED)
+{
+	GtkTreeIter *iter = NULL;
+	gint type = __ca_selection_type (GTK_TREE_VIEW (
+	    gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+
+	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
+		if (iter) gtk_tree_iter_free (iter);
+		dialog_error (_("Please select a certificate to export its chain."));
+		return;
+	}
+
+	guint64 cert_id = 0;
+	gtk_tree_model_get (GTK_TREE_MODEL (ca_model), iter,
+	                    CA_MODEL_COLUMN_ID, &cert_id, -1);
+	gtk_tree_iter_free (iter);
+
+	gchar *cn = NULL;
+	{
+		gchar *dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id);
+		if (dn) {
+			/* Best-effort CN extraction for the default filename. */
+			const gchar *p = strstr (dn, "CN=");
+			if (p) {
+				p += 3;
+				const gchar *end = strchr (p, ',');
+				cn = end ? g_strndup (p, end - p) : g_strdup (p);
+			}
+			g_free (dn);
+		}
+	}
+
+	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	GtkWidget *dialog = gtk_file_chooser_dialog_new (
+	    _("Export certificate chain"), GTK_WINDOW (parent),
+	    GTK_FILE_CHOOSER_ACTION_SAVE,
+	    _("_Cancel"), GTK_RESPONSE_CANCEL,
+	    _("_Save"),   GTK_RESPONSE_ACCEPT, NULL);
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	if (cn && cn[0]) {
+		gchar *fname = g_strdup_printf ("%s.chain.pem", cn);
+		gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), fname);
+		g_free (fname);
+	}
+
+	gint resp = gtk_dialog_run (GTK_DIALOG (dialog));
+	if (resp != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy (dialog);
+		g_free (cn);
+		return;
+	}
+
+	gchar *filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+	gtk_widget_destroy (dialog);
+
+	gchar *chain_pem = ca_file_get_chain_pem_from_id (cert_id);
+	if (! chain_pem) {
+		dialog_error (_("Could not build certificate chain."));
+		g_free (filename);
+		g_free (cn);
+		return;
+	}
+
+	GError *err = NULL;
+	if (! g_file_set_contents (filename, chain_pem, -1, &err)) {
+		dialog_error (g_strdup_printf (_("Failed to write chain: %s"),
+		                               err ? err->message : "?"));
+		g_clear_error (&err);
+	} else {
+		GtkWidget *info = gtk_message_dialog_new (
+		    GTK_WINDOW (parent),
+		    GTK_DIALOG_DESTROY_WITH_PARENT,
+		    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+		    "%s", _("Certificate chain exported successfully."));
+		gtk_dialog_run (GTK_DIALOG (info));
+		gtk_widget_destroy (info);
+	}
+
+	g_free (chain_pem);
+	g_free (filename);
+	g_free (cn);
 }
 
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)

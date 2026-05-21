@@ -38,6 +38,7 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data);
 void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_export_chain_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
 void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data);

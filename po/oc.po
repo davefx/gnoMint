@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 11:47+0200\n"
+"POT-Creation-Date: 2026-05-21 12:02+0200\n"
 "PO-Revision-Date: 2010-05-16 15:17+0000\n"
 "Last-Translator: Cédric VALMARY (Tot en òc) <cvalmary@yahoo.fr>\n"
 "Language-Team: Occitan (post 1500) <oc@li.org>\n"
@@ -77,15 +77,15 @@ msgstr ""
 msgid "Base de datos de certificados de gnoMint"
 msgstr ""
 
-#: src/ca.c:227
+#: src/ca.c:255
 msgid "<b>Certificates</b>"
 msgstr "<b>Certificats</b>"
 
-#: src/ca.c:390
+#: src/ca.c:399
 msgid "<b>Certificate Signing Requests</b>"
 msgstr ""
 
-#: src/ca.c:433 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
+#: src/ca.c:442 src/ca-cli-callbacks.c:172 src/ca-cli-callbacks.c:186
 #: src/ca-cli-callbacks.c:201 src/ca-cli-callbacks.c:629
 #: src/ca-cli-callbacks.c:638 src/ca-cli-callbacks.c:1258
 #: src/ca-cli-callbacks.c:1267 src/certificate_properties.c:178
@@ -93,7 +93,7 @@ msgstr ""
 msgid "%m/%d/%Y %R GMT"
 msgstr ""
 
-#: src/ca.c:436 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
+#: src/ca.c:445 src/ca-cli-callbacks.c:175 src/ca-cli-callbacks.c:189
 #: src/ca-cli-callbacks.c:204 src/ca-cli-callbacks.c:632
 #: src/ca-cli-callbacks.c:641 src/ca-cli-callbacks.c:1261
 #: src/ca-cli-callbacks.c:1270 src/certificate_properties.c:181
@@ -101,121 +101,143 @@ msgstr ""
 msgid "%m/%d/%Y %H:%M GMT"
 msgstr ""
 
-#: src/ca.c:586 src/certificate_properties.c:588 src/crl.c:184
+#: src/ca.c:595 src/certificate_properties.c:588 src/crl.c:184
 #: src/new_cert.c:192 src/new_req_window.c:192
 msgid "Subject"
 msgstr "Subjècte"
 
-#: src/ca.c:622
+#: src/ca.c:631
 msgid "Serial"
 msgstr "Periodic"
 
-#: src/ca.c:630
+#: src/ca.c:639
 msgid "Activation"
 msgstr "Activacion"
 
-#: src/ca.c:640
+#: src/ca.c:649
 msgid "Expiration"
 msgstr "Expiracion"
 
-#: src/ca.c:650
+#: src/ca.c:659
 msgid "Revocation"
 msgstr "Revocacion"
 
-#: src/ca.c:951
+#: src/ca.c:966
 msgid "Export certificate"
 msgstr ""
 
-#: src/ca.c:954 src/ca.c:961 src/ca.c:1063 src/ca.c:1114 src/ca.c:1165
-#: src/ca.c:2011 src/ca.c:2117 src/ca.c:2151 src/crl.c:257 src/main.c:330
-#: src/main.c:402 src/main.c:490 gui/san_editor_dialog.ui.h:9
+#: src/ca.c:969 src/ca.c:976 src/ca.c:1078 src/ca.c:1129 src/ca.c:1180
+#: src/ca.c:1370 src/ca.c:2113 src/ca.c:2219 src/ca.c:2253 src/crl.c:257
+#: src/main.c:330 src/main.c:402 src/main.c:490 gui/san_editor_dialog.ui.h:9
 msgid "_Cancel"
 msgstr ""
 
-#: src/ca.c:955 src/ca.c:962 src/ca.c:1064 src/ca.c:1115 src/ca.c:1166
-#: src/ca.c:2012 src/crl.c:258
+#: src/ca.c:970 src/ca.c:977 src/ca.c:1079 src/ca.c:1130 src/ca.c:1181
+#: src/ca.c:1371 src/ca.c:2114 src/crl.c:258
 msgid "_Save"
 msgstr ""
 
-#: src/ca.c:958
+#: src/ca.c:973
 msgid "Export certificate signing request"
 msgstr ""
 
-#: src/ca.c:973 src/ca.c:1009 src/ca.c:1019 src/export.c:278
+#: src/ca.c:988 src/ca.c:1024 src/ca.c:1034 src/export.c:278
 msgid "There was an error while exporting certificate."
 msgstr ""
 
-#: src/ca.c:975 src/ca.c:1011 src/ca.c:1021
+#: src/ca.c:990 src/ca.c:1026 src/ca.c:1036
 msgid "There was an error while exporting CSR."
 msgstr ""
 
-#: src/ca.c:1034 src/ca.c:1200
+#: src/ca.c:1049 src/ca.c:1215
 msgid "Certificate exported successfully"
 msgstr ""
 
-#: src/ca.c:1041
+#: src/ca.c:1056
 msgid "Certificate signing request exported successfully"
 msgstr ""
 
-#: src/ca.c:1060
+#: src/ca.c:1075
 msgid "Export crypted private key"
 msgstr ""
 
-#: src/ca.c:1089 src/ca.c:1141
+#: src/ca.c:1104 src/ca.c:1156
 msgid "Private key exported successfully"
 msgstr ""
 
-#: src/ca.c:1111
+#: src/ca.c:1126
 msgid "Export unencrypted private key"
 msgstr ""
 
-#: src/ca.c:1162
+#: src/ca.c:1177
 msgid "Export whole certificate in PKCS#12 package"
 msgstr ""
 
-#: src/ca.c:1233
+#: src/ca.c:1248
 msgid "Export CSR - gnoMint"
 msgstr ""
 
-#: src/ca.c:1238
+#: src/ca.c:1253
 msgid ""
 "Please, choose which part of the saved Certificate Signing Request you want "
 "to export:"
 msgstr ""
 
-#: src/ca.c:1243
+#: src/ca.c:1258
 msgid ""
 "<i>Export the Certificate Signing Request to a public file, in PEM format.</"
 "i>"
 msgstr ""
 
-#: src/ca.c:1248
+#: src/ca.c:1263
 msgid ""
 "<i>Export the saved private key to a PKCS#8 password-protected file. This "
 "file should only be accessed by the subject of the Certificate Signing "
 "Request.</i>"
 msgstr ""
 
-#: src/ca.c:1312
+#: src/ca.c:1327
 msgid "Unexpected error"
 msgstr "Error inesperada"
 
-#: src/ca.c:1372
+#: src/ca.c:1342
+msgid "Please select a certificate to export its chain."
+msgstr ""
+
+#: src/ca.c:1368
+#, fuzzy
+msgid "Export certificate chain"
+msgstr "<b>Certificats</b>"
+
+#: src/ca.c:1391
+msgid "Could not build certificate chain."
+msgstr ""
+
+#: src/ca.c:1399
+#, c-format
+msgid "Failed to write chain: %s"
+msgstr ""
+
+#: src/ca.c:1407
+msgid "Certificate chain exported successfully."
+msgstr ""
+
+#: src/ca.c:1474
 msgid "Are you sure you want to revoke this certificate?"
 msgstr ""
 
-#: src/ca.c:1373
+#: src/ca.c:1475
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
 "as the CRL is checked)."
 msgstr ""
 
-#: src/ca.c:1381
+#: src/ca.c:1483
 msgid "Are you sure you want to revoke this CA certificate?"
 msgstr ""
 
-#: src/ca.c:1382
+#: src/ca.c:1484
 msgid ""
 "Revoking a certificate will include it in the next CRL, marking it as "
 "invalid. This way, any future use of the certificate will be denied (as long "
@@ -226,68 +248,68 @@ msgid ""
 "certificate."
 msgstr ""
 
-#: src/ca.c:1425
+#: src/ca.c:1527
 msgid "Are you sure you want to delete this Certificate Signing Request?"
 msgstr ""
 
-#: src/ca.c:1789
+#: src/ca.c:1891
 msgid "Change CA password - gnoMint"
 msgstr ""
 
-#: src/ca.c:1807
+#: src/ca.c:1909
 msgid ""
 "The current password you have entered  doesn't match with the actual current "
 "database password."
 msgstr ""
 
-#: src/ca.c:1822
+#: src/ca.c:1924
 msgid "Error while changing database password. The operation was cancelled."
 msgstr ""
 
-#: src/ca.c:1831
+#: src/ca.c:1933
 msgid "Password changed successfully"
 msgstr ""
 
-#: src/ca.c:1841 src/ca-cli-callbacks.c:1091
+#: src/ca.c:1943 src/ca-cli-callbacks.c:1091
 msgid ""
 "Error while establishing database password. The operation was cancelled."
 msgstr ""
 
-#: src/ca.c:1851
+#: src/ca.c:1953
 msgid "Password established successfully"
 msgstr ""
 
-#: src/ca.c:1861
+#: src/ca.c:1963
 msgid "Error while removing database password. The operation was cancelled."
 msgstr ""
 
-#: src/ca.c:1870
+#: src/ca.c:1972
 msgid "Password removed successfully"
 msgstr ""
 
-#: src/ca.c:2008
+#: src/ca.c:2110
 msgid "Save Diffie-Hellman parameters"
 msgstr ""
 
-#: src/ca.c:2034
+#: src/ca.c:2136
 msgid "Diffie-Hellman parameters saved successfully"
 msgstr ""
 
 #. Import single file
-#: src/ca.c:2114
+#: src/ca.c:2216
 msgid "Select PEM file to import"
 msgstr ""
 
-#: src/ca.c:2118 src/ca.c:2152 src/main.c:331 src/main.c:403 src/main.c:491
+#: src/ca.c:2220 src/ca.c:2254 src/main.c:331 src/main.c:403 src/main.c:491
 msgid "_Open"
 msgstr ""
 
-#: src/ca.c:2135
+#: src/ca.c:2237
 #, c-format
 msgid "Problem when importing '%s' file"
 msgstr ""
 
-#: src/ca.c:2148
+#: src/ca.c:2250
 msgid "Select directory to import"
 msgstr ""
 
@@ -2781,21 +2803,32 @@ msgstr ""
 msgid "Shows the certificate properties window"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:2 gui/csr_popup_menu.ui.h:2
+#: gui/certificate_popup_menu.ui.h:2 gui/main_window.ui.h:23
+msgid "Export full c_hain..."
+msgstr ""
+
+#: gui/certificate_popup_menu.ui.h:3 gui/main_window.ui.h:24
+msgid ""
+"Export the selected certificate together with every intermediate CA up to "
+"the root, bundled into a single PEM file ready to deploy as a web server's "
+"chain file."
+msgstr ""
+
+#: gui/certificate_popup_menu.ui.h:4 gui/csr_popup_menu.ui.h:2
 #: gui/main_window.ui.h:22
 msgid "E_xport"
 msgstr "E_xportar"
 
-#: gui/certificate_popup_menu.ui.h:3
+#: gui/certificate_popup_menu.ui.h:5
 msgid "Exports the certificate so it can be imported by any other application"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:4 gui/csr_popup_menu.ui.h:4
+#: gui/certificate_popup_menu.ui.h:6 gui/csr_popup_menu.ui.h:4
 #: gui/main_window.ui.h:13
 msgid "Extrac_t private key"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:5
+#: gui/certificate_popup_menu.ui.h:7
 msgid ""
 "Extracts the private key of the selected \n"
 "certificate from the database to an \n"
@@ -2803,28 +2836,28 @@ msgid ""
 "each time the certificate will be used"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:9 gui/main_window.ui.h:15
+#: gui/certificate_popup_menu.ui.h:11 gui/main_window.ui.h:15
 #, fuzzy
 msgid "Revo_ke"
 msgstr "Revocar"
 
-#: gui/certificate_popup_menu.ui.h:10
+#: gui/certificate_popup_menu.ui.h:12
 msgid "Revokes the selected certificate"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:11 gui/main_window.ui.h:9
+#: gui/certificate_popup_menu.ui.h:13 gui/main_window.ui.h:9
 msgid "Add _Web Server Certificate (wizard)"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:12
+#: gui/certificate_popup_menu.ui.h:14
 msgid "Quick certificate generation for a web server, signed by this CA"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:13 gui/main_window.ui.h:11
+#: gui/certificate_popup_menu.ui.h:15 gui/main_window.ui.h:11
 msgid "Add _Email Server Certificate (wizard)"
 msgstr ""
 
-#: gui/certificate_popup_menu.ui.h:14
+#: gui/certificate_popup_menu.ui.h:16
 msgid "Quick certificate generation for an email server, signed by this CA"
 msgstr ""
 
@@ -3400,29 +3433,29 @@ msgstr ""
 msgid "_Import"
 msgstr "_Importar"
 
-#: gui/main_window.ui.h:23 gui/san_manager_widget.ui.h:4
+#: gui/main_window.ui.h:25 gui/san_manager_widget.ui.h:4
 msgid "_Edit"
 msgstr "_Edicion"
 
-#: gui/main_window.ui.h:24
+#: gui/main_window.ui.h:26
 msgid "_View"
 msgstr "_Afichatge"
 
-#: gui/main_window.ui.h:25
+#: gui/main_window.ui.h:27
 msgid "Certificate _Signing Requests"
 msgstr ""
 
-#: gui/main_window.ui.h:26
+#: gui/main_window.ui.h:28
 #, fuzzy
 msgid "_Revoked Certificates"
 msgstr "<b>Certificats</b>"
 
-#: gui/main_window.ui.h:27
+#: gui/main_window.ui.h:29
 #, fuzzy
 msgid "E_xpired Certificates"
 msgstr "<b>Certificats</b>"
 
-#: gui/main_window.ui.h:28
+#: gui/main_window.ui.h:30
 msgid ""
 "When unchecked, certificates whose validity has already ended are hidden "
 "from the tree. A certificate is also considered expired if any of its "
@@ -3430,75 +3463,75 @@ msgid ""
 "alongside it."
 msgstr ""
 
-#: gui/main_window.ui.h:29
+#: gui/main_window.ui.h:31
 msgid "_Help"
 msgstr "_Ajuda"
 
-#: gui/main_window.ui.h:30
+#: gui/main_window.ui.h:32
 msgid "Create a new database"
 msgstr ""
 
-#: gui/main_window.ui.h:31
+#: gui/main_window.ui.h:33
 msgid "Open an existing database"
 msgstr ""
 
-#: gui/main_window.ui.h:32
+#: gui/main_window.ui.h:34
 msgid "Add an autosigned CA"
 msgstr ""
 
-#: gui/main_window.ui.h:33
+#: gui/main_window.ui.h:35
 msgid "Add autosigned CA certificate"
 msgstr ""
 
-#: gui/main_window.ui.h:34
+#: gui/main_window.ui.h:36
 msgid "Add a new Certificate Signing Request"
 msgstr ""
 
-#: gui/main_window.ui.h:35
+#: gui/main_window.ui.h:37
 msgid "Add CSR"
 msgstr ""
 
-#: gui/main_window.ui.h:36
+#: gui/main_window.ui.h:38
 msgid "Extract the private key of the selected item into a external file"
 msgstr ""
 
-#: gui/main_window.ui.h:37
+#: gui/main_window.ui.h:39
 msgid "Extract Private Key"
 msgstr ""
 
-#: gui/main_window.ui.h:38
+#: gui/main_window.ui.h:40
 msgid "Revoke the selected certificate"
 msgstr ""
 
-#: gui/main_window.ui.h:39
+#: gui/main_window.ui.h:41
 msgid "Revoke"
 msgstr "Revocar"
 
-#: gui/main_window.ui.h:40
+#: gui/main_window.ui.h:42
 msgid "Sign the selected Certificate Signing Request"
 msgstr ""
 
-#: gui/main_window.ui.h:41
+#: gui/main_window.ui.h:43
 msgid "Sign"
 msgstr "Signar"
 
-#: gui/main_window.ui.h:42
+#: gui/main_window.ui.h:44
 msgid "Delete the selected Certificate Signing Request"
 msgstr ""
 
-#: gui/main_window.ui.h:43
+#: gui/main_window.ui.h:45
 msgid "Quick certificate generation for web server"
 msgstr ""
 
-#: gui/main_window.ui.h:44
+#: gui/main_window.ui.h:46
 msgid "Web Server Wizard"
 msgstr ""
 
-#: gui/main_window.ui.h:45
+#: gui/main_window.ui.h:47
 msgid "Quick certificate generation for email server"
 msgstr ""
 
-#: gui/main_window.ui.h:46
+#: gui/main_window.ui.h:48
 msgid "Email Server Wizard"
 msgstr ""
 

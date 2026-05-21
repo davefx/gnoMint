@@ -2583,6 +2583,65 @@ gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id)
 	return __ca_file_get_field_from_id (type, db_id, "pem");
 }
 
+/* Build a PEM bundle for the certificate chain rooted at db_id: the
+ * leaf certificate's PEM, followed by each ancestor's PEM up to and
+ * including the root. Result is g_strdup'd; caller frees.
+ *
+ * Returns NULL if the leaf cert is missing. Missing ancestors are
+ * skipped (the chain truncates at the first gap); this matches the
+ * behaviour of openssl verify when an intermediate isn't local.
+ *
+ * Used by the "Export full certificate chain" action — see #52. */
+gchar * ca_file_get_chain_pem_from_id (guint64 cert_id)
+{
+	gchar *leaf_pem = ca_file_get_public_pem_from_id (
+	    CA_FILE_ELEMENT_TYPE_CERT, cert_id);
+	if (! leaf_pem)
+		return NULL;
+
+	GString *chain = g_string_new (NULL);
+	g_string_append (chain, leaf_pem);
+	if (chain->len > 0 && chain->str[chain->len - 1] != '\n')
+		g_string_append_c (chain, '\n');
+	g_free (leaf_pem);
+
+	/* Walk parent_route (format ":<id1>:<id2>:..."). We append PEMs
+	 * in the order they appear in the route — closest parent first,
+	 * root last — to produce a bundle compatible with
+	 * `openssl verify -untrusted ...` and what most web servers
+	 * (Apache SSLCertificateChainFile, nginx ssl_certificate) expect. */
+	gchar *parent_route = __ca_file_get_field_from_id (
+	    CA_FILE_ELEMENT_TYPE_CERT, cert_id, "parent_route");
+	if (parent_route && parent_route[0]) {
+		gchar **ids = g_strsplit (parent_route, ":", -1);
+		/* The split produces leading/trailing empty strings around
+		 * the ':' delimiters; we walk from rightmost (closest parent)
+		 * to leftmost (root). */
+		gint n = 0;
+		while (ids && ids[n])
+			n++;
+		for (gint i = n - 1; i >= 0; i--) {
+			if (! ids[i] || ! ids[i][0])
+				continue;
+			guint64 ancestor_id = g_ascii_strtoull (ids[i], NULL, 10);
+			if (ancestor_id == 0)
+				continue;
+			gchar *anc_pem = ca_file_get_public_pem_from_id (
+			    CA_FILE_ELEMENT_TYPE_CERT, ancestor_id);
+			if (! anc_pem)
+				continue;
+			g_string_append (chain, anc_pem);
+			if (chain->len > 0 && chain->str[chain->len - 1] != '\n')
+				g_string_append_c (chain, '\n');
+			g_free (anc_pem);
+		}
+		g_strfreev (ids);
+	}
+	g_free (parent_route);
+
+	return g_string_free (chain, FALSE);
+}
+
 gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id)
 {
 	gboolean res;
