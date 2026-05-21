@@ -22,6 +22,26 @@
     <property name="can_focus">False</property>
     <property name="pixbuf">sign.png</property>
   </object>
+  <object class="GtkImage" id="wizardwebimg">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">wizard-webserver.png</property>
+  </object>
+  <object class="GtkImage" id="wizardwebimg_menu">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">wizard-webserver.png</property>
+  </object>
+  <object class="GtkImage" id="wizardemailimg">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">wizard-email.png</property>
+  </object>
+  <object class="GtkImage" id="wizardemailimg_menu">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">wizard-email.png</property>
+  </object>
   <object class="GtkWindow" id="main_window1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -130,6 +150,32 @@
                             </child>
                           </object>
                         </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="wizard_web_menuitem">
+                        <property name="label" translatable="yes">Add _Web Server Certificate (wizard)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_text" translatable="yes">Quick certificate generation for a web server, signed by an existing CA</property>
+                        <property name="image">wizardwebimg_menu</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_wizard_web_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="wizard_email_menuitem">
+                        <property name="label" translatable="yes">Add _Email Server Certificate (wizard)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_text" translatable="yes">Quick certificate generation for an email server, signed by an existing CA</property>
+                        <property name="image">wizardemailimg_menu</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_wizard_email_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -552,7 +598,7 @@
                 <property name="tooltip_markup">Quick certificate generation for web server</property>
                 <property name="tooltip_text" translatable="yes">Quick certificate generation for web server</property>
                 <property name="label" translatable="yes">Web Server Wizard</property>
-                <property name="stock_id">gtk-network</property>
+                <property name="icon_widget">wizardwebimg</property>
                 <signal name="clicked" handler="on_wizard_web_activate"/>
               </object>
               <packing>
@@ -567,7 +613,7 @@
                 <property name="tooltip_markup">Quick certificate generation for email server</property>
                 <property name="tooltip_text" translatable="yes">Quick certificate generation for email server</property>
                 <property name="label" translatable="yes">Email Server Wizard</property>
-                <property name="stock_id">gtk-network</property>
+                <property name="icon_widget">wizardemailimg</property>
                 <signal name="clicked" handler="on_wizard_email_activate"/>
               </object>
               <packing>

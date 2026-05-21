@@ -43,7 +43,9 @@ gtkbuilder_DATA =   \
 	addca.png \
 	addcsr.png \
 	extractpkey.png \
-	sign.png
+	sign.png \
+	wizard-webserver.png \
+	wizard-email.png
 
 EXTRA_DIST = $(gtkbuilder_DATA) $(deskicon_DATA) $(desktop_in_files) $(appdata_in_files)
 
