@@ -120,6 +120,7 @@ int main (int   argc,
 	
 	preferences_gui_set_csr_visible_callback (ca_update_csr_view);
 	preferences_gui_set_revoked_visible_callback (ca_update_revoked_view);
+	preferences_gui_set_expired_visible_callback (ca_update_expired_view);
 
         preferences_init (argc, argv);
 
@@ -168,6 +169,7 @@ int main (int   argc,
         }
         ca_update_revoked_view (preferences_get_revoked_visible(), FALSE);
         ca_update_csr_view (preferences_get_crq_visible(), FALSE);
+        ca_update_expired_view (preferences_get_expired_visible(), FALSE);
         
 
 	gtk_builder_connect_signals (main_window_gtkb, NULL);	       	

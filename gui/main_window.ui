@@ -395,6 +395,18 @@
                         <signal name="toggled" handler="ca_rcrt_view_toggled" swapped="no"/>
                       </object>
                     </child>
+                    <child>
+                      <object class="GtkCheckMenuItem" id="expired_view_menuitem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">E_xpired Certificates</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_text" translatable="yes">When unchecked, certificates whose validity has already ended are hidden from the tree. A certificate is also considered expired if any of its issuing CAs has expired, so an expired CA's whole subtree is hidden alongside it.</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="toggled" handler="ca_expired_view_toggled" swapped="no"/>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>

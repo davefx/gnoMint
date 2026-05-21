@@ -26,6 +26,8 @@ void preferences_gui_set_csr_visible_callback (PreferencesGuiChangeCallback call
 
 void preferences_gui_set_revoked_visible_callback (PreferencesGuiChangeCallback callback);
 
+void preferences_gui_set_expired_visible_callback (PreferencesGuiChangeCallback callback);
+
 void preferences_init (int, char**);
 
 gchar *preferences_get_size(void);
@@ -33,6 +35,9 @@ void preferences_set_size (const gchar *new_value);
 
 gboolean preferences_get_revoked_visible(void);
 void preferences_set_revoked_visible (gboolean new_value);
+
+gboolean preferences_get_expired_visible(void);
+void preferences_set_expired_visible (gboolean new_value);
 
 gboolean preferences_get_crq_visible(void);
 void preferences_set_crq_visible (gboolean new_value);

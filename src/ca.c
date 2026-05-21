@@ -65,7 +65,11 @@ enum {CA_MODEL_COLUMN_ID=0,
       CA_MODEL_COLUMN_PARENT_ROUTE=11,
       CA_MODEL_COLUMN_ITEM_TYPE=12,
       CA_MODEL_COLUMN_PARENT_ID=13, /* Only for CSRs */
-      CA_MODEL_COLUMN_NUMBER=14}
+      CA_MODEL_COLUMN_FOREGROUND=14, /* GdkRGBA-style color name, or NULL
+                                      * for default. "gray" for certs
+                                      * with effective_expiration past
+                                      * the current time. */
+      CA_MODEL_COLUMN_NUMBER=15}
         CaModelColumns;
 
 enum {CSR_MODEL_COLUMN_ID=0,
@@ -94,6 +98,16 @@ static GtkTreeIter * csr_parent_iter = NULL;
 
 static gboolean view_csr = TRUE;
 static gboolean view_rcrt = TRUE;
+static gboolean view_expired = TRUE;
+
+/* Map ca_id (guint64 boxed as a pointer) → effective_expiration (time_t
+ * boxed as a pointer). Used by the hide-expired filter to enforce the
+ * RFC 5280 rule that a certificate's effective validity ends with its
+ * issuing CA. Populated as ca_file_foreach_crt iterates: CAs come before
+ * their descendants in hierarchical order, so by the time a descendant
+ * is processed its CA's effective_expiration is already cached. Reset
+ * each ca_refresh_model_callback. */
+static GHashTable *ca_effective_expiration = NULL;
 
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
@@ -143,7 +157,70 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
         guint64 uint64_value;
 	const gchar * string_value;
 	gchar * last_node_route = NULL;
-	
+
+	/* Compute this cert's *effective* expiration: the earliest of its
+	 * own notAfter and every ancestor CA's notAfter, per RFC 5280.
+	 *
+	 * Parent lookup uses parent_route, which is colon-delimited like
+	 * ":3:5:" (this cert's parent is id 5, grandparent is id 3). For
+	 * top-level certs parent_route is ":" — no parent, so effective
+	 * expiration is just self_expiration.
+	 *
+	 * Because ca_file_foreach_crt yields certs in hierarchical order,
+	 * by the time we see a leaf cert the entire CA chain is already
+	 * cached in ca_effective_expiration. We also cache CAs we process
+	 * so that any cert further down can look us up. */
+	time_t self_expiration = (argv[CA_FILE_CERT_COLUMN_EXPIRATION] &&
+				  argv[CA_FILE_CERT_COLUMN_EXPIRATION][0])
+		? (time_t) g_ascii_strtoll (
+		    argv[CA_FILE_CERT_COLUMN_EXPIRATION], NULL, 10)
+		: 0;
+	time_t effective_expiration = self_expiration;
+
+	if (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE]) {
+		const gchar *route = argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE];
+		const gchar *trailing = strrchr (route, ':');
+		/* route looks like ":3:5:" — the immediate parent id sits
+		 * between the second-to-last and the last ':'. */
+		if (trailing && trailing != route) {
+			const gchar *p = trailing - 1;
+			while (p > route && *p != ':')
+				p--;
+			if (*p == ':' && p + 1 < trailing) {
+				guint64 parent_id = g_ascii_strtoull (p + 1, NULL, 10);
+				gpointer key = GUINT_TO_POINTER ((guint) parent_id);
+				if (ca_effective_expiration &&
+				    g_hash_table_contains (ca_effective_expiration, key)) {
+					time_t parent_eff = (time_t) GPOINTER_TO_INT (
+					    g_hash_table_lookup (ca_effective_expiration, key));
+					if (parent_eff > 0 &&
+					    (effective_expiration == 0 ||
+					     parent_eff < effective_expiration))
+						effective_expiration = parent_eff;
+				}
+			}
+		}
+	}
+
+	/* Cache this CA's effective expiration so descendants pick it up. */
+	if (argv[CA_FILE_CERT_COLUMN_IS_CA] &&
+	    atoi (argv[CA_FILE_CERT_COLUMN_IS_CA]) == 1 &&
+	    argv[CA_FILE_CERT_COLUMN_ID] && ca_effective_expiration) {
+		guint64 self_id = g_ascii_strtoull (
+		    argv[CA_FILE_CERT_COLUMN_ID], NULL, 10);
+		g_hash_table_insert (ca_effective_expiration,
+		                     GUINT_TO_POINTER ((guint) self_id),
+		                     GINT_TO_POINTER ((gint) effective_expiration));
+	}
+
+	/* Skip if hiding expired and this cert (or its CA chain) is past. */
+	if (! view_expired && effective_expiration > 0 &&
+	    effective_expiration < time (NULL)) {
+		g_free (last_id_value);
+		g_free (last_parent_route_value);
+		return 0;
+	}
+
 	if (cert_title_inserted == FALSE) {
 		gtk_tree_store_append (new_model, &iter, NULL);
 		gtk_tree_store_set (new_model, &iter,
@@ -225,7 +302,14 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	
 	gtk_tree_store_append (new_model, &iter, (last_parent_iter ? last_parent_iter: cert_parent_iter));
 
-        if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])        
+	/* Grey out the row if the certificate's effective validity has
+	 * ended. effective_expiration was computed above with cascade
+	 * through any parent CAs. */
+	const gchar *row_foreground =
+	    (effective_expiration > 0 && effective_expiration < time (NULL))
+	        ? "gray" : NULL;
+
+        if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])
                 gtk_tree_store_set (new_model, &iter,
                                     CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CERT_COLUMN_ID]),
                                     CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_FILE_CERT_COLUMN_IS_CA]),
@@ -240,9 +324,10 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_FILE_CERT_COLUMN_PARENT_DN],
 				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],
                                     CA_MODEL_COLUMN_ITEM_TYPE, 0,
+                                    CA_MODEL_COLUMN_FOREGROUND, row_foreground,
                                     -1);
         else {
-                gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>", 
+                gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>",
                                                                    argv[CA_FILE_CERT_COLUMN_SUBJECT]);
 
                 gtk_tree_store_set (new_model, &iter,
@@ -259,6 +344,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_FILE_CERT_COLUMN_PARENT_DN],
 				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],
                                     CA_MODEL_COLUMN_ITEM_TYPE, 0,
+                                    CA_MODEL_COLUMN_FOREGROUND, row_foreground,
                                     -1);
 
                 g_free (revoked_subject);
@@ -440,14 +526,19 @@ gboolean ca_refresh_model_callback ()
            - Parent ID (only for CSR)
 	*/
 
-	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING, 
-					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING, 
-					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING);
+	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING,
+					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING,
+					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING,
+					G_TYPE_STRING /* FOREGROUND */);
 
 	cert_title_inserted = FALSE;
 	cert_parent_iter = NULL;
 	last_parent_iter = NULL;
 	last_cert_iter = NULL;
+
+	if (ca_effective_expiration)
+		g_hash_table_destroy (ca_effective_expiration);
+	ca_effective_expiration = g_hash_table_new (g_direct_hash, g_direct_equal);
 	csr_title_inserted=FALSE;
 	csr_parent_iter = NULL;
 
@@ -478,8 +569,9 @@ gboolean ca_refresh_model_callback ()
 		gtk_tree_view_insert_column_with_attributes (treeview,
 							     -1, _("Subject"), renderer,
 							     "markup", CA_MODEL_COLUMN_SUBJECT,
+							     "foreground", CA_MODEL_COLUMN_FOREGROUND,
 							     NULL);
-		
+
 /*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
 /*                                       _("Subject of the certificate or request"),  */
 /*                                       _("This is the distinguished name (DN) of the certificate or request")); */
@@ -512,7 +604,8 @@ gboolean ca_refresh_model_callback ()
 
 		gtk_tree_view_insert_column_with_attributes (treeview,
                                                              -1, _("Serial"), renderer,
-                                                             "markup", CA_MODEL_COLUMN_SERIAL, 
+                                                             "markup", CA_MODEL_COLUMN_SERIAL,
+                                                             "foreground", CA_MODEL_COLUMN_FOREGROUND,
                                                              NULL);
 		
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
@@ -521,6 +614,9 @@ gboolean ca_refresh_model_callback ()
 							    -1, _("Activation"), renderer,
 							    __ca_tree_view_date_datafunc,
 							    GINT_TO_POINTER(CA_MODEL_COLUMN_ACTIVATION), g_free);
+		gtk_tree_view_column_add_attribute (
+		    gtk_tree_view_get_column (treeview, -1 + (gint)gtk_tree_view_get_n_columns (treeview)),
+		    renderer, "foreground", CA_MODEL_COLUMN_FOREGROUND);
 
 		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
 
@@ -528,14 +624,20 @@ gboolean ca_refresh_model_callback ()
 							    -1, _("Expiration"), renderer,
 							    __ca_tree_view_date_datafunc,
 							    GINT_TO_POINTER(CA_MODEL_COLUMN_EXPIRATION), g_free);
+		gtk_tree_view_column_add_attribute (
+		    gtk_tree_view_get_column (treeview, -1 + (gint)gtk_tree_view_get_n_columns (treeview)),
+		    renderer, "foreground", CA_MODEL_COLUMN_FOREGROUND);
 
                 renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
-                
+
                 columns_number = gtk_tree_view_insert_column_with_data_func (treeview,
                                                                              -1, _("Revocation"), renderer,
                                                                              __ca_tree_view_date_datafunc,
-                                                                             GINT_TO_POINTER(CA_MODEL_COLUMN_REVOCATION), 
+                                                                             GINT_TO_POINTER(CA_MODEL_COLUMN_REVOCATION),
                                                                              g_free);
+                gtk_tree_view_column_add_attribute (
+                    gtk_tree_view_get_column (treeview, columns_number - 1),
+                    renderer, "foreground", CA_MODEL_COLUMN_FOREGROUND);
                 
 
 	}
@@ -1419,6 +1521,23 @@ G_MODULE_EXPORT gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointe
         ca_update_revoked_view (gtk_check_menu_item_get_active (button), TRUE);
         if (view_rcrt != preferences_get_revoked_visible())
                 preferences_set_revoked_visible (view_rcrt);
+
+        return TRUE;
+}
+
+void ca_update_expired_view (gboolean new_value, gboolean refresh)
+{
+        view_expired = new_value;
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_window_gtkb, "expired_view_menuitem")), new_value);
+        if (refresh)
+                dialog_refresh_list();
+}
+
+G_MODULE_EXPORT gboolean ca_expired_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+{
+        ca_update_expired_view (gtk_check_menu_item_get_active (button), TRUE);
+        if (view_expired != preferences_get_expired_visible())
+                preferences_set_expired_visible (view_expired);
 
         return TRUE;
 }

@@ -45,6 +45,8 @@ void ca_update_csr_view (gboolean new_value, gboolean refresh);
 gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
 void ca_update_revoked_view (gboolean new_value, gboolean refresh);
 gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
+void ca_update_expired_view (gboolean new_value, gboolean refresh);
+gboolean ca_expired_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
 void ca_generate_crl (GtkCheckMenuItem *button, gpointer user_data);
 gboolean ca_treeview_popup_timeout_program_cb (gpointer data);
 void ca_treeview_popup_timeout_program (GdkEventButton *event);
