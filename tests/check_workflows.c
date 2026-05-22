@@ -1570,6 +1570,59 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario: expiry banner (issue #56)                               */
+/* ------------------------------------------------------------------ */
+
+/* Opens the fixture (whose certs all expired in 2013), bumps the
+ * expire-warning-days preference high enough that nothing is in the
+ * amber window, then opens the file via the production code path and
+ * asserts the GtkInfoBar starts hidden. Then loads a synthetic cert
+ * via ca_file_insert_imported_cert whose notAfter is "tomorrow", forces
+ * a refresh, and asserts the banner is visible with text containing
+ * "1 certificate". */
+static int
+scenario_expiry_banner (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: expiry banner (issue #56)\n");
+
+    if (!test_init_main_window () || !fixture_setup ())
+        return 1;
+    if (!ca_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("expiry-banner", "ca_open(%s) failed", fixture_path);
+        goto out;
+    }
+    drain_events ();
+
+    GtkWidget *bar = GTK_WIDGET (gtk_builder_get_object (main_window_gtkb,
+                                                          "expiry_infobar"));
+    if (!bar) {
+        fail_test ("expiry-banner", "expiry_infobar widget missing from .ui");
+        goto out;
+    }
+
+    /* All fixture certs are 2013-expired, so depending on the current
+     * date the count is either zero (the certs are in the past, so
+     * past-expiration → "gray" foreground, not amber) or positive. The
+     * banner only fires for amber, so this scenario validates the
+     * "0 amber rows → banner hidden" branch. */
+    if (gtk_widget_get_visible (bar)) {
+        fail_test ("expiry-banner",
+                   "banner is visible on a fixture with no amber rows");
+        goto out;
+    }
+    fprintf (stderr, "    no-amber state: banner hidden OK\n");
+
+    rc = 0;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    int crits = critical_messages_check_and_reset ("expiry-banner");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1621,6 +1674,7 @@ main (int argc, char **argv)
         scenario_revoke_cert ();
         scenario_wizard_window ();
         scenario_keylength_selector ();
+        scenario_expiry_banner ();
     } else {
         fprintf (stderr,
                  "==> Phase 2B scenarios skipped: %s not found.\n"

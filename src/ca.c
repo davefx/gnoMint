@@ -138,6 +138,17 @@ static gboolean view_expired = TRUE;
  * each ca_refresh_model_callback. */
 static GHashTable *ca_effective_expiration = NULL;
 
+/* Count of certificates whose effective_expiration falls inside the
+ * configured warning window. Reset to 0 at the start of every
+ * ca_refresh_model_callback, incremented from __ca_refresh_model_add_certificate
+ * each time ca_compute_row_foreground returns the amber colour. Used
+ * to drive the expiry-banner shown above the tree view (issue #56). */
+static gint ca_expiring_soon_count = 0;
+
+/* The user may dismiss the banner; once dismissed for a given file
+ * we don't show it again until the user re-opens the file. */
+static gboolean ca_expiry_infobar_dismissed = FALSE;
+
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
 int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames);
@@ -334,6 +345,10 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	const gchar *row_foreground = ca_compute_row_foreground (
 	    effective_expiration, time (NULL),
 	    preferences_get_expire_warning_days ());
+
+	/* Count amber rows so we can drive the expiry banner (#56). */
+	if (row_foreground && g_strcmp0 (row_foreground, "#cc7700") == 0)
+		ca_expiring_soon_count++;
 
         if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])
                 gtk_tree_store_set (new_model, &iter,
@@ -565,6 +580,7 @@ gboolean ca_refresh_model_callback ()
 	if (ca_effective_expiration)
 		g_hash_table_destroy (ca_effective_expiration);
 	ca_effective_expiration = g_hash_table_new (g_direct_hash, g_direct_equal);
+	ca_expiring_soon_count = 0;
 	csr_title_inserted=FALSE;
 	csr_parent_iter = NULL;
 
@@ -677,7 +693,48 @@ gboolean ca_refresh_model_callback ()
 
 	gtk_tree_view_expand_all (treeview);
 
+	/* Update the expiry banner (#56). Shown only when at least one
+	 * cert is in the amber window AND the user hasn't dismissed it
+	 * for the currently-open file. */
+	{
+		GtkWidget *bar  = GTK_WIDGET (
+		    gtk_builder_get_object (main_window_gtkb, "expiry_infobar"));
+		GtkLabel  *lbl  = GTK_LABEL (
+		    gtk_builder_get_object (main_window_gtkb, "expiry_infobar_label"));
+		gint days = preferences_get_expire_warning_days ();
+
+		if (bar && lbl && ca_expiring_soon_count > 0 &&
+		    !ca_expiry_infobar_dismissed && days > 0) {
+			gchar *msg = g_strdup_printf (
+			    ngettext ("<b>%d certificate</b> expires in the next %d days. "
+			              "Right-click it to renew with a fresh key.",
+			              "<b>%d certificates</b> expire in the next %d days. "
+			              "Right-click each one to renew with a fresh key.",
+			              ca_expiring_soon_count),
+			    ca_expiring_soon_count, days);
+			gtk_label_set_markup (lbl, msg);
+			g_free (msg);
+			gtk_widget_show (bar);
+		} else if (bar) {
+			gtk_widget_hide (bar);
+		}
+	}
+
 	return TRUE;
+}
+
+/* GtkInfoBar response handler: dismiss / close => hide and remember
+ * that we've dismissed for this open file. Re-opening the file resets
+ * the dismissed flag. */
+G_MODULE_EXPORT void
+ca_expiry_infobar_response (GtkInfoBar *bar,
+                            gint        response,
+                            gpointer    user_data G_GNUC_UNUSED)
+{
+	if (response == GTK_RESPONSE_CLOSE || response == -7 /* close button */) {
+		ca_expiry_infobar_dismissed = TRUE;
+		gtk_widget_hide (GTK_WIDGET (bar));
+	}
 }
 
 void __ca_certificate_activated (GtkTreeView *tree_view,
@@ -1844,7 +1901,7 @@ G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_
 
 
 
-gboolean ca_open (gchar *filename, gboolean create) 
+gboolean ca_open (gchar *filename, gboolean create)
 {
 	if (! ca_file_open (filename, create))
 		return FALSE;
@@ -1853,10 +1910,12 @@ gboolean ca_open (gchar *filename, gboolean create)
 	__enable_widget ("save_as1");
 	__enable_widget ("preferences1");
 
+	/* Re-arm the expiry banner for the freshly-opened file. */
+	ca_expiry_infobar_dismissed = FALSE;
 
 	dialog_refresh_list();
-	
-	
+
+
 	return TRUE;
 }
 
