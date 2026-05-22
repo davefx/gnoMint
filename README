@@ -1,20 +1,66 @@
 gnoMint - A Certification Authority Software using GTK libraries.
 
-You can get more information at http://gnomint.sf.net
+Documentation
+-------------
 
+The full user manual, install guide, tutorial, and feature reference
+are published as a GitHub Pages site:
+
+    https://davefx.github.io/gnomint
+
+The Markdown source for the same content lives under docs/ in this
+repository, so you can also read it offline:
+
+    docs/index.md            Landing page
+    docs/install.md          Install guide (packages + source build)
+    docs/manual.md           Task-oriented user manual
+    docs/tutorial.md         Worked example: small-firm CA with OpenVPN
+    docs/features.md         Feature overview
+    docs/releases.md         Release history since 2006
+
+The legacy site at gnomint.sourceforge.net is no longer maintained;
+its content has been archived into the docs/ tree above.
+
+Quick start
+-----------
+
+    ./autogen.sh        # only after a fresh clone / when configure.ac changes
+    ./configure
+    make
+    sudo make install
+    gnomint &           # GUI
+    gnomint-cli         # readline shell
+
+See docs/install.md for the full dependency list.
+
+Two binaries
+------------
+
+The build produces two binaries from a shared source tree:
+
+    gnomint       The GTK 3 desktop application.
+    gnomint-cli   A readline CLI with the same capabilities. Use it
+                  in cron jobs, CI pipelines, and anywhere a script
+                  is more convenient than clicking.
 
 Year 2038 (Y2K38) Support
---------------------------
+-------------------------
 
-gnoMint is designed to handle certificates with expiration dates beyond 
-January 19, 2038 (the Year 2038 problem). The application uses 64-bit 
+gnoMint is designed to handle certificates with expiration dates beyond
+January 19, 2038 (the Year 2038 problem). The application uses 64-bit
 time_t values to ensure proper handling of dates far into the future.
 
 The following measures have been implemented:
-- Compile-time flags (_TIME_BITS=64, _FILE_OFFSET_BITS=64) to ensure 
+- Compile-time flags (_TIME_BITS=64, _FILE_OFFSET_BITS=64) to ensure
   64-bit time_t even on 32-bit systems
 - Static assertions to verify time_t is 64-bit at compile time
 - Support for certificate expiration dates well beyond 2038
 
-This ensures gnoMint can safely create and manage certificates with 
+This ensures gnoMint can safely create and manage certificates with
 validity periods extending decades into the future.
+
+Issues and patches
+------------------
+
+    https://github.com/davefx/gnoMint/issues
+    https://github.com/davefx/gnoMint/pulls

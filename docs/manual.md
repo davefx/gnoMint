@@ -12,17 +12,53 @@ first.
 
 The manual is divided into:
 
-1. [Concepts](#concepts) — the model gnoMint operates on
-2. [Bootstrapping your first CA](#bootstrapping-your-first-ca)
-3. [Issuing certificates](#issuing-certificates)
-4. [Wizards: web-server and email certs](#wizards-web-server-and-email-certs)
-5. [Importing a CSR and signing it](#importing-a-csr-and-signing-it)
-6. [Renewing, revoking, and CRLs](#renewing-revoking-and-crls)
-7. [Exporting](#exporting)
-8. [Bulk operations](#bulk-operations)
-9. [Expiry warnings](#expiry-warnings)
-10. [Using the CLI](#using-the-cli)
-11. [Preferences](#preferences)
+1. [Quick start: your first CA in 5 minutes](#quick-start-your-first-ca-in-5-minutes)
+2. [Concepts](#concepts) — the model gnoMint operates on
+3. [Bootstrapping your first CA](#bootstrapping-your-first-ca)
+4. [Issuing certificates](#issuing-certificates)
+5. [Wizards: web-server and email certs](#wizards-web-server-and-email-certs)
+6. [Importing a CSR and signing it](#importing-a-csr-and-signing-it)
+7. [Renewing, revoking, and CRLs](#renewing-revoking-and-crls)
+8. [Exporting](#exporting)
+9. [Bulk operations](#bulk-operations)
+10. [Search and filter](#search-and-filter)
+11. [Comparing two certificates](#comparing-two-certificates)
+12. [Expiry warnings](#expiry-warnings)
+13. [Importing existing infrastructure](#importing-existing-infrastructure)
+14. [Using the CLI](#using-the-cli)
+15. [Preferences](#preferences)
+16. [Troubleshooting](#troubleshooting)
+
+---
+
+## Quick start: your first CA in 5 minutes
+
+Want to be productive in five minutes? Run through this checklist; the
+rest of the manual goes deeper on each step.
+
+1. **Install** (see the [install guide]({{ site.baseurl }}/install)).
+2. **Launch** `gnomint` from a terminal or your application menu. A
+   default database is created at
+   `~/.local/share/gnomint/default.gnomint`.
+3. **Create a root CA**: **Certificates → Add → Add self-signed CA**.
+   Fill in:
+   - CN (e.g. `Example Root CA`)
+   - O, OU, C as you wish
+   - Pick **ECDSA P-384** (fast + modern) or **RSA 4096** (compat)
+   - Validity: 240 months (20 years)
+4. **Issue a web-server certificate**: **Certificates → Add Web Server
+   Certificate (wizard)** — the wizard sets all the right key-usage
+   and EKU flags for you. Just enter the hostname.
+5. **Export the bundle**: right-click your new cert → **Export full
+   certificate chain**. You get a `fullchain.pem` ready for nginx /
+   Apache / HAProxy.
+6. *(Optional)* **Encrypt the database**: **Certificates → Change
+   Database Password**, set a passphrase. From now on you'll need it
+   to sign anything new — but if your laptop is stolen the keys are
+   safe.
+
+That's it. You have a working CA, one issued cert, and a deployable
+chain bundle.
 
 ---
 
@@ -167,10 +203,19 @@ The issued certificate is filed under the CA you picked.
 
 ### Renewing
 
-> *Note: certificate renewal is an in-progress feature for the next
-> release; see [issue #50](https://github.com/davefx/gnoMint/issues/50).
-> Until then, re-issue manually by signing a new cert with the same
-> subject and SAN.*
+Right-click any non-revoked certificate and choose **Renew with fresh
+key**. gnoMint:
+
+1. Lifts the subject DN and SAN from the existing cert.
+2. Generates a fresh RSA-2048 keypair.
+3. Signs a new certificate with the same parent CA using the CA's
+   current policy for validity period, key usage, and EKU.
+4. Adds the new cert alongside the old one — the original is left in
+   place so you can deploy + verify the new one before revoking the
+   old one (standard "issue new, deploy, revoke old" pattern).
+
+CLI equivalent: `renewcert <cert-id>`. Useful from cron — pipe a list
+of expiring cert ids and let `gnomint-cli` reissue them on a schedule.
 
 ### Revoking
 
@@ -229,6 +274,68 @@ together in the CRL. Issue
 
 ---
 
+## Search and filter
+
+A **search box** sits above the tree view. Type any substring of a
+subject CN/DN or a serial number and the tree narrows in real-time to
+the matching rows. CAs are always shown so you can see *which CA*
+issued each match. Press **Ctrl+F** anywhere in the main window to
+jump into the search entry. Clear the entry (or just delete the text)
+to restore the full view. Issue
+[#53](https://github.com/davefx/gnoMint/issues/53).
+
+In the CLI:
+
+```bash
+gnomint> search example.com
+Matches (id    serial  subject):
+3       1       www.example.com
+7       3       vpn.example.com
+2 matches.
+```
+
+---
+
+## Comparing two certificates
+
+Right-click any certificate → **Compare with PEM file…**. Pick a
+second certificate (from a `.pem` file you have lying around), and
+gnoMint opens a side-by-side diff dialog:
+
+| Field | Selected cert | Other cert |
+|---|---|---|
+| Subject CN | example.com | **www.example.com** |
+| Serial | 7 | 12 |
+| Activation | 2026-05-01 | 2027-05-22 |
+| Subject Key ID | (one hash) | (different hash) |
+| … | | |
+
+Rows that differ are **highlighted in amber**, identical rows are
+plain. Useful for:
+
+- Verifying a renewed cert kept the SAN list and key usage you wanted.
+- Comparing your local copy of a cert against the one the server is
+  actually serving.
+- Investigating cross-signing or alternate-issuance situations.
+
+CLI equivalent — either argument can be a DB id or a path to a PEM
+file:
+
+```bash
+gnomint> diff 7 /tmp/served.pem
+Field                  7                     /tmp/served.pem
+-----                  ----                  -----
+* Subject CN           example.com           www.example.com
+  Subject DN           ...                   ...
+* Activation           2026-05-01 …          2027-05-22 …
+…
+3 fields differ.
+```
+
+Issue [#55](https://github.com/davefx/gnoMint/issues/55).
+
+---
+
 ## Expiry warnings
 
 ### Per-row colouring
@@ -251,6 +358,52 @@ months will turn amber along with the CA. Issue
 **View → Show expired certificates** toggles whether expired entries
 (and their entire subtree, in the case of an expired CA) appear in the
 list. The setting is persisted in GSettings.
+
+---
+
+## Importing existing infrastructure
+
+If you already have a CA built with another tool, gnoMint can usually
+absorb it.
+
+### From a single PEM/DER file
+
+**File → Import file…** picks up:
+
+- A single X.509 certificate (PEM or DER).
+- A single private key (PEM, encrypted or plain).
+- A CSR (PKCS#10).
+- A CRL.
+- A **PKCS#12** bundle — both cert + private key together. You'll be
+  prompted for the bundle's passphrase.
+
+Imported certificates land under the matching CA in the tree (matched
+by issuer SKI). Standalone certs with no matching CA in the database
+end up at the top level as orphans.
+
+### From an OpenSSL CA directory
+
+**File → Import directory…** absorbs a full OpenSSL-style CA layout
+(`certs/`, `private/`, `index.txt`, `serial`, etc.). gnoMint reads:
+
+- The CA certificate and key (from `cacert.pem` + `private/cakey.pem`
+  or the path your `openssl.cnf` points at).
+- Every issued cert under `certs/` and `newcerts/`.
+- The serial counter so the next issuance picks up where OpenSSL left
+  off.
+
+This is the recommended way to migrate a long-running OpenSSL CA into
+gnoMint without re-issuing every certificate.
+
+### Diffie-Hellman parameters
+
+**Certificates → Generate DH parameters…** writes a PKCS#3 file for
+use by OpenVPN / Apache / nginx. Pick a bit length (2048 minimum,
+3072 recommended); generation takes a while because finding a safe
+prime is genuinely slow.
+
+CLI equivalents: `importfile <path>`, `importdir <path>`,
+`dhgen <bits> <path>`.
 
 ---
 
@@ -303,3 +456,85 @@ All preferences live in GSettings under the
 gsettings list-keys org.gnome.gnomint
 gsettings set org.gnome.gnomint expire-warning-days 60
 ```
+
+---
+
+## Troubleshooting
+
+### gnoMint won't start / crashes immediately
+
+- Run from a terminal to see the stderr output:
+  ```bash
+  gnomint
+  ```
+- If a previous version of the GUI files is installed, the new binary
+  may load mismatched `.ui` templates and trip GTK criticals. Re-run
+  `sudo make install` after every build that touches `gui/*.ui`.
+- On Wayland sessions, force the X11 backend if you suspect a Wayland
+  driver issue: `GDK_BACKEND=x11 gnomint`.
+
+### "Cannot find parent CA in database"
+
+The signing path looks up the parent CA by matching the new
+certificate's **Authority Key ID** against existing CAs' **Subject Key
+ID**. Very old CAs (pre-1.0 gnoMint, or imports from tools that don't
+populate SKI) have an empty `subject_key_id`, so this lookup fails.
+
+Workarounds:
+- Re-issue the CA itself so it gets a SKI extension.
+- Or open the database in a SQLite tool and manually set
+  `subject_key_id` on the offending CA's row to a value matching the
+  child's `issuer_key_id`.
+
+### "Error while signing CSR" / "Cannot decrypt parent CA's private key"
+
+Most often this means the database is passphrase-protected and the
+prompt was cancelled or answered wrong. Re-try and provide the correct
+passphrase. If you've forgotten the database passphrase, there's no
+recovery — that's the point.
+
+### A renewed cert ends up in the wrong place
+
+`renewcert` / **Renew with fresh key** inserts the new cert directly
+under the same parent CA as the original. If the tree looks wrong,
+verify the parent CA still has a `subject_key_id` populated (see the
+previous troubleshooting entry).
+
+### Where do gnoMint's files live?
+
+| File | Path |
+|---|---|
+| Default database | `$XDG_DATA_HOME/gnomint/default.gnomint` (typically `~/.local/share/gnomint/default.gnomint`) |
+| Legacy DB location (auto-migrated) | `~/.gnomint/default.gnomint` |
+| Preferences (GSettings) | `org.gnome.gnomint` schema; backing file under `$XDG_CONFIG_HOME/dconf/user` |
+| Installed UI templates | `$prefix/share/gnomint/*.ui` (typically `/usr/local/share/gnomint/`) |
+| Translations | `$prefix/share/locale/<lang>/LC_MESSAGES/gnomint.mo` |
+
+### Running the test suite
+
+After a `./configure && make` from a source checkout:
+
+```bash
+make -C tests check
+```
+
+What it covers:
+
+- `check_y2k38` — confirms 64-bit `time_t` so post-2038 validity dates work
+- `check_ui_consistency` — static check of every `gui/*.ui` for layout
+  collisions, missing handlers, etc.
+- `check_workflows` — runtime regression test under a headless Wayland
+  compositor (weston). Exercises new-CA / sign / revoke / renew /
+  expiry banner / search filter / certificate diff.
+- `check_cli_email.sh`, `check_cli_wizard.sh`, `check_cli_parity.sh` —
+  shell tests that drive `gnomint-cli` end-to-end and grep the output.
+
+If `make check` fails, run `tests/run-headless.sh tests/check_workflows`
+directly for the most detailed output.
+
+### Getting help
+
+- Bug reports and feature requests:
+  [github.com/davefx/gnoMint/issues](https://github.com/davefx/gnoMint/issues).
+- Patches: [pull requests welcome](https://github.com/davefx/gnoMint/pulls).
+- Live docs: this site (the Markdown source is in `docs/` in the repo).
