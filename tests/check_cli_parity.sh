@@ -31,6 +31,8 @@ Yes
 exportchain 2 $CHAIN
 revokemany 5 6
 deletemany 1
+search gnoMint
+search xx-no-such-cert-xx
 quit
 EOF
 
@@ -38,6 +40,9 @@ grep -q "Certificate renewed" "$TMPDIR/out.txt"
 grep -q "Full chain.*written to $CHAIN" "$TMPDIR/out.txt"
 grep -q "2 certificates revoked" "$TMPDIR/out.txt"
 grep -q "CSR deleted" "$TMPDIR/out.txt"
+# search command must surface the matching cert and report 0 for a bogus pattern
+grep -q "gnoMint program" "$TMPDIR/out.txt"
+grep -q "0 matches\." "$TMPDIR/out.txt"
 
 # Confirm chain has at least 2 BEGIN markers (leaf + root for a level-1 cert)
 BEGIN=$(grep -c "BEGIN CERTIFICATE" "$CHAIN")
