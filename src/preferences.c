@@ -43,6 +43,13 @@ void preferences_set_gnome_keyring_export (gboolean new_value)
         g_settings_set_boolean (preferences_settings, "gnome-keyring-export", new_value);
 }
 
+gint preferences_get_expire_warning_days (void)
+{
+        if (!preferences_settings)
+                return 30;  /* default if uninitialised */
+        return g_settings_get_int (preferences_settings, "expire-warning-days");
+}
+
 
 void preferences_deinit ()
 {
