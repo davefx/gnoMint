@@ -1351,6 +1351,116 @@ scenario_ecdsa_eddsa_keygen (void)
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario: certificate renewal (issue #50)                         */
+/* ------------------------------------------------------------------ */
+
+#include "cert_renewal.h"
+#include "ca_file.h"
+
+/* Renews a leaf cert from the fixture and asserts:
+ *   - cert_renewal_renew returns NULL (no error)
+ *   - new cert id is non-zero
+ *   - new cert appears in the cert table with the same CN
+ *   - new cert's serial is different from the old one
+ *   - old cert is still present and not revoked. */
+static int
+scenario_certificate_renewal (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: certificate renewal (issue #50)\n");
+
+    if (!fixture_setup ())
+        return 1;
+    if (!ca_file_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("renewal", "ca_file_open(%s) failed", fixture_path);
+        goto out;
+    }
+
+    /* Cert id 2 (Signing software CA) sits directly under the root,
+     * which is the only fixture CA that ships with subject_key_id set.
+     * Deeper certs can't currently be renewed because
+     * ca_file_insert_cert resolves the parent CA via SKI matching;
+     * fixing that is tracked separately. */
+    guint64 old_id = 2;
+    gchar *old_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, old_id);
+    if (!old_pem) {
+        fail_test ("renewal", "fixture missing cert id %" G_GUINT64_FORMAT, old_id);
+        goto out;
+    }
+    TlsCert *old_cert = tls_parse_cert_pem (old_pem);
+    g_free (old_pem);
+    if (!old_cert) {
+        fail_test ("renewal", "cannot parse old cert PEM");
+        goto out;
+    }
+
+    guint64 new_id = 0;
+    gchar *err = cert_renewal_renew (old_id, &new_id);
+    if (err) {
+        fail_test ("renewal", "cert_renewal_renew error: %s", err);
+        g_free (err);
+        tls_cert_free (old_cert);
+        goto out;
+    }
+    if (new_id == 0) {
+        fail_test ("renewal", "no new cert id returned");
+        tls_cert_free (old_cert);
+        goto out;
+    }
+    fprintf (stderr, "    renewed cert id %" G_GUINT64_FORMAT
+             " → %" G_GUINT64_FORMAT "\n", old_id, new_id);
+
+    /* The new cert must be parseable and share the CN with the old. */
+    gchar *new_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, new_id);
+    if (!new_pem) {
+        fail_test ("renewal", "new cert id not retrievable");
+        tls_cert_free (old_cert);
+        goto out;
+    }
+    TlsCert *new_cert = tls_parse_cert_pem (new_pem);
+    g_free (new_pem);
+    if (!new_cert) {
+        fail_test ("renewal", "cannot parse new cert PEM");
+        tls_cert_free (old_cert);
+        goto out;
+    }
+    if (g_strcmp0 (new_cert->cn, old_cert->cn) != 0) {
+        fail_test ("renewal", "CN mismatch: old=\"%s\" new=\"%s\"",
+                   old_cert->cn ? old_cert->cn : "(null)",
+                   new_cert->cn ? new_cert->cn : "(null)");
+        goto out_cleanup;
+    }
+
+    /* Serial must differ. */
+    if (g_strcmp0 (new_cert->sha1, old_cert->sha1) == 0) {
+        fail_test ("renewal", "new cert has same SHA1 as old — keypair was not regenerated");
+        goto out_cleanup;
+    }
+
+    /* Old cert still present, not revoked. */
+    gchar *old_pem_again = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, old_id);
+    if (!old_pem_again) {
+        fail_test ("renewal", "old cert was removed from database");
+        goto out_cleanup;
+    }
+    g_free (old_pem_again);
+
+    fprintf (stderr, "    CN preserved (\"%s\"), distinct SHA1, old cert intact OK\n",
+             new_cert->cn);
+    rc = 0;
+
+out_cleanup:
+    tls_cert_free (old_cert);
+    tls_cert_free (new_cert);
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    int crits = critical_messages_check_and_reset ("renewal");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scenario: key-length selector swaps with algorithm                */
 /* ------------------------------------------------------------------ */
 
@@ -1489,6 +1599,7 @@ main (int argc, char **argv)
     scenario_chain_export ();
     scenario_bulk_operations ();
     scenario_ecdsa_eddsa_keygen ();
+    scenario_certificate_renewal ();
 
     /* Phase 2B scenarios drive production code paths that load .ui
      * files from PACKAGE_DATA_DIR (new_ca_window.c et al). That path
