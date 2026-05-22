@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 gnoMint is a GTK+ 3 graphical (and readline-driven CLI) Certification Authority manager written in C. It uses GnuTLS for crypto, libgcrypt for low-level primitives, and SQLite 3 as the on-disk format for CA databases (`*.gnomint` files). Builds produce two binaries from a shared source tree: `gnomint` (GTK GUI) and `gnomint-cli` (readline CLI).
 
-Project home: http://gnomint.sourceforge.net — upstream repo: https://github.com/davefx/gnoMint.
+Upstream repo: https://github.com/davefx/gnoMint. The legacy gnomint.sourceforge.net site is gone; its content has been archived into docs/ in the repo.
 
 ## Build
 

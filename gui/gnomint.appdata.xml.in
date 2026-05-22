@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2006-2016 David Marín Carreño <davefx@gmail.com> -->
+<!-- Copyright 2006-2026 David Marín Carreño <davefx@gmail.com> -->
 <component type="desktop-application">
   <id>net.sourceforge.gnomint</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -36,11 +36,11 @@
   <screenshots>
     <screenshot type="default">
       <_caption>Main window showing certificate list</_caption>
-      <image>https://gnomint.sourceforge.net/images/main_window_thumb.png</image>
+      <image>https://raw.githubusercontent.com/davefx/gnoMint/master/docs/assets/screenshots/main-window.png</image>
     </screenshot>
   </screenshots>
   
-  <url type="homepage">https://gnomint.sourceforge.net</url>
+  <url type="homepage">https://github.com/davefx/gnoMint</url>
   <url type="bugtracker">https://github.com/davefx/gnoMint/issues</url>
   
   <developer id="com.gmail.davefx">

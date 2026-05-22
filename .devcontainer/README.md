@@ -113,6 +113,6 @@ Then update the `Dockerfile` to include them permanently.
 ## Additional Resources
 
 - [VS Code Dev Containers Documentation](https://code.visualstudio.com/docs/devcontainers/containers)
-- [gnoMint Project Website](http://gnomint.sourceforge.net)
+- [gnoMint on GitHub](https://github.com/davefx/gnoMint)
 - [GTK+ Documentation](https://docs.gtk.org/)
 - [GnuTLS Documentation](https://www.gnutls.org/documentation.html)

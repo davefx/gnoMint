@@ -3,7 +3,9 @@ description: >-
   A graphical Certification Authority manager for GTK 3, GnuTLS, and SQLite.
   Bootstrap CAs, sign CSRs, issue and revoke certificates, all from a
   desktop app — or driven from the readline CLI.
-baseurl: "/gnomint"
+# Pages serves the repo at /<repo>/ with the GitHub case preserved.
+# This repo is davefx/gnoMint (capital M), so baseurl is /gnoMint.
+baseurl: "/gnoMint"
 url: "https://davefx.github.io"
 
 remote_theme: pages-themes/minimal@v0.2.0
