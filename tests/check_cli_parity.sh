@@ -33,6 +33,8 @@ revokemany 5 6
 deletemany 1
 search gnoMint
 search xx-no-such-cert-xx
+diff 1 3
+diff 1 1
 quit
 EOF
 
@@ -43,6 +45,10 @@ grep -q "CSR deleted" "$TMPDIR/out.txt"
 # search command must surface the matching cert and report 0 for a bogus pattern
 grep -q "gnoMint program" "$TMPDIR/out.txt"
 grep -q "0 matches\." "$TMPDIR/out.txt"
+# diff command: comparing distinct certs reports >= 1 differences,
+# comparing a cert against itself reports 0.
+grep -qE "^[1-9][0-9]* fields? differ\." "$TMPDIR/out.txt"
+grep -qE "^0 fields? differ\." "$TMPDIR/out.txt"
 
 # Confirm chain has at least 2 BEGIN markers (leaf + root for a level-1 cert)
 BEGIN=$(grep -c "BEGIN CERTIFICATE" "$CHAIN")

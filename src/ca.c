@@ -43,6 +43,7 @@
 #include "new_req_window.h"
 #include "new_cert.h"
 #include "cert_renewal.h"
+#include "cert_diff.h"
 #include "preferences-gui.h"
 #include "preferences-window.h"
 #include "import.h"
@@ -1802,6 +1803,169 @@ G_MODULE_EXPORT void ca_on_renew_activate (GtkMenuItem *menuitem, gpointer user_
 	ca_refresh_model_callback ();
 }
 
+
+/* Build and show the diff dialog from two PEM strings. Both must be
+ * non-NULL; ownership stays with the caller. */
+static void
+__ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
+                       const gchar *left_label, const gchar *right_label)
+{
+	CertDiff *diff = cert_diff_new (pem_left, pem_right);
+
+	GObject *parent_obj = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	GtkWidget *parent = (parent_obj && GTK_IS_WINDOW (parent_obj))
+	                    ? GTK_WIDGET (parent_obj) : NULL;
+	gint n_diffs = cert_diff_count_differences (diff);
+	gchar *title = g_strdup_printf (
+	    ngettext ("Certificate diff — %d difference",
+	              "Certificate diff — %d differences", n_diffs),
+	    n_diffs);
+
+	GtkWidget *dlg = gtk_dialog_new_with_buttons (
+	    title, parent ? GTK_WINDOW (parent) : NULL,
+	    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+	    _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+	g_free (title);
+	gtk_window_set_default_size (GTK_WINDOW (dlg), 900, 600);
+
+	GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dlg));
+	gtk_container_set_border_width (GTK_CONTAINER (content), 8);
+
+	GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+	                                 GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	gtk_widget_set_vexpand (scroll, TRUE);
+	gtk_widget_set_hexpand (scroll, TRUE);
+	gtk_box_pack_start (GTK_BOX (content), scroll, TRUE, TRUE, 0);
+
+	GtkWidget *grid = gtk_grid_new ();
+	gtk_grid_set_column_spacing (GTK_GRID (grid), 12);
+	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
+	gtk_container_add (GTK_CONTAINER (scroll), grid);
+
+	/* Column headers. */
+	GtkWidget *l_hdr_left  = gtk_label_new (NULL);
+	gchar *m;
+	m = g_markup_printf_escaped ("<b>%s</b>", left_label  ? left_label  : _("Left"));
+	gtk_label_set_markup (GTK_LABEL (l_hdr_left), m); g_free (m);
+	gtk_label_set_xalign (GTK_LABEL (l_hdr_left), 0);
+	GtkWidget *l_hdr_right = gtk_label_new (NULL);
+	m = g_markup_printf_escaped ("<b>%s</b>", right_label ? right_label : _("Right"));
+	gtk_label_set_markup (GTK_LABEL (l_hdr_right), m); g_free (m);
+	gtk_label_set_xalign (GTK_LABEL (l_hdr_right), 0);
+
+	gtk_grid_attach (GTK_GRID (grid), gtk_label_new (""),  0, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), l_hdr_left,          1, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), l_hdr_right,         2, 0, 1, 1);
+
+	gint row = 1;
+	for (GList *l = diff->fields; l; l = l->next) {
+		CertDiffField *f = (CertDiffField *) l->data;
+		GtkWidget *name  = gtk_label_new (f->field_name);
+		gtk_label_set_xalign (GTK_LABEL (name), 0);
+		gtk_widget_set_valign (name, GTK_ALIGN_START);
+
+		const gchar *lval = f->left  ? f->left  : "—";
+		const gchar *rval = f->right ? f->right : "—";
+
+		GtkWidget *left  = gtk_label_new (NULL);
+		GtkWidget *right = gtk_label_new (NULL);
+
+		if (f->differs) {
+			gchar *lm = g_markup_printf_escaped (
+			    "<span foreground=\"#cc7700\">%s</span>", lval);
+			gchar *rm = g_markup_printf_escaped (
+			    "<span foreground=\"#cc7700\">%s</span>", rval);
+			gtk_label_set_markup (GTK_LABEL (left),  lm);
+			gtk_label_set_markup (GTK_LABEL (right), rm);
+			g_free (lm); g_free (rm);
+		} else {
+			gtk_label_set_text (GTK_LABEL (left),  lval);
+			gtk_label_set_text (GTK_LABEL (right), rval);
+		}
+		gtk_label_set_xalign (GTK_LABEL (left),  0);
+		gtk_label_set_xalign (GTK_LABEL (right), 0);
+		gtk_label_set_selectable (GTK_LABEL (left),  TRUE);
+		gtk_label_set_selectable (GTK_LABEL (right), TRUE);
+		gtk_label_set_line_wrap (GTK_LABEL (left),  TRUE);
+		gtk_label_set_line_wrap (GTK_LABEL (right), TRUE);
+		gtk_widget_set_hexpand (left,  TRUE);
+		gtk_widget_set_hexpand (right, TRUE);
+
+		gtk_grid_attach (GTK_GRID (grid), name,  0, row, 1, 1);
+		gtk_grid_attach (GTK_GRID (grid), left,  1, row, 1, 1);
+		gtk_grid_attach (GTK_GRID (grid), right, 2, row, 1, 1);
+		row++;
+	}
+
+	gtk_widget_show_all (dlg);
+	gtk_dialog_run (GTK_DIALOG (dlg));
+	gtk_widget_destroy (dlg);
+	cert_diff_free (diff);
+}
+
+/* Menu callback: prompt for a PEM file via GtkFileChooser, then diff
+ * against the currently-selected cert. */
+G_MODULE_EXPORT void
+ca_on_compare_with_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+                             gpointer user_data G_GNUC_UNUSED)
+{
+	GtkTreeIter *iter = NULL;
+	gint type = __ca_selection_type (
+	    GTK_TREE_VIEW (gtk_builder_get_object (main_window_gtkb, "ca_treeview")),
+	    &iter);
+	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
+		if (iter) gtk_tree_iter_free (iter);
+		return;
+	}
+	gchar *left_pem = NULL;
+	gchar *left_subject = NULL;
+	gtk_tree_model_get (GTK_TREE_MODEL (ca_model), iter,
+	                    CA_MODEL_COLUMN_PEM, &left_pem,
+	                    CA_MODEL_COLUMN_SUBJECT, &left_subject,
+	                    -1);
+	gtk_tree_iter_free (iter);
+	if (!left_pem) {
+		dialog_error (_("Cannot read PEM of the selected certificate."));
+		g_free (left_subject);
+		return;
+	}
+
+	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	GtkWidget *chooser = gtk_file_chooser_dialog_new (
+	    _("Compare with PEM file…"),
+	    (parent && GTK_IS_WINDOW (parent)) ? GTK_WINDOW (parent) : NULL,
+	    GTK_FILE_CHOOSER_ACTION_OPEN,
+	    _("_Cancel"), GTK_RESPONSE_CANCEL,
+	    _("_Open"),   GTK_RESPONSE_ACCEPT, NULL);
+	gint resp = gtk_dialog_run (GTK_DIALOG (chooser));
+	gchar *path = (resp == GTK_RESPONSE_ACCEPT)
+	              ? gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser))
+	              : NULL;
+	gtk_widget_destroy (chooser);
+	if (!path) {
+		g_free (left_pem); g_free (left_subject);
+		return;
+	}
+
+	gchar *right_pem = NULL;
+	GError *err = NULL;
+	if (!g_file_get_contents (path, &right_pem, NULL, &err)) {
+		dialog_error (err ? err->message : _("Cannot read file."));
+		g_clear_error (&err);
+		g_free (path); g_free (left_pem); g_free (left_subject);
+		return;
+	}
+	gchar *right_label = g_path_get_basename (path);
+	__ca_show_diff_dialog (left_pem, right_pem,
+	                       left_subject ? left_subject : _("Selected"),
+	                       right_label);
+	g_free (right_label);
+	g_free (right_pem);
+	g_free (left_pem);
+	g_free (left_subject);
+	g_free (path);
+}
 
 G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
 {

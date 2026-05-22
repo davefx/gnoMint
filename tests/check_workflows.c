@@ -1461,6 +1461,77 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario: certificate diff helper (issue #55)                     */
+/* ------------------------------------------------------------------ */
+
+#include "cert_diff.h"
+
+/* Pure-helper test: load two distinct certs from the fixture, run
+ * cert_diff_new on them, and assert:
+ *   - the diff structure was produced
+ *   - at least one field differs (Subject CN at minimum)
+ *   - identical PEMs produce zero differences. */
+static int
+scenario_certificate_diff (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: certificate diff (issue #55)\n");
+
+    if (!fixture_setup ())
+        return 1;
+    if (!ca_file_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("cert-diff", "ca_file_open(%s) failed", fixture_path);
+        goto out;
+    }
+
+    gchar *pem1 = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, 1);
+    gchar *pem3 = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, 3);
+    if (!pem1 || !pem3) {
+        fail_test ("cert-diff", "fixture missing cert id 1 or 3");
+        g_free (pem1); g_free (pem3);
+        goto out;
+    }
+
+    /* Different certs → must produce > 0 differences. */
+    CertDiff *d = cert_diff_new (pem1, pem3);
+    if (!d) {
+        fail_test ("cert-diff", "cert_diff_new returned NULL");
+        g_free (pem1); g_free (pem3);
+        goto out;
+    }
+    gint n = cert_diff_count_differences (d);
+    fprintf (stderr, "    cert 1 vs cert 3: %d field(s) differ\n", n);
+    if (n < 1) {
+        fail_test ("cert-diff", "expected at least one diff, got %d", n);
+        cert_diff_free (d);
+        g_free (pem1); g_free (pem3);
+        goto out;
+    }
+    cert_diff_free (d);
+
+    /* Same cert against itself → must produce 0 differences. */
+    CertDiff *d2 = cert_diff_new (pem1, pem1);
+    gint n2 = cert_diff_count_differences (d2);
+    fprintf (stderr, "    cert 1 vs cert 1: %d field(s) differ\n", n2);
+    if (n2 != 0) {
+        fail_test ("cert-diff", "identical PEMs reported %d differences", n2);
+        cert_diff_free (d2);
+        g_free (pem1); g_free (pem3);
+        goto out;
+    }
+    cert_diff_free (d2);
+
+    g_free (pem1); g_free (pem3);
+    rc = 0;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    int crits = critical_messages_check_and_reset ("cert-diff");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scenario: key-length selector swaps with algorithm                */
 /* ------------------------------------------------------------------ */
 
@@ -1779,6 +1850,7 @@ main (int argc, char **argv)
     scenario_bulk_operations ();
     scenario_ecdsa_eddsa_keygen ();
     scenario_certificate_renewal ();
+    scenario_certificate_diff ();
 
     /* Phase 2B scenarios drive production code paths that load .ui
      * files from PACKAGE_DATA_DIR (new_ca_window.c et al). That path
