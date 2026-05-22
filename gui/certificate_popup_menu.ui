@@ -100,6 +100,18 @@ each time the certificate will be used</property>
       </object>
     </child>
     <child>
+      <object class="GtkImageMenuItem" id="compare_menuitem">
+        <property name="label" translatable="yes">_Compare with PEM file…</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="has_tooltip">True</property>
+        <property name="tooltip_text" translatable="yes">Diff this certificate against another one loaded from a PEM file. Differing fields are highlighted.</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="ca_on_compare_with_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
       <object class="GtkImageMenuItem" id="revoke_menuitem">
         <property name="label" translatable="yes">Revo_ke</property>
         <property name="visible">True</property>

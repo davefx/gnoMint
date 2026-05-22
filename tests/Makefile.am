@@ -55,6 +55,7 @@ check_ui_consistency_SOURCES = \
 	$(top_srcdir)/src/new_req_window.c \
 	$(top_srcdir)/src/new_cert.c \
 	$(top_srcdir)/src/cert_renewal.c \
+	$(top_srcdir)/src/cert_diff.c \
 	$(top_srcdir)/src/ca_bulk.c \
 	$(top_srcdir)/src/creation_process_window.c \
 	$(top_srcdir)/src/dialog.c \
@@ -116,6 +117,7 @@ check_workflows_SOURCES = \
 	$(top_srcdir)/src/new_req_window.c \
 	$(top_srcdir)/src/new_cert.c \
 	$(top_srcdir)/src/cert_renewal.c \
+	$(top_srcdir)/src/cert_diff.c \
 	$(top_srcdir)/src/ca_bulk.c \
 	$(top_srcdir)/src/creation_process_window.c \
 	$(top_srcdir)/src/dialog.c \

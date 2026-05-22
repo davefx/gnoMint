@@ -2075,3 +2075,81 @@ int ca_cli_callback_search (int argc, char **argv)
 	g_free (ctx.needle_lower);
 	return 0;
 }
+
+
+/* ------------------------------------------------------------------ */
+/*  diff — side-by-side comparison of two certificates (#55)          */
+/* ------------------------------------------------------------------ */
+
+#include "cert_diff.h"
+
+static gchar *
+__cli_load_pem_from_arg (const gchar *arg, gchar **err_out)
+{
+	/* If `arg` is a numeric id, look up in DB. Otherwise treat as a
+	 * filesystem path to a PEM file. */
+	gchar *end = NULL;
+	guint64 id = g_ascii_strtoull (arg, &end, 10);
+	if (end && *end == '\0' && id > 0) {
+		if (! ca_file_check_if_is_cert_id (id)) {
+			*err_out = g_strdup_printf (
+			    _("'%s' is not a certificate id in this database."),
+			    arg);
+			return NULL;
+		}
+		gchar *pem = ca_file_get_public_pem_from_id (
+		    CA_FILE_ELEMENT_TYPE_CERT, id);
+		if (!pem)
+			*err_out = g_strdup_printf (
+			    _("Cannot read PEM for cert id %s."), arg);
+		return pem;
+	}
+	gchar *contents = NULL;
+	GError *gerr = NULL;
+	if (! g_file_get_contents (arg, &contents, NULL, &gerr)) {
+		*err_out = g_strdup (gerr ? gerr->message
+		                          : _("Cannot read file."));
+		g_clear_error (&gerr);
+		return NULL;
+	}
+	return contents;
+}
+
+int
+ca_cli_callback_diff (int argc, char **argv)
+{
+	if (argc < 3) {
+		dialog_error (_("Usage: diff <cert-id-or-path> <cert-id-or-path>"));
+		return -1;
+	}
+	gchar *err = NULL;
+	gchar *left = __cli_load_pem_from_arg (argv[1], &err);
+	if (!left) { dialog_error (err); g_free (err); return -1; }
+	gchar *right = __cli_load_pem_from_arg (argv[2], &err);
+	if (!right) {
+		dialog_error (err); g_free (err); g_free (left); return -1;
+	}
+
+	CertDiff *d = cert_diff_new (left, right);
+	g_free (left); g_free (right);
+
+	gint width = 30;
+	printf ("%-*s  %-40s  %-40s\n",
+	        width, _("Field"), argv[1], argv[2]);
+	printf ("%-*s  %-40s  %-40s\n",
+	        width, "-----", "----", "-----");
+	for (GList *l = d->fields; l; l = l->next) {
+		CertDiffField *f = (CertDiffField *) l->data;
+		const gchar *marker = f->differs ? "*" : " ";
+		printf ("%s %-*s  %-40s  %-40s\n",
+		        marker,
+		        width - 2, f->field_name,
+		        f->left  ? f->left  : "—",
+		        f->right ? f->right : "—");
+	}
+	gint n = cert_diff_count_differences (d);
+	printf (ngettext ("\n%d field differs.\n",
+	                  "\n%d fields differ.\n", n), n);
+	cert_diff_free (d);
+	return 0;
+}

@@ -20,6 +20,7 @@ gnomint_SOURCES = \
         new_req_window.c \
 	new_cert.c \
 	cert_renewal.c \
+	cert_diff.c \
 	ca_bulk.c \
 	creation_process_window.c \
 	dialog.c \
@@ -77,6 +78,7 @@ gnomint_cli_SOURCES = \
 	ca_policy.c \
 	ca_bulk.c \
 	cert_renewal.c \
+	cert_diff.c \
 	crl.c \
         csr_creation.c \
         import.c \
@@ -114,6 +116,7 @@ EXTRA_DIST = \
 	new_req_window.h \
 	new_cert.h \
 	cert_renewal.h \
+	cert_diff.h \
 	ca_bulk.h \
 	tls.h\
 	pkey_manage.h \
