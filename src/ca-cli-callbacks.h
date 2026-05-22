@@ -52,3 +52,4 @@ int ca_cli_callback_renew (int argc, char **argv);
 int ca_cli_callback_exportchain (int argc, char **argv);
 int ca_cli_callback_revokemany (int argc, char **argv);
 int ca_cli_callback_deletemany (int argc, char **argv);
+int ca_cli_callback_search (int argc, char **argv);

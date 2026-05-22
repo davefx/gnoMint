@@ -150,6 +150,27 @@ static gint ca_expiring_soon_count = 0;
  * we don't show it again until the user re-opens the file. */
 static gboolean ca_expiry_infobar_dismissed = FALSE;
 
+/* Active search text for the filter box (#53). When non-empty, leaf
+ * certificates whose subject/serial doesn't contain this substring
+ * (case-insensitive) are hidden from the tree. Owned by ca.c; freed
+ * on next change. */
+static gchar *ca_search_text = NULL;
+
+/* Does the haystack (UTF-8) contain the needle (UTF-8) ignoring case?
+ * Both are assumed non-NULL; an empty needle matches anything. */
+static gboolean
+__ca_search_match (const gchar *haystack, const gchar *needle)
+{
+	if (!needle || !*needle) return TRUE;
+	if (!haystack) return FALSE;
+	gchar *h = g_utf8_strdown (haystack, -1);
+	gchar *n = g_utf8_strdown (needle, -1);
+	gboolean m = (strstr (h, n) != NULL);
+	g_free (h);
+	g_free (n);
+	return m;
+}
+
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
 int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames);
@@ -191,6 +212,21 @@ void __enable_widget (gchar *widget_name);
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames)
 {
+	/* Search filter (#53): skip leaf certs whose subject/serial
+	 * doesn't contain the active search text. CAs are always shown
+	 * so the tree hierarchy stays intact and the search reveals
+	 * which CA issued the matched leaves. Run before any allocation
+	 * so the early-return is leak-free. */
+	if (ca_search_text && *ca_search_text &&
+	    argv[CA_FILE_CERT_COLUMN_IS_CA] &&
+	    atoi (argv[CA_FILE_CERT_COLUMN_IS_CA]) == 0) {
+		gboolean matched =
+		    __ca_search_match (argv[CA_FILE_CERT_COLUMN_SUBJECT], ca_search_text) ||
+		    __ca_search_match (argv[CA_FILE_CERT_COLUMN_SERIAL],  ca_search_text);
+		if (! matched)
+			return 0;
+	}
+
 	GtkTreeIter iter;
 	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
 	GValue *last_id_value = g_new0 (GValue, 1);
@@ -407,6 +443,13 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 
 int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames)
 {
+	/* Search filter (#53): skip CSRs whose subject doesn't match. */
+	if (ca_search_text && *ca_search_text) {
+		if (! __ca_search_match (argv[CA_FILE_CSR_COLUMN_SUBJECT],
+		                          ca_search_text))
+			return 0;
+	}
+
 	GtkTreeIter iter;
 	GtkTreeStore * new_model = GTK_TREE_STORE(pArg);
 
@@ -722,6 +765,39 @@ gboolean ca_refresh_model_callback ()
 	}
 
 	return TRUE;
+}
+
+/* Ctrl+F focuses the search entry (#53). Returning TRUE prevents
+ * the event from propagating further; FALSE lets other handlers run.
+ * GdkEventKey rather than the typed GdkEvent* so GtkBuilder can wire
+ * the connect_signals_full() call directly. */
+G_MODULE_EXPORT gboolean
+ca_on_main_window_key_press (GtkWidget *widget G_GNUC_UNUSED,
+                             GdkEventKey *event,
+                             gpointer user_data G_GNUC_UNUSED)
+{
+	if ((event->state & GDK_CONTROL_MASK) &&
+	    (event->keyval == GDK_KEY_f || event->keyval == GDK_KEY_F)) {
+		GObject *entry = gtk_builder_get_object (main_window_gtkb,
+		                                          "search_entry");
+		if (entry && GTK_IS_WIDGET (entry)) {
+			gtk_widget_grab_focus (GTK_WIDGET (entry));
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/* Search-entry handler (#53). Triggers on every keystroke; just stash
+ * the new search text and refresh the tree. The actual filter is
+ * applied in __ca_refresh_model_add_certificate. */
+G_MODULE_EXPORT void
+ca_on_search_changed (GtkSearchEntry *entry, gpointer user_data G_GNUC_UNUSED)
+{
+	const gchar *text = gtk_entry_get_text (GTK_ENTRY (entry));
+	g_free (ca_search_text);
+	ca_search_text = (text && *text) ? g_strdup (text) : NULL;
+	ca_refresh_model_callback ();
 }
 
 /* GtkInfoBar response handler: dismiss / close => hide and remember
@@ -1860,6 +1936,15 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 	/* Re-arm the expiry banner for the freshly-opened file. */
 	ca_expiry_infobar_dismissed = FALSE;
+
+	/* Reset the search filter so the new DB starts with everything
+	 * visible — both internally and in the entry widget. */
+	g_clear_pointer (&ca_search_text, g_free);
+	{
+		GObject *e = gtk_builder_get_object (main_window_gtkb, "search_entry");
+		if (e && GTK_IS_ENTRY (e))
+			gtk_entry_set_text (GTK_ENTRY (e), "");
+	}
 
 	dialog_refresh_list();
 

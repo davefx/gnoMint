@@ -2003,3 +2003,75 @@ int ca_cli_callback_deletemany (int argc, char **argv)
 	                  "%d CSRs deleted.\n", done), done);
 	return 0;
 }
+
+
+/* ------------------------------------------------------------------ */
+/*  search — list certs/CSRs whose subject or serial matches (#53)     */
+/* ------------------------------------------------------------------ */
+
+typedef struct {
+	gchar *needle_lower;
+	gint   matches;
+} CliSearchCtx;
+
+static int
+__ca_cli_search_cert (void *pArg, int argc, char **argv, char **columnNames)
+{
+	CliSearchCtx *ctx = (CliSearchCtx *) pArg;
+	if (argc <= CA_FILE_CERT_COLUMN_SERIAL) return 0;
+	const gchar *subj = argv[CA_FILE_CERT_COLUMN_SUBJECT];
+	const gchar *ser  = argv[CA_FILE_CERT_COLUMN_SERIAL];
+	gboolean hit = FALSE;
+	if (subj) {
+		gchar *low = g_utf8_strdown (subj, -1);
+		if (strstr (low, ctx->needle_lower)) hit = TRUE;
+		g_free (low);
+	}
+	if (!hit && ser && strstr (ser, ctx->needle_lower)) hit = TRUE;
+	if (hit) {
+		printf ("%s\t%s\t%s\n",
+		        argv[CA_FILE_CERT_COLUMN_ID]      ? argv[CA_FILE_CERT_COLUMN_ID]      : "",
+		        argv[CA_FILE_CERT_COLUMN_SERIAL]  ? argv[CA_FILE_CERT_COLUMN_SERIAL]  : "",
+		        argv[CA_FILE_CERT_COLUMN_SUBJECT] ? argv[CA_FILE_CERT_COLUMN_SUBJECT] : "");
+		ctx->matches++;
+	}
+	return 0;
+}
+
+static int
+__ca_cli_search_csr (void *pArg, int argc, char **argv, char **columnNames)
+{
+	CliSearchCtx *ctx = (CliSearchCtx *) pArg;
+	if (argc <= CA_FILE_CSR_COLUMN_SUBJECT) return 0;
+	const gchar *subj = argv[CA_FILE_CSR_COLUMN_SUBJECT];
+	if (!subj) return 0;
+	gchar *low = g_utf8_strdown (subj, -1);
+	if (strstr (low, ctx->needle_lower)) {
+		printf ("CSR\t%s\t%s\n",
+		        argv[CA_FILE_CSR_COLUMN_ID] ? argv[CA_FILE_CSR_COLUMN_ID] : "",
+		        subj);
+		ctx->matches++;
+	}
+	g_free (low);
+	return 0;
+}
+
+int ca_cli_callback_search (int argc, char **argv)
+{
+	if (argc < 2 || !argv[1] || !*argv[1]) {
+		dialog_error (_("Usage: search <pattern>"));
+		return -1;
+	}
+	CliSearchCtx ctx;
+	ctx.needle_lower = g_utf8_strdown (argv[1], -1);
+	ctx.matches = 0;
+
+	printf (_("Matches (id\tserial\tsubject):\n"));
+	ca_file_foreach_crt (__ca_cli_search_cert, FALSE, &ctx);
+	ca_file_foreach_csr (__ca_cli_search_csr, &ctx);
+	printf (ngettext ("%d match.\n", "%d matches.\n", ctx.matches),
+	        ctx.matches);
+
+	g_free (ctx.needle_lower);
+	return 0;
+}

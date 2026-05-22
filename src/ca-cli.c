@@ -71,6 +71,7 @@ CaCommand ca_commands[] = {
 	{"exportchain", 2, 2, N_("exportchain <cert-id> <filename>"), N_("Export the full certificate chain (leaf → root) for the given certificate as a PEM bundle."), ca_cli_callback_exportchain},
 	{"revokemany", 1, 64, N_("revokemany <cert-id> [cert-id ...]"), N_("Revoke many certificates at once. Non-cert ids are silently skipped."), ca_cli_callback_revokemany},
 	{"deletemany", 1, 64, N_("deletemany <csr-id> [csr-id ...]"), N_("Delete many CSRs at once. Non-CSR ids are silently skipped."), ca_cli_callback_deletemany},
+	{"search", 1, 1, N_("search <pattern>"), N_("List certificates and CSRs whose subject or serial contains <pattern> (case-insensitive)."), ca_cli_callback_search},
 	{"about", 0, 0, "about", N_("Show about message"), ca_cli_callback_about}, // 25
 	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_cli_callback_warranty}, // 26
 	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_cli_callback_distribution}, // 27
@@ -80,7 +81,7 @@ CaCommand ca_commands[] = {
 	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_cli_callback_exit}, // 31
 	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_cli_callback_exit} // 32
 };
-#define CA_COMMAND_NUMBER 37
+#define CA_COMMAND_NUMBER 38
 
 
 

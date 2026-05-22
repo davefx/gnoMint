@@ -1623,6 +1623,132 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario: search/filter box (issue #53)                           */
+/* ------------------------------------------------------------------ */
+
+/* Counts the rows in the tree view's model whose IS_CA flag is FALSE
+ * — i.e. leaf certificates and CSRs. We use it before/after applying
+ * a search filter to confirm the filter actually hides rows. */
+static void
+__count_leaves_recursive (GtkTreeModel *m, GtkTreeIter *iter, gint *out)
+{
+    do {
+        /* Counts rows that are neither title headers (id=0) nor CAs
+         * (IS_CA=TRUE in column 1). */
+        gboolean is_ca = FALSE;
+        guint64 id = 0;
+        gtk_tree_model_get (m, iter,
+                            CA_MODEL_COLUMN_ID, &id,
+                            1 /* IS_CA */, &is_ca,
+                            -1);
+        if (!is_ca && id != 0)
+            (*out)++;
+        GtkTreeIter child;
+        if (gtk_tree_model_iter_children (m, &child, iter))
+            __count_leaves_recursive (m, &child, out);
+    } while (gtk_tree_model_iter_next (m, iter));
+}
+
+static gint
+count_visible_leaves (void)
+{
+    GtkTreeView *tv = GTK_TREE_VIEW (
+        gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
+    if (!tv) return -1;
+    GtkTreeModel *m = gtk_tree_view_get_model (tv);
+    if (!m) return -1;
+    gint n = 0;
+    GtkTreeIter iter;
+    if (gtk_tree_model_get_iter_first (m, &iter))
+        __count_leaves_recursive (m, &iter, &n);
+    return n;
+}
+
+static int
+scenario_search_filter (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: search/filter box (issue #53)\n");
+
+    if (!test_init_main_window () || !fixture_setup ())
+        return 1;
+    if (!ca_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("search-filter", "ca_open(%s) failed", fixture_path);
+        goto out;
+    }
+    drain_events ();
+
+    extern void ca_on_search_changed (GtkSearchEntry *entry, gpointer ud);
+    GtkEntry *entry = GTK_ENTRY (gtk_builder_get_object (main_window_gtkb,
+                                                          "search_entry"));
+    if (!entry) {
+        fail_test ("search-filter", "search_entry widget missing");
+        goto out;
+    }
+
+    gint before = count_visible_leaves ();
+    if (before <= 0) {
+        fail_test ("search-filter", "no leaf rows in fixture before filter");
+        goto out;
+    }
+    fprintf (stderr, "    leaves before filter: %d\n", before);
+
+    /* Apply a filter that should match a small subset. "gnoMint" appears
+     * in cert id 3's CN ("gnoMint program"). */
+    gtk_entry_set_text (entry, "gnoMint");
+    /* search-changed has a debounce timeout in GtkSearchEntry; invoke
+     * the handler directly so the test isn't time-dependent. */
+    ca_on_search_changed ((GtkSearchEntry *) entry, NULL);
+    drain_events ();
+    gint after = count_visible_leaves ();
+    fprintf (stderr, "    leaves after \"gnoMint\": %d\n", after);
+    if (after >= before) {
+        fail_test ("search-filter",
+                   "filter \"gnoMint\" didn't hide anything (%d -> %d)",
+                   before, after);
+        goto out;
+    }
+    if (after == 0) {
+        fail_test ("search-filter",
+                   "filter \"gnoMint\" hid every leaf (expected at least one match)");
+        goto out;
+    }
+
+    /* Apply a filter that should match nothing. */
+    gtk_entry_set_text (entry, "xx-no-such-cert-xx");
+    ca_on_search_changed ((GtkSearchEntry *) entry, NULL);
+    drain_events ();
+    gint none = count_visible_leaves ();
+    fprintf (stderr, "    leaves after no-match filter: %d\n", none);
+    if (none != 0) {
+        fail_test ("search-filter",
+                   "no-match filter still shows %d leaves", none);
+        goto out;
+    }
+
+    /* Clear the filter — everything should come back. */
+    gtk_entry_set_text (entry, "");
+    ca_on_search_changed ((GtkSearchEntry *) entry, NULL);
+    drain_events ();
+    gint restored = count_visible_leaves ();
+    fprintf (stderr, "    leaves after clearing filter: %d\n", restored);
+    if (restored != before) {
+        fail_test ("search-filter",
+                   "clearing filter restored %d leaves, expected %d",
+                   restored, before);
+        goto out;
+    }
+
+    rc = 0;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    int crits = critical_messages_check_and_reset ("search-filter");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1675,6 +1801,7 @@ main (int argc, char **argv)
         scenario_wizard_window ();
         scenario_keylength_selector ();
         scenario_expiry_banner ();
+        scenario_search_filter ();
     } else {
         fprintf (stderr,
                  "==> Phase 2B scenarios skipped: %s not found.\n"
