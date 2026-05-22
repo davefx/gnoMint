@@ -28,8 +28,11 @@
 #include <readline/history.h>
 #include <unistd.h>
 
+#include <time.h>
+
 #include "ca-cli.h"
 #include "ca_file.h"
+#include "preferences.h"
 #include "ca-cli-callbacks.h"
 
 
@@ -64,6 +67,10 @@ CaCommand ca_commands[] = {
 	{"showpreferences", 0, 0, "showpreferences", N_("Show program preferences"), ca_cli_callback_showpreferences}, // 22
 	{"setpreference", 2, 2, N_("setpreference <preference-id> <value>"), N_("Set the given program preference"), ca_cli_callback_setpreference}, // 23
 	{"addservercert", 3, 3, N_("addservercert <ca-id> <cert-type> <server-name>"), N_("Quick server certificate generation (cert-type: 'web' or 'email')"), ca_cli_callback_addservercert}, // 24
+	{"renewcert", 1, 1, N_("renewcert <cert-id>"), N_("Reissue a certificate with the same subject + SAN and a fresh keypair. The old certificate remains in the database."), ca_cli_callback_renew},
+	{"exportchain", 2, 2, N_("exportchain <cert-id> <filename>"), N_("Export the full certificate chain (leaf → root) for the given certificate as a PEM bundle."), ca_cli_callback_exportchain},
+	{"revokemany", 1, 64, N_("revokemany <cert-id> [cert-id ...]"), N_("Revoke many certificates at once. Non-cert ids are silently skipped."), ca_cli_callback_revokemany},
+	{"deletemany", 1, 64, N_("deletemany <csr-id> [csr-id ...]"), N_("Delete many CSRs at once. Non-CSR ids are silently skipped."), ca_cli_callback_deletemany},
 	{"about", 0, 0, "about", N_("Show about message"), ca_cli_callback_about}, // 25
 	{"warranty", 0, 0, "warranty", N_("Show warranty information"), ca_cli_callback_warranty}, // 26
 	{"distribution", 0, 0, "distribution", N_("Show distribution information"), ca_cli_callback_distribution}, // 27
@@ -73,7 +80,7 @@ CaCommand ca_commands[] = {
 	{"exit", 0, 0, "exit", N_("Close database and exit program"), ca_cli_callback_exit}, // 31
 	{"bye", 0, 0, "bye", N_("Close database and exit program"), ca_cli_callback_exit} // 32
 };
-#define CA_COMMAND_NUMBER 33
+#define CA_COMMAND_NUMBER 37
 
 
 
@@ -89,17 +96,64 @@ gboolean ca_refresh_model (void)
 
 
 
-gboolean ca_open (gchar *filename, gboolean create) 
+/* Walked over ca_file_foreach_crt to count certs whose own notAfter is
+ * within the configured warning window. CLI-only; the GUI does the
+ * same accounting with cascade-aware expiration via ca.c. */
+typedef struct {
+	time_t now;
+	time_t threshold;
+	gint   count;
+} ExpiringCountCtx;
+
+static int
+__ca_cli_count_expiring (void *pArg, int argc, char **argv, char **columnNames)
+{
+	ExpiringCountCtx *ctx = (ExpiringCountCtx *) pArg;
+	if (argc <= CA_FILE_CERT_COLUMN_EXPIRATION) return 0;
+	if (argv[CA_FILE_CERT_COLUMN_REVOCATION] &&
+	    argv[CA_FILE_CERT_COLUMN_REVOCATION][0])
+		return 0;  /* revoked — skip */
+	if (!argv[CA_FILE_CERT_COLUMN_EXPIRATION]) return 0;
+	time_t exp = (time_t) atoll (argv[CA_FILE_CERT_COLUMN_EXPIRATION]);
+	if (exp <= 0) return 0;
+	if (exp >= ctx->now && exp < ctx->threshold)
+		ctx->count++;
+	return 0;
+}
+
+gboolean ca_open (gchar *filename, gboolean create)
 {
         gboolean result;
 
         fprintf (stderr, _("Opening database %s..."), filename);
-        result = ca_file_open (filename, create); 
-        
+        result = ca_file_open (filename, create);
+
         if (result)
                 fprintf (stderr, _(" OK.\n"));
         else
                 fprintf (stderr, _(" Error.\n"));
+
+	if (result) {
+		/* Mirror of the GUI banner (#56). Count certs whose
+		 * notAfter is within `expire-warning-days` and print a
+		 * notice on stderr. */
+		gint warn_days = preferences_get_expire_warning_days ();
+		if (warn_days > 0) {
+			ExpiringCountCtx ctx;
+			ctx.now = time (NULL);
+			ctx.threshold = ctx.now + (time_t) warn_days * 86400;
+			ctx.count = 0;
+			ca_file_foreach_crt (__ca_cli_count_expiring, FALSE, &ctx);
+			if (ctx.count > 0) {
+				fprintf (stderr, ngettext (
+				    "Notice: %d certificate expires within the "
+				    "next %d days. Use `renewcert <id>` to reissue.\n",
+				    "Notice: %d certificates expire within the "
+				    "next %d days. Use `renewcert <id>` to reissue.\n",
+				    ctx.count), ctx.count, warn_days);
+			}
+		}
+	}
 
 	return result;
 }

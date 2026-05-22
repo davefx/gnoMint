@@ -11,7 +11,7 @@
 ##                           user environment is Wayland.
 
 TESTS = check_y2k38 check_ui_consistency check_workflows \
-        check_cli_email.sh check_cli_wizard.sh
+        check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh
 check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 
 # Per-test wrapper: only check_workflows runs under a headless Wayland
@@ -19,7 +19,7 @@ check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 # spawn gnomint-cli directly so they need no display either.
 check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
 
-EXTRA_DIST = run-headless.sh check_cli_email.sh check_cli_wizard.sh
+EXTRA_DIST = run-headless.sh check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh
 
 # ---------------------------------------------------------------
 # Y2K38 verification — no GUI dependencies, just stdio + time.h.
@@ -55,6 +55,7 @@ check_ui_consistency_SOURCES = \
 	$(top_srcdir)/src/new_req_window.c \
 	$(top_srcdir)/src/new_cert.c \
 	$(top_srcdir)/src/cert_renewal.c \
+	$(top_srcdir)/src/ca_bulk.c \
 	$(top_srcdir)/src/creation_process_window.c \
 	$(top_srcdir)/src/dialog.c \
 	$(top_srcdir)/src/ca.c \
@@ -115,6 +116,7 @@ check_workflows_SOURCES = \
 	$(top_srcdir)/src/new_req_window.c \
 	$(top_srcdir)/src/new_cert.c \
 	$(top_srcdir)/src/cert_renewal.c \
+	$(top_srcdir)/src/ca_bulk.c \
 	$(top_srcdir)/src/creation_process_window.c \
 	$(top_srcdir)/src/dialog.c \
 	$(top_srcdir)/src/ca.c \

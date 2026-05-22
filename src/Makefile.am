@@ -20,6 +20,7 @@ gnomint_SOURCES = \
         new_req_window.c \
 	new_cert.c \
 	cert_renewal.c \
+	ca_bulk.c \
 	creation_process_window.c \
 	dialog.c \
 	ca.c \
@@ -74,6 +75,8 @@ gnomint_cli_SOURCES = \
         ca_creation.c \
 	ca_file.c \
 	ca_policy.c \
+	ca_bulk.c \
+	cert_renewal.c \
 	crl.c \
         csr_creation.c \
         import.c \
@@ -81,7 +84,7 @@ gnomint_cli_SOURCES = \
 	preferences.c \
 	pkey_manage.c \
 	tls.c \
-	uint160.c 
+	uint160.c
 
 
 gnomint_cli_LDADD = \
@@ -111,6 +114,7 @@ EXTRA_DIST = \
 	new_req_window.h \
 	new_cert.h \
 	cert_renewal.h \
+	ca_bulk.h \
 	tls.h\
 	pkey_manage.h \
 	preferences.h \

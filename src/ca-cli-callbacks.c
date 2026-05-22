@@ -37,6 +37,8 @@
 #include "preferences.h"
 #include "tls.h"
 #include "crl.h"
+#include "ca_bulk.h"
+#include "cert_renewal.h"
 
 extern CaCommand ca_commands[];
 #define CA_COMMAND_NUMBER 33
@@ -413,8 +415,17 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 			if (aux)
 				g_free (aux);
 
-			aux = dialog_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (csr_creation_data->key_type ? "DSA" : "RSA"));
-		} while (g_ascii_strcasecmp (aux, "RSA") && g_ascii_strcasecmp (aux, "DSA"));
+			aux = dialog_ask_for_string (
+			    _("Enter type of key you are going to create "
+			      "(RSA/DSA/ECDSA/Ed25519)"),
+			    csr_creation_data->key_type == 3 ? "Ed25519" :
+			    csr_creation_data->key_type == 2 ? "ECDSA" :
+			    csr_creation_data->key_type == 1 ? "DSA" : "RSA");
+		} while (g_ascii_strcasecmp (aux, "RSA") &&
+		         g_ascii_strcasecmp (aux, "DSA") &&
+		         g_ascii_strcasecmp (aux, "ECDSA") &&
+		         g_ascii_strcasecmp (aux, "Ed25519") &&
+		         g_ascii_strcasecmp (aux, "ED25519"));
 
 		if (! g_ascii_strcasecmp (aux, "RSA")) {
 			csr_creation_data->key_type = 0;
@@ -422,15 +433,36 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		} else if (! g_ascii_strcasecmp (aux, "DSA")) {
 			csr_creation_data->key_type = 1;
 			max_key_length = 3072;
+		} else if (! g_ascii_strcasecmp (aux, "ECDSA")) {
+			csr_creation_data->key_type = 2;
+			max_key_length = 521;
+		} else {
+			csr_creation_data->key_type = 3; /* Ed25519 */
+			max_key_length = 0; /* fixed */
 		}
 		g_free (aux);
 		aux = NULL;
-		
-		do {
-				csr_creation_data->key_bitlength = dialog_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
-											  1024, max_key_length, csr_creation_data->key_bitlength);
-				
-		} while (csr_creation_data->key_bitlength % 1024);
+
+		if (csr_creation_data->key_type == 2 /* ECDSA */) {
+			/* P-256 / P-384 / P-521. */
+			do {
+				csr_creation_data->key_bitlength =
+				    dialog_ask_for_number (
+				        _("Enter curve size for ECDSA (256, 384, or 521)"),
+				        256, 521, csr_creation_data->key_bitlength ?
+				                  csr_creation_data->key_bitlength : 256);
+			} while (csr_creation_data->key_bitlength != 256 &&
+			         csr_creation_data->key_bitlength != 384 &&
+			         csr_creation_data->key_bitlength != 521);
+		} else if (csr_creation_data->key_type == 3 /* Ed25519 */) {
+			csr_creation_data->key_bitlength = 0;
+		} else {
+			do {
+				csr_creation_data->key_bitlength = dialog_ask_for_number (
+				    _("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+				    1024, max_key_length, csr_creation_data->key_bitlength);
+			} while (csr_creation_data->key_bitlength % 1024);
+		}
 
 		printf (_("These are the provided CSR properties:\n"));
 
@@ -452,8 +484,19 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		if (csr_creation_data->subject_alt_name && csr_creation_data->subject_alt_name[0])
 			printf (_("\tSubject Alternative Names: %s\n"), csr_creation_data->subject_alt_name);
 		printf (_("Key pair\n"));
-		printf (_("\tType: %s\n"), (csr_creation_data->key_type ? "DSA" : "RSA"));
-		printf (_("\tKey bitlength: %d\n"), csr_creation_data->key_bitlength);
+		{
+			const gchar *type_name =
+			    csr_creation_data->key_type == 3 ? "Ed25519" :
+			    csr_creation_data->key_type == 2 ? "ECDSA" :
+			    csr_creation_data->key_type == 1 ? "DSA" : "RSA";
+			printf (_("\tType: %s\n"), type_name);
+			if (csr_creation_data->key_type == 3)
+				printf (_("\tKey size: fixed (Ed25519)\n"));
+			else if (csr_creation_data->key_type == 2)
+				printf (_("\tCurve: P-%d\n"), csr_creation_data->key_bitlength);
+			else
+				printf (_("\tKey bitlength: %d\n"), csr_creation_data->key_bitlength);
+		}
 
 		change_data = dialog_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
 
@@ -562,21 +605,50 @@ int ca_cli_callback_addca (int argc, char **argv)
 			if (aux)
 				g_free (aux);
 
-			aux = dialog_ask_for_string (_("Enter type of key you are going to create (RSA/DSA)"), (ca_creation_data->key_type ? "DSA" : "RSA"));
-		} while (g_ascii_strcasecmp (aux, "RSA") && g_ascii_strcasecmp (aux, "DSA"));
-		
+			aux = dialog_ask_for_string (
+			    _("Enter type of key you are going to create "
+			      "(RSA/DSA/ECDSA/Ed25519)"),
+			    ca_creation_data->key_type == 3 ? "Ed25519" :
+			    ca_creation_data->key_type == 2 ? "ECDSA" :
+			    ca_creation_data->key_type == 1 ? "DSA" : "RSA");
+		} while (g_ascii_strcasecmp (aux, "RSA") &&
+		         g_ascii_strcasecmp (aux, "DSA") &&
+		         g_ascii_strcasecmp (aux, "ECDSA") &&
+		         g_ascii_strcasecmp (aux, "Ed25519") &&
+		         g_ascii_strcasecmp (aux, "ED25519"));
+
 		if (! g_ascii_strcasecmp (aux, "RSA")) {
 			ca_creation_data->key_type = 0;
 		} else if (! g_ascii_strcasecmp (aux, "DSA")) {
 			ca_creation_data->key_type = 1;
+		} else if (! g_ascii_strcasecmp (aux, "ECDSA")) {
+			ca_creation_data->key_type = 2;
+		} else {
+			ca_creation_data->key_type = 3; /* Ed25519 */
 		}
 		g_free (aux);
 		aux = NULL;
-		
-		do {
-			ca_creation_data->key_bitlength = dialog_ask_for_number (_("Enter bitlength for the key (it must be a whole multiple of 1024)"),
-									     1024,10240,ca_creation_data->key_bitlength);
-		} while (ca_creation_data->key_bitlength % 1024);
+
+		if (ca_creation_data->key_type == 2 /* ECDSA */) {
+			do {
+				ca_creation_data->key_bitlength =
+				    dialog_ask_for_number (
+				        _("Enter curve size for ECDSA (256, 384, or 521)"),
+				        256, 521, ca_creation_data->key_bitlength ?
+				                  ca_creation_data->key_bitlength : 256);
+			} while (ca_creation_data->key_bitlength != 256 &&
+			         ca_creation_data->key_bitlength != 384 &&
+			         ca_creation_data->key_bitlength != 521);
+		} else if (ca_creation_data->key_type == 3 /* Ed25519 */) {
+			ca_creation_data->key_bitlength = 0;
+		} else {
+			gint max_len = (ca_creation_data->key_type == 1) ? 3072 : 10240;
+			do {
+				ca_creation_data->key_bitlength = dialog_ask_for_number (
+				    _("Enter bitlength for the key (it must be a whole multiple of 1024)"),
+				    1024, max_len, ca_creation_data->key_bitlength);
+			} while (ca_creation_data->key_bitlength % 1024);
+		}
 
 
 		ca_creation_data->key_months_before_expiration = dialog_ask_for_number (_("Introduce number of months before expiration of the new certification authority"),
@@ -620,7 +692,13 @@ int ca_cli_callback_addca (int argc, char **argv)
 		if (ca_creation_data->subject_alt_name && ca_creation_data->subject_alt_name[0])
 			printf (_("\tSubject Alternative Names: %s\n"), ca_creation_data->subject_alt_name);
 		printf (_("Key pair\n"));
-		printf (_("\tType: %s\n"), (ca_creation_data->key_type ? "DSA" : "RSA"));
+		{
+			const gchar *type_name =
+			    ca_creation_data->key_type == 3 ? "Ed25519" :
+			    ca_creation_data->key_type == 2 ? "ECDSA" :
+			    ca_creation_data->key_type == 1 ? "DSA" : "RSA";
+			printf (_("\tType: %s\n"), type_name);
+		}
 		printf (_("\tKey bitlength: %d\n"), ca_creation_data->key_bitlength);
 		printf (_("Validity\n"));
 		printf (_("Validity:\n"));
@@ -1809,5 +1887,119 @@ int ca_cli_callback_addservercert (int argc, char **argv)
 	printf(_("Certificate generated successfully for: %s\n"), server_name);
 	printf(_("Certificate type: %s\n"), is_web_server ? _("Web Server") : _("Email Server"));
 
+	return 0;
+}
+
+
+/* ------------------------------------------------------------------ */
+/*  Renew, exportchain, revokemany, deletemany — CLI parity for the   */
+/*  GUI features added in #49 / #50 / #52 / #54.                      */
+/* ------------------------------------------------------------------ */
+
+int ca_cli_callback_renew (int argc, char **argv)
+{
+	if (argc < 2) {
+		dialog_error (_("Usage: renewcert <cert-id>"));
+		return -1;
+	}
+	guint64 id = atoll (argv[1]);
+	if (! ca_file_check_if_is_cert_id (id)) {
+		dialog_error (_("The given certificate id is not valid"));
+		return -1;
+	}
+	if (! dialog_ask_for_confirmation (
+	        _("gnoMint will issue a new certificate with the same subject "
+	          "and SAN as this one, signed by the same CA, with a fresh "
+	          "keypair. The old certificate stays in place."),
+	        _("Renew? [Yes]/No "), TRUE)) {
+		printf (_("Operation cancelled.\n"));
+		return 0;
+	}
+	guint64 new_id = 0;
+	gchar *err = cert_renewal_renew (id, &new_id);
+	if (err) {
+		dialog_error (err);
+		g_free (err);
+		return -1;
+	}
+	printf (_("Certificate renewed. New certificate id: %" G_GUINT64_FORMAT "\n"),
+	        new_id);
+	return 0;
+}
+
+int ca_cli_callback_exportchain (int argc, char **argv)
+{
+	if (argc < 3) {
+		dialog_error (_("Usage: exportchain <cert-id> <filename>"));
+		return -1;
+	}
+	guint64 id = atoll (argv[1]);
+	if (! ca_file_check_if_is_cert_id (id)) {
+		dialog_error (_("The given certificate id is not valid"));
+		return -1;
+	}
+	gchar *chain = ca_file_get_chain_pem_from_id (id);
+	if (!chain || !*chain) {
+		g_free (chain);
+		dialog_error (_("Cannot build chain PEM for that certificate."));
+		return -1;
+	}
+	GError *gerr = NULL;
+	if (! g_file_set_contents (argv[2], chain, -1, &gerr)) {
+		dialog_error (gerr ? gerr->message : _("Cannot write chain file."));
+		g_clear_error (&gerr);
+		g_free (chain);
+		return -1;
+	}
+	g_free (chain);
+	printf (_("Full chain (leaf → root) written to %s\n"), argv[2]);
+	return 0;
+}
+
+int ca_cli_callback_revokemany (int argc, char **argv)
+{
+	if (argc < 2) {
+		dialog_error (_("Usage: revokemany <cert-id> [cert-id ...]"));
+		return -1;
+	}
+	GSList *ids = NULL;
+	for (int i = 1; i < argc; i++) {
+		guint64 id = atoll (argv[i]);
+		if (id != 0)
+			ids = g_slist_prepend (ids, GUINT_TO_POINTER ((guint) id));
+	}
+	gchar *err = NULL;
+	gint done = ca_bulk_revoke_ids (ids, &err);
+	g_slist_free (ids);
+	if (err) {
+		dialog_error (err);
+		g_free (err);
+	}
+	printf (ngettext ("%d certificate revoked.\n",
+	                  "%d certificates revoked.\n", done), done);
+	return 0;
+}
+
+int ca_cli_callback_deletemany (int argc, char **argv)
+{
+	if (argc < 2) {
+		dialog_error (_("Usage: deletemany <csr-id> [csr-id ...]"));
+		return -1;
+	}
+	GSList *ids = NULL;
+	for (int i = 1; i < argc; i++) {
+		guint64 id = atoll (argv[i]);
+		if (id != 0)
+			ids = g_slist_prepend (ids, GUINT_TO_POINTER ((guint) id));
+	}
+	gchar *err = NULL;
+	gint done = ca_bulk_delete_csr_ids (ids, &err);
+	g_slist_free (ids);
+	if (err) {
+		dialog_error (err);
+		g_free (err);
+	}
+	printf (ngettext ("%d CSR deleted.\n",
+	                  "%d CSRs deleted.\n", done), done);
 	return 0;
 }

@@ -32,6 +32,7 @@
 
 
 #include "ca.h"
+#include "ca_bulk.h"
 #include "ca_file.h"
 #include "certificate_properties.h"
 #include "crl.h"
@@ -1498,61 +1499,8 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_U
 /*  Bulk operations (issue #54)                                       */
 /* ------------------------------------------------------------------ */
 
-/* Revoke every certificate whose id is in `cert_ids`. Skips entries
- * that aren't certs or are already revoked. Returns the count of
- * actually-revoked entries; if `error_out` is non-NULL, the first
- * underlying error is stored there (caller frees with g_free). */
-gint
-ca_bulk_revoke_ids (GSList *cert_ids, gchar **error_out)
-{
-	gint count = 0;
-	if (error_out)
-		*error_out = NULL;
-	for (GSList *l = cert_ids; l; l = l->next) {
-		guint64 id = GPOINTER_TO_UINT (l->data);
-		if (id == 0)
-			continue;
-		if (! ca_file_check_if_is_cert_id (id))
-			continue;
-		gchar *err = ca_file_revoke_crt (id);
-		if (err) {
-			if (error_out && ! *error_out)
-				*error_out = err;
-			else
-				g_free (err);
-			continue;
-		}
-		count++;
-	}
-	return count;
-}
-
-/* Delete every CSR whose id is in `csr_ids`. Skips entries that aren't
- * CSRs. Returns the count of actually-deleted entries. */
-gint
-ca_bulk_delete_csr_ids (GSList *csr_ids, gchar **error_out)
-{
-	gint count = 0;
-	if (error_out)
-		*error_out = NULL;
-	for (GSList *l = csr_ids; l; l = l->next) {
-		guint64 id = GPOINTER_TO_UINT (l->data);
-		if (id == 0)
-			continue;
-		if (! ca_file_check_if_is_csr_id (id))
-			continue;
-		gchar *err = ca_file_remove_csr (id);
-		if (err) {
-			if (error_out && ! *error_out)
-				*error_out = err;
-			else
-				g_free (err);
-			continue;
-		}
-		count++;
-	}
-	return count;
-}
+/* The actual ca_bulk_revoke_ids / ca_bulk_delete_csr_ids implementations
+ * live in ca_bulk.c so the CLI can link them too. */
 
 /* Helper: walk the tree selection, partitioning selected rows into a
  * list of cert ids and a list of CSR ids. The returned GSLists are
