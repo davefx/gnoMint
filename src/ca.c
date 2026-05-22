@@ -41,6 +41,7 @@
 #include "new_ca_window.h"
 #include "new_req_window.h"
 #include "new_cert.h"
+#include "cert_renewal.h"
 #include "preferences-gui.h"
 #include "preferences-window.h"
 #include "import.h"
@@ -805,6 +806,8 @@ void __ca_activate_certificate_selection (GtkTreeIter *iter)
         widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
         gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
+        widget = gtk_builder_get_object (main_window_gtkb, "renew1");
+        if (widget) gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
 
 	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
@@ -842,6 +845,9 @@ void __ca_activate_csr_selection (GtkTreeIter *iter)
 	widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
+	widget = gtk_builder_get_object (main_window_gtkb, "renew1");
+	if (widget) gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+
 	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
 	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
@@ -875,6 +881,9 @@ void __ca_deactivate_actions ()
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 	widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+
+	widget = gtk_builder_get_object (main_window_gtkb, "renew1");
+	if (widget) gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
 
 	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
@@ -1658,6 +1667,58 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 	gtk_tree_iter_free (iter);
 
 	dialog_refresh_list();
+}
+
+
+G_MODULE_EXPORT void ca_on_renew_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	GtkTreeIter *iter = NULL;
+	gint type = __ca_selection_type (GTK_TREE_VIEW (
+	    gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	guint64 cert_id = 0;
+	guint64 new_cert_id = 0;
+	gchar  *err = NULL;
+	GObject *parent_win = NULL;
+	GtkDialog *confirm = NULL;
+	gint response = 0;
+
+	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
+		if (iter) gtk_tree_iter_free (iter);
+		return;
+	}
+
+	gtk_tree_model_get (GTK_TREE_MODEL (ca_model), iter,
+	                    CA_MODEL_COLUMN_ID, &cert_id, -1);
+	gtk_tree_iter_free (iter);
+
+	parent_win = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	confirm = GTK_DIALOG (gtk_message_dialog_new_with_markup (
+	    GTK_WINDOW (parent_win),
+	    GTK_DIALOG_DESTROY_WITH_PARENT,
+	    GTK_MESSAGE_QUESTION,
+	    GTK_BUTTONS_YES_NO,
+	    _("<b>Renew this certificate?</b>\n\n"
+	      "gnoMint will issue a new certificate with the same subject "
+	      "and SAN as the selected one, signed by the same CA, with a "
+	      "freshly-generated keypair. The old certificate will remain in "
+	      "the database — revoke it manually after you have deployed the "
+	      "new one.")));
+	response = gtk_dialog_run (confirm);
+	gtk_widget_destroy (GTK_WIDGET (confirm));
+	if (response != GTK_RESPONSE_YES)
+		return;
+
+	err = cert_renewal_renew (cert_id, &new_cert_id);
+	if (err) {
+		dialog_error (err);
+		g_free (err);
+		return;
+	}
+
+	dialog_info (_("Certificate renewed. A new certificate with a fresh "
+	               "keypair has been added to the database alongside the "
+	               "original."));
+	ca_refresh_model_callback ();
 }
 
 

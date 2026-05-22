@@ -193,6 +193,18 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="renew1">
+                        <property name="label" translatable="yes">Re_new with fresh key</property>
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Issue a new certificate with the same subject and SAN as this one, signed by the same CA with a freshly-generated keypair. The old certificate is left in place; revoke it manually after you have deployed the new one.</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="ca_on_renew_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="revoke1">
                         <property name="label" translatable="yes">Revo_ke</property>
                         <property name="visible">True</property>

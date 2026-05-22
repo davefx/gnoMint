@@ -1,0 +1,209 @@
+/*  gnoMint — certificate renewal.
+ *  See cert_renewal.h for the contract.
+ */
+
+#include <glib.h>
+#include <glib/gi18n.h>
+#include <string.h>
+#include <time.h>
+
+#include "cert_renewal.h"
+#include "ca_file.h"
+#include "tls.h"
+#include "pkey_manage.h"
+
+/* Read an integer policy with a fallback. */
+static gint
+policy_int_default (guint64 ca_id, const gchar *key, gint fallback)
+{
+	gint v = ca_file_policy_get_int (ca_id, key);
+	return v ? v : fallback;
+}
+
+gchar *
+cert_renewal_renew (guint64 cert_id, guint64 *new_cert_id_out)
+{
+	gchar  *old_pem = NULL;
+	TlsCert *old_cert = NULL;
+	guint64 parent_ca_id = 0;
+	gchar  *parent_pem = NULL;
+	gchar  *parent_dn = NULL;
+	PkeyManageData *parent_crypted_pkey = NULL;
+	gchar  *parent_pkey_pem = NULL;
+	gchar  *new_private_key_pem = NULL;
+	gchar  *new_csr_pem = NULL;
+	gchar  *new_cert_pem = NULL;
+	gchar  *crypted_new_pkey = NULL;
+	gnutls_x509_privkey_t *new_key = NULL;
+	TlsCreationData    *csr_cd  = NULL;
+	TlsCertCreationData *cert_cd = NULL;
+	gchar  *error = NULL;
+
+	/* 1. Fetch + parse the old cert. */
+	old_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id);
+	if (!old_pem) {
+		error = g_strdup (_("Cannot read certificate PEM from database."));
+		goto out;
+	}
+	old_cert = tls_parse_cert_pem (old_pem);
+	if (!old_cert) {
+		error = g_strdup (_("Cannot parse certificate."));
+		goto out;
+	}
+
+	/* 2. Locate parent CA. The cert's issuer DN (i_dn) matches a CA
+	 * certificate in the database. Self-signed CAs are their own
+	 * issuer — that's still a valid renewal target. */
+	if (!ca_file_get_id_from_dn (CA_FILE_ELEMENT_TYPE_CERT,
+	                             old_cert->i_dn, &parent_ca_id)) {
+		error = g_strdup_printf (
+		    _("Cannot find issuer CA in this database (issuer DN: %s)."),
+		    old_cert->i_dn ? old_cert->i_dn : "(null)");
+		goto out;
+	}
+
+	parent_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT,
+	                                              parent_ca_id);
+	parent_dn  = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT,
+	                                      parent_ca_id);
+	parent_crypted_pkey = pkey_manage_get_certificate_pkey (parent_ca_id);
+	if (!parent_pem || !parent_dn || !parent_crypted_pkey) {
+		error = g_strdup (_("Cannot load parent CA material from database."));
+		goto out;
+	}
+
+	/* Decrypt parent CA's private key. Prompts for the DB passphrase
+	 * if the database is encrypted. */
+	parent_pkey_pem = pkey_manage_uncrypt (parent_crypted_pkey, parent_dn);
+	if (!parent_pkey_pem) {
+		error = g_strdup (_("Cannot decrypt parent CA's private key."));
+		goto out;
+	}
+
+	/* 3. Build TlsCreationData for the new keypair + CSR. Inherits
+	 * subject and SAN from the old cert; key type defaults to RSA
+	 * 2048 (matches the most common case). Future work: detect the
+	 * old cert's actual key algorithm and renew with the same. */
+	csr_cd = g_new0 (TlsCreationData, 1);
+	csr_cd->cn           = g_strdup (old_cert->cn);
+	csr_cd->org          = g_strdup (old_cert->o);
+	csr_cd->ou           = g_strdup (old_cert->ou);
+	csr_cd->country      = g_strdup (old_cert->c);
+	csr_cd->state        = g_strdup (old_cert->st);
+	csr_cd->city         = g_strdup (old_cert->l);
+	csr_cd->emailAddress = g_strdup (old_cert->emailAddress);
+	csr_cd->subject_alt_name = g_strdup (old_cert->subject_alt_name);
+	csr_cd->key_type     = 0;     /* RSA */
+	csr_cd->key_bitlength = 2048;
+	csr_cd->activation   = time (NULL);
+	csr_cd->expiration   = csr_cd->activation + 86400 * 30; /* placeholder */
+
+	/* 4. Generate fresh RSA keypair. */
+	error = tls_generate_rsa_keys (csr_cd, &new_private_key_pem, &new_key);
+	if (error) goto out;
+
+	/* 5. Generate CSR using the old cert's subject info. */
+	error = tls_generate_csr (csr_cd, new_key, &new_csr_pem);
+	if (error) goto out;
+
+	/* 6. Build TlsCertCreationData from parent CA's policy. */
+	cert_cd = g_new0 (TlsCertCreationData, 1);
+	{
+		gint months = policy_int_default (parent_ca_id, "MONTHS_TO_EXPIRE", 12);
+		time_t now = time (NULL);
+		cert_cd->activation = now;
+		cert_cd->expiration = now + (time_t) months * 30 * 86400;
+		cert_cd->key_months_before_expiration = months;
+	}
+	cert_cd->ca                = ca_file_policy_get_int (parent_ca_id, "CA");
+	cert_cd->crl_signing       = ca_file_policy_get_int (parent_ca_id, "CRL_SIGN");
+	cert_cd->non_repudiation   = ca_file_policy_get_int (parent_ca_id, "NON_REPUDIATION");
+	cert_cd->digital_signature = ca_file_policy_get_int (parent_ca_id, "DIGITAL_SIGNATURE");
+	cert_cd->key_encipherment  = ca_file_policy_get_int (parent_ca_id, "KEY_ENCIPHERMENT");
+	cert_cd->key_agreement     = ca_file_policy_get_int (parent_ca_id, "KEY_AGREEMENT");
+	cert_cd->data_encipherment = ca_file_policy_get_int (parent_ca_id, "DATA_ENCIPHERMENT");
+	cert_cd->web_server        = ca_file_policy_get_int (parent_ca_id, "TLS_WEB_SERVER");
+	cert_cd->web_client        = ca_file_policy_get_int (parent_ca_id, "TLS_WEB_CLIENT");
+	cert_cd->time_stamping     = ca_file_policy_get_int (parent_ca_id, "TIME_STAMPING");
+	cert_cd->ocsp_signing      = ca_file_policy_get_int (parent_ca_id, "OCSP_SIGNING");
+	cert_cd->code_signing      = ca_file_policy_get_int (parent_ca_id, "CODE_SIGNING");
+	cert_cd->email_protection  = ca_file_policy_get_int (parent_ca_id, "EMAIL_PROTECTION");
+
+	/* If nothing is enabled (typical for an existing leaf cert under a
+	 * permissive policy) fall back to the digitalSignature + keyEncipherment
+	 * + serverAuth profile, which covers ~90% of real-world certificates. */
+	if (!cert_cd->digital_signature && !cert_cd->key_encipherment &&
+	    !cert_cd->web_server && !cert_cd->web_client &&
+	    !cert_cd->code_signing && !cert_cd->email_protection) {
+		cert_cd->digital_signature = TRUE;
+		cert_cd->key_encipherment  = TRUE;
+		cert_cd->web_server        = TRUE;
+	}
+
+	ca_file_get_next_serial (&cert_cd->serial, parent_ca_id);
+
+	/* 7. Sign the CSR with the parent CA. */
+	error = tls_generate_certificate (cert_cd, new_csr_pem,
+	                                  parent_pem, parent_pkey_pem,
+	                                  &new_cert_pem);
+	if (error) goto out;
+
+	/* 8. Encrypt the new private key under the new cert's DN. */
+	{
+		TlsCsr *new_csr_info = tls_parse_csr_pem (new_csr_pem);
+		if (!new_csr_info) {
+			error = g_strdup (_("Cannot parse generated CSR."));
+			goto out;
+		}
+		crypted_new_pkey = pkey_manage_crypt (new_private_key_pem,
+		                                      new_csr_info->dn);
+		tls_csr_free (new_csr_info);
+		if (!crypted_new_pkey) {
+			error = g_strdup (_("Cannot encrypt new private key."));
+			goto out;
+		}
+	}
+
+	/* 9. Insert the new certificate. ca_file_insert_cert returns
+	 * gettext-interned strings on error, which the caller must not
+	 * g_free — wrap in g_strdup so the contract on `error` is uniform
+	 * (always heap-allocated, caller frees). */
+	{
+		gchar *insert_err = ca_file_insert_cert (
+		    FALSE /* is_ca */, TRUE /* private_key_in_db */,
+		    crypted_new_pkey, new_cert_pem);
+		if (insert_err) {
+			error = g_strdup (insert_err);
+			goto out;
+		}
+	}
+
+	if (new_cert_id_out) {
+		/* Look up the freshly-inserted cert by its DN. */
+		TlsCert *new_cert = tls_parse_cert_pem (new_cert_pem);
+		if (new_cert) {
+			ca_file_get_id_from_dn (CA_FILE_ELEMENT_TYPE_CERT,
+			                        new_cert->dn, new_cert_id_out);
+			tls_cert_free (new_cert);
+		}
+	}
+
+out:
+	if (new_key) {
+		gnutls_x509_privkey_deinit (*new_key);
+		g_free (new_key);
+	}
+	g_free (old_pem);
+	if (old_cert) tls_cert_free (old_cert);
+	g_free (parent_pem);
+	g_free (parent_dn);
+	pkey_manage_data_free (parent_crypted_pkey);
+	g_free (parent_pkey_pem);
+	g_free (new_private_key_pem);
+	g_free (new_csr_pem);
+	g_free (new_cert_pem);
+	g_free (crypted_new_pkey);
+	if (csr_cd) tls_creation_data_free (csr_cd);
+	g_free (cert_cd);
+	return error;
+}
