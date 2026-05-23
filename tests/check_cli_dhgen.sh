@@ -1,15 +1,9 @@
 #!/bin/sh
-# check_cli_dhgen.sh - exercise gnomint-cli `dhgen`. Generation is slow
-# because GnuTLS has to find a safe prime; we use the minimum acceptable
-# size and gate behind GNOMINT_TEST_DHGEN=1 so `make check` stays fast
-# by default. To run: GNOMINT_TEST_DHGEN=1 make -C tests check.
+# check_cli_dhgen.sh - exercise gnomint-cli `dhgen`. Modern GnuTLS uses
+# known safe primes for common bit lengths, so 1024-bit parameter
+# generation completes in well under a second — no need to gate.
 
 set -eu
-
-if [ "${GNOMINT_TEST_DHGEN:-0}" != "1" ]; then
-    echo "SKIP: set GNOMINT_TEST_DHGEN=1 to run this test (it takes 30s+)" >&2
-    exit 77
-fi
 
 GNOMINT_CLI=${GNOMINT_CLI:-../src/gnomint-cli}
 if [ ! -x "$GNOMINT_CLI" ]; then
