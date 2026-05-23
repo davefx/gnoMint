@@ -444,13 +444,19 @@ int ca_cli_callback_addcsr (int argc, char **argv)
 		aux = NULL;
 
 		if (csr_creation_data->key_type == 2 /* ECDSA */) {
-			/* P-256 / P-384 / P-521. */
+			/* P-256 / P-384 / P-521. The default lands at 256
+			 * unless a previous prompt left a valid curve in
+			 * key_bitlength; an RSA-sized default (e.g. 2048)
+			 * would trip dialog_ask_for_number's assertion. */
+			gint ecdsa_default =
+			    (csr_creation_data->key_bitlength == 384 ||
+			     csr_creation_data->key_bitlength == 521)
+			        ? csr_creation_data->key_bitlength : 256;
 			do {
 				csr_creation_data->key_bitlength =
 				    dialog_ask_for_number (
 				        _("Enter curve size for ECDSA (256, 384, or 521)"),
-				        256, 521, csr_creation_data->key_bitlength ?
-				                  csr_creation_data->key_bitlength : 256);
+				        256, 521, ecdsa_default);
 			} while (csr_creation_data->key_bitlength != 256 &&
 			         csr_creation_data->key_bitlength != 384 &&
 			         csr_creation_data->key_bitlength != 521);
@@ -630,12 +636,15 @@ int ca_cli_callback_addca (int argc, char **argv)
 		aux = NULL;
 
 		if (ca_creation_data->key_type == 2 /* ECDSA */) {
+			gint ecdsa_default =
+			    (ca_creation_data->key_bitlength == 384 ||
+			     ca_creation_data->key_bitlength == 521)
+			        ? ca_creation_data->key_bitlength : 256;
 			do {
 				ca_creation_data->key_bitlength =
 				    dialog_ask_for_number (
 				        _("Enter curve size for ECDSA (256, 384, or 521)"),
-				        256, 521, ca_creation_data->key_bitlength ?
-				                  ca_creation_data->key_bitlength : 256);
+				        256, 521, ecdsa_default);
 			} while (ca_creation_data->key_bitlength != 256 &&
 			         ca_creation_data->key_bitlength != 384 &&
 			         ca_creation_data->key_bitlength != 521);
