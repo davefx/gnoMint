@@ -59,6 +59,11 @@ void dialog_establish_refresh_function (DialogRefreshCallback callback)
 
 gboolean dialog_refresh_list (void)
 {
+	/* The CLI doesn't register a refresh callback — calling through a
+	 * NULL function pointer would segfault. The GUI registers via
+	 * dialog_establish_refresh_function in main.c. */
+	if (!dialog_refresh_callback)
+		return TRUE;
 	return dialog_refresh_callback();
 }
 
