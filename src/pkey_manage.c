@@ -367,7 +367,7 @@ gchar * __pkey_manage_to_hex (const guchar *buffer, size_t len)
 	guint i;
 
 	for (i=0; i<len; i++) {
-		sprintf (&res[i*2], "%02X", buffer[i]);
+		snprintf (&res[i*2], 3, "%02X", buffer[i]);
 	}
 	
 	return res;
@@ -546,8 +546,8 @@ gchar * __pkey_manage_aes_decrypt (const gchar *string, const gchar *password)
 	}
 
 	// It's a new-type ciphered message. 
-	strncpy (iv_hex, &string[3], 32);
-	strncpy (ctr_hex, &string[35], 32);
+	snprintf (iv_hex, sizeof(iv_hex), "%.32s", &string[3]);
+	snprintf (ctr_hex, sizeof(ctr_hex), "%.32s", &string[35]);
 	ciphered = &string[67];
 
 	iv = __pkey_manage_from_hex (iv_hex);
