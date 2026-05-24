@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnomint\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-22 13:33+0200\n"
+"POT-Creation-Date: 2026-05-24 14:20+0200\n"
 "PO-Revision-Date: 2010-04-05 14:02+0000\n"
 "Last-Translator: Sergio Oller <Unknown>\n"
 "Language-Team: Catalan <ca@li.org>\n"
@@ -141,24 +141,24 @@ msgid "<b>Certificate Signing Requests</b>"
 msgstr "<b>Sol·licituds de signatura de certificats</b>"
 
 #: ../src/ca.c:503 ../src/ca-cli-callbacks.c:174 ../src/ca-cli-callbacks.c:188
-#: ../src/ca-cli-callbacks.c:203 ../src/ca-cli-callbacks.c:707
-#: ../src/ca-cli-callbacks.c:716 ../src/ca-cli-callbacks.c:1336
-#: ../src/ca-cli-callbacks.c:1345 ../src/certificate_properties.c:178
+#: ../src/ca-cli-callbacks.c:203 ../src/ca-cli-callbacks.c:716
+#: ../src/ca-cli-callbacks.c:725 ../src/ca-cli-callbacks.c:1345
+#: ../src/ca-cli-callbacks.c:1354 ../src/certificate_properties.c:178
 #: ../src/certificate_properties.c:188
 msgid "%m/%d/%Y %R GMT"
 msgstr "%d/%m/%Y %R GMT"
 
 #: ../src/ca.c:506 ../src/ca-cli-callbacks.c:177 ../src/ca-cli-callbacks.c:191
-#: ../src/ca-cli-callbacks.c:206 ../src/ca-cli-callbacks.c:710
-#: ../src/ca-cli-callbacks.c:719 ../src/ca-cli-callbacks.c:1339
-#: ../src/ca-cli-callbacks.c:1348 ../src/certificate_properties.c:181
+#: ../src/ca-cli-callbacks.c:206 ../src/ca-cli-callbacks.c:719
+#: ../src/ca-cli-callbacks.c:728 ../src/ca-cli-callbacks.c:1348
+#: ../src/ca-cli-callbacks.c:1357 ../src/certificate_properties.c:181
 #: ../src/certificate_properties.c:191
 #, fuzzy
 msgid "%m/%d/%Y %H:%M GMT"
 msgstr "%d/%m/%Y %R GMT"
 
 #: ../src/ca.c:657 ../src/certificate_properties.c:588 ../src/crl.c:184
-#: ../src/new_cert.c:192 ../src/new_req_window.c:192
+#: ../src/new_cert.c:198 ../src/new_req_window.c:192
 msgid "Subject"
 msgstr "Persona certificada"
 
@@ -402,7 +402,7 @@ msgstr ""
 msgid "_Open"
 msgstr ""
 
-#: ../src/ca.c:1954 ../src/ca-cli-callbacks.c:2111
+#: ../src/ca.c:1954 ../src/ca-cli-callbacks.c:2120
 #, fuzzy
 msgid "Cannot read file."
 msgstr "Afegir certificat de la CA auto-signat"
@@ -466,7 +466,7 @@ msgstr ""
 msgid "Password changed successfully"
 msgstr "Contrasenya canviada correctament"
 
-#: ../src/ca.c:2477 ../src/ca-cli-callbacks.c:1169
+#: ../src/ca.c:2477 ../src/ca-cli-callbacks.c:1178
 msgid ""
 "Error while establishing database password. The operation was cancelled."
 msgstr ""
@@ -919,7 +919,7 @@ msgid "The file already exists, so it will be overwritten."
 msgstr "El fitxer ja existeix, se sobreescriurà."
 
 #: ../src/ca-cli-callbacks.c:59 ../src/ca-cli-callbacks.c:108
-#: ../src/ca-cli-callbacks.c:807
+#: ../src/ca-cli-callbacks.c:816
 msgid "Are you sure? Yes/[No] "
 msgstr "Esteu segur? Sí/[No] "
 
@@ -1074,8 +1074,8 @@ msgstr "Sol·licituds de certificat a la base de dades:\n"
 msgid "Id.\tParent Id.\tCSR Subject\t\tKey in DB?\n"
 msgstr "Id.\tId. pare\tTitular de la CSR\t\tClau en BD?\n"
 
-#: ../src/ca-cli-callbacks.c:295 ../src/ca-cli-callbacks.c:1112
-#: ../src/ca-cli-callbacks.c:1499 ../src/ca-cli-callbacks.c:1528
+#: ../src/ca-cli-callbacks.c:295 ../src/ca-cli-callbacks.c:1121
+#: ../src/ca-cli-callbacks.c:1508 ../src/ca-cli-callbacks.c:1537
 msgid "The given CA id. is not valid"
 msgstr "L'identificador de la CA proporcionat no és vàlid"
 
@@ -1088,127 +1088,127 @@ msgstr ""
 "Introduïu les dades corresponents al titular de la sol·licitud de signatura "
 "del certificat:\n"
 
-#: ../src/ca-cli-callbacks.c:351 ../src/ca-cli-callbacks.c:551
+#: ../src/ca-cli-callbacks.c:351 ../src/ca-cli-callbacks.c:557
 msgid "Enter country (C)"
 msgstr "Introduïu el país (C)"
 
-#: ../src/ca-cli-callbacks.c:359 ../src/ca-cli-callbacks.c:557
+#: ../src/ca-cli-callbacks.c:359 ../src/ca-cli-callbacks.c:563
 msgid "Enter state or province (ST)"
 msgstr "Introduïu el nom de l'estat o la província (ST)"
 
-#: ../src/ca-cli-callbacks.c:368 ../src/ca-cli-callbacks.c:563
+#: ../src/ca-cli-callbacks.c:368 ../src/ca-cli-callbacks.c:569
 msgid "Enter locality or city (L)"
 msgstr "Introduïu la localitat o la ciutat (L)"
 
-#: ../src/ca-cli-callbacks.c:376 ../src/ca-cli-callbacks.c:569
+#: ../src/ca-cli-callbacks.c:376 ../src/ca-cli-callbacks.c:575
 msgid "Enter organization (O)"
 msgstr "Introduïu l'organització (O)"
 
-#: ../src/ca-cli-callbacks.c:384 ../src/ca-cli-callbacks.c:575
+#: ../src/ca-cli-callbacks.c:384 ../src/ca-cli-callbacks.c:581
 msgid "Enter organizational unit (OU)"
 msgstr "Introduïu la Unitat organitzativa (OU)"
 
-#: ../src/ca-cli-callbacks.c:391 ../src/ca-cli-callbacks.c:581
+#: ../src/ca-cli-callbacks.c:391 ../src/ca-cli-callbacks.c:587
 msgid "Enter common name (CN)"
 msgstr "Introduïu Nom habitual (CN)"
 
-#: ../src/ca-cli-callbacks.c:397 ../src/ca-cli-callbacks.c:587
+#: ../src/ca-cli-callbacks.c:397 ../src/ca-cli-callbacks.c:593
 msgid "Enter email address (leave blank for none)"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:408 ../src/ca-cli-callbacks.c:598
+#: ../src/ca-cli-callbacks.c:408 ../src/ca-cli-callbacks.c:604
 msgid ""
 "Enter Subject Alternative Names (SAN) [format: "
 "DNS:example.com,IP:192.168.1.1]"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:419 ../src/ca-cli-callbacks.c:609
+#: ../src/ca-cli-callbacks.c:419 ../src/ca-cli-callbacks.c:615
 #, fuzzy
 msgid "Enter type of key you are going to create (RSA/DSA/ECDSA/Ed25519)"
 msgstr "Introduïu el tipus de clau que es crearà (RSA/DSA)"
 
-#: ../src/ca-cli-callbacks.c:451 ../src/ca-cli-callbacks.c:636
+#: ../src/ca-cli-callbacks.c:458 ../src/ca-cli-callbacks.c:646
 msgid "Enter curve size for ECDSA (256, 384, or 521)"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:462 ../src/ca-cli-callbacks.c:648
+#: ../src/ca-cli-callbacks.c:468 ../src/ca-cli-callbacks.c:657
 msgid "Enter bitlength for the key (it must be a whole multiple of 1024)"
 msgstr "Introduïu la mida de la clau en bits (múltiple de 1024)"
 
-#: ../src/ca-cli-callbacks.c:467
+#: ../src/ca-cli-callbacks.c:473
 #, c-format
 msgid "These are the provided CSR properties:\n"
 msgstr "Aquestes són les propietats de la CSR proporcionada:\n"
 
-#: ../src/ca-cli-callbacks.c:469 ../src/ca-cli-callbacks.c:677
-#: ../src/ca-cli-callbacks.c:1323 ../src/ca-cli-callbacks.c:1388
+#: ../src/ca-cli-callbacks.c:475 ../src/ca-cli-callbacks.c:686
+#: ../src/ca-cli-callbacks.c:1332 ../src/ca-cli-callbacks.c:1397
 #, c-format
 msgid "Subject:\n"
 msgstr "Titular:\n"
 
-#: ../src/ca-cli-callbacks.c:470 ../src/ca-cli-callbacks.c:678
+#: ../src/ca-cli-callbacks.c:476 ../src/ca-cli-callbacks.c:687
 #, c-format
 msgid "\tDistinguished Name: "
 msgstr "\tNom distintiu: "
 
-#: ../src/ca-cli-callbacks.c:485 ../src/ca-cli-callbacks.c:693
-#: ../src/ca-cli-callbacks.c:1327 ../src/ca-cli-callbacks.c:1391
+#: ../src/ca-cli-callbacks.c:491 ../src/ca-cli-callbacks.c:702
+#: ../src/ca-cli-callbacks.c:1336 ../src/ca-cli-callbacks.c:1400
 #, c-format
 msgid "\tSubject Alternative Names: %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:486 ../src/ca-cli-callbacks.c:694
+#: ../src/ca-cli-callbacks.c:492 ../src/ca-cli-callbacks.c:703
 #, c-format
 msgid "Key pair\n"
 msgstr "Parella de claus\n"
 
-#: ../src/ca-cli-callbacks.c:492 ../src/ca-cli-callbacks.c:700
+#: ../src/ca-cli-callbacks.c:498 ../src/ca-cli-callbacks.c:709
 #, c-format
 msgid "\tType: %s\n"
 msgstr "\tTipus: %s\n"
 
-#: ../src/ca-cli-callbacks.c:494
+#: ../src/ca-cli-callbacks.c:500
 #, c-format
 msgid "\tKey size: fixed (Ed25519)\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:496
+#: ../src/ca-cli-callbacks.c:502
 #, c-format
 msgid "\tCurve: P-%d\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:498 ../src/ca-cli-callbacks.c:702
+#: ../src/ca-cli-callbacks.c:504 ../src/ca-cli-callbacks.c:711
 #, c-format
 msgid "\tKey bitlength: %d\n"
 msgstr "\tLongitud en bits: %d\n"
 
-#: ../src/ca-cli-callbacks.c:501 ../src/ca-cli-callbacks.c:723
+#: ../src/ca-cli-callbacks.c:507 ../src/ca-cli-callbacks.c:732
 msgid "Do you want to change anything? Yes/[No] "
 msgstr "Voleu canviar quelcom? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:505
+#: ../src/ca-cli-callbacks.c:511
 msgid ""
 "You are about to create a Certificate Signing Request with these properties."
 msgstr ""
 "Ara es crearà una petició de signatura del certificat (CSR) amb aquestes "
 "propietats."
 
-#: ../src/ca-cli-callbacks.c:506 ../src/ca-cli-callbacks.c:728
+#: ../src/ca-cli-callbacks.c:512 ../src/ca-cli-callbacks.c:737
 msgid "Are you sure? [Yes]/No "
 msgstr "Esteu segur [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:511 ../src/ca-cli-callbacks.c:733
-#: ../src/ca-cli-callbacks.c:817 ../src/ca-cli-callbacks.c:948
-#: ../src/ca-cli-callbacks.c:1069 ../src/ca-cli-callbacks.c:1098
-#: ../src/ca-cli-callbacks.c:1164 ../src/ca-cli-callbacks.c:1191
-#: ../src/ca-cli-callbacks.c:1219 ../src/ca-cli-callbacks.c:1234
-#: ../src/ca-cli-callbacks.c:1558 ../src/ca-cli-callbacks.c:1601
-#: ../src/ca-cli-callbacks.c:1915
+#: ../src/ca-cli-callbacks.c:517 ../src/ca-cli-callbacks.c:742
+#: ../src/ca-cli-callbacks.c:826 ../src/ca-cli-callbacks.c:957
+#: ../src/ca-cli-callbacks.c:1078 ../src/ca-cli-callbacks.c:1107
+#: ../src/ca-cli-callbacks.c:1173 ../src/ca-cli-callbacks.c:1200
+#: ../src/ca-cli-callbacks.c:1228 ../src/ca-cli-callbacks.c:1243
+#: ../src/ca-cli-callbacks.c:1567 ../src/ca-cli-callbacks.c:1610
+#: ../src/ca-cli-callbacks.c:1924
 #, c-format
 msgid "Operation cancelled.\n"
 msgstr "Operació cancel·lada\n"
 
-#: ../src/ca-cli-callbacks.c:549
+#: ../src/ca-cli-callbacks.c:555
 #, c-format
 msgid ""
 "Please enter data corresponding to subject of the new Certification "
@@ -1217,7 +1217,7 @@ msgstr ""
 "Introduïu les dades corresponents al titular de la nova Entitat "
 "Certificadora (CA):\n"
 
-#: ../src/ca-cli-callbacks.c:654
+#: ../src/ca-cli-callbacks.c:663
 msgid ""
 "Introduce number of months before expiration of the new certification "
 "authority"
@@ -1225,216 +1225,216 @@ msgstr ""
 "Introduïu el nombre de mesos abans la caducitat de la nova Entitat "
 "certificadora"
 
-#: ../src/ca-cli-callbacks.c:675
+#: ../src/ca-cli-callbacks.c:684
 #, c-format
 msgid "These are the provided new CA properties:\n"
 msgstr "Aquestes són les propietats proporcionades per a la nova CA:\n"
 
-#: ../src/ca-cli-callbacks.c:703
+#: ../src/ca-cli-callbacks.c:712
 #, c-format
 msgid "Validity\n"
 msgstr "Validesa\n"
 
-#: ../src/ca-cli-callbacks.c:704 ../src/ca-cli-callbacks.c:1333
+#: ../src/ca-cli-callbacks.c:713 ../src/ca-cli-callbacks.c:1342
 #, c-format
 msgid "Validity:\n"
 msgstr "Validesa:\n"
 
-#: ../src/ca-cli-callbacks.c:712 ../src/ca-cli-callbacks.c:1341
+#: ../src/ca-cli-callbacks.c:721 ../src/ca-cli-callbacks.c:1350
 #, c-format
 msgid "\tActivated on: %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:721 ../src/ca-cli-callbacks.c:1350
+#: ../src/ca-cli-callbacks.c:730 ../src/ca-cli-callbacks.c:1359
 #, c-format
 msgid "\tExpires on: %s\n"
 msgstr "\tCaduca el: %s\n"
 
-#: ../src/ca-cli-callbacks.c:727
+#: ../src/ca-cli-callbacks.c:736
 msgid ""
 "You are about to create a new Certification Authority with these properties."
 msgstr "Es crearà una nova Entitat certificadora (CA) amb aquestes propietats."
 
-#: ../src/ca-cli-callbacks.c:753 ../src/ca-cli-callbacks.c:801
-#: ../src/ca-cli-callbacks.c:1308
+#: ../src/ca-cli-callbacks.c:762 ../src/ca-cli-callbacks.c:810
+#: ../src/ca-cli-callbacks.c:1317
 msgid "The given certificate id. is not valid"
 msgstr "L'identificador de certificat proporcionat no és vàlid"
 
-#: ../src/ca-cli-callbacks.c:760 ../src/ca-cli-callbacks.c:784
+#: ../src/ca-cli-callbacks.c:769 ../src/ca-cli-callbacks.c:793
 #, c-format
 msgid "Private key extracted successfully into file '%s'\n"
 msgstr "Clau privada extreta amb èxit al fitxer: '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:777 ../src/ca-cli-callbacks.c:929
-#: ../src/ca-cli-callbacks.c:1082 ../src/ca-cli-callbacks.c:1377
+#: ../src/ca-cli-callbacks.c:786 ../src/ca-cli-callbacks.c:938
+#: ../src/ca-cli-callbacks.c:1091 ../src/ca-cli-callbacks.c:1386
 msgid "The given CSR id. is not valid"
 msgstr "L'identificador de la CSR proporcionat no és vàlid"
 
-#: ../src/ca-cli-callbacks.c:807
+#: ../src/ca-cli-callbacks.c:816
 msgid "This certificate will be revoked."
 msgstr "Aquest certificat serà revocat."
 
-#: ../src/ca-cli-callbacks.c:813
+#: ../src/ca-cli-callbacks.c:822
 #, c-format
 msgid "Certificate revoked.\n"
 msgstr "Certificat revocat.\n"
 
-#: ../src/ca-cli-callbacks.c:827 ../src/ca-cli-callbacks.c:1358
+#: ../src/ca-cli-callbacks.c:836 ../src/ca-cli-callbacks.c:1367
 #, c-format
 msgid "Certificate uses:\n"
 msgstr "Usos del certificat:\n"
 
-#: ../src/ca-cli-callbacks.c:830
+#: ../src/ca-cli-callbacks.c:839
 #, c-format
 msgid "* Certification Authority use enabled.\n"
 msgstr "* Ús com a entitat certificadora habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:832
+#: ../src/ca-cli-callbacks.c:841
 #, c-format
 msgid "* Certification Authority use disabled.\n"
 msgstr "* Ús com a entitat certificadora deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:836
+#: ../src/ca-cli-callbacks.c:845
 #, c-format
 msgid "* CRL signing use enabled.\n"
 msgstr "* Ús per a la firma de CRLs habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:838
+#: ../src/ca-cli-callbacks.c:847
 #, c-format
 msgid "* CRL signing use disabled.\n"
 msgstr "* Ús per a la firma de CRLs deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:842
+#: ../src/ca-cli-callbacks.c:851
 #, c-format
 msgid "* Digital Signature use enabled.\n"
 msgstr "* Ús per a la signatura digital habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:844
+#: ../src/ca-cli-callbacks.c:853
 #, c-format
 msgid "* Digital Signature use disabled.\n"
 msgstr "* Ús per a la signatura digital deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:848 ../src/ca-cli-callbacks.c:850
+#: ../src/ca-cli-callbacks.c:857 ../src/ca-cli-callbacks.c:859
 #, c-format
 msgid "* Data Encipherment use enabled.\n"
 msgstr "Ús per al xifrat de dades habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:854
+#: ../src/ca-cli-callbacks.c:863
 #, c-format
 msgid "* Key Encipherment use enabled.\n"
 msgstr "Ús per al xifrat de claus habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:856
+#: ../src/ca-cli-callbacks.c:865
 #, c-format
 msgid "* Key Encipherment use disabled.\n"
 msgstr "Ús per al xifrat de claus deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:860
+#: ../src/ca-cli-callbacks.c:869
 #, c-format
 msgid "* Non Repudiation use enabled.\n"
 msgstr "Ús per al no repudi habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:862
+#: ../src/ca-cli-callbacks.c:871
 #, c-format
 msgid "* Non Repudiation use disabled.\n"
 msgstr "Ús per al no repudi deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:866
+#: ../src/ca-cli-callbacks.c:875
 #, c-format
 msgid "* Key Agreement use enabled.\n"
 msgstr "Ús per a la negociació de claus habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:868
+#: ../src/ca-cli-callbacks.c:877
 #, c-format
 msgid "* Key Agreement use disabled.\n"
 msgstr "Ús per a la negociació de claus deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:871
+#: ../src/ca-cli-callbacks.c:880
 #, c-format
 msgid "Certificate purposes:\n"
 msgstr "Finalitats del certificat:\n"
 
-#: ../src/ca-cli-callbacks.c:874
+#: ../src/ca-cli-callbacks.c:883
 #, c-format
 msgid "* Email Protection purpose enabled.\n"
 msgstr "* Finalitat per a la protecció del correu electrònic habilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:876
+#: ../src/ca-cli-callbacks.c:885
 #, c-format
 msgid "* Email Protection purpose disabled.\n"
 msgstr "* Finalitat per a la protecció del correu electrònic deshabilitat.\n"
 
-#: ../src/ca-cli-callbacks.c:880
+#: ../src/ca-cli-callbacks.c:889
 #, c-format
 msgid "* Code Signing purpose enabled.\n"
 msgstr "* Finalitat per a la firma de codi  habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:882
+#: ../src/ca-cli-callbacks.c:891
 #, c-format
 msgid "* Code Signing purpose disabled.\n"
 msgstr "* Finalitat per a la firma de codi deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:886
+#: ../src/ca-cli-callbacks.c:895
 #, c-format
 msgid "* TLS Web Client purpose enabled.\n"
 msgstr "* Finalitat de client web TLS habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:888
+#: ../src/ca-cli-callbacks.c:897
 #, c-format
 msgid "* TLS Web Client purpose disabled.\n"
 msgstr "* Finalitat de client web TLS deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:892
+#: ../src/ca-cli-callbacks.c:901
 #, c-format
 msgid "* TLS Web Server purpose enabled.\n"
 msgstr "* Finalitat de servidor web TLS habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:894
+#: ../src/ca-cli-callbacks.c:903
 #, c-format
 msgid "* TLS Web Server purpose disabled.\n"
 msgstr "* Finalitat de servidor web TLS deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:898
+#: ../src/ca-cli-callbacks.c:907
 #, c-format
 msgid "* Time Stamping purpose enabled.\n"
 msgstr "* Finalitat de marca horària habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:900
+#: ../src/ca-cli-callbacks.c:909
 #, c-format
 msgid "* Time Stamping purpose disabled.\n"
 msgstr "* Finalitat de marca horària deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:904
+#: ../src/ca-cli-callbacks.c:913
 #, c-format
 msgid "* OCSP Signing purpose enabled.\n"
 msgstr "* Finalitat de signatura OCSP habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:906
+#: ../src/ca-cli-callbacks.c:915
 #, c-format
 msgid "* OCSP Signing purpose disabled.\n"
 msgstr "* Finalitat de signatura OCSP deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:910
+#: ../src/ca-cli-callbacks.c:919
 #, c-format
 msgid "* Any purpose enabled.\n"
 msgstr "* Qualsevol finalitat habilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:912
+#: ../src/ca-cli-callbacks.c:921
 #, c-format
 msgid "* Any purpose disabled.\n"
 msgstr "* Qualsevol finalitat deshabilitada.\n"
 
-#: ../src/ca-cli-callbacks.c:936
+#: ../src/ca-cli-callbacks.c:945
 #, c-format
 msgid "You are about to sign the following Certificate Signing Request:\n"
 msgstr "Ara es signarà la següent petició de signatura de certificat (CSR):\n"
 
-#: ../src/ca-cli-callbacks.c:938
+#: ../src/ca-cli-callbacks.c:947
 #, c-format
 msgid "with the certificate corresponding to the next CA:\n"
 msgstr "amb el certificat corresponent a aquesta CA:\n"
 
-#: ../src/ca-cli-callbacks.c:941
+#: ../src/ca-cli-callbacks.c:950
 msgid ""
 "Introduce number of months before expiration of the new certificate (0 to "
 "cancel)"
@@ -1442,199 +1442,199 @@ msgstr ""
 "Màxim nombre de mesos abans de la caducitat del nou certificat (0 per a "
 "cancel·lar):"
 
-#: ../src/ca-cli-callbacks.c:967 ../src/ca-cli-callbacks.c:1055
+#: ../src/ca-cli-callbacks.c:976 ../src/ca-cli-callbacks.c:1064
 #, c-format
 msgid ""
 "The new certificate will be created with the following uses and purposes:\n"
 msgstr "El nou certificat es validarà per als següents usos i finalitats:\n"
 
-#: ../src/ca-cli-callbacks.c:970
+#: ../src/ca-cli-callbacks.c:979
 msgid "Do you want to change any property of the new certificate? Yes/[No] "
 msgstr "Desitgeu canviar alguna propietat del nou certificat? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:973
+#: ../src/ca-cli-callbacks.c:982
 msgid "* Enable Certification Authority use? [Yes]/No "
 msgstr "* Habilitar ús com Entitat certificadora? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:975
+#: ../src/ca-cli-callbacks.c:984
 #, c-format
 msgid "* Certification Authority use disabled by policy\n"
 msgstr "* Ús com a Entitat certificadora deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:979
+#: ../src/ca-cli-callbacks.c:988
 msgid "* Enable CRL Signing? [Yes]/No "
 msgstr "* Habilitar ús per a la signatura de CRL? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:981
+#: ../src/ca-cli-callbacks.c:990
 #, c-format
 msgid "* CRL signing use disabled by policy\n"
 msgstr "* Ús per a la signatura de CRL deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:985
+#: ../src/ca-cli-callbacks.c:994
 msgid "* Enable Digital Signature use? [Yes]/No "
 msgstr "* Habilitar l'ús per a la signatura digital? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:987
+#: ../src/ca-cli-callbacks.c:996
 #, c-format
 msgid "* Digital Signature use disabled by policy\n"
 msgstr "* Ús per a la signatura digital deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:991
+#: ../src/ca-cli-callbacks.c:1000
 msgid "Enable Data Encipherment use? [Yes]/No "
 msgstr "Habilitar l'ús per al xifratge de dades? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:993
+#: ../src/ca-cli-callbacks.c:1002
 #, c-format
 msgid "* Data Encipherment use disabled by policy\n"
 msgstr "* Ús per al xifratge de dades deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:997
+#: ../src/ca-cli-callbacks.c:1006
 msgid "Enable Key Encipherment use? [Yes]/No "
 msgstr "Habilitar l'ús per al xifrat de claus? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:999
+#: ../src/ca-cli-callbacks.c:1008
 #, c-format
 msgid "* Key Encipherment use disabled by policy\n"
 msgstr "* Ús per al xifratge de claus deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1003
+#: ../src/ca-cli-callbacks.c:1012
 msgid "Enable Non Repudiation use? [Yes]/No "
 msgstr "Habilitar l'ús per al no repudi? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1005
+#: ../src/ca-cli-callbacks.c:1014
 #, c-format
 msgid "* Non Repudiation use disabled by policy\n"
 msgstr "* Ús per al no repudi deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1009
+#: ../src/ca-cli-callbacks.c:1018
 msgid "Enable Key Agreement use? [Yes]/No "
 msgstr "Habilitar l'ús per a negociació de claus? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1011
+#: ../src/ca-cli-callbacks.c:1020
 #, c-format
 msgid "* Key Agreement use disabled by policy\n"
 msgstr "* Ús per a la negociació de claus deshabilitat per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1015
+#: ../src/ca-cli-callbacks.c:1024
 msgid "Enable Email Protection purpose? [Yes]/No "
 msgstr "Habilitar la finalitat de protecció de correu electrònic? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1017
+#: ../src/ca-cli-callbacks.c:1026
 #, c-format
 msgid "* Email Protection purpose disabled by policy\n"
 msgstr ""
 "* Finalitat de protecció del correu electrònic deshabilitada per una "
 "directiva.\n"
 
-#: ../src/ca-cli-callbacks.c:1021
+#: ../src/ca-cli-callbacks.c:1030
 msgid "Enable Code Signing purpose? [Yes]/No "
 msgstr "Habilitar la finalitat de signatura de codi? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1023
+#: ../src/ca-cli-callbacks.c:1032
 #, c-format
 msgid "* Code Signing purpose disabled by policy\n"
 msgstr "* Finalitat de signatura de codi deshabilitada per una directiva.\n"
 
-#: ../src/ca-cli-callbacks.c:1027
+#: ../src/ca-cli-callbacks.c:1036
 msgid "Enable TLS Web Client purpose? [Yes]/No "
 msgstr "Habilitar la finalitat de client web TLS? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1029
+#: ../src/ca-cli-callbacks.c:1038
 #, c-format
 msgid "* TLS Web Client purpose disabled by policy\n"
 msgstr "* Finalitat de client web TLS deshabilitada per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1033
+#: ../src/ca-cli-callbacks.c:1042
 msgid "Enable TLS Web Server purpose? [Yes]/No "
 msgstr "Habilitar la finalitat de servidor web TLS? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1035
+#: ../src/ca-cli-callbacks.c:1044
 #, c-format
 msgid "* TLS Web Server purpose disabled by policy\n"
 msgstr "* Finalitat de servidor web TLS deshabilitada per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1039
+#: ../src/ca-cli-callbacks.c:1048
 msgid "Enable Time Stamping purpose? [Yes]/No "
 msgstr "Habilitat la finalitat de marcatge temporal? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1041
+#: ../src/ca-cli-callbacks.c:1050
 #, c-format
 msgid "* Time Stamping purpose disabled by policy\n"
 msgstr "Finalitat de marcatge temporal deshabilitada per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1045
+#: ../src/ca-cli-callbacks.c:1054
 msgid "Enable OCSP Signing purpose? [Yes]/No "
 msgstr "Habilitar la finalitat per a la signatura d'OCSP? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1046
+#: ../src/ca-cli-callbacks.c:1055
 #, c-format
 msgid "* OCSP Signing purpose disabled by policy\n"
 msgstr ""
 "* Finalitat per a la signatura d'OCSP deshabilitada per una directiva\n"
 
-#: ../src/ca-cli-callbacks.c:1050
+#: ../src/ca-cli-callbacks.c:1059
 msgid "Enable any purpose? [Yes]/No "
 msgstr "Habilitar l'ús per a qualsevol finalitat? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1052
+#: ../src/ca-cli-callbacks.c:1061
 #, c-format
 msgid "* Any purpose disabled by policy\n"
 msgstr ""
 "* L'ús per a qualsevol finalitat s'ha deshabilitat amb una directiva.\n"
 
-#: ../src/ca-cli-callbacks.c:1060
+#: ../src/ca-cli-callbacks.c:1069
 msgid ""
 "All the mandatory data for the certificate generation has been gathered."
 msgstr ""
 "S'ha obtingut tota la informació necessària per la generació del certificat."
 
-#: ../src/ca-cli-callbacks.c:1060
+#: ../src/ca-cli-callbacks.c:1069
 msgid "Do you want to proceed with the signing? [Yes]/No "
 msgstr "Voleu continuar amb la signatura i generació del certificat? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1066
+#: ../src/ca-cli-callbacks.c:1075
 #, c-format
 msgid "Certificate signed.\n"
 msgstr "Certificat signat.\n"
 
-#: ../src/ca-cli-callbacks.c:1088
+#: ../src/ca-cli-callbacks.c:1097
 msgid "This Certificate Signing Request will be deleted."
 msgstr "La sol·licitud de signatura de certificat (CSR) s'esborrarà."
 
-#: ../src/ca-cli-callbacks.c:1088
+#: ../src/ca-cli-callbacks.c:1097
 msgid "This operation cannot be undone. Are you sure? Yes/[No] "
 msgstr "Aquesta operació no pot desfer-se. Esteu segur? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:1094
+#: ../src/ca-cli-callbacks.c:1103
 #, c-format
 msgid "Certificate Signing Request deleted.\n"
 msgstr "Sol·licitud de signatura de certificat esborrada.\n"
 
-#: ../src/ca-cli-callbacks.c:1119
+#: ../src/ca-cli-callbacks.c:1128
 #, c-format
 msgid "CRL generated successfully into file '%s'\n"
 msgstr "CRL generada amb èxit i desada al fitxer '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:1136
+#: ../src/ca-cli-callbacks.c:1145
 msgid "The bit-length of the prime number must be whole multiple of 1024"
 msgstr "La longitud en bits del nombre primer ha de ser múltiple enter de 1024"
 
-#: ../src/ca-cli-callbacks.c:1145
+#: ../src/ca-cli-callbacks.c:1154
 #, c-format
 msgid "Diffie-Hellman parameters created and saved successfully in file '%s'\n"
 msgstr ""
 "Els paràmetres Diffie-Hellman s'han creat i s'han desat correctament al "
 "fitxer '%s'\n"
 
-#: ../src/ca-cli-callbacks.c:1157
+#: ../src/ca-cli-callbacks.c:1166
 msgid "Currently, the database is not password-protected."
 msgstr "Actualment la base de dades no es troba protegida per contrasenya."
 
-#: ../src/ca-cli-callbacks.c:1157
+#: ../src/ca-cli-callbacks.c:1166
 msgid "Do you want to password protect it? [Yes]/No "
 msgstr "Desitgeu protegir-la amb contrasenya? [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1158
+#: ../src/ca-cli-callbacks.c:1167
 msgid ""
 "OK. You need to supply a password for protecting the private keys in the\n"
 "database, so nobody else but authorized people can use them. This password\n"
@@ -1647,37 +1647,37 @@ msgstr ""
 "faci ús de\n"
 "qualsevol clau privada a la base de dades."
 
-#: ../src/ca-cli-callbacks.c:1161
+#: ../src/ca-cli-callbacks.c:1170
 msgid "Insert password:"
 msgstr "Introduïu la contrasenya:"
 
-#: ../src/ca-cli-callbacks.c:1161
+#: ../src/ca-cli-callbacks.c:1170
 msgid "Insert password (confirm):"
 msgstr "Torneu a introduir la contrasenya:"
 
-#: ../src/ca-cli-callbacks.c:1162 ../src/ca-cli-callbacks.c:1232
+#: ../src/ca-cli-callbacks.c:1171 ../src/ca-cli-callbacks.c:1241
 msgid "The introduced passwords are distinct."
 msgstr "Les contrasenyes introduïdes són diferents."
 
-#: ../src/ca-cli-callbacks.c:1173
+#: ../src/ca-cli-callbacks.c:1182
 #, c-format
 msgid "Password established successfully.\n"
 msgstr "Contrasenya establerta amb èxit.\n"
 
-#: ../src/ca-cli-callbacks.c:1180
+#: ../src/ca-cli-callbacks.c:1189
 #, c-format
 msgid "Nothing done.\n"
 msgstr "No s'ha fet res.\n"
 
-#: ../src/ca-cli-callbacks.c:1184
+#: ../src/ca-cli-callbacks.c:1193
 msgid "Currently, the database IS password-protected."
 msgstr "Actualment la base de dades ESTÀ protegida amb contrasenya."
 
-#: ../src/ca-cli-callbacks.c:1184
+#: ../src/ca-cli-callbacks.c:1193
 msgid "Do you want to remove this password protection? Yes/[No] "
 msgstr "Desitgeu eliminar aquesta protecció amb contrasenya? Sí/[No] "
 
-#: ../src/ca-cli-callbacks.c:1188
+#: ../src/ca-cli-callbacks.c:1197
 #, c-format
 msgid ""
 "For removing the password-protection, the current database password\n"
@@ -1686,13 +1686,13 @@ msgstr ""
 "Per eliminar la protecció amb contrasenya, heu de proporcionar la \n"
 "contrasenya actual.\n"
 
-#: ../src/ca-cli-callbacks.c:1189 ../src/ca-cli-callbacks.c:1217
+#: ../src/ca-cli-callbacks.c:1198 ../src/ca-cli-callbacks.c:1226
 msgid "Please, insert the current database password (Empty to cancel): "
 msgstr ""
 "Introduïu la contrasenya actual de la base de dades (Buida per a "
 "cancel·lar): "
 
-#: ../src/ca-cli-callbacks.c:1196 ../src/ca-cli-callbacks.c:1224
+#: ../src/ca-cli-callbacks.c:1205 ../src/ca-cli-callbacks.c:1233
 msgid ""
 "The current password you have entered\n"
 "doesn't match with the actual current database password."
@@ -1700,7 +1700,7 @@ msgstr ""
 "La contrasenya actual introduïda\n"
 "no coincideix amb la contrasenya real de la base de dades."
 
-#: ../src/ca-cli-callbacks.c:1201
+#: ../src/ca-cli-callbacks.c:1210
 msgid ""
 "Error while removing database password. \n"
 "The operation was cancelled."
@@ -1708,12 +1708,12 @@ msgstr ""
 "S'ha produït un error al eliminar la contrasenya de\n"
 "la base de dades. S'ha cancel·lat l'operació."
 
-#: ../src/ca-cli-callbacks.c:1206
+#: ../src/ca-cli-callbacks.c:1215
 #, c-format
 msgid "Password removed successfully.\n"
 msgstr "Contrasenya eliminada amb èxit.\n"
 
-#: ../src/ca-cli-callbacks.c:1216
+#: ../src/ca-cli-callbacks.c:1225
 #, c-format
 msgid ""
 "You must supply the current database password before changing the password.\n"
@@ -1721,7 +1721,7 @@ msgstr ""
 "Ha de proporcionar la contrasenya actual de la base de dades abans de "
 "canviar-la.\n"
 
-#: ../src/ca-cli-callbacks.c:1228
+#: ../src/ca-cli-callbacks.c:1237
 msgid ""
 "OK. Now you must supply a new password for protecting the private keys in "
 "the\n"
@@ -1735,15 +1735,15 @@ msgstr ""
 "Aquesta contrasenya es demanarà sempre que gnoMint faci ús d'alguna clau\n"
 "privada a la base de dades."
 
-#: ../src/ca-cli-callbacks.c:1231
+#: ../src/ca-cli-callbacks.c:1240
 msgid "Insert new password:"
 msgstr "Introduïu la nova contrasenya:"
 
-#: ../src/ca-cli-callbacks.c:1231
+#: ../src/ca-cli-callbacks.c:1240
 msgid "Insert new password (confirm):"
 msgstr "Torneu a introduïr la contrasenya:"
 
-#: ../src/ca-cli-callbacks.c:1240
+#: ../src/ca-cli-callbacks.c:1249
 msgid ""
 "Error while changing database password. \n"
 "The operation was cancelled."
@@ -1751,296 +1751,296 @@ msgstr ""
 "S'ha produït un error al canviar la contrasenya de la base de dades. \n"
 "S'ha cancel·lat la operació"
 
-#: ../src/ca-cli-callbacks.c:1246
+#: ../src/ca-cli-callbacks.c:1255
 #, c-format
 msgid "Password changed successfully.\n"
 msgstr "La contrasenya s'ha canviat amb èxit.\n"
 
-#: ../src/ca-cli-callbacks.c:1264
+#: ../src/ca-cli-callbacks.c:1273
 msgid "Problem when importing the given file."
 msgstr "S'han produït problemes en importar el fitxer indicat."
 
-#: ../src/ca-cli-callbacks.c:1267
+#: ../src/ca-cli-callbacks.c:1276
 #, c-format
 msgid "File imported successfully.\n"
 msgstr "Fitxer importat amb èxit.\n"
 
-#: ../src/ca-cli-callbacks.c:1283
+#: ../src/ca-cli-callbacks.c:1292
 #, c-format
 msgid "Directory imported successfully.\n"
 msgstr "Directori importat amb èxit.\n"
 
-#: ../src/ca-cli-callbacks.c:1316
+#: ../src/ca-cli-callbacks.c:1325
 #, c-format
 msgid "Certificate:\n"
 msgstr "Certificat:\n"
 
-#: ../src/ca-cli-callbacks.c:1320
+#: ../src/ca-cli-callbacks.c:1329
 #, c-format
 msgid "\tSerial number: %s\n"
 msgstr "\tNúm. de sèrie: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1324 ../src/ca-cli-callbacks.c:1330
-#: ../src/ca-cli-callbacks.c:1389
+#: ../src/ca-cli-callbacks.c:1333 ../src/ca-cli-callbacks.c:1339
+#: ../src/ca-cli-callbacks.c:1398
 #, c-format
 msgid "\tDistinguished Name: %s\n"
 msgstr "\tNom distintiu (DN): %s\n"
 
-#: ../src/ca-cli-callbacks.c:1324 ../src/ca-cli-callbacks.c:1325
-#: ../src/ca-cli-callbacks.c:1330 ../src/ca-cli-callbacks.c:1331
+#: ../src/ca-cli-callbacks.c:1333 ../src/ca-cli-callbacks.c:1334
+#: ../src/ca-cli-callbacks.c:1339 ../src/ca-cli-callbacks.c:1340
 msgid "None."
 msgstr "Cap."
 
-#: ../src/ca-cli-callbacks.c:1325 ../src/ca-cli-callbacks.c:1331
-#: ../src/ca-cli-callbacks.c:1393
+#: ../src/ca-cli-callbacks.c:1334 ../src/ca-cli-callbacks.c:1340
+#: ../src/ca-cli-callbacks.c:1402
 #, c-format
 msgid "\tUnique ID: %s\n"
 msgstr "\tIdentificador únic: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1329
+#: ../src/ca-cli-callbacks.c:1338
 #, c-format
 msgid "Issuer:\n"
 msgstr "Emissor:\n"
 
-#: ../src/ca-cli-callbacks.c:1352
+#: ../src/ca-cli-callbacks.c:1361
 #, c-format
 msgid "Fingerprints:\n"
 msgstr "Empremtes digitals:\n"
 
-#: ../src/ca-cli-callbacks.c:1353
+#: ../src/ca-cli-callbacks.c:1362
 #, c-format
 msgid "\tSHA1 fingerprint: %s\n"
 msgstr "\tEmpremta digital SHA1: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1354
+#: ../src/ca-cli-callbacks.c:1363
 #, c-format
 msgid "\tMD5 fingerprint: %s\n"
 msgstr "\tEmpremta digital MD5: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1355
+#: ../src/ca-cli-callbacks.c:1364
 #, fuzzy, c-format
 msgid "\tSHA256 fingerprint: %s\n"
 msgstr "\tEmpremta digital SHA1: %s\n"
 
-#: ../src/ca-cli-callbacks.c:1386
+#: ../src/ca-cli-callbacks.c:1395
 #, c-format
 msgid "Certificate Signing Request:\n"
 msgstr "Sol·licitud de signatura de certificat:\n"
 
-#: ../src/ca-cli-callbacks.c:1463
+#: ../src/ca-cli-callbacks.c:1472
 msgid "Generated certs inherit Country from CA                           "
 msgstr ""
 "Els certificats generats hereten el país de la CA                           "
 
-#: ../src/ca-cli-callbacks.c:1464
+#: ../src/ca-cli-callbacks.c:1473
 msgid "Generated certs inherit State from CA                             "
 msgstr ""
 "Els certificats generats hereten l'estat/província de la "
 "CA                             "
 
-#: ../src/ca-cli-callbacks.c:1465
+#: ../src/ca-cli-callbacks.c:1474
 msgid "Generated certs inherit Locality from CA                          "
 msgstr ""
 "Els certificats generats hereten localitat o ciutat de la "
 "CA                          "
 
-#: ../src/ca-cli-callbacks.c:1466
+#: ../src/ca-cli-callbacks.c:1475
 msgid "Generated certs inherit Organization from CA                      "
 msgstr ""
 "Els certificats generats hereten l'Organització de la "
 "CA                      "
 
-#: ../src/ca-cli-callbacks.c:1467
+#: ../src/ca-cli-callbacks.c:1476
 msgid "Generated certs inherit Organizational Unit from CA               "
 msgstr ""
 "Els certificats generats hereten la unitat organitzacional de la "
 "CA               "
 
-#: ../src/ca-cli-callbacks.c:1468
+#: ../src/ca-cli-callbacks.c:1477
 msgid "Country in generated certs must be the same than in CA            "
 msgstr ""
 "El país dels certificats generats ha de coincidir amb la CA            "
 
-#: ../src/ca-cli-callbacks.c:1469
+#: ../src/ca-cli-callbacks.c:1478
 msgid "State in generated certs must be the same than in CA              "
 msgstr ""
 "L'Estat o província dels cert. generats ha de coincidir amb la "
 "CA              "
 
-#: ../src/ca-cli-callbacks.c:1470
+#: ../src/ca-cli-callbacks.c:1479
 msgid "Locality in generated certs must be the same than in CA           "
 msgstr ""
 "La localitat o ciutat dels cert. generats ha de coincidir amb la "
 "CA           "
 
-#: ../src/ca-cli-callbacks.c:1471
+#: ../src/ca-cli-callbacks.c:1480
 msgid "Organization in generated certs must be the same than in CA       "
 msgstr ""
 "L'organització dels cert. generats ha de coincidir amb la de la CA       "
 
-#: ../src/ca-cli-callbacks.c:1472
+#: ../src/ca-cli-callbacks.c:1481
 msgid "Organizational Unit in generated certs must be the same than in CA"
 msgstr "La Unitat Organitzativa dels cert. generats ha de coincidir amb la CA"
 
-#: ../src/ca-cli-callbacks.c:1473
+#: ../src/ca-cli-callbacks.c:1482
 msgid "Maximum number of hours between CRL updates                       "
 msgstr ""
 "Nombre màxim d'hores entre actualitzacions de CRLs                       "
 
-#: ../src/ca-cli-callbacks.c:1474
+#: ../src/ca-cli-callbacks.c:1483
 msgid "CRL distribution point (URL where CRL is published)               "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1475
+#: ../src/ca-cli-callbacks.c:1484
 msgid "Maximum number of months before expiration of new certs           "
 msgstr ""
 "Num. màxim de mesos abans de la caducitat dels nous certificats           "
 
-#: ../src/ca-cli-callbacks.c:1476
+#: ../src/ca-cli-callbacks.c:1485
 msgid "CA use enabled in generated certs                                 "
 msgstr ""
 "Habilitar l'ús com a CA en els certificats "
 "generats                                 "
 
-#: ../src/ca-cli-callbacks.c:1477
+#: ../src/ca-cli-callbacks.c:1486
 msgid "CRL Sign use enabled in generated certs                           "
 msgstr ""
 "Habilitar l'ús per a signatura de CRLs en els certificats "
 "generats                           "
 
-#: ../src/ca-cli-callbacks.c:1478
+#: ../src/ca-cli-callbacks.c:1487
 msgid "Non reputation use enabled in generated certs                     "
 msgstr ""
 "Habilitar l'ús per al no repudi en els certificats "
 "generats                     "
 
-#: ../src/ca-cli-callbacks.c:1479
+#: ../src/ca-cli-callbacks.c:1488
 msgid "Digital signature use enabled in generated certs                  "
 msgstr ""
 "Habilita l'ús per a la signatura digital en els cert. "
 "generats                  "
 
-#: ../src/ca-cli-callbacks.c:1480
+#: ../src/ca-cli-callbacks.c:1489
 msgid "Key encipherment use enabled in generated certs                   "
 msgstr ""
 "Habilita l'ús per al xifratge de claus en els cert. "
 "generats                   "
 
-#: ../src/ca-cli-callbacks.c:1481
+#: ../src/ca-cli-callbacks.c:1490
 msgid "Key agreement use enabled in generated certs                      "
 msgstr ""
 "Habilita l'ús per a la negociació de claus en els cert. "
 "generats                      "
 
-#: ../src/ca-cli-callbacks.c:1482
+#: ../src/ca-cli-callbacks.c:1491
 msgid "Data encipherment use enabled in generated certs                  "
 msgstr ""
 "Habilita l'ús per al xifratge de dades en els cert. "
 "generats                  "
 
-#: ../src/ca-cli-callbacks.c:1483
+#: ../src/ca-cli-callbacks.c:1492
 msgid "TLS web server purpose enabled in generated certs                 "
 msgstr ""
 "Habilita la finalitat de servidor web TLS per als cert. "
 "generats                 "
 
-#: ../src/ca-cli-callbacks.c:1484
+#: ../src/ca-cli-callbacks.c:1493
 msgid "TLS web client purpose enabled in generated certs                 "
 msgstr ""
 "Habilita la finalitat de client web TLS per als cert. "
 "generats                 "
 
-#: ../src/ca-cli-callbacks.c:1485
+#: ../src/ca-cli-callbacks.c:1494
 msgid "Time stamping purpose enabled in generated certs                  "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1486
+#: ../src/ca-cli-callbacks.c:1495
 msgid "Code signing server purpose enabled in generated certs            "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1487
+#: ../src/ca-cli-callbacks.c:1496
 msgid "Email protection purpose enabled in generated certs               "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1488
+#: ../src/ca-cli-callbacks.c:1497
 msgid "OCSP signing purpose enabled in generated certs                   "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1489
+#: ../src/ca-cli-callbacks.c:1498
 msgid "Any purpose enabled in generated certs                            "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1503
+#: ../src/ca-cli-callbacks.c:1512
 #, c-format
 msgid "Showing policies of the following certificate:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1505
+#: ../src/ca-cli-callbacks.c:1514
 #, c-format
 msgid ""
 "\n"
 "Policies:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1507
+#: ../src/ca-cli-callbacks.c:1516
 #, c-format
 msgid "Id.\tDescription\t\t\t\t\t\t\t\tValue\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1533
+#: ../src/ca-cli-callbacks.c:1542
 msgid "The given policy id is not valid"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1545
+#: ../src/ca-cli-callbacks.c:1554
 #, c-format
 msgid ""
 "You are about to assign to the policy\n"
 "'%s' the new value '%s'."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1549 ../src/ca-cli-callbacks.c:1593
+#: ../src/ca-cli-callbacks.c:1558 ../src/ca-cli-callbacks.c:1602
 msgid "Are you sure? Yes/[No] : "
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1554
+#: ../src/ca-cli-callbacks.c:1563
 #, c-format
 msgid "Policy set correctly to '%s'.\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1568
+#: ../src/ca-cli-callbacks.c:1577
 #, c-format
 msgid "gnoMint-cli current preferences:\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1570
+#: ../src/ca-cli-callbacks.c:1579
 #, c-format
 msgid "Id.\tName\t\t\tValue\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1571
+#: ../src/ca-cli-callbacks.c:1580
 #, c-format
 msgid "0\tGnome keyring support\t%d\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1583
+#: ../src/ca-cli-callbacks.c:1592
 msgid "The given preference id is not valid"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1589
+#: ../src/ca-cli-callbacks.c:1598
 #, c-format
 msgid ""
 "You are about to assign to the preference 'Gnome keyring support' the new "
 "value '%d'."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1611
+#: ../src/ca-cli-callbacks.c:1620
 #, c-format
 msgid ""
 "%s version %s\n"
 "%s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1612
+#: ../src/ca-cli-callbacks.c:1621
 #, c-format
 msgid ""
 "\n"
@@ -2049,7 +2049,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1613 ../src/ca-cli-callbacks.c:1614
+#: ../src/ca-cli-callbacks.c:1622 ../src/ca-cli-callbacks.c:1623
 #: ../src/main.c:544
 msgid "translator-credits"
 msgstr ""
@@ -2057,14 +2057,14 @@ msgstr ""
 "  David Marín https://launchpad.net/~davefx\n"
 "  Sergio Oller https://launchpad.net/~zeehio"
 
-#: ../src/ca-cli-callbacks.c:1614
+#: ../src/ca-cli-callbacks.c:1623
 #, c-format
 msgid ""
 "Translators:\n"
 "%s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1621
+#: ../src/ca-cli-callbacks.c:1630
 msgid ""
 "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
 "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
@@ -2082,7 +2082,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1639
+#: ../src/ca-cli-callbacks.c:1648
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -2099,204 +2099,204 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1654
+#: ../src/ca-cli-callbacks.c:1663
 #, c-format
 msgid "%s version %s\n"
 msgstr "%s versió %s\n"
 
-#: ../src/ca-cli-callbacks.c:1663
+#: ../src/ca-cli-callbacks.c:1672
 #, c-format
 msgid "Available commands:\n"
 msgstr "Ordres disponibles:\n"
 
-#: ../src/ca-cli-callbacks.c:1664
+#: ../src/ca-cli-callbacks.c:1673
 #, c-format
 msgid "===================\n"
 msgstr "===================\n"
 
-#: ../src/ca-cli-callbacks.c:1674
+#: ../src/ca-cli-callbacks.c:1683
 #, c-format
 msgid "Exiting gnomint-cli...\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1715
+#: ../src/ca-cli-callbacks.c:1724
 #, fuzzy
 msgid "The given CA id is not valid"
 msgstr "L'identificador de la CA proporcionat no és vàlid"
 
-#: ../src/ca-cli-callbacks.c:1727
+#: ../src/ca-cli-callbacks.c:1736
 msgid "Certificate type must be 'web' or 'email'"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1733
+#: ../src/ca-cli-callbacks.c:1742
 msgid "Server name cannot be empty"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1737
+#: ../src/ca-cli-callbacks.c:1746
 #, fuzzy, c-format
 msgid "Creating %s certificate for: %s\n"
 msgstr "Creant un certificat arrel de la CA"
 
-#: ../src/ca-cli-callbacks.c:1738
+#: ../src/ca-cli-callbacks.c:1747
 #, fuzzy
 msgid "web server"
 msgstr "Servidor web TLS"
 
-#: ../src/ca-cli-callbacks.c:1738
+#: ../src/ca-cli-callbacks.c:1747
 #, fuzzy
 msgid "email server"
 msgstr "Servidor web TLS"
 
-#: ../src/ca-cli-callbacks.c:1814
+#: ../src/ca-cli-callbacks.c:1823
 #, c-format
 msgid "Error: Key generation failed: %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1822
+#: ../src/ca-cli-callbacks.c:1831
 #, fuzzy, c-format
 msgid "Error: CSR generation failed: %s\n"
 msgstr "Nombre de CSRs en el fitxer: %d\n"
 
-#: ../src/ca-cli-callbacks.c:1831
+#: ../src/ca-cli-callbacks.c:1840
 #, c-format
 msgid "Error: Failed to parse generated CSR\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1842
+#: ../src/ca-cli-callbacks.c:1851
 #, c-format
 msgid "Error: Failed to save CSR: %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1856
+#: ../src/ca-cli-callbacks.c:1865
 msgid "CSR created with ID: %"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1880
+#: ../src/ca-cli-callbacks.c:1889
 #, fuzzy, c-format
 msgid "Error: Failed to sign certificate: %s\n"
 msgstr "S'ha produït un error signant el certificat"
 
-#: ../src/ca-cli-callbacks.c:1887
+#: ../src/ca-cli-callbacks.c:1896
 #, fuzzy, c-format
 msgid "Certificate generated successfully for: %s\n"
 msgstr "Certificat exportat amb èxit."
 
-#: ../src/ca-cli-callbacks.c:1888
+#: ../src/ca-cli-callbacks.c:1897
 #, fuzzy, c-format
 msgid "Certificate type: %s\n"
 msgstr "Usos del certificat:\n"
 
-#: ../src/ca-cli-callbacks.c:1888
+#: ../src/ca-cli-callbacks.c:1897
 #, fuzzy
 msgid "Web Server"
 msgstr "Servidor web TLS"
 
-#: ../src/ca-cli-callbacks.c:1888
+#: ../src/ca-cli-callbacks.c:1897
 msgid "Email Server"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1902
+#: ../src/ca-cli-callbacks.c:1911
 #, fuzzy
 msgid "Usage: renewcert <cert-id>"
 msgstr "showcert <id del certificat>"
 
-#: ../src/ca-cli-callbacks.c:1907 ../src/ca-cli-callbacks.c:1938
+#: ../src/ca-cli-callbacks.c:1916 ../src/ca-cli-callbacks.c:1947
 #, fuzzy
 msgid "The given certificate id is not valid"
 msgstr "L'identificador de certificat proporcionat no és vàlid"
 
-#: ../src/ca-cli-callbacks.c:1911
+#: ../src/ca-cli-callbacks.c:1920
 msgid ""
 "gnoMint will issue a new certificate with the same subject and SAN as this "
 "one, signed by the same CA, with a fresh keypair. The old certificate stays "
 "in place."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1914
+#: ../src/ca-cli-callbacks.c:1923
 #, fuzzy
 msgid "Renew? [Yes]/No "
 msgstr "Esteu segur [Sí]/No "
 
-#: ../src/ca-cli-callbacks.c:1925
+#: ../src/ca-cli-callbacks.c:1934
 msgid "Certificate renewed. New certificate id: %"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1933
+#: ../src/ca-cli-callbacks.c:1942
 #, fuzzy
 msgid "Usage: exportchain <cert-id> <filename>"
 msgstr "extractcertpkey <id. del certificat> <nom del fitxer>"
 
-#: ../src/ca-cli-callbacks.c:1944
+#: ../src/ca-cli-callbacks.c:1953
 msgid "Cannot build chain PEM for that certificate."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1949
+#: ../src/ca-cli-callbacks.c:1958
 #, fuzzy
 msgid "Cannot write chain file."
 msgstr "Afegir certificat de la CA auto-signat"
 
-#: ../src/ca-cli-callbacks.c:1955
+#: ../src/ca-cli-callbacks.c:1964
 #, c-format
 msgid "Full chain (leaf → root) written to %s\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1962
+#: ../src/ca-cli-callbacks.c:1971
 msgid "Usage: revokemany <cert-id> [cert-id ...]"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:1978
+#: ../src/ca-cli-callbacks.c:1987
 #, fuzzy, c-format
 msgid "%d certificate revoked.\n"
 msgid_plural "%d certificates revoked.\n"
 msgstr[0] "Certificat revocat.\n"
 msgstr[1] "Certificat revocat.\n"
 
-#: ../src/ca-cli-callbacks.c:1986
+#: ../src/ca-cli-callbacks.c:1995
 msgid "Usage: deletemany <csr-id> [csr-id ...]"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:2002
+#: ../src/ca-cli-callbacks.c:2011
 #, c-format
 msgid "%d CSR deleted.\n"
 msgid_plural "%d CSRs deleted.\n"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/ca-cli-callbacks.c:2062
+#: ../src/ca-cli-callbacks.c:2071
 msgid "Usage: search <pattern>"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:2069
+#: ../src/ca-cli-callbacks.c:2078
 #, c-format
 msgid "Matches (id\tserial\tsubject):\n"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:2072
+#: ../src/ca-cli-callbacks.c:2081
 #, c-format
 msgid "%d match.\n"
 msgid_plural "%d matches.\n"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/ca-cli-callbacks.c:2096
+#: ../src/ca-cli-callbacks.c:2105
 #, fuzzy, c-format
 msgid "'%s' is not a certificate id in this database."
 msgstr "_Obre una base de dades de certificats"
 
-#: ../src/ca-cli-callbacks.c:2104
+#: ../src/ca-cli-callbacks.c:2113
 #, c-format
 msgid "Cannot read PEM for cert id %s."
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:2122
+#: ../src/ca-cli-callbacks.c:2131
 msgid "Usage: diff <cert-id-or-path> <cert-id-or-path>"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:2138
+#: ../src/ca-cli-callbacks.c:2147
 msgid "Field"
 msgstr ""
 
-#: ../src/ca-cli-callbacks.c:2151
+#: ../src/ca-cli-callbacks.c:2160
 #, c-format
 msgid ""
 "\n"
@@ -2723,7 +2723,7 @@ msgstr ""
 msgid "CSR generated successfully"
 msgstr ""
 
-#: ../src/csr_properties.c:77 ../src/new_cert.c:273 ../src/new_cert.c:280
+#: ../src/csr_properties.c:77 ../src/new_cert.c:279
 #, fuzzy
 msgid "None"
 msgstr "Cap."
@@ -2734,22 +2734,22 @@ msgid ""
 "in a external file.</b>"
 msgstr ""
 
-#: ../src/dialog.c:103
+#: ../src/dialog.c:108
 #, c-format
 msgid ""
 "\n"
 "The password must have, at least, %d characters\n"
 msgstr ""
 
-#: ../src/dialog.c:127
+#: ../src/dialog.c:132
 msgid "List of affirmative answers, separated with #|Yes#yes#Y#y"
 msgstr ""
 
-#: ../src/dialog.c:128
+#: ../src/dialog.c:133
 msgid "List of negative answers, separated with #|No#no#N#n"
 msgstr ""
 
-#: ../src/dialog.c:396
+#: ../src/dialog.c:401
 msgid "To do. Feature not implemented yet."
 msgstr ""
 
@@ -3031,37 +3031,37 @@ msgstr "Mida en bits de la clau privada:"
 msgid "ECDSA curve:"
 msgstr ""
 
-#: ../src/new_cert.c:350
+#: ../src/new_cert.c:377
 msgid ""
 "The policy of this CA obligue the country field of the certificates to be "
 "the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert.c:356
+#: ../src/new_cert.c:383
 msgid ""
 "The policy of this CA obligue the state/province field of the certificates "
 "to be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert.c:362
+#: ../src/new_cert.c:389
 msgid ""
 "The policy of this CA obligue the locality/city field of the certificates to "
 "be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert.c:368
+#: ../src/new_cert.c:395
 msgid ""
 "The policy of this CA obligue the organization field of the certificates to "
 "be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert.c:374
+#: ../src/new_cert.c:401
 msgid ""
 "The policy of this CA obligue the organizational unit field of the "
 "certificates to be the same as the one in the CA cert."
 msgstr ""
 
-#: ../src/new_cert.c:831
+#: ../src/new_cert.c:876
 msgid ""
 "The expiration date of the new certificate is after the expiration date of "
 "the CA certificate.\n"
@@ -3070,7 +3070,7 @@ msgid ""
 "will be created with the same expiration date as the CA certificate."
 msgstr ""
 
-#: ../src/new_cert.c:847
+#: ../src/new_cert.c:892
 msgid "Error while signing CSR."
 msgstr ""
 

@@ -761,6 +761,81 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario 6b: SAN editor is present in the sign-CSR dialog (#40)   */
+/* ------------------------------------------------------------------ */
+
+extern GtkBuilder *new_cert_window_gtkb;
+extern GtkWidget  *new_cert_san_manager;
+
+static int
+scenario_sign_csr_has_san_editor (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: sign-CSR has SAN editor (issue #40)\n");
+    if (!test_init_main_window () || !fixture_setup ())
+        return 1;
+    if (!ca_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("san-editor", "ca_open(%s) failed", fixture_path);
+        goto out;
+    }
+    if (!select_row_by_id ("1", 1)) {
+        fail_test ("san-editor", "fixture CSR id=1 missing");
+        goto out;
+    }
+
+    /* Open the dialog WITHOUT auto-dismissing — the dismiss timer
+     * could destroy it before we get to inspect san_alignment.
+     * ca_on_sign1_activate calls new_cert_window_display which builds
+     * the dialog synchronously, attaches the SAN editor, and shows
+     * it. We check immediately, then tear it down by hand. */
+    ca_on_sign1_activate (NULL, NULL);
+
+    if (!new_cert_window_gtkb) {
+        fail_test ("san-editor", "new_cert_window_gtkb is NULL after sign");
+        goto out;
+    }
+
+    /* The san_alignment container must exist and have a child (the
+     * san_manager_widget added at runtime). */
+    GObject *container = gtk_builder_get_object (new_cert_window_gtkb,
+                                                  "san_alignment");
+    if (!container || !GTK_IS_CONTAINER (container)) {
+        fail_test ("san-editor", "san_alignment widget missing from .ui");
+        goto out;
+    }
+    GList *kids = gtk_container_get_children (GTK_CONTAINER (container));
+    int n_kids = g_list_length (kids);
+    g_list_free (kids);
+    if (n_kids == 0) {
+        fail_test ("san-editor",
+                   "san_alignment is empty — SAN editor wasn't attached");
+        goto out;
+    }
+    fprintf (stderr, "    san_alignment has %d child(ren); editor live\n",
+             n_kids);
+
+    if (!new_cert_san_manager) {
+        fail_test ("san-editor", "new_cert_san_manager global is NULL");
+        goto out;
+    }
+
+    /* Tear the dialog down manually so the next scenario starts clean. */
+    GObject *win = gtk_builder_get_object (new_cert_window_gtkb,
+                                            "new_cert_window");
+    if (win && GTK_IS_WIDGET (win))
+        gtk_widget_destroy (GTK_WIDGET (win));
+    drain_events ();
+
+    int crits = critical_messages_check_and_reset ("san-editor");
+    rc = (crits == 0) ? 0 : 1;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    return rc;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scenario 7 (Phase 2B): revoke cert                                */
 /* ------------------------------------------------------------------ */
 
@@ -1869,6 +1944,7 @@ main (int argc, char **argv)
         scenario_view_properties_full ();
         scenario_extract_private_key ();
         scenario_sign_csr ();
+        scenario_sign_csr_has_san_editor ();
         scenario_revoke_cert ();
         scenario_wizard_window ();
         scenario_keylength_selector ();
