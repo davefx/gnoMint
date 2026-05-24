@@ -379,23 +379,23 @@ gchar * __certificate_properties_dump_key_usage(guint key_usage)
 	gchar *result = g_new0 (gchar, BUFFER_SIZE_MAX + 1);
 	gchar *buffer_iterator = result;
 	if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Digital signature"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Digital signature"));
 	if (key_usage & GNUTLS_KEY_NON_REPUDIATION)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Non repudiation"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Non repudiation"));
 	if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key encipherment"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Key encipherment"));
 	if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Data encipherment"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Data encipherment"));
 	if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key agreement"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Key agreement"));
 	if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Certificate signing"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Certificate signing"));
 	if (key_usage & GNUTLS_KEY_CRL_SIGN)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("CRL signing"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("CRL signing"));
 	if (key_usage & GNUTLS_KEY_ENCIPHER_ONLY)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key encipherment only"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Key encipherment only"));
 	if (key_usage & GNUTLS_KEY_DECIPHER_ONLY)
-		buffer_iterator += sprintf(buffer_iterator, "%s\n", _("Key decipherment only"));
+		buffer_iterator += snprintf(buffer_iterator, BUFFER_SIZE_MAX - (buffer_iterator - result), "%s\n", _("Key decipherment only"));
 	*(buffer_iterator - 1) = 0;
 	return result;
 }
@@ -407,7 +407,7 @@ void __certificate_properties_fill_cert_version(GtkTreeStore *store, GtkTreeIter
 	GtkTreeIter j;
 
 	result = gnutls_x509_crt_get_version(*certificate);
-	sprintf(value, "v%d", result);
+	snprintf(value, sizeof(value), "v%d", result);
 	gtk_tree_store_append(store, &j, parent);
 	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Version"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
 }
@@ -1011,7 +1011,7 @@ void __certificate_properties_fill_cert_ext_ExtKeyUsage (GtkTreeStore *store,
 			return;
 		}
 		label = __certificate_properties_lookup_oid_label(certificate_properties_oid_label_table, buffer);
-		usage_buffer_iterator += sprintf(usage_buffer_iterator, "%s\n", label);
+		usage_buffer_iterator += snprintf(usage_buffer_iterator, BUFFER_SIZE_MAX - (usage_buffer_iterator - usage_buffer), "%s\n", label);
 	}
 
 	*(usage_buffer_iterator - 1) = 0;
