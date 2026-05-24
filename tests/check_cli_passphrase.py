@@ -165,6 +165,32 @@ def bootstrap_ca(fd, cn):
     expect(fd, "gnoMint > ")
 
 
+def bootstrap_csr(fd, cn):
+    """Drive addcsr (no inheritance) to create one CSR. Same prompt
+    sequence as bootstrap_ca minus the months-before-expiration step
+    (CSRs take validity from the CA at signing time)."""
+    send(fd, "addcsr")
+    for _ in range(5):
+        expect(fd, ": ")
+        send(fd, "")           # blank C/ST/L/O/OU
+    expect(fd, ": ")
+    send(fd, cn)               # CN
+    expect(fd, ": ")
+    send(fd, "")               # email
+    expect(fd, ": ")
+    send(fd, "")               # SAN
+    expect(fd, "[RSA]")
+    send(fd, "RSA")
+    expect(fd, "Enter bitlength")
+    send(fd, "1024")
+    expect(fd, "change anything")
+    send(fd, "no")
+    expect(fd, "Are you sure")
+    send(fd, "yes")
+    expect(fd, "CSR generated successfully")
+    expect(fd, "gnoMint > ")
+
+
 def scenario_extractcertpkey(tmpdir):
     db = os.path.join(tmpdir, "ec.gnomint")
     key_out = os.path.join(tmpdir, "ec.key.pem")
@@ -207,6 +233,51 @@ def scenario_extractcertpkey(tmpdir):
             f"extracted key lacks PEM markers (got: {data[:80]!r})"
         )
     print("  scenario_extractcertpkey OK")
+
+
+def scenario_extractcsrpkey(tmpdir):
+    """Same shape as scenario_extractcertpkey but for a CSR row."""
+    db = os.path.join(tmpdir, "ecsr.gnomint")
+    key_out = os.path.join(tmpdir, "ecsr.key.pem")
+
+    pid, fd = spawn_cli(db)
+    try:
+        expect(fd, "gnoMint > ")
+        bootstrap_ca(fd, "CSR Parent CA")
+        bootstrap_csr(fd, "Throwaway CSR")
+
+        send(fd, f"extractcsrpkey 1 {key_out}")
+        expect(fd, "supply a passphrase")
+        send_passphrase(fd, PASSPHRASE)
+        expect(fd, "extracted successfully")
+        expect(fd, "gnoMint > ")
+        send(fd, "quit")
+        time.sleep(0.3)
+    finally:
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+        try:
+            os.waitpid(pid, 0)
+        except OSError:
+            pass
+
+    if not os.path.isfile(key_out):
+        raise AssertionError(f"extractcsrpkey didn't create {key_out}")
+    with open(key_out) as f:
+        data = f.read()
+    expected_markers = (
+        "BEGIN ENCRYPTED PRIVATE KEY",
+        "BEGIN PRIVATE KEY",
+        "BEGIN RSA PRIVATE KEY",
+        "BEGIN EC PRIVATE KEY",
+    )
+    if not any(m in data for m in expected_markers):
+        raise AssertionError(
+            f"extracted CSR key lacks PEM markers (got: {data[:80]!r})"
+        )
+    print("  scenario_extractcsrpkey OK")
 
 
 def scenario_changepassword(tmpdir):
@@ -257,11 +328,13 @@ def main():
     tmpdir = tempfile.mkdtemp(prefix="gnomint-pty-")
     try:
         scenario_extractcertpkey(tmpdir)
+        scenario_extractcsrpkey(tmpdir)
         scenario_changepassword(tmpdir)
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-    print("PASS: extractcertpkey + changepassword exercised under a pty")
+    print("PASS: extractcertpkey + extractcsrpkey + changepassword "
+          "exercised under a pty")
     return 0
 
 

@@ -14,7 +14,7 @@ TESTS = check_y2k38 check_ui_consistency check_workflows \
         check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
         check_cli_info.sh check_cli_lifecycle.sh \
         check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
-        check_cli_dhgen.sh check_cli_passphrase.py
+        check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py
 check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 
 # Per-test wrapper: only check_workflows runs under a headless Wayland
@@ -25,7 +25,8 @@ check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
 EXTRA_DIST = run-headless.sh check_cli_email.sh check_cli_wizard.sh \
              check_cli_parity.sh check_cli_info.sh check_cli_lifecycle.sh \
              check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
-             check_cli_dhgen.sh check_cli_passphrase.py
+             check_cli_importdir.sh check_cli_dhgen.sh \
+             check_cli_passphrase.py
 
 # ---------------------------------------------------------------
 # Y2K38 verification — no GUI dependencies, just stdio + time.h.
