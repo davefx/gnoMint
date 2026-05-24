@@ -1759,6 +1759,31 @@ scenario_expiry_banner (void)
     }
     fprintf (stderr, "    no-amber state: banner hidden OK\n");
 
+    /* "Show them" response handler (#56 follow-up): exercise the
+     * response handler directly. CA_BANNER_RESPONSE_SHOW_THEM == 100
+     * (defined in src/ca.c). After firing the response, the global
+     * ca_view_only_expiring should be TRUE. After firing the CLOSE
+     * response, it should be FALSE again. */
+    extern gboolean ca_view_only_expiring;
+    extern void ca_expiry_infobar_response (GtkInfoBar *bar, gint resp,
+                                            gpointer user_data);
+    ca_view_only_expiring = FALSE;
+    ca_expiry_infobar_response (GTK_INFO_BAR (bar), 100, NULL);
+    if (!ca_view_only_expiring) {
+        fail_test ("expiry-banner",
+                   "Show-them response didn't set ca_view_only_expiring");
+        goto out;
+    }
+    fprintf (stderr, "    Show-them response → only-expiring mode OK\n");
+
+    ca_expiry_infobar_response (GTK_INFO_BAR (bar), GTK_RESPONSE_CLOSE, NULL);
+    if (ca_view_only_expiring) {
+        fail_test ("expiry-banner",
+                   "Close response didn't clear ca_view_only_expiring");
+        goto out;
+    }
+    fprintf (stderr, "    Close response → only-expiring cleared OK\n");
+
     rc = 0;
 
 out:

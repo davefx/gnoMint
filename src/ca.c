@@ -151,6 +151,17 @@ static gint ca_expiring_soon_count = 0;
  * we don't show it again until the user re-opens the file. */
 static gboolean ca_expiry_infobar_dismissed = FALSE;
 
+/* "Show only expiring" filter mode (#56): when TRUE, the row-add
+ * function skips any non-amber leaf row. CAs are always shown so the
+ * tree hierarchy stays intact. Activated by the banner's "Show them"
+ * action button; reset when the banner is dismissed or a new file is
+ * opened. Non-static so the test scenario can flip it directly. */
+gboolean ca_view_only_expiring = FALSE;
+
+/* Custom GtkInfoBar response id for the banner's "Show them" button.
+ * Chosen well outside the GtkResponseType range so it can't collide. */
+#define CA_BANNER_RESPONSE_SHOW_THEM 100
+
 /* Active search text for the filter box (#53). When non-empty, leaf
  * certificates whose subject/serial doesn't contain this substring
  * (case-insensitive) are hidden from the tree. Owned by ca.c; freed
@@ -385,8 +396,22 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	    preferences_get_expire_warning_days ());
 
 	/* Count amber rows so we can drive the expiry banner (#56). */
-	if (row_foreground && g_strcmp0 (row_foreground, "#cc7700") == 0)
+	gboolean is_amber = (row_foreground &&
+	                     g_strcmp0 (row_foreground, "#cc7700") == 0);
+	if (is_amber)
 		ca_expiring_soon_count++;
+
+	/* "Show only expiring" mode (#56 "Show them"): hide non-amber
+	 * leaves. CAs are always shown so the tree path to an amber
+	 * leaf stays visible. */
+	if (ca_view_only_expiring &&
+	    argv[CA_FILE_CERT_COLUMN_IS_CA] &&
+	    atoi (argv[CA_FILE_CERT_COLUMN_IS_CA]) == 0 &&
+	    !is_amber) {
+		if (last_id_value) g_free (last_id_value);
+		if (last_parent_route_value) g_free (last_parent_route_value);
+		return 0;
+	}
 
         if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])
                 gtk_tree_store_set (new_model, &iter,
@@ -750,15 +775,47 @@ gboolean ca_refresh_model_callback ()
 
 		if (bar && lbl && ca_expiring_soon_count > 0 &&
 		    !ca_expiry_infobar_dismissed && days > 0) {
-			gchar *msg = g_strdup_printf (
-			    ngettext ("<b>%d certificate</b> expires in the next %d days. "
-			              "Right-click it to renew with a fresh key.",
-			              "<b>%d certificates</b> expire in the next %d days. "
-			              "Right-click each one to renew with a fresh key.",
-			              ca_expiring_soon_count),
-			    ca_expiring_soon_count, days);
+			gchar *msg;
+			if (ca_view_only_expiring) {
+				msg = g_strdup_printf (
+				    ngettext (
+				        "Showing only the <b>%d certificate</b> expiring "
+				        "in the next %d days. Close this banner to show "
+				        "everything again.",
+				        "Showing only the <b>%d certificates</b> expiring "
+				        "in the next %d days. Close this banner to show "
+				        "everything again.",
+				        ca_expiring_soon_count),
+				    ca_expiring_soon_count, days);
+			} else {
+				msg = g_strdup_printf (
+				    ngettext (
+				        "<b>%d certificate</b> expires in the next %d days. "
+				        "Right-click it to renew with a fresh key.",
+				        "<b>%d certificates</b> expire in the next %d days. "
+				        "Right-click each one to renew with a fresh key.",
+				        ca_expiring_soon_count),
+				    ca_expiring_soon_count, days);
+			}
 			gtk_label_set_markup (lbl, msg);
 			g_free (msg);
+
+			/* Add the "Show them" action button on first show. The
+			 * GtkInfoBar widget itself owns the button once added; we
+			 * don't want to add it again on every refresh, so we
+			 * stash a flag on the widget. */
+			if (!g_object_get_data (G_OBJECT (bar), "show-them-added")) {
+				gtk_info_bar_add_button (GTK_INFO_BAR (bar),
+				                         _("_Show them"),
+				                         CA_BANNER_RESPONSE_SHOW_THEM);
+				g_object_set_data (G_OBJECT (bar), "show-them-added",
+				                   GINT_TO_POINTER (1));
+			}
+			/* Don't offer "Show them" if we're already in that mode. */
+			GtkWidget *button = gtk_info_bar_get_action_area (GTK_INFO_BAR (bar));
+			if (button) {
+				gtk_widget_set_sensitive (button, !ca_view_only_expiring);
+			}
 			gtk_widget_show (bar);
 		} else if (bar) {
 			gtk_widget_hide (bar);
@@ -809,8 +866,21 @@ ca_expiry_infobar_response (GtkInfoBar *bar,
                             gint        response,
                             gpointer    user_data G_GNUC_UNUSED)
 {
+	if (response == CA_BANNER_RESPONSE_SHOW_THEM) {
+		/* Enter "show only expiring" filter mode and refresh. The
+		 * banner stays visible (text changes to reflect the mode);
+		 * closing it both clears the filter and dismisses the banner. */
+		ca_view_only_expiring = TRUE;
+		ca_refresh_model_callback ();
+		return;
+	}
 	if (response == GTK_RESPONSE_CLOSE || response == -7 /* close button */) {
 		ca_expiry_infobar_dismissed = TRUE;
+		if (ca_view_only_expiring) {
+			/* Restore the full view too. */
+			ca_view_only_expiring = FALSE;
+			ca_refresh_model_callback ();
+		}
 		gtk_widget_hide (GTK_WIDGET (bar));
 	}
 }
@@ -2100,6 +2170,7 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 	/* Re-arm the expiry banner for the freshly-opened file. */
 	ca_expiry_infobar_dismissed = FALSE;
+	ca_view_only_expiring = FALSE;
 
 	/* Reset the search filter so the new DB starts with everything
 	 * visible — both internally and in the entry widget. */
