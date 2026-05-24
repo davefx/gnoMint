@@ -34,10 +34,16 @@
 #include "pkey_manage.h"
 #include "preferences-gui.h"
 #include "new_cert.h"
+#ifndef GNOMINTCLI
+#  include "san_manager.h"
+#endif
 
 #ifndef GNOMINTCLI
 GtkBuilder * new_cert_window_gtkb = NULL;
 GtkTreeStore * new_cert_ca_list_model = NULL;
+#ifndef GNOMINTCLI
+GtkWidget *new_cert_san_manager = NULL;  /* SAN editor for issue #40 */
+#endif
 
 
 enum {NEW_CERT_CA_MODEL_COLUMN_ID=0,
@@ -273,12 +279,33 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 		gtk_label_set_text (GTK_LABEL(object), _("None"));
 	}
 
-	object = gtk_builder_get_object (new_cert_window_gtkb, "san_label");
-	if (csr_info->subject_alt_name && csr_info->subject_alt_name[0]) {
-		gtk_label_set_text (GTK_LABEL(object), csr_info->subject_alt_name);
-	} else {
-		gtk_label_set_text (GTK_LABEL(object), _("None"));
+#ifndef GNOMINTCLI
+	/* SAN editor (issue #40): replace the read-only san_label with a
+	 * live san_manager_widget pre-populated from the CSR. The
+	 * commit handler (on_new_cert_next2_clicked) reads
+	 * san_manager_get_string back into cert_creation_data so the
+	 * issued certificate carries whatever the CA operator chose,
+	 * not just the CSR's request. CLI doesn't have a SAN editor —
+	 * the CLI signing path keeps the CSR's SAN verbatim. */
+	{
+		GtkBuilder *san_builder = gtk_builder_new ();
+		gchar *san_ui = g_build_filename (PACKAGE_DATA_DIR, "gnomint",
+		                                   "san_manager_widget.ui", NULL);
+		gtk_builder_add_from_file (san_builder, san_ui, NULL);
+		g_free (san_ui);
+		new_cert_san_manager = san_manager_create (san_builder,
+		                                            "san_manager_vbox");
+		if (new_cert_san_manager) {
+			GtkWidget *box = GTK_WIDGET (gtk_builder_get_object (
+			    new_cert_window_gtkb, "san_alignment"));
+			gtk_container_add (GTK_CONTAINER (box), new_cert_san_manager);
+			gtk_widget_show_all (new_cert_san_manager);
+			if (csr_info->subject_alt_name && csr_info->subject_alt_name[0])
+				san_manager_set_string (new_cert_san_manager,
+				                        csr_info->subject_alt_name);
+		}
 	}
+#endif
 	
         object = gtk_builder_get_object (new_cert_window_gtkb, "signing_ca_treeview");
         __new_cert_populate_ca_treeview (GTK_TREE_VIEW(object));
@@ -764,7 +791,25 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->crl_distribution_point = ca_file_policy_get (ca_id, "CRL_DISTRIBUTION_POINT");
 
 	// SANs will be copied from the CSR by default
+#ifndef GNOMINTCLI
+	/* SAN editor (issue #40): read the (possibly-edited) SAN list back
+	 * from the manager widget. The empty string also means none, and
+	 * we normalise to NULL so the downstream tls_generate_certificate
+	 * path takes the no-SAN branch. */
+	if (new_cert_san_manager) {
+		gchar *edited_san = san_manager_get_string (new_cert_san_manager);
+		if (edited_san && *edited_san) {
+			cert_creation_data->subject_alt_name = edited_san;
+		} else {
+			g_free (edited_san);
+			cert_creation_data->subject_alt_name = NULL;
+		}
+	} else {
+		cert_creation_data->subject_alt_name = NULL;
+	}
+#else
 	cert_creation_data->subject_alt_name = NULL;
+#endif
 
 	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
 
