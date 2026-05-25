@@ -288,6 +288,25 @@ static void gnomint_activate(GtkApplication *app, gpointer user_data)
         ca_update_expired_view (preferences_get_expired_visible(), FALSE);
 
 
+	/* Fix toolbar icon paths: GtkImage file= in .ui uses bare
+	 * filenames; in GTK 4 these must be absolute paths. */
+	static const char *icon_widgets[] = {
+		"addcaimg", "addcsrimg", "extractpkeyimg", "signimg",
+		"wizardwebimg", "wizardemailimg", NULL
+	};
+	static const char *icon_files[] = {
+		"addca.png", "addcsr.png", "extractpkey.png", "sign.png",
+		"wizard-webserver.png", "wizard-email.png", NULL
+	};
+	for (int i = 0; icon_widgets[i]; i++) {
+		GtkImage *img = GTK_IMAGE(gtk_builder_get_object(main_window_gtkb, icon_widgets[i]));
+		if (img) {
+			gchar *path = g_build_filename(PACKAGE_DATA_DIR, "gnomint", icon_files[i], NULL);
+			gtk_image_set_from_file(img, path);
+			g_free(path);
+		}
+	}
+
 	/* GTK 4: signal auto-connection is no longer available via
 	 * gtk_builder_connect_signals(). Toolbar button handlers are
 	 * connected explicitly below; menu items use GActions instead. */
