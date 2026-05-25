@@ -21,8 +21,26 @@ sudo apt install gnomint
 sudo dnf install gnomint
 ```
 
-For the latest release (1.4.0 "Lazarus" and newer), you'll likely want
-to build from source.
+For the latest release (1.5.0 "Belt and Braces" and newer), you'll
+likely want to install via Flatpak or build from source.
+
+---
+
+## Flatpak
+
+The easiest way to run the latest gnoMint on any Linux distribution:
+
+```bash
+# Build and install from the repo manifest
+flatpak-builder --install --user build-flatpak \
+    net.sourceforge.gnomint.yml
+
+# Run
+flatpak run net.sourceforge.gnomint
+```
+
+The Flatpak bundles GnuTLS, libgcrypt, and all other dependencies
+inside the sandbox. It uses the GNOME 48 runtime for GTK 4.
 
 ---
 
@@ -32,13 +50,12 @@ to build from source.
 
 gnoMint links against:
 
-- **GTK 3** (≥ 3.18)
-- **GLib / GIO** (≥ 2.40)
-- **GnuTLS** (≥ 3.4)
+- **GTK 4** (≥ 4.6)
+- **GLib / GIO** (≥ 2.66)
+- **GnuTLS** (≥ 2.0; ≥ 2.7.4 for advanced features)
 - **libgcrypt**
 - **SQLite 3**
 - **GNU readline** (for `gnomint-cli`)
-- **gdk-pixbuf 2**
 
 Build-time tools:
 
@@ -51,8 +68,8 @@ On Debian/Ubuntu the full set installs with:
 ```bash
 sudo apt install \
     build-essential autoconf automake libtool intltool pkg-config \
-    libgtk-3-dev libglib2.0-dev libgnutls28-dev libgcrypt20-dev \
-    libsqlite3-dev libreadline-dev libgdk-pixbuf2.0-dev
+    libgtk-4-dev libglib2.0-dev libgnutls28-dev libgcrypt20-dev \
+    libsqlite3-dev libreadline-dev
 ```
 
 The same package list is used by gnoMint's CI workflow, so it stays in
@@ -73,7 +90,7 @@ From a release tarball, skip `autogen.sh` and start at `./configure`.
 
 The build produces two binaries:
 
-- `gnomint`     — the GTK 3 desktop application
+- `gnomint`     — the GTK 4 desktop application
 - `gnomint-cli` — the readline command-line interface
 
 Both are installed into `$prefix/bin` (default `/usr/local/bin`). UI
@@ -113,6 +130,6 @@ If `./configure` or `make` fails, please file a bug at
 including:
 
 - distribution + version (`lsb_release -a` or contents of `/etc/os-release`)
-- output of `pkg-config --modversion gtk+-3.0 gnutls glib-2.0 sqlite3`
+- output of `pkg-config --modversion gtk4 gnutls glib-2.0 sqlite3`
 - the failing line from `./configure` (or `config.log` if it bailed out)
 - the gnoMint version (release tarball name or `git describe`)
