@@ -105,6 +105,8 @@ extern gboolean ca_treeview_row_activated (GtkTreeView *, GtkTreePath *,
                                            GtkTreeViewColumn *, gpointer);
 
 extern void on_new_ca_privkey_type_toggle (GtkCheckButton *button, gpointer user_data);
+extern void gnomint_register_actions (GtkWindow *window, GtkApplication *app);
+extern gboolean on_main_window1_delete (GtkWindow *window);
 
 /* TLS helpers exercised by the email scenario. */
 extern void    tls_init (void);
@@ -1923,6 +1925,133 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario: application startup smoke test                          */
+/* ------------------------------------------------------------------ */
+
+static int
+scenario_application_startup (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: application startup smoke test\n");
+
+    if (!test_init_main_window ())
+        return 1;
+
+    GtkWidget *win_widget = GTK_WIDGET (gtk_builder_get_object (
+        main_window_gtkb, "main_window1"));
+    if (!win_widget) {
+        fail_test ("app-startup", "main_window1 widget is NULL");
+        return 1;
+    }
+
+    if (!GTK_IS_APPLICATION_WINDOW (win_widget)) {
+        fail_test ("app-startup",
+                   "main_window1 must be GtkApplicationWindow, got %s",
+                   G_OBJECT_TYPE_NAME (win_widget));
+        return 1;
+    }
+
+    GtkWindow *win = GTK_WINDOW (win_widget);
+    GtkApplication *app = gtk_application_new (
+        "org.gnome.gnomint.test", G_APPLICATION_DEFAULT_FLAGS);
+    g_application_register (G_APPLICATION (app), NULL, NULL);
+    gtk_window_set_application (win, app);
+
+    gnomint_register_actions (win, app);
+    drain_events ();
+    fprintf (stderr, "    gnomint_register_actions() succeeded\n");
+
+    static const char *win_action_names[] = {
+        "new-db", "open-db", "save-as", "add-ca", "add-csr",
+        "wizard-web", "wizard-email", "extract-pkey", "renew",
+        "revoke", "sign", "delete", "generate-crl", "generate-dh",
+        "change-password", "import", "export", "export-chain",
+        "bulk-revoke", "bulk-delete-csrs", "properties", "preferences",
+        "compare-pem", "view-csrs", "view-revoked", "view-expired",
+        NULL
+    };
+    for (const char **p = win_action_names; *p; p++) {
+        GAction *a = g_action_map_lookup_action (G_ACTION_MAP (win), *p);
+        if (!a) {
+            fail_test ("app-startup", "window action '%s' not registered", *p);
+            goto out;
+        }
+    }
+    fprintf (stderr, "    all %d window actions registered\n",
+             (int)(sizeof(win_action_names)/sizeof(win_action_names[0]) - 1));
+
+    static const char *app_action_names[] = { "quit", "about", NULL };
+    for (const char **p = app_action_names; *p; p++) {
+        GAction *a = g_action_map_lookup_action (G_ACTION_MAP (app), *p);
+        if (!a) {
+            fail_test ("app-startup", "app action '%s' not registered", *p);
+            goto out;
+        }
+    }
+    fprintf (stderr, "    all app actions registered\n");
+
+    GAction *csrs = g_action_map_lookup_action (G_ACTION_MAP (win), "view-csrs");
+    GVariant *state = g_action_get_state (csrs);
+    if (!state || !g_variant_is_of_type (state, G_VARIANT_TYPE_BOOLEAN)) {
+        fail_test ("app-startup", "view-csrs has no boolean state");
+        if (state) g_variant_unref (state);
+        goto out;
+    }
+    g_variant_unref (state);
+    fprintf (stderr, "    stateful toggle actions have boolean state\n");
+
+    static const char *toolbar_ids[] = {
+        "toolbutton1", "toolbutton2", "addca_toolbutton",
+        "addcsr_toolbutton", "extractpkey_toolbutton",
+        "revoke_toolbutton", "sign_toolbutton", "delete_toolbutton",
+        "wizard_web_toolbutton", "wizard_email_toolbutton", NULL
+    };
+    for (const char **p = toolbar_ids; *p; p++) {
+        GtkWidget *btn = GTK_WIDGET (gtk_builder_get_object (
+            main_window_gtkb, *p));
+        if (!btn) {
+            fail_test ("app-startup", "toolbar button '%s' missing", *p);
+            goto out;
+        }
+    }
+    fprintf (stderr, "    all toolbar buttons present\n");
+
+    GtkWidget *infobar = GTK_WIDGET (gtk_builder_get_object (
+        main_window_gtkb, "expiry_infobar"));
+    GtkWidget *search = GTK_WIDGET (gtk_builder_get_object (
+        main_window_gtkb, "search_entry"));
+    GtkWidget *tree = GTK_WIDGET (gtk_builder_get_object (
+        main_window_gtkb, "ca_treeview"));
+    GtkWidget *menubar = GTK_WIDGET (gtk_builder_get_object (
+        main_window_gtkb, "menubar1"));
+
+    if (!infobar || !search || !tree || !menubar) {
+        fail_test ("app-startup",
+                   "missing core widget: infobar=%p search=%p tree=%p menubar=%p",
+                   infobar, search, tree, menubar);
+        goto out;
+    }
+    if (!GTK_IS_INFO_BAR (infobar)) {
+        fail_test ("app-startup", "expiry_infobar is not a GtkInfoBar");
+        goto out;
+    }
+    if (!GTK_IS_SEARCH_ENTRY (search)) {
+        fail_test ("app-startup", "search_entry is not a GtkSearchEntry");
+        goto out;
+    }
+    if (!GTK_IS_TREE_VIEW (tree)) {
+        fail_test ("app-startup", "ca_treeview is not a GtkTreeView");
+        goto out;
+    }
+    fprintf (stderr, "    core widgets (infobar, search, tree, menubar) present and typed correctly\n");
+
+    rc = 0;
+out:;
+    int crits = critical_messages_check_and_reset ("app-startup");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Driver                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1969,6 +2098,7 @@ main (int argc, char **argv)
                                      "main_window.ui", NULL);
     if (g_file_test (probe, G_FILE_TEST_EXISTS)) {
         scenario_new_self_signed_ca ();
+        scenario_application_startup ();
         scenario_view_properties_full ();
         scenario_extract_private_key ();
         scenario_sign_csr ();
