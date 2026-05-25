@@ -26,14 +26,26 @@
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkNotebook" id="notebook2">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
             <property name="focusable">1</property>
             <child>
               <object class="GtkNotebookPage">
                 <property name="child">
                   <object class="GtkBox" id="vbox6">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkBox" id="vboxCertCapabilities">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">5</property>
                         <child>
@@ -54,6 +66,10 @@
                     </child>
                     <child>
                       <object class="GtkGrid" id="table6">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
                         <property name="column_spacing">10</property>
                         <child>
                           <object class="GtkLabel" id="md5Label">
@@ -528,6 +544,10 @@
                 <property name="position">1</property>
                 <property name="child">
                   <object class="GtkBox" id="vbox13">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">5</property>
                     <child>
@@ -619,6 +639,10 @@ certificates that this CA will be able to generate:
                     </child>
                     <child>
                       <object class="GtkBox" id="hbox6">
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">8</property>
+            <property name="margin-bottom">8</property>
                         <property name="valign">center</property>
                         <child>
                           <object class="GtkLabel" id="label36">
@@ -643,6 +667,10 @@ expiration of the new generated certificates:</property>
                     </child>
                     <child>
                       <object class="GtkExpander" id="expander1">
+            <property name="margin-start">4</property>
+            <property name="margin-end">4</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">4</property>
                         <property name="valign">center</property>
                         <property name="focusable">1</property>
                         <child>
@@ -650,6 +678,10 @@ expiration of the new generated certificates:</property>
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkBox" id="hbox7">
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">8</property>
+            <property name="margin-bottom">8</property>
                                 <child>
                                   <object class="GtkLabel" id="label24">
                                     <property name="label" translatable="1">Hours between CRL updates:</property>
@@ -669,6 +701,10 @@ expiration of the new generated certificates:</property>
                             </child>
                             <child>
                               <object class="GtkBox" id="vbox2">
+            <property name="margin-start">9</property>
+            <property name="margin-end">9</property>
+            <property name="margin-top">9</property>
+            <property name="margin-bottom">9</property>
                                 <property name="orientation">vertical</property>
                                 <child>
                                   <object class="GtkLabel" id="label3">
@@ -697,10 +733,18 @@ expiration of the new generated certificates:</property>
                     </child>
                     <child>
                       <object class="GtkExpander" id="expander3">
+            <property name="margin-start">4</property>
+            <property name="margin-end">4</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">4</property>
                         <property name="valign">center</property>
                         <property name="focusable">1</property>
                         <child>
                           <object class="GtkGrid" id="table7">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
                             <child>
                               <object class="GtkCheckButton" id="country_inherited_check">
                                 <property name="label" translatable="1">Country</property>
@@ -890,10 +934,18 @@ expiration of the new generated certificates:</property>
                     </child>
                     <child>
                       <object class="GtkExpander" id="expander5">
+            <property name="margin-start">4</property>
+            <property name="margin-end">4</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">4</property>
                         <property name="valign">center</property>
                         <property name="focusable">1</property>
                         <child>
                           <object class="GtkGrid" id="table12">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
                             <child>
                               <object class="GtkCheckButton" id="ca_check2">
                                 <property name="label" translatable="1">Certification Authority</property>
@@ -997,9 +1049,17 @@ expiration of the new generated certificates:</property>
                     </child>
                     <child>
                       <object class="GtkExpander" id="expander6">
+            <property name="margin-start">4</property>
+            <property name="margin-end">4</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">4</property>
                         <property name="focusable">1</property>
                         <child>
                           <object class="GtkGrid" id="table15">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
                             <child>
                               <object class="GtkCheckButton" id="email_protection_check2">
                                 <property name="label" translatable="1">Email protection</property>
@@ -1117,6 +1177,10 @@ expiration of the new generated certificates:</property>
         </child>
         <child>
           <object class="GtkBox" id="hbuttonbox2">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>

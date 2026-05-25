@@ -2,6 +2,10 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="get_pkey_dialog">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
     <property name="title" translatable="1">Choose private key file. gnoMint</property>
     <property name="modal">1</property>
     <child>

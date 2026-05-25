@@ -9,6 +9,10 @@
     <property name="page_increment">1024</property>
   </object>
   <object class="GtkDialog" id="dh_parameters_dialog">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
     <property name="title" translatable="1">New Diffie-Hellman parameters - gnoMint</property>
     <child>
       <placeholder/>
