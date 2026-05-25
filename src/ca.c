@@ -815,7 +815,7 @@ gboolean ca_refresh_model_callback ()
 			/* Don't offer "Show them" if we're already in that mode. */
 			gtk_widget_set_visible (bar, TRUE);
 		} else if (bar) {
-			gtk_widget_hide (bar);
+			gtk_widget_set_visible(bar, FALSE);
 		}
 	}
 
@@ -877,7 +877,7 @@ ca_expiry_infobar_response (GtkInfoBar *bar,
 			ca_view_only_expiring = FALSE;
 			ca_refresh_model_callback ();
 		}
-		gtk_widget_hide (GTK_WIDGET (bar));
+		gtk_widget_set_visible(GTK_WIDGET(bar), FALSE);
 	}
 }
 
@@ -1771,7 +1771,7 @@ ca_on_bulk_delete_csrs_activate (gpointer sender G_GNUC_UNUSED,
 	}
 
 	gchar *err = NULL;
-	gint done = ca_bulk_delete_csr_ids (csr_ids, &err);
+	ca_bulk_delete_csr_ids (csr_ids, &err);
 	g_slist_free (csr_ids);
 
 	if (err) {

@@ -45,7 +45,7 @@ void preferences_window_display()
                                       preferences_get_gnome_keyring_export());
 	widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
 
-        gtk_widget_show (widget);
+        gtk_widget_set_visible(widget, TRUE);
 
 }
 

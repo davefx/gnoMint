@@ -11,7 +11,10 @@ gnomint_CFLAGS = \
 	$(SQLITE_CFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DCOMPILATION_DATE=`date +%s` \
-	-DHAVE_CONFIG_H
+	-DHAVE_CONFIG_H \
+	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_6 \
+	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_6 \
+	-Wall -Werror
 
 gnomint_SOURCES = \
 	main.c \
@@ -65,7 +68,8 @@ gnomint_cli_CFLAGS = \
 	$(SQLITE_CFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DCOMPILATION_DATE=`date +%s` \
-	-DHAVE_CONFIG_H -DGNOMINTCLI
+	-DHAVE_CONFIG_H -DGNOMINTCLI \
+	-Wall -Werror
 
 gnomint_cli_SOURCES = \
 	dialog.c \

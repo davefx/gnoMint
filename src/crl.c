@@ -216,7 +216,7 @@ void crl_window_display (void)
 				   NULL);
 	
         widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-        gtk_widget_show (widget);
+        gtk_widget_set_visible(widget, TRUE);
 
         __crl_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object (crl_window_gtkb, "crl_ca_treeview")));
 

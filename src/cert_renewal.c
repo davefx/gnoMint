@@ -16,7 +16,7 @@
 static gint
 policy_int_default (guint64 ca_id, const gchar *key, gint fallback)
 {
-	gint v = ca_file_policy_get_int (ca_id, key);
+	gint v = ca_file_policy_get_int (ca_id, (gchar *) key);
 	return v ? v : fallback;
 }
 

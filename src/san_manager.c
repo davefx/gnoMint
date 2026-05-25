@@ -193,7 +193,7 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 			if (san_validate(type, value, &error_msg)) {
 				*out_type = g_strdup(san_type_to_string(type));
 				*out_value = g_strdup(value);
-				gtk_widget_hide(GTK_WIDGET(dialog));
+				gtk_widget_set_visible(GTK_WIDGET(dialog), FALSE);
 				return TRUE;
 			} else {
 				// Show error
@@ -209,7 +209,7 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 				// Continue loop to let user correct
 			}
 		} else {
-			gtk_widget_hide(GTK_WIDGET(dialog));
+			gtk_widget_set_visible(GTK_WIDGET(dialog), FALSE);
 			return FALSE;
 		}
 	}

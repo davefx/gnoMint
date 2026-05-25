@@ -681,23 +681,50 @@ G_MODULE_EXPORT void on_quit1_activate  (gpointer sender, gpointer     user_data
 
 G_MODULE_EXPORT void on_about1_activate  (gpointer sender, gpointer     user_data)
 {
-
 	GtkWidget *widget;
-	gchar *authors[2];
 
 	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
-	authors[0] = PACKAGE_AUTHORS;
-	authors[1] = NULL;
+	const gchar *authors[] = {
+		"David Marín Carreño <davefx@gmail.com>",
+		NULL
+	};
+	const gchar *collaborators[] = {
+		"Ahmed Baizid <ahmed@baizid.org>",
+		"Jaroslav Imrich <jariq@jariq.sk>",
+		"Staněk Luboš <lubek@users.sourceforge.net>",
+		NULL
+	};
 
-	gtk_show_about_dialog (GTK_WINDOW(widget),
-			       "version", PACKAGE_VERSION,
-			       "copyright", PACKAGE_COPYRIGHT,
-			       "comments", _("gnoMint is a program for creating and managing Certification Authorities, and their certificates"),
-			       "license",  _("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. \n\nYou should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."),
-			       "wrap_license", TRUE,
-			       "website", PACKAGE_WEBSITE,
-			       "authors", authors,
-			       "translator_credits", _("translator-credits"),
-			       NULL);
+	GtkAboutDialog *dlg = GTK_ABOUT_DIALOG (gtk_about_dialog_new ());
+	gtk_window_set_transient_for (GTK_WINDOW (dlg), GTK_WINDOW (widget));
+	gtk_window_set_modal (GTK_WINDOW (dlg), TRUE);
+
+	gtk_about_dialog_set_program_name (dlg, "gnoMint");
+	gtk_about_dialog_set_version (dlg, PACKAGE_VERSION);
+	gtk_about_dialog_set_copyright (dlg, PACKAGE_COPYRIGHT);
+	gtk_about_dialog_set_comments (dlg,
+		_("gnoMint is a program for creating and managing "
+		  "Certification Authorities, and their certificates"));
+	gtk_about_dialog_set_license (dlg,
+		_("This program is free software; you can redistribute it "
+		  "and/or modify it under the terms of the GNU General Public "
+		  "License as published by the Free Software Foundation; either "
+		  "version 3 of the License, or (at your option) any later "
+		  "version.\n\nThis program is distributed in the hope that it "
+		  "will be useful, but WITHOUT ANY WARRANTY; without even the "
+		  "implied warranty of MERCHANTABILITY or FITNESS FOR A "
+		  "PARTICULAR PURPOSE.  See the GNU General Public License for "
+		  "more details.\n\nYou should have received a copy of the GNU "
+		  "General Public License along with this program; if not, "
+		  "write to the Free Software Foundation, Inc., 51 Franklin "
+		  "Street, Fifth Floor, Boston, MA  02110-1301, USA."));
+	gtk_about_dialog_set_wrap_license (dlg, TRUE);
+	gtk_about_dialog_set_website (dlg, PACKAGE_WEBSITE);
+	gtk_about_dialog_set_authors (dlg, authors);
+	gtk_about_dialog_add_credit_section (dlg,
+		_("Code collaborators"), collaborators);
+	gtk_about_dialog_set_translator_credits (dlg, _("translator-credits"));
+
+	gtk_window_present (GTK_WINDOW (dlg));
 }

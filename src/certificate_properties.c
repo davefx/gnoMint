@@ -151,7 +151,7 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT, 
                                                                         cert_id));
 
-	gtk_widget_show (GTK_WIDGET(widget));
+	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 }
 
 
@@ -248,7 +248,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 		g_value_set_boolean (valtrue, TRUE);
 
 		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certPropSeparator");
-		gtk_widget_show (GTK_WIDGET(widget));
+		gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 		
 		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "vboxCertCapabilities");
 		

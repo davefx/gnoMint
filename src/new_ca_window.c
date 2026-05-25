@@ -129,37 +129,37 @@ G_MODULE_EXPORT void on_new_ca_privkey_type_toggle (GtkCheckButton *button,
 
 	if (rsatoggle && gtk_check_button_get_active (rsatoggle)) {
 		gtk_adjustment_set_upper (adj, 10240);
-		gtk_widget_show (spin);
-		if (combo) gtk_widget_hide (combo);
+		gtk_widget_set_visible(spin, TRUE);
+		if (combo) gtk_widget_set_visible(combo, FALSE);
 		if (label) {
 			gtk_label_set_text (label, _("Private key bit length:"));
-			gtk_widget_show (GTK_WIDGET (label));
+			gtk_widget_set_visible(GTK_WIDGET(label), TRUE);
 		}
 	} else if (dsatoggle && gtk_check_button_get_active(dsatoggle)) {
 		gtk_adjustment_set_upper (adj, 3072);
 		if (value > 3072)
 			gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), 3072);
-		gtk_widget_show (spin);
-		if (combo) gtk_widget_hide (combo);
+		gtk_widget_set_visible(spin, TRUE);
+		if (combo) gtk_widget_set_visible(combo, FALSE);
 		if (label) {
 			gtk_label_set_text (label, _("Private key bit length:"));
-			gtk_widget_show (GTK_WIDGET (label));
+			gtk_widget_set_visible(GTK_WIDGET(label), TRUE);
 		}
 	} else if (ecdsatoggle && gtk_check_button_get_active(ecdsatoggle)) {
-		gtk_widget_hide (spin);
+		gtk_widget_set_visible(spin, FALSE);
 		if (combo) {
-			gtk_widget_show (combo);
+			gtk_widget_set_visible(combo, TRUE);
 			if (!gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo)))
 				gtk_combo_box_set_active_id (GTK_COMBO_BOX (combo), "256");
 		}
 		if (label) {
 			gtk_label_set_text (label, _("ECDSA curve:"));
-			gtk_widget_show (GTK_WIDGET (label));
+			gtk_widget_set_visible(GTK_WIDGET(label), TRUE);
 		}
 	} else if (eddsatoggle && gtk_check_button_get_active(eddsatoggle)) {
-		gtk_widget_hide (spin);
-		if (combo) gtk_widget_hide (combo);
-		if (label) gtk_widget_hide (GTK_WIDGET (label));
+		gtk_widget_set_visible(spin, FALSE);
+		if (combo) gtk_widget_set_visible(combo, FALSE);
+		if (label) gtk_widget_set_visible(GTK_WIDGET(label), FALSE);
 	}
 }
 
