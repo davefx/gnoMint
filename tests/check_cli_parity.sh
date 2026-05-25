@@ -23,7 +23,13 @@ trap 'rm -rf "$TMPDIR"' EXIT
 DB="$TMPDIR/cli-parity.gnomint"
 CHAIN="$TMPDIR/chain.pem"
 
+# Force a writable copy. Under `make distcheck` the dist tarball ships
+# the fixture mode 0444 (autotools convention); plain cp inherits that
+# mode, and gnomint-cli's first-open migration silently fails on the
+# read-only DB so subsequent commands abort with "Cannot find last
+# assigned serial number".
 cp "$FIXTURE" "$DB"
+chmod 644 "$DB"
 
 LC_ALL=C "$CLI" "$DB" >"$TMPDIR/out.txt" 2>&1 <<EOF
 renewcert 2

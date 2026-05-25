@@ -15,6 +15,51 @@ file.
 
 ---
 
+## 1.5.0 — "Belt and Braces" (2026-05-24)
+
+Six weeks after Lazarus. Closes the running-a-CA-over-years loop
+(warning → filter → renew → diff) and brings `gnomint-cli` to full
+parity with the GUI. Every state-mutating CLI command is now covered
+by an automated test.
+
+Highlights:
+
+- **ECDSA / Ed25519 key support** ([#49](https://github.com/davefx/gnoMint/issues/49))
+  in both wizards and the CLI prompts.
+- **Algorithm-aware key-size selector** — spinbutton for RSA/DSA,
+  curve dropdown for ECDSA, hidden for Ed25519.
+- **Certificate renewal** ([#50](https://github.com/davefx/gnoMint/issues/50)):
+  right-click → *Renew with fresh key*. CLI: `renewcert <id>`.
+- **Search / filter box** ([#53](https://github.com/davefx/gnoMint/issues/53))
+  above the tree view; Ctrl+F focuses it. CLI: `search <pattern>`.
+- **Side-by-side certificate diff** ([#55](https://github.com/davefx/gnoMint/issues/55)):
+  right-click → *Compare with PEM file…*. CLI: `diff <id|path> <id|path>`.
+- **Startup expiry banner** ([#56](https://github.com/davefx/gnoMint/issues/56))
+  with a *Show them* action that filters the tree to the expiring
+  certs. CLI: stderr notice on `ca_open`.
+- **Editable SAN list when signing a CSR** ([#40](https://github.com/davefx/gnoMint/issues/40)):
+  the sign-CSR dialog now embeds the full SAN editor.
+- **GitHub Pages site** under `docs/` — landing, features, install,
+  manual, tutorial, release history, all with current GTK 3
+  screenshots.
+- **Full user manual** ([#57](https://github.com/davefx/gnoMint/issues/57))
+  covering every workflow, the CLI, and a troubleshooting section.
+- **CLI parity**: `renewcert`, `exportchain`, `revokemany`,
+  `deletemany`, `search`, `diff` all available from `gnomint-cli`.
+- **Comprehensive test coverage**: 5 suites → 14 suites, all green.
+  pty-driven Python script for the getpass-using commands
+  (`extractcertpkey`, `extractcsrpkey`, `changepassword`).
+
+Bug fixes:
+
+- ECDSA prompt no longer asserts in `addca`/`addcsr`.
+- `gnomint-cli importfile` no longer segfaults.
+- Copyright updated to 2006-2026; dead sourceforge URLs replaced.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+---
+
 ## 1.4.0 — "Lazarus" (2026-05-19)
 
 After a decade-long hiatus since 1.3.0, gnoMint returns. This release

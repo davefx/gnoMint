@@ -1,3 +1,109 @@
+* Version 1.5.0 "Belt and Braces" (2026.05.24)
+
+Six weeks after Lazarus, gnoMint 1.5.0 closes the running-a-CA-over-
+years loop (warning → filter → renew → diff) and finishes pulling the
+gnomint-cli interface to parity with the GUI. Every state-mutating
+command in ca_commands[] now has shell-test coverage; the test suite
+went from 5 suites to 14, all green.
+
+- FEATURE: ECDSA and Ed25519 key support (#49). New ECDSA generator
+  selects between NIST P-256, P-384 and P-521 from key_bitlength;
+  new Ed25519 generator ignores key length (fixed by the curve).
+  Both algorithms are available from the New-CA wizard, the New-CSR
+  wizard, and gnomint-cli's addca/addcsr prompts.
+
+- FEATURE: Algorithm-aware key-size selector. The bit-length input
+  in the New-CA and New-CSR wizards swaps to match the chosen
+  algorithm: spinbutton for RSA/DSA, P-256/P-384/P-521 dropdown for
+  ECDSA, hidden entirely for Ed25519 (curve size is fixed). The CLI
+  prompts do the same.
+
+- FEATURE: Certificate renewal (#50). Right-click → "Renew with
+  fresh key" reissues a certificate with the same subject and SAN,
+  signed by the same CA, with a freshly-generated keypair. The old
+  cert stays in the database — standard "issue new, deploy, revoke
+  old" pattern. CLI verb: renewcert <cert-id>.
+
+- FEATURE: Search / filter box (#53). A GtkSearchEntry above the
+  tree view filters certificates and CSRs as you type, matching on
+  subject or serial substring (case-insensitive). Ctrl+F focuses
+  the entry. CAs are always shown so the tree path to each match
+  stays visible. CLI verb: search <pattern>.
+
+- FEATURE: Side-by-side certificate diff (#55). Right-click a cert →
+  "Compare with PEM file…" opens a 3-column dialog (field, left,
+  right) showing every X.509 property; differing rows are
+  highlighted in amber. CLI verb: diff <cert-id-or-path>
+  <cert-id-or-path> (either argument can be a DB id or a path to a
+  PEM file).
+
+- FEATURE: Startup expiry banner (#56). Opening a database surfaces
+  a GtkInfoBar above the tree counting any certificates whose
+  effective expiration is inside the warning window (default 30
+  days, configurable via expire-warning-days). The banner's "Show
+  them" action filters the tree to only the expiring rows; closing
+  the banner restores the full view. gnomint-cli prints the same
+  notice on stderr at startup.
+
+- FEATURE: Editable SAN list when signing a CSR (#40). The sign-CSR
+  dialog now embeds the full SAN manager widget, pre-populated from
+  the CSR's request. A CA operator can add, remove, or override SAN
+  entries before signing — restoring the authority a CA is supposed
+  to have.
+
+- FEATURE: GitHub Pages site under docs/. A new Jekyll site (landing
+  page, features overview, install guide, task-oriented user manual,
+  tutorial, release history) lives in the docs/ tree and is served
+  from https://davefx.github.io/gnoMint/ once Pages is enabled in
+  repo settings. The same content is browsable offline as Markdown.
+
+- FEATURE: Full user manual (#57). docs/manual.md covers every
+  workflow: quick start, concepts, bootstrapping a CA, issuing
+  certificates, wizards, importing CSRs, renewing/revoking/CRLs,
+  exporting, bulk operations, search/filter, comparing certificates,
+  expiry warnings, importing OpenSSL CA layouts, the CLI, and a
+  troubleshooting section.
+
+- FEATURE: CLI parity pass. gnomint-cli gained renewcert, exportchain,
+  revokemany, deletemany, search, diff, and the per-algorithm prompt
+  flow. Every GUI menu entry now has a matching CLI verb. The CLI
+  also prints the expiry-window notice on database open.
+
+- FEATURE: Comprehensive CLI test coverage. Every state-mutating
+  command in ca_commands[] is now tested by at least one shell or
+  python-pty script. New test files: check_cli_info.sh,
+  check_cli_lifecycle.sh, check_cli_keys.sh, check_cli_banner.sh,
+  check_cli_import.sh, check_cli_importdir.sh, check_cli_dhgen.sh,
+  check_cli_passphrase.py. The pty-driven script in particular
+  exercises extractcertpkey, extractcsrpkey, and changepassword
+  end-to-end — the commands that read passphrases via getpass().
+
+- BUGFIX: ECDSA prompt no longer aborts. addca and addcsr pre-set
+  key_bitlength to 2048 before the algorithm prompt, then the ECDSA
+  branch called dialog_ask_for_number(min=256, max=521, default=2048)
+  and tripped an assertion. The default is now clamped to a valid
+  curve size before the prompt fires.
+
+- BUGFIX: gnomint-cli importfile no longer segfaults. The shared
+  import path called dialog_refresh_list() on success;
+  dialog_refresh_list() dereferenced a NULL function pointer because
+  the CLI never registers a refresh callback (the GUI does).
+  Added a null check.
+
+- BUGFIX: Copyright bumped from 2006-2016 to 2006-2026 and dead
+  sourceforge URLs replaced with GitHub repo links throughout. The
+  legacy gnomint.sourceforge.net site is gone; its content has been
+  archived into docs/.
+
+- POLISH: GTK 3 screenshots throughout the docs site, captured live
+  from the build (main window with a sample CA hierarchy, all four
+  key-algorithm wizard states, the new-CA / new-CSR / export / import
+  / preferences dialogs).
+
+This release is database-compatible with 1.4.0 — no migration step
+needed.
+
+
 * Version 1.4.0 "Lazarus" (2026.05.19)
 
 After a decade-long hiatus since 1.3.0, gnoMint returns. This

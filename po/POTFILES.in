@@ -28,6 +28,8 @@ gui/san_manager_widget.ui
 gui/wizard_window.ui
 mime/gnomint.xml.in
 src/ca.c
+src/cert_diff.c
+src/cert_renewal.c
 src/ca-cli.c
 src/ca-cli-callbacks.c
 src/ca_creation.c
