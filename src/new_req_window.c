@@ -203,14 +203,14 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 }
 
-G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data)
+G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkCheckButton *button, gpointer user_data)
 {
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
 	GtkTreeIter iter;
 
 
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")))) {
 		/* Inherit */
 		gtk_widget_set_sensitive (GTK_WIDGET(treeview), TRUE);
 		gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
@@ -228,7 +228,7 @@ G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gp
 
 
 
-G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
+G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkCheckButton *button,
                                                      gpointer        user_data);
 
 void new_req_window_display()
@@ -248,9 +248,9 @@ void new_req_window_display()
 
 	__new_req_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview")));
 
-	new_req_inherit_fields_toggled (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
+	new_req_inherit_fields_toggled (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
 
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "rsa_radiobutton1")), TRUE);
+	gtk_check_button_set_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1")), TRUE);
 
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")), 2048);
 
@@ -267,8 +267,22 @@ void new_req_window_display()
 		gtk_widget_set_visible(san_manager_widget1, TRUE);
 	}
 
-	/* Force initial spinbutton/curve-combo visibility to match the
-	 * active radio. */
+	/* Connect signals explicitly (gtk_builder_connect_signals removed in GTK 4) */
+	GtkWidget *w;
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "dsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "ecdsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "eddsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton"));
+	if (w) g_signal_connect(w, "toggled", G_CALLBACK(new_req_inherit_fields_toggled), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "manual_radiobutton"));
+	if (w) g_signal_connect(w, "toggled", G_CALLBACK(new_req_inherit_fields_toggled), NULL);
+
 	on_new_req_privkey_type_toggle (NULL, NULL);
 }
 
@@ -280,13 +294,13 @@ void new_req_tab_activate (int tab_number)
 
 }
 
-G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
+G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkCheckButton *button,
 						     gpointer        user_data)
 {
-	GtkToggleButton *rsatoggle   = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "rsa_radiobutton1"));
-	GtkToggleButton *dsatoggle   = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
-	GtkToggleButton *ecdsatoggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "ecdsa_radiobutton1"));
-	GtkToggleButton *eddsatoggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "eddsa_radiobutton1"));
+	GtkCheckButton *rsatoggle   = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1"));
+	GtkCheckButton *dsatoggle   = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "dsa_radiobutton1"));
+	GtkCheckButton *ecdsatoggle = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "ecdsa_radiobutton1"));
+	GtkCheckButton *eddsatoggle = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "eddsa_radiobutton1"));
 
 	GtkAdjustment *adj = GTK_ADJUSTMENT (gtk_builder_get_object (new_req_window_gtkb, "AdjustmentKeyLengthSpinButton1"));
 	GtkWidget *spin    = GTK_WIDGET (gtk_builder_get_object (new_req_window_gtkb, "keylength_spinbutton1"));
@@ -294,7 +308,7 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
 	GtkLabel  *label   = GTK_LABEL  (gtk_builder_get_object (new_req_window_gtkb, "label99"));
 	gdouble    value   = gtk_spin_button_get_value (GTK_SPIN_BUTTON (spin));
 
-	if (rsatoggle && gtk_toggle_button_get_active (rsatoggle)) {
+	if (rsatoggle && gtk_check_button_get_active(rsatoggle)) {
 		gtk_adjustment_set_upper (adj, 10240);
 		gtk_widget_show (spin);
 		if (combo) gtk_widget_hide (combo);
@@ -302,7 +316,7 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
 			gtk_label_set_text (label, _("Private key bit length:"));
 			gtk_widget_show (GTK_WIDGET (label));
 		}
-	} else if (dsatoggle && gtk_toggle_button_get_active (dsatoggle)) {
+	} else if (dsatoggle && gtk_check_button_get_active(dsatoggle)) {
 		gtk_adjustment_set_upper (adj, 3072);
 		if (value > 3072)
 			gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), 3072);
@@ -312,14 +326,14 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
 			gtk_label_set_text (label, _("Private key bit length:"));
 			gtk_widget_show (GTK_WIDGET (label));
 		}
-	} else if (ecdsatoggle && gtk_toggle_button_get_active (ecdsatoggle)) {
+	} else if (ecdsatoggle && gtk_check_button_get_active(ecdsatoggle)) {
 		gtk_widget_hide (spin);
 		if (combo) gtk_widget_show (combo);
 		if (label) {
 			gtk_label_set_text (label, _("ECDSA curve:"));
 			gtk_widget_show (GTK_WIDGET (label));
 		}
-	} else if (eddsatoggle && gtk_toggle_button_get_active (eddsatoggle)) {
+	} else if (eddsatoggle && gtk_check_button_get_active(eddsatoggle)) {
 		gtk_widget_hide (spin);
 		if (combo) gtk_widget_hide (combo);
 		if (label) gtk_widget_hide (GTK_WIDGET (label));
@@ -372,7 +386,7 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 	const gchar *pem;
 	gboolean inherit_fields;
 
-	inherit_fields = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
+	inherit_fields = gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
 
         if (inherit_fields && gtk_tree_selection_get_selected (selection, &model, &iter)) {
 
@@ -580,11 +594,11 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 		    gtk_builder_get_object (new_req_window_gtkb, "ecdsa_radiobutton1"));
 		GtkWidget *dsa   = GTK_WIDGET (
 		    gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
-		if (eddsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eddsa)))
+		if (eddsa && gtk_check_button_get_active (GTK_CHECK_BUTTON (eddsa)))
 			csr_creation_data->key_type = 3; /* EdDSA */
-		else if (ecdsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (ecdsa)))
+		else if (ecdsa && gtk_check_button_get_active (GTK_CHECK_BUTTON (ecdsa)))
 			csr_creation_data->key_type = 2; /* ECDSA */
-		else if (dsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dsa)))
+		else if (dsa && gtk_check_button_get_active (GTK_CHECK_BUTTON (dsa)))
 			csr_creation_data->key_type = 1; /* DSA */
 		else
 			csr_creation_data->key_type = 0; /* RSA */

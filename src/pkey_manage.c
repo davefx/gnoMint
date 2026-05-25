@@ -237,7 +237,7 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 			} else {
 				g_free (file_name);
 				file_name = g_strdup ((gchar *) g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(filepath_widget))));
-				save_new_filename = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(remember_filepath_widget));
+				save_new_filename = gtk_check_button_get_active (GTK_CHECK_BUTTON(remember_filepath_widget));
 			}
 			
 			widget = gtk_builder_get_object (dialog_gtkb, "get_pkey_dialog");
@@ -755,7 +755,7 @@ gchar * pkey_manage_ask_password ()
 			return NULL;
 		} else {
 			password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
-			remember = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(remember_password_widget));
+			remember = gtk_check_button_get_active (GTK_CHECK_BUTTON(remember_password_widget));
 		}
 
 		is_key_ok = ca_file_check_password (password);

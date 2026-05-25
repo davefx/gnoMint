@@ -104,6 +104,8 @@ extern void ca_on_revoke_activate (gpointer sender, gpointer);
 extern gboolean ca_treeview_row_activated (GtkTreeView *, GtkTreePath *,
                                            GtkTreeViewColumn *, gpointer);
 
+extern void on_new_ca_privkey_type_toggle (GtkCheckButton *button, gpointer user_data);
+
 /* TLS helpers exercised by the email scenario. */
 extern void    tls_init (void);
 extern gchar * tls_generate_rsa_keys (TlsCreationData *cd,
@@ -1637,11 +1639,11 @@ scenario_keylength_selector (void)
                                                            "keylength_spinbutton"));
     GtkWidget *combo = GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb,
                                                             "ecdsa_curve_combo"));
-    GtkToggleButton *rsa = GTK_TOGGLE_BUTTON (gtk_builder_get_object (
+    GtkCheckButton *rsa = GTK_CHECK_BUTTON (gtk_builder_get_object (
         new_ca_window_gtkb, "rsa_radiobutton"));
-    GtkToggleButton *ecdsa = GTK_TOGGLE_BUTTON (gtk_builder_get_object (
+    GtkCheckButton *ecdsa = GTK_CHECK_BUTTON (gtk_builder_get_object (
         new_ca_window_gtkb, "ecdsa_radiobutton"));
-    GtkToggleButton *eddsa = GTK_TOGGLE_BUTTON (gtk_builder_get_object (
+    GtkCheckButton *eddsa = GTK_CHECK_BUTTON (gtk_builder_get_object (
         new_ca_window_gtkb, "eddsa_radiobutton"));
 
     if (!spin || !combo || !rsa || !ecdsa || !eddsa) {
@@ -1650,7 +1652,7 @@ scenario_keylength_selector (void)
     }
 
     /* RSA (default): spin visible, combo hidden. */
-    gtk_toggle_button_set_active (rsa, TRUE);
+    gtk_check_button_set_active (rsa, TRUE);
     drain_events ();
     if (!gtk_widget_get_visible (spin)) {
         fail_test ("keylength-selector", "RSA: spinbutton should be visible");
@@ -1663,7 +1665,9 @@ scenario_keylength_selector (void)
     fprintf (stderr, "    RSA: spin shown, combo hidden OK\n");
 
     /* ECDSA: combo shown, spin hidden, active id = "256". */
-    gtk_toggle_button_set_active (ecdsa, TRUE);
+    gtk_check_button_set_active (ecdsa, TRUE);
+    drain_events ();
+    on_new_ca_privkey_type_toggle (NULL, NULL);
     drain_events ();
     if (gtk_widget_get_visible (spin)) {
         fail_test ("keylength-selector", "ECDSA: spinbutton should be hidden");
@@ -1683,7 +1687,9 @@ scenario_keylength_selector (void)
     fprintf (stderr, "    ECDSA: combo shown (default %s), spin hidden OK\n", id);
 
     /* Ed25519: both hidden. */
-    gtk_toggle_button_set_active (eddsa, TRUE);
+    gtk_check_button_set_active (eddsa, TRUE);
+    drain_events ();
+    on_new_ca_privkey_type_toggle (NULL, NULL);
     drain_events ();
     if (gtk_widget_get_visible (spin)) {
         fail_test ("keylength-selector", "Ed25519: spinbutton should be hidden");

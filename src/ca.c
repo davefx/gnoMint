@@ -1500,7 +1500,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 		return;
 	} 
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
 		/* Export public part */
 		__ca_export_public_pem (iter, type);
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
@@ -1510,7 +1510,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 		return;
 	}
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
 		/* Export private part (crypted) */
 		g_free (__ca_export_private_pkcs8 (iter, type));
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
@@ -1520,7 +1520,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 		return;
 	}
 
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
 		/* Export private part (uncrypted) */
 		__ca_export_private_pem (iter, type);
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
@@ -1530,7 +1530,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 		return;
 	}
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
 		/* Export PKCS#12 structure */
 		__ca_export_pkcs12 (iter, type);
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
@@ -2153,9 +2153,6 @@ gboolean ca_open (gchar *filename, gboolean create)
 	if (! ca_file_open (filename, create))
 		return FALSE;
 
-	__enable_widget ("new_certificate1");
-	__enable_widget ("save_as1");
-	__enable_widget ("preferences1");
 
 	/* Re-arm the expiry banner for the freshly-opened file. */
 	ca_expiry_infobar_dismissed = FALSE;
@@ -2332,7 +2329,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 
 	if (ca_file_is_password_protected()) {
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
+		gtk_check_button_set_active (GTK_CHECK_BUTTON(widget), TRUE);
 
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label1");
 		g_object_set (G_OBJECT(widget), "visible", TRUE, NULL);
@@ -2357,7 +2354,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 
 	} else {
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_no_radiobutton");
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
+		gtk_check_button_set_active (GTK_CHECK_BUTTON(widget), TRUE);
 
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label1");
 		g_object_set (G_OBJECT(widget), "visible", FALSE, NULL);
@@ -2422,7 +2419,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 	} while (repeat);
 	
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (widget))) {
 
 		if (ca_file_is_password_protected()) {
 			// It's a password change
@@ -2507,7 +2504,7 @@ G_MODULE_EXPORT gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gp
 	gboolean pwd_protect;
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	pwd_protect = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+	pwd_protect = gtk_check_button_get_active (GTK_CHECK_BUTTON (widget));
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
 	pwd1 = gtk_editable_get_text(GTK_EDITABLE(widget));
@@ -2549,7 +2546,7 @@ G_MODULE_EXPORT gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget
 		return TRUE;
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (widget))) {
 		/* We want to password-protect the database */
 		
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label2");
@@ -2690,7 +2687,7 @@ G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_da
 	GObject *main_window_widget, *widget;
 	GtkWidget *dialog;
 	GtkBuilder * dialog_gtkb = NULL;
-        GtkToggleButton *radiobutton = NULL;
+        GtkCheckButton *radiobutton = NULL;
 	gint response = 0;
         gboolean import_file = TRUE;
 	
@@ -2710,8 +2707,8 @@ G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_da
                 return;
         }
 
-        radiobutton = GTK_TOGGLE_BUTTON(gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
-        import_file = gtk_toggle_button_get_active(radiobutton);
+        radiobutton = GTK_CHECK_BUTTON(gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
+        import_file = gtk_check_button_get_active(radiobutton);
 
         gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 
