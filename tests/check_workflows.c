@@ -1853,8 +1853,8 @@ scenario_search_filter (void)
     drain_events ();
 
     extern void ca_on_search_changed (GtkSearchEntry *entry, gpointer ud);
-    GtkEntry *entry = GTK_ENTRY (gtk_builder_get_object (main_window_gtkb,
-                                                          "search_entry"));
+    GtkSearchEntry *entry = GTK_SEARCH_ENTRY (gtk_builder_get_object (main_window_gtkb,
+                                                                      "search_entry"));
     if (!entry) {
         fail_test ("search-filter", "search_entry widget missing");
         goto out;

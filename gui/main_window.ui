@@ -58,7 +58,7 @@
       <section><item><attribute name="label" translatable="yes">About</attribute><attribute name="action">app.about</attribute></item></section>
     </submenu>
   </menu>
-  <object class="GtkWindow" id="main_window1">
+  <object class="GtkApplicationWindow" id="main_window1">
     <property name="title" translatable="1">gnoMint</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
