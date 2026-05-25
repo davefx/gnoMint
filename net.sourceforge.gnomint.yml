@@ -69,6 +69,10 @@ modules:
     buildsystem: autotools
     post-install:
       - glib-compile-schemas /app/share/glib-2.0/schemas/
+      - mv /app/share/applications/gnomint.desktop /app/share/applications/net.sourceforge.gnomint.desktop || true
+      - mv /app/share/appdata/gnomint.appdata.xml /app/share/appdata/net.sourceforge.gnomint.appdata.xml || true
+      - mkdir -p /app/share/metainfo && cp /app/share/appdata/net.sourceforge.gnomint.appdata.xml /app/share/metainfo/ || true
+      - mv /app/share/mime/packages/gnomint.xml /app/share/mime/packages/net.sourceforge.gnomint.xml || true
     sources:
       - type: git
         url: https://github.com/davefx/gnoMint.git
