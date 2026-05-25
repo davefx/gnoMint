@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -134,7 +135,6 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	gtk_builder_add_from_file (certificate_properties_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_properties_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (certificate_properties_window_gtkb, NULL);
 	
 	__certificate_properties_populate (certificate_pem);
 	__certificate_details_populate (certificate_pem);
@@ -257,9 +257,9 @@ void __certificate_properties_populate (const char *certificate_pem)
 			label = GTK_LABEL(gtk_label_new ((gchar *) g_list_nth_data (cert->uses, i)));
 			gtk_label_set_xalign (label, 0.0);
 			gtk_label_set_yalign (label, 0.5);
-			gtk_box_pack_end (GTK_BOX(widget), GTK_WIDGET(label), 0, 0, 0);
+			gtk_box_append(GTK_BOX(widget), GTK_WIDGET(label));
 		}
-		gtk_widget_show_all (GTK_WIDGET(widget));
+		gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 		
 		g_free (valtrue);
 	}
@@ -274,7 +274,7 @@ void __certificate_properties_populate (const char *certificate_pem)
 G_MODULE_EXPORT void certificate_properties_close_clicked (const char *certificate_pem)
 {
 	GObject *widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 }
 
 

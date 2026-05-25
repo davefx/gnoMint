@@ -1,28 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkBox" id="san_manager_vbox">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
     <property name="orientation">vertical</property>
     <property name="spacing">6</property>
     <child>
       <object class="GtkScrolledWindow" id="scrolled_window">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="shadow_type">in</property>
+        <property name="vexpand">1</property>
+        <property name="focusable">1</property>
         <property name="height_request">120</property>
-        <child>
+        <property name="child">
           <object class="GtkTreeView" id="san_treeview">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
+            <property name="focusable">1</property>
             <property name="model">san_list_model</property>
-            <property name="headers_visible">True</property>
-            <property name="enable_search">False</property>
+            <property name="enable_search">0</property>
             <child>
               <object class="GtkTreeViewColumn" id="type_column">
-                <property name="title" translatable="yes">Type</property>
+                <property name="title" translatable="1">Type</property>
                 <property name="sizing">autosize</property>
                 <child>
                   <object class="GtkCellRendererText" id="type_cell"/>
@@ -34,9 +28,9 @@
             </child>
             <child>
               <object class="GtkTreeViewColumn" id="value_column">
-                <property name="title" translatable="yes">Value</property>
+                <property name="title" translatable="1">Value</property>
                 <property name="sizing">autosize</property>
-                <property name="expand">True</property>
+                <property name="expand">1</property>
                 <child>
                   <object class="GtkCellRendererText" id="value_cell"/>
                   <attributes>
@@ -46,67 +40,39 @@
               </object>
             </child>
           </object>
-        </child>
+        </property>
       </object>
-      <packing>
-        <property name="expand">True</property>
-        <property name="fill">True</property>
-        <property name="position">0</property>
-      </packing>
     </child>
     <child>
-      <object class="GtkButtonBox" id="button_box">
+      <object class="GtkBox" id="button_box">
+        <property name="valign">center</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">6</property>
-        <property name="layout_style">start</property>
         <child>
           <object class="GtkButton" id="add_button">
-            <property name="label" translatable="yes">_Add</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
+            <property name="label" translatable="1">_Add</property>
+            <property name="focusable">1</property>
+            <property name="receives_default">1</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
           <object class="GtkButton" id="edit_button">
-            <property name="label" translatable="yes">_Edit</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="sensitive">False</property>
+            <property name="label" translatable="1">_Edit</property>
+            <property name="focusable">1</property>
+            <property name="receives_default">1</property>
+            <property name="sensitive">0</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">1</property>
-          </packing>
         </child>
         <child>
           <object class="GtkButton" id="remove_button">
-            <property name="label" translatable="yes">_Remove</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="sensitive">False</property>
+            <property name="label" translatable="1">_Remove</property>
+            <property name="focusable">1</property>
+            <property name="receives_default">1</property>
+            <property name="sensitive">0</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">2</property>
-          </packing>
         </child>
       </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">False</property>
-        <property name="position">1</property>
-      </packing>
     </child>
   </object>
   <object class="GtkListStore" id="san_list_model">

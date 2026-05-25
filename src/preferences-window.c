@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,9 +40,8 @@ void preferences_window_display()
 	gtk_builder_add_from_file (preferences_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "preferences_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (preferences_window_gtkb, NULL);
 	
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_window_gtkb, "gnomekeyring_export_check")),
+        gtk_check_button_set_active (GTK_CHECK_BUTTON(gtk_builder_get_object(preferences_window_gtkb, "gnomekeyring_export_check")),
                                       preferences_get_gnome_keyring_export());
 	widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
 
@@ -50,9 +50,9 @@ void preferences_window_display()
 }
 
 
-G_MODULE_EXPORT void preferences_window_gnomekeyring_export_toggled (GtkToggleButton *togglebutton, gpointer user_data)
+G_MODULE_EXPORT void preferences_window_gnomekeyring_export_toggled (GtkCheckButton *togglebutton, gpointer user_data)
 {
-        gboolean new_status = gtk_toggle_button_get_active (togglebutton);
+        gboolean new_status = gtk_check_button_get_active (togglebutton);
         gboolean current_status = preferences_get_gnome_keyring_export();
 
         if (new_status != current_status)
@@ -62,6 +62,6 @@ G_MODULE_EXPORT void preferences_window_gnomekeyring_export_toggled (GtkToggleBu
 G_MODULE_EXPORT void preferences_window_ok_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
        	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
-	gtk_widget_destroy (widget); 
+	gtk_window_destroy(GTK_WINDOW(widget)); 
 
 }

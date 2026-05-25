@@ -23,7 +23,7 @@
 #ifndef GNOMINTCLI
 
 void new_req_window_display (void);
-void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data);
+void new_req_inherit_fields_toggled (GtkCheckButton *button, gpointer user_data);
 void new_req_tab_activate (int tab_number);
 void on_new_req_cn_entry_changed (GtkEditable *editable,
                                   gpointer user_data);

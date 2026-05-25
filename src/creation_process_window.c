@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,9 +56,9 @@ void creation_process_window_error_dialog (gchar *message)
 					 "%s",
 					 message);
    
-	gtk_dialog_run (GTK_DIALOG(dialog));
+	compat_dialog_run (GTK_DIALOG(dialog));
    
-	gtk_widget_destroy (dialog);
+	gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 void creation_process_window_ca_finish (void) 
@@ -79,10 +80,10 @@ void creation_process_window_ca_finish (void)
                                          GTK_BUTTONS_CLOSE,
                                          "%s",
                                          _("CA creation process finished"));
-        gtk_dialog_run (GTK_DIALOG(dialog));
+        compat_dialog_run (GTK_DIALOG(dialog));
         
-        gtk_widget_destroy (GTK_WIDGET(dialog));
-        gtk_widget_destroy (GTK_WIDGET(widget));
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 			
 
 }
@@ -113,7 +114,7 @@ gint creation_process_window_ca_pulse (gpointer data)
 
 	ca_creation_unlock_status_mutex();
 
-	gtk_main_iteration();
+	g_main_context_iteration(NULL, TRUE);
 
 	if (status > 0) {
 		creation_process_window_ca_finish ();
@@ -126,7 +127,7 @@ gint creation_process_window_ca_pulse (gpointer data)
 			printf ("%s\n\n", error_message);
 		}
 		widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 	}
 
 
@@ -154,7 +155,6 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 		return;
 	}
 	
-	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
 	if (!widget) {
@@ -162,11 +162,11 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 		return;
 	}
 	
-	gtk_widget_show_all (GTK_WIDGET(widget));
+	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 	
 	/* Process pending events to ensure window is displayed */
-	while (gtk_events_pending())
-		gtk_main_iteration();
+	while (g_main_context_pending(NULL))
+		g_main_context_iteration(NULL, TRUE);
 
 	creation_process_window_thread = ca_creation_launch_thread (ca_creation_data);
 
@@ -213,11 +213,11 @@ G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 					 "%s",
 					 _("Creation process cancelled"));
    
-	gtk_dialog_run (GTK_DIALOG(dialog));
+	compat_dialog_run (GTK_DIALOG(dialog));
 
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
-	gtk_widget_destroy (widget);
+	gtk_window_destroy(GTK_WINDOW(widget));
 	
 }
 
@@ -240,10 +240,10 @@ void creation_process_window_csr_finish (void) {
 					 GTK_BUTTONS_CLOSE,
 					 "%s",
 					 _("CSR creation process finished"));
-	gtk_dialog_run (GTK_DIALOG(dialog));
+	compat_dialog_run (GTK_DIALOG(dialog));
 	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
-	gtk_widget_destroy (widget);
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	gtk_window_destroy(GTK_WINDOW(widget));
 
 	dialog_refresh_list ();
 }
@@ -272,7 +272,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 
 	csr_creation_unlock_status_mutex();
 
-	gtk_main_iteration();
+	g_main_context_iteration(NULL, TRUE);
 
 	if (status > 0) {
 		creation_process_window_csr_finish ();
@@ -285,7 +285,7 @@ gint creation_process_window_csr_pulse (gpointer data)
 			printf ("%s\n\n", error_message);
 		}
 		widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window"));
-		gtk_widget_destroy (widget);
+		gtk_window_destroy(GTK_WINDOW(widget));
 	}
 
 
@@ -309,7 +309,6 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 		return;
 	}
 	
-	gtk_builder_connect_signals (creation_process_window_gtkb, NULL); 	
 	
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "titleLabel");
 	if (widget) {
@@ -322,11 +321,11 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 		return;
 	}
 	
-	gtk_widget_show_all (GTK_WIDGET(widget));
+	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 	
 	/* Process pending events to ensure window is displayed */
-	while (gtk_events_pending())
-		gtk_main_iteration();
+	while (g_main_context_pending(NULL))
+		g_main_context_iteration(NULL, TRUE);
 
 	creation_process_window_thread = csr_creation_launch_thread (ca_creation_data);
 

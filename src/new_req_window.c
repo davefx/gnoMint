@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -202,14 +203,14 @@ void __new_req_populate_ca_treeview (GtkTreeView *treeview)
 
 }
 
-G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gpointer user_data)
+G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkCheckButton *button, gpointer user_data)
 {
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
 	GtkTreeIter iter;
 
 
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")))) {
 		/* Inherit */
 		gtk_widget_set_sensitive (GTK_WIDGET(treeview), TRUE);
 		gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
@@ -227,7 +228,7 @@ G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkToggleButton *button, gp
 
 
 
-G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
+G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkCheckButton *button,
                                                      gpointer        user_data);
 
 void new_req_window_display()
@@ -242,15 +243,14 @@ void new_req_window_display()
 	gtk_builder_add_from_file (new_req_window_gtkb, ui_file, NULL);
 	g_free(ui_file);
 	
-	gtk_builder_connect_signals (new_req_window_gtkb, NULL); 	
 	
 	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_req_window_gtkb, "country_combobox1")));
 
 	__new_req_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview")));
 
-	new_req_inherit_fields_toggled (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
+	new_req_inherit_fields_toggled (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
 
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "rsa_radiobutton1")), TRUE);
+	gtk_check_button_set_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1")), TRUE);
 
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "keylength_spinbutton1")), 2048);
 
@@ -263,12 +263,26 @@ void new_req_window_display()
 	
 	if (san_manager_widget1) {
 		alignment = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "san_alignment1"));
-		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget1);
-		gtk_widget_show_all(san_manager_widget1);
+		gtk_box_append(GTK_BOX(alignment), san_manager_widget1);
+		gtk_widget_set_visible(san_manager_widget1, TRUE);
 	}
 
-	/* Force initial spinbutton/curve-combo visibility to match the
-	 * active radio. */
+	/* Connect signals explicitly (gtk_builder_connect_signals removed in GTK 4) */
+	GtkWidget *w;
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "dsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "ecdsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "eddsa_radiobutton1"));
+	if (w) g_signal_connect(w, "notify::active", G_CALLBACK(on_new_req_privkey_type_toggle), NULL);
+
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton"));
+	if (w) g_signal_connect(w, "toggled", G_CALLBACK(new_req_inherit_fields_toggled), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "manual_radiobutton"));
+	if (w) g_signal_connect(w, "toggled", G_CALLBACK(new_req_inherit_fields_toggled), NULL);
+
 	on_new_req_privkey_type_toggle (NULL, NULL);
 }
 
@@ -280,13 +294,13 @@ void new_req_tab_activate (int tab_number)
 
 }
 
-G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
+G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkCheckButton *button,
 						     gpointer        user_data)
 {
-	GtkToggleButton *rsatoggle   = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "rsa_radiobutton1"));
-	GtkToggleButton *dsatoggle   = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
-	GtkToggleButton *ecdsatoggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "ecdsa_radiobutton1"));
-	GtkToggleButton *eddsatoggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (new_req_window_gtkb, "eddsa_radiobutton1"));
+	GtkCheckButton *rsatoggle   = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1"));
+	GtkCheckButton *dsatoggle   = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "dsa_radiobutton1"));
+	GtkCheckButton *ecdsatoggle = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "ecdsa_radiobutton1"));
+	GtkCheckButton *eddsatoggle = GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "eddsa_radiobutton1"));
 
 	GtkAdjustment *adj = GTK_ADJUSTMENT (gtk_builder_get_object (new_req_window_gtkb, "AdjustmentKeyLengthSpinButton1"));
 	GtkWidget *spin    = GTK_WIDGET (gtk_builder_get_object (new_req_window_gtkb, "keylength_spinbutton1"));
@@ -294,7 +308,7 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
 	GtkLabel  *label   = GTK_LABEL  (gtk_builder_get_object (new_req_window_gtkb, "label99"));
 	gdouble    value   = gtk_spin_button_get_value (GTK_SPIN_BUTTON (spin));
 
-	if (rsatoggle && gtk_toggle_button_get_active (rsatoggle)) {
+	if (rsatoggle && gtk_check_button_get_active(rsatoggle)) {
 		gtk_adjustment_set_upper (adj, 10240);
 		gtk_widget_show (spin);
 		if (combo) gtk_widget_hide (combo);
@@ -302,7 +316,7 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
 			gtk_label_set_text (label, _("Private key bit length:"));
 			gtk_widget_show (GTK_WIDGET (label));
 		}
-	} else if (dsatoggle && gtk_toggle_button_get_active (dsatoggle)) {
+	} else if (dsatoggle && gtk_check_button_get_active(dsatoggle)) {
 		gtk_adjustment_set_upper (adj, 3072);
 		if (value > 3072)
 			gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), 3072);
@@ -312,14 +326,14 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkToggleButton *button,
 			gtk_label_set_text (label, _("Private key bit length:"));
 			gtk_widget_show (GTK_WIDGET (label));
 		}
-	} else if (ecdsatoggle && gtk_toggle_button_get_active (ecdsatoggle)) {
+	} else if (ecdsatoggle && gtk_check_button_get_active(ecdsatoggle)) {
 		gtk_widget_hide (spin);
 		if (combo) gtk_widget_show (combo);
 		if (label) {
 			gtk_label_set_text (label, _("ECDSA curve:"));
 			gtk_widget_show (GTK_WIDGET (label));
 		}
-	} else if (eddsatoggle && gtk_toggle_button_get_active (eddsatoggle)) {
+	} else if (eddsatoggle && gtk_check_button_get_active(eddsatoggle)) {
 		gtk_widget_hide (spin);
 		if (combo) gtk_widget_hide (combo);
 		if (label) gtk_widget_hide (GTK_WIDGET (label));
@@ -331,7 +345,7 @@ G_MODULE_EXPORT void on_new_req_cn_entry_changed (GtkEditable *editable,
 {
 	GtkButton *button = GTK_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "new_req_next2"));
 
-	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
+	if (strlen (gtk_editable_get_text(GTK_EDITABLE(editable)))) 
 		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
 	else
 		gtk_widget_set_sensitive (GTK_WIDGET(button), FALSE);
@@ -372,7 +386,7 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 	const gchar *pem;
 	gboolean inherit_fields;
 
-	inherit_fields = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
+	inherit_fields = gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
 
         if (inherit_fields && gtk_tree_selection_get_selected (selection, &model, &iter)) {
 
@@ -401,37 +415,37 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "ST_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "ST_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->st);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->st);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                        gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "L_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "L_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->l);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->l);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                        gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "O_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "O_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->o);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->o);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                        gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 }
                 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "OU_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "OU_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->ou);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->ou);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-			gtk_entry_set_text(GTK_ENTRY(widget), "");
+			gtk_editable_set_text(GTK_EDITABLE(widget), "");
 		}
                 
                 tls_cert_free (tlscert);
@@ -443,16 +457,16 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 		gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
         }
 
         g_free (value);
@@ -483,7 +497,7 @@ G_MODULE_EXPORT void on_new_req_cancel_clicked (GtkButton *widget,
 	
 	GtkWindow *window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
 
-	gtk_widget_destroy(GTK_WIDGET(window));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 	
 }
 
@@ -519,42 +533,42 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 	}
 		
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "st_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->state = g_strdup (text);
 	else
 		csr_creation_data->state = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "city_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->city = g_strdup (text);
 	else
 		csr_creation_data->city = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "o_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->org = g_strdup (text);
 	else
 		csr_creation_data->org = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "ou_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->ou = g_strdup (text);
 	else
 		csr_creation_data->ou = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "cn_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->cn = g_strdup (text);
 	else
 		csr_creation_data->cn = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "email_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->emailAddress = g_strdup (text);
 	else
@@ -580,11 +594,11 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 		    gtk_builder_get_object (new_req_window_gtkb, "ecdsa_radiobutton1"));
 		GtkWidget *dsa   = GTK_WIDGET (
 		    gtk_builder_get_object (new_req_window_gtkb, "dsa_radiobutton1"));
-		if (eddsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eddsa)))
+		if (eddsa && gtk_check_button_get_active (GTK_CHECK_BUTTON (eddsa)))
 			csr_creation_data->key_type = 3; /* EdDSA */
-		else if (ecdsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (ecdsa)))
+		else if (ecdsa && gtk_check_button_get_active (GTK_CHECK_BUTTON (ecdsa)))
 			csr_creation_data->key_type = 2; /* ECDSA */
-		else if (dsa && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dsa)))
+		else if (dsa && gtk_check_button_get_active (GTK_CHECK_BUTTON (dsa)))
 			csr_creation_data->key_type = 1; /* DSA */
 		else
 			csr_creation_data->key_type = 0; /* RSA */
@@ -613,7 +627,7 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
         }
 
 	window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
-	gtk_widget_destroy(GTK_WIDGET(window));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 
 	creation_process_window_csr_display (csr_creation_data);	
 

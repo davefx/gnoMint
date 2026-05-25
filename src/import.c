@@ -20,6 +20,7 @@
 #ifndef GNOMINTCLI
 
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #endif
 
 #include <glib-object.h>
@@ -49,7 +50,6 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_password_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (dialog_gtkb, NULL);
 	
 	password_widget = gtk_builder_get_object (dialog_gtkb, "import_password_entry");
 	description_widget = gtk_builder_get_object (dialog_gtkb, "import_crypted_part_description");
@@ -60,18 +60,18 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 
         gtk_widget_grab_focus (GTK_WIDGET(password_widget));
         widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
-        response = gtk_dialog_run(GTK_DIALOG(widget)); 
+        response = compat_dialog_run(GTK_DIALOG(widget)); 
 	
         if (!response) {
-                gtk_widget_destroy (GTK_WIDGET(widget));
+                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
                 g_object_unref (G_OBJECT(dialog_gtkb));
                 return NULL;
         } else {
-                password = g_strdup ((gchar *) gtk_entry_get_text (GTK_ENTRY(password_widget)));
+                password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
         }
 
 	widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 	g_object_unref (G_OBJECT(dialog_gtkb));
 
 	return password;

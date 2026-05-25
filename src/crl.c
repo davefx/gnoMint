@@ -26,6 +26,7 @@
 #include <glib-object.h>
 
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #endif
 
 #include "crl.h"
@@ -213,7 +214,6 @@ void crl_window_display (void)
 	gtk_builder_add_from_file (crl_window_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_crl_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (crl_window_gtkb, NULL);
 	
         widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_widget_show (widget);
@@ -226,7 +226,7 @@ void crl_window_display (void)
 G_MODULE_EXPORT void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata)
 {
 	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-        gtk_widget_destroy(GTK_WIDGET(window));	
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));	
 
 }
 
@@ -258,15 +258,14 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
 		
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_widget_destroy (GTK_WIDGET(dialog));
+	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return;
 	}
 
-	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	
 	strerror = crl_generate (ca_id, filename);
 	if (strerror) {
@@ -275,19 +274,19 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 		
 	}
 
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 						    GTK_DIALOG_DESTROY_WITH_PARENT,
 						    GTK_MESSAGE_INFO,
 						    GTK_BUTTONS_CLOSE,
 						    "%s",
 						    _("CRL generated successfully")));
-	gtk_dialog_run (GTK_DIALOG(dialog));
+	compat_dialog_run (GTK_DIALOG(dialog));
 	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
         dialog = GTK_DIALOG(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-        gtk_widget_destroy(GTK_WIDGET(dialog));	
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));	
 			
 }
 

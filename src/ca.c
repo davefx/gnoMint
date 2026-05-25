@@ -22,6 +22,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <gdk/gdk.h>
 #include <glib/gi18n.h>
 
@@ -170,7 +171,7 @@ static gchar *ca_search_text = NULL;
 
 /* Does the haystack (UTF-8) contain the needle (UTF-8) ignoring case?
  * Both are assumed non-NULL; an empty needle matches anything. */
-static gboolean
+gboolean
 __ca_search_match (const gchar *haystack, const gchar *needle)
 {
 	if (!needle || !*needle) return TRUE;
@@ -812,11 +813,7 @@ gboolean ca_refresh_model_callback ()
 				                   GINT_TO_POINTER (1));
 			}
 			/* Don't offer "Show them" if we're already in that mode. */
-			GtkWidget *button = gtk_info_bar_get_action_area (GTK_INFO_BAR (bar));
-			if (button) {
-				gtk_widget_set_sensitive (button, !ca_view_only_expiring);
-			}
-			gtk_widget_show (bar);
+			gtk_widget_set_visible (bar, TRUE);
 		} else if (bar) {
 			gtk_widget_hide (bar);
 		}
@@ -825,17 +822,16 @@ gboolean ca_refresh_model_callback ()
 	return TRUE;
 }
 
-/* Ctrl+F focuses the search entry (#53). Returning TRUE prevents
- * the event from propagating further; FALSE lets other handlers run.
- * GdkEventKey rather than the typed GdkEvent* so GtkBuilder can wire
- * the connect_signals_full() call directly. */
-G_MODULE_EXPORT gboolean
-ca_on_main_window_key_press (GtkWidget *widget G_GNUC_UNUSED,
-                             GdkEventKey *event,
-                             gpointer user_data G_GNUC_UNUSED)
+/* Ctrl+F focuses the search entry (#53). GTK 4 uses
+ * GtkEventControllerKey instead of the old key-press-event signal. */
+gboolean
+ca_on_key_pressed (GtkEventControllerKey *controller,
+                   guint keyval, guint keycode,
+                   GdkModifierType state,
+                   gpointer user_data G_GNUC_UNUSED)
 {
-	if ((event->state & GDK_CONTROL_MASK) &&
-	    (event->keyval == GDK_KEY_f || event->keyval == GDK_KEY_F)) {
+	if ((state & GDK_CONTROL_MASK) &&
+	    (keyval == GDK_KEY_f || keyval == GDK_KEY_F)) {
 		GObject *entry = gtk_builder_get_object (main_window_gtkb,
 		                                          "search_entry");
 		if (entry && GTK_IS_WIDGET (entry)) {
@@ -852,7 +848,7 @@ ca_on_main_window_key_press (GtkWidget *widget G_GNUC_UNUSED,
 G_MODULE_EXPORT void
 ca_on_search_changed (GtkSearchEntry *entry, gpointer user_data G_GNUC_UNUSED)
 {
-	const gchar *text = gtk_entry_get_text (GTK_ENTRY (entry));
+	const gchar *text = gtk_editable_get_text(GTK_EDITABLE(entry));
 	g_free (ca_search_text);
 	ca_search_text = (text && *text) ? g_strdup (text) : NULL;
 	ca_refresh_model_callback ();
@@ -1205,13 +1201,12 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 								  _("_Save"), GTK_RESPONSE_ACCEPT,
 								  NULL));
 		
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
-		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+	if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+		filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
 		file = g_io_channel_new_file (filename, "w", &error);
 		if (error) {
-			gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 			if (type == 1)
 				dialog_error (_("There was an error while exporting certificate."));
 			else
@@ -1247,7 +1242,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 		}
 
                 if (error) {
-                        gtk_widget_destroy (GTK_WIDGET(dialog));
+                        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
                         if (type == CA_FILE_ELEMENT_TYPE_CERT)
                                 dialog_error (_("There was an error while exporting certificate."));
                         else
@@ -1257,7 +1252,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 
                 g_io_channel_shutdown (file, TRUE, &error);
                 if (error) {
-                        gtk_widget_destroy (GTK_WIDGET(dialog));
+                        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
                         if (type == CA_FILE_ELEMENT_TYPE_CERT)
                                 dialog_error (_("There was an error while exporting certificate."));
                         else
@@ -1267,7 +1262,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 
                 g_io_channel_unref (file);
 
-                gtk_widget_destroy (GTK_WIDGET(dialog));
+                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
                 if (type == CA_FILE_ELEMENT_TYPE_CERT)
                         dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
                                                                     GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -1282,9 +1277,9 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                                                                     GTK_BUTTONS_CLOSE,
                                                                     "%s",
                                                                     _("Certificate signing request exported successfully")));
-                gtk_dialog_run (GTK_DIALOG(dialog));
+                compat_dialog_run (GTK_DIALOG(dialog));
 			
-                gtk_widget_destroy (GTK_WIDGET(dialog));
+                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
         }
 }
@@ -1307,15 +1302,14 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
 		
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_widget_destroy (GTK_WIDGET(dialog));
+	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return NULL;
 	}
 
-	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
@@ -1330,9 +1324,9 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 							    GTK_BUTTONS_CLOSE,
 							    "%s",
 							    _("Private key exported successfully")));
-		gtk_dialog_run (GTK_DIALOG(dialog));
+		compat_dialog_run (GTK_DIALOG(dialog));
 		
-		gtk_widget_destroy (GTK_WIDGET(dialog));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	} else {
 		dialog_error (strerror);
 	}
@@ -1358,15 +1352,14 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
 							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
         
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_widget_destroy (GTK_WIDGET(dialog));
+	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return;
 	}
         
-	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
 	
@@ -1382,9 +1375,9 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
                                                             GTK_BUTTONS_CLOSE,
                                                             "%s",
                                                             _("Private key exported successfully")));
-                gtk_dialog_run (GTK_DIALOG(dialog));
+                compat_dialog_run (GTK_DIALOG(dialog));
                 
-                gtk_widget_destroy (GTK_WIDGET(dialog));
+                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
         }
 	
 }
@@ -1409,15 +1402,14 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 				_("_Save"), GTK_RESPONSE_ACCEPT,
 				NULL));
 	
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_widget_destroy (GTK_WIDGET(dialog));
+	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return;
 	}
 
-	filename = g_strdup(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog)));
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
 
         error_msg = export_pkcs12 (id, type, filename);
@@ -1441,15 +1433,15 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 						    GTK_BUTTONS_CLOSE,
 						    "%s",
 						    _("Certificate exported successfully")));
-	gtk_dialog_run (GTK_DIALOG(dialog));
+	compat_dialog_run (GTK_DIALOG(dialog));
 	
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	
 	
 }
 
 
-G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
 	//GtkDialog * dialog = NULL;
@@ -1463,7 +1455,6 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 	gtk_builder_add_from_file (dialog_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "export_certificate_dialog.ui", NULL ),
 				   NULL);
-	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 	
 	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &has_pk_in_db, -1);			
 	widget = gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2");
@@ -1500,56 +1491,56 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 
 	widget = gtk_builder_get_object (dialog_gtkb, "export_certificate_dialog");
 
-	response = gtk_dialog_run(GTK_DIALOG(widget)); 
+	response = compat_dialog_run(GTK_DIALOG(widget)); 
 	
 	if (!response || response == GTK_RESPONSE_CANCEL) {
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		gtk_tree_iter_free (iter);
 		return;
 	} 
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
 		/* Export public part */
 		__ca_export_public_pem (iter, type);
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		gtk_tree_iter_free (iter);
 		
 		return;
 	}
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
 		/* Export private part (crypted) */
 		g_free (__ca_export_private_pkcs8 (iter, type));
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		gtk_tree_iter_free (iter);
 		
 		return;
 	}
 
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
 		/* Export private part (uncrypted) */
 		__ca_export_private_pem (iter, type);
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		gtk_tree_iter_free (iter);
 		
 		return;
 	}
 	
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
 		/* Export PKCS#12 structure */
 		__ca_export_pkcs12 (iter, type);
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		gtk_tree_iter_free (iter);
 		
 		return;
 	}
 	
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 	g_object_unref (G_OBJECT(dialog_gtkb));
 	gtk_tree_iter_free (iter);
 	dialog_error (_("Unexpected error"));
@@ -1558,7 +1549,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer use
 /* Export the full certificate chain (leaf + intermediates + root) as a
  * single PEM bundle. Intended use: deploy the bundle as a web server's
  * SSLCertificateChainFile / ssl_certificate. See #52. */
-G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+G_MODULE_EXPORT void ca_on_export_chain_activate (gpointer sender G_GNUC_UNUSED,
                                                   gpointer user_data G_GNUC_UNUSED)
 {
 	GtkTreeIter *iter = NULL;
@@ -1597,22 +1588,21 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_U
 	    GTK_FILE_CHOOSER_ACTION_SAVE,
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    _("_Save"),   GTK_RESPONSE_ACCEPT, NULL);
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 	if (cn && cn[0]) {
 		gchar *fname = g_strdup_printf ("%s.chain.pem", cn);
 		gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), fname);
 		g_free (fname);
 	}
 
-	gint resp = gtk_dialog_run (GTK_DIALOG (dialog));
+	gint resp = compat_dialog_run (GTK_DIALOG (dialog));
 	if (resp != GTK_RESPONSE_ACCEPT) {
-		gtk_widget_destroy (dialog);
+		gtk_window_destroy(GTK_WINDOW(dialog));
 		g_free (cn);
 		return;
 	}
 
-	gchar *filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-	gtk_widget_destroy (dialog);
+	gchar *filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+	gtk_window_destroy(GTK_WINDOW(dialog));
 
 	gchar *chain_pem = ca_file_get_chain_pem_from_id (cert_id);
 	if (! chain_pem) {
@@ -1633,8 +1623,8 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_U
 		    GTK_DIALOG_DESTROY_WITH_PARENT,
 		    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 		    "%s", _("Certificate chain exported successfully."));
-		gtk_dialog_run (GTK_DIALOG (info));
-		gtk_widget_destroy (info);
+		compat_dialog_run (GTK_DIALOG (info));
+		gtk_window_destroy(GTK_WINDOW(info));
 	}
 
 	g_free (chain_pem);
@@ -1653,7 +1643,7 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (GtkMenuItem *menuitem G_GNUC_U
  * list of cert ids and a list of CSR ids. The returned GSLists are
  * caller-owned (free with g_slist_free; no per-element free needed
  * since each element is a GUINT-boxed pointer). */
-static void
+void
 __ca_collect_selected_ids (GSList **cert_ids_out, GSList **csr_ids_out)
 {
 	*cert_ids_out = NULL;
@@ -1690,7 +1680,7 @@ __ca_collect_selected_ids (GSList **cert_ids_out, GSList **csr_ids_out)
  * cert (and skip CSRs / non-certs in the selection). Visible from the
  * Certificates menu and the right-click popup. */
 G_MODULE_EXPORT void
-ca_on_bulk_revoke_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+ca_on_bulk_revoke_activate (gpointer sender G_GNUC_UNUSED,
                             gpointer user_data G_GNUC_UNUSED)
 {
 	GSList *cert_ids = NULL, *csr_ids = NULL;
@@ -1717,8 +1707,8 @@ ca_on_bulk_revoke_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
 	      "it as invalid. CSRs in the selection (if any) are not affected; "
 	      "use \"Delete selected CSRs\" for those."));
 	g_free (msg);
-	gint resp = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	gint resp = compat_dialog_run (GTK_DIALOG (dialog));
+	gtk_window_destroy(GTK_WINDOW(dialog));
 
 	if (resp != GTK_RESPONSE_YES) {
 		g_slist_free (cert_ids);
@@ -1741,15 +1731,15 @@ ca_on_bulk_revoke_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
 	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
 	    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", summary);
 	g_free (summary);
-	gtk_dialog_run (GTK_DIALOG (info));
-	gtk_widget_destroy (info);
+	compat_dialog_run (GTK_DIALOG (info));
+	gtk_window_destroy(GTK_WINDOW(info));
 
 	dialog_refresh_list ();
 }
 
 /* GUI handler: bulk-delete CSRs from the current selection. */
 G_MODULE_EXPORT void
-ca_on_bulk_delete_csrs_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+ca_on_bulk_delete_csrs_activate (gpointer sender G_GNUC_UNUSED,
                                  gpointer user_data G_GNUC_UNUSED)
 {
 	GSList *cert_ids = NULL, *csr_ids = NULL;
@@ -1772,8 +1762,8 @@ ca_on_bulk_delete_csrs_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
 	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
 	    GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "<b>%s</b>", msg);
 	g_free (msg);
-	gint resp = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	gint resp = compat_dialog_run (GTK_DIALOG (dialog));
+	gtk_window_destroy(GTK_WINDOW(dialog));
 
 	if (resp != GTK_RESPONSE_YES) {
 		g_slist_free (csr_ids);
@@ -1792,7 +1782,7 @@ ca_on_bulk_delete_csrs_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
 	dialog_refresh_list ();
 }
 
-G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (gpointer sender, gpointer user_data)
 {
 	GtkTreeIter *iter = NULL;	
 	gint type;
@@ -1822,7 +1812,7 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, g
 }
 
 
-G_MODULE_EXPORT void ca_on_renew_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 {
 	GtkTreeIter *iter = NULL;
 	gint type = __ca_selection_type (GTK_TREE_VIEW (
@@ -1855,8 +1845,8 @@ G_MODULE_EXPORT void ca_on_renew_activate (GtkMenuItem *menuitem, gpointer user_
 	      "freshly-generated keypair. The old certificate will remain in "
 	      "the database — revoke it manually after you have deployed the "
 	      "new one.")));
-	response = gtk_dialog_run (confirm);
-	gtk_widget_destroy (GTK_WIDGET (confirm));
+	response = compat_dialog_run (confirm);
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET (confirm)));
 	if (response != GTK_RESPONSE_YES)
 		return;
 
@@ -1876,7 +1866,7 @@ G_MODULE_EXPORT void ca_on_renew_activate (GtkMenuItem *menuitem, gpointer user_
 
 /* Build and show the diff dialog from two PEM strings. Both must be
  * non-NULL; ownership stays with the caller. */
-static void
+void
 __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
                        const gchar *left_label, const gchar *right_label)
 {
@@ -1899,19 +1889,18 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 	gtk_window_set_default_size (GTK_WINDOW (dlg), 900, 600);
 
 	GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dlg));
-	gtk_container_set_border_width (GTK_CONTAINER (content), 8);
 
-	GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
+	GtkWidget *scroll = gtk_scrolled_window_new ();
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
 	                                 GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_widget_set_vexpand (scroll, TRUE);
 	gtk_widget_set_hexpand (scroll, TRUE);
-	gtk_box_pack_start (GTK_BOX (content), scroll, TRUE, TRUE, 0);
+	gtk_box_append (GTK_BOX (content), scroll);
 
 	GtkWidget *grid = gtk_grid_new ();
 	gtk_grid_set_column_spacing (GTK_GRID (grid), 12);
 	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
-	gtk_container_add (GTK_CONTAINER (scroll), grid);
+	gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scroll), grid);
 
 	/* Column headers. */
 	GtkWidget *l_hdr_left  = gtk_label_new (NULL);
@@ -1957,8 +1946,8 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 		gtk_label_set_xalign (GTK_LABEL (right), 0);
 		gtk_label_set_selectable (GTK_LABEL (left),  TRUE);
 		gtk_label_set_selectable (GTK_LABEL (right), TRUE);
-		gtk_label_set_line_wrap (GTK_LABEL (left),  TRUE);
-		gtk_label_set_line_wrap (GTK_LABEL (right), TRUE);
+		gtk_label_set_wrap (GTK_LABEL (left),  TRUE);
+		gtk_label_set_wrap (GTK_LABEL (right), TRUE);
 		gtk_widget_set_hexpand (left,  TRUE);
 		gtk_widget_set_hexpand (right, TRUE);
 
@@ -1968,16 +1957,16 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 		row++;
 	}
 
-	gtk_widget_show_all (dlg);
-	gtk_dialog_run (GTK_DIALOG (dlg));
-	gtk_widget_destroy (dlg);
+	gtk_widget_set_visible(dlg, TRUE);
+	compat_dialog_run (GTK_DIALOG (dlg));
+	gtk_window_destroy(GTK_WINDOW(dlg));
 	cert_diff_free (diff);
 }
 
 /* Menu callback: prompt for a PEM file via GtkFileChooser, then diff
  * against the currently-selected cert. */
 G_MODULE_EXPORT void
-ca_on_compare_with_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
+ca_on_compare_with_activate (gpointer sender G_GNUC_UNUSED,
                              gpointer user_data G_GNUC_UNUSED)
 {
 	GtkTreeIter *iter = NULL;
@@ -2008,11 +1997,11 @@ ca_on_compare_with_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
 	    GTK_FILE_CHOOSER_ACTION_OPEN,
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    _("_Open"),   GTK_RESPONSE_ACCEPT, NULL);
-	gint resp = gtk_dialog_run (GTK_DIALOG (chooser));
+	gint resp = compat_dialog_run (GTK_DIALOG (chooser));
 	gchar *path = (resp == GTK_RESPONSE_ACCEPT)
-	              ? gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser))
+	              ? g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser)))
 	              : NULL;
-	gtk_widget_destroy (chooser);
+	gtk_window_destroy(GTK_WINDOW(chooser));
 	if (!path) {
 		g_free (left_pem); g_free (left_subject);
 		return;
@@ -2037,7 +2026,7 @@ ca_on_compare_with_activate (GtkMenuItem *menuitem G_GNUC_UNUSED,
 	g_free (path);
 }
 
-G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
@@ -2077,8 +2066,8 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 							    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked). \n\nMoreover, revoking a CA certificate can invalidate all the certificates generated with it, so all them should be regenerated with a new CA certificate.")));
 	}
 
-	response = gtk_dialog_run(dialog);
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	response = compat_dialog_run(dialog);
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
 	if (response == GTK_RESPONSE_NO) {
 		gtk_tree_iter_free (iter);
@@ -2097,7 +2086,7 @@ G_MODULE_EXPORT void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user
 }
 
 
-G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
@@ -2119,8 +2108,8 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 						    "%s",
 						    _("Are you sure you want to delete this Certificate Signing Request?")));
 
-	response = gtk_dialog_run(dialog);
-	gtk_widget_destroy (GTK_WIDGET(dialog));
+	response = compat_dialog_run(dialog);
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
 	if (response == GTK_RESPONSE_NO) {
 		gtk_tree_iter_free (iter);
@@ -2134,7 +2123,7 @@ G_MODULE_EXPORT void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer use
 	dialog_refresh_list();
 }
 
-G_MODULE_EXPORT void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data)
+G_MODULE_EXPORT void ca_on_sign1_activate (gpointer sender, gpointer user_data)
 {
 	GtkTreeIter *iter = NULL;
 
@@ -2164,9 +2153,6 @@ gboolean ca_open (gchar *filename, gboolean create)
 	if (! ca_file_open (filename, create))
 		return FALSE;
 
-	__enable_widget ("new_certificate1");
-	__enable_widget ("save_as1");
-	__enable_widget ("preferences1");
 
 	/* Re-arm the expiry banner for the freshly-opened file. */
 	ca_expiry_infobar_dismissed = FALSE;
@@ -2178,7 +2164,7 @@ gboolean ca_open (gchar *filename, gboolean create)
 	{
 		GObject *e = gtk_builder_get_object (main_window_gtkb, "search_entry");
 		if (e && GTK_IS_ENTRY (e))
-			gtk_entry_set_text (GTK_ENTRY (e), "");
+			gtk_editable_set_text(GTK_EDITABLE(e), "");
 	}
 
 	dialog_refresh_list();
@@ -2217,14 +2203,14 @@ gchar * ca_get_selected_row_pem ()
 void ca_update_csr_view (gboolean new_value, gboolean refresh)
 {
         view_csr = new_value;
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_window_gtkb, "csr_view_menuitem")), new_value);
         if (refresh)
                 dialog_refresh_list();
 }
 
-G_MODULE_EXPORT gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_csr_view_toggled (gpointer sender, gpointer user_data)
 {
-        ca_update_csr_view (gtk_check_menu_item_get_active (button), TRUE);
+        view_csr = !view_csr;
+        ca_update_csr_view (view_csr, TRUE);
         if (view_csr != preferences_get_crq_visible())
                 preferences_set_crq_visible (view_csr);
 
@@ -2234,14 +2220,14 @@ G_MODULE_EXPORT gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer
 void ca_update_revoked_view (gboolean new_value, gboolean refresh)
 {
         view_rcrt = new_value;
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_window_gtkb, "revoked_view_menuitem")), new_value);
         if (refresh)
                 dialog_refresh_list();
 }
 
-G_MODULE_EXPORT gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_rcrt_view_toggled (gpointer sender, gpointer user_data)
 {
-        ca_update_revoked_view (gtk_check_menu_item_get_active (button), TRUE);
+        view_rcrt = !view_rcrt;
+        ca_update_revoked_view (view_rcrt, TRUE);
         if (view_rcrt != preferences_get_revoked_visible())
                 preferences_set_revoked_visible (view_rcrt);
 
@@ -2251,21 +2237,21 @@ G_MODULE_EXPORT gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointe
 void ca_update_expired_view (gboolean new_value, gboolean refresh)
 {
         view_expired = new_value;
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_window_gtkb, "expired_view_menuitem")), new_value);
         if (refresh)
                 dialog_refresh_list();
 }
 
-G_MODULE_EXPORT gboolean ca_expired_view_toggled (GtkCheckMenuItem *button, gpointer user_data)
+G_MODULE_EXPORT gboolean ca_expired_view_toggled (gpointer sender, gpointer user_data)
 {
-        ca_update_expired_view (gtk_check_menu_item_get_active (button), TRUE);
+        view_expired = !view_expired;
+        ca_update_expired_view (view_expired, TRUE);
         if (view_expired != preferences_get_expired_visible())
                 preferences_set_expired_visible (view_expired);
 
         return TRUE;
 }
 
-G_MODULE_EXPORT void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data)
+G_MODULE_EXPORT void ca_generate_crl (gpointer sender, gpointer user_data)
 {
         crl_window_display ();
 }
@@ -2274,144 +2260,58 @@ G_MODULE_EXPORT void ca_generate_crl (GtkCheckMenuItem *item, gpointer user_data
 
 
 
-G_MODULE_EXPORT gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
-				    GdkEvent *event, gpointer user_data)
+void
+ca_treeview_popup_handler (GtkGestureClick *gesture,
+                           int n_press, double x, double y,
+                           gpointer user_data)
 {
-	GdkEventButton *event_button;
-	GObject *menu, *widget;
+	GtkTreeView *tree_view = GTK_TREE_VIEW (user_data);
+	GMenuModel *menu_model = NULL;
 	GtkTreeIter *iter = NULL;
-	gboolean pk_indb, is_revoked;
 	gint selection_type;
-	GdkWindow *window;
-	gint x, y;
-	GdkRectangle rect;
 	GtkTreePath *path = NULL;
 	GtkTreeSelection *selection;
-	
-	g_return_val_if_fail (event != NULL, FALSE);
-	
-	if (event->type == GDK_BUTTON_PRESS) {
 
-		event_button = (GdkEventButton *) event;
-		if (event_button->button == 3) {
-			/* Select the row under cursor before showing menu */
-			if (gtk_tree_view_get_path_at_pos(tree_view, 
-							  (gint)event_button->x, 
-							  (gint)event_button->y,
-							  &path, NULL, NULL, NULL)) {
-				selection = gtk_tree_view_get_selection(tree_view);
-				gtk_tree_selection_select_path(selection, path);
-				gtk_tree_path_free(path);
-			}
-			
-			/* Handle right-click popup menu directly */
-			selection_type  = __ca_selection_type (tree_view, &iter);
-			
-			switch (selection_type) {
-				
-			case CA_FILE_ELEMENT_TYPE_CERT:
-				if (!cert_popup_menu_gtkb) {
-					if (iter)
-						gtk_tree_iter_free (iter);
-					return FALSE;
-				}
-				
-				menu = gtk_builder_get_object (cert_popup_menu_gtkb,
-							     "certificate_popup_menu");
-				
-				if (!menu) {
-					if (iter)
-						gtk_tree_iter_free (iter);
-					return FALSE;
-				}
-				
-				gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-						   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-						   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
-				
-				widget = gtk_builder_get_object (cert_popup_menu_gtkb, "extract_pkey_menuitem");
-				if (widget)
-					gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-				
-				widget = gtk_builder_get_object (cert_popup_menu_gtkb, "revoke_menuitem");
-				if (widget)
-					gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
-
-				/* Get click position and show menu there */
-				window = gtk_widget_get_window (GTK_WIDGET(tree_view));
-				if (window) {
-					gdk_window_get_device_position (window, event_button->device, &x, &y, NULL);
-					
-					rect.x = x;
-					rect.y = y;
-					rect.width = 1;
-					rect.height = 1;
-					
-					/* Detach if already attached to avoid warning, then attach and show */
-					gtk_menu_detach (GTK_MENU(menu));
-					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
-					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
-								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST, 
-								(GdkEvent *)event_button);
-				}
-				gtk_tree_iter_free (iter);
-				return TRUE;  /* Event handled */
-			case CA_FILE_ELEMENT_TYPE_CSR:
-				if (!csr_popup_menu_gtkb) {
-					if (iter)
-						gtk_tree_iter_free (iter);
-					return FALSE;
-				}
-				
-				menu = gtk_builder_get_object (csr_popup_menu_gtkb,
-							     "csr_popup_menu");
-
-				if (!menu) {
-					if (iter)
-						gtk_tree_iter_free (iter);
-					return FALSE;
-				}
-
-				gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, 
-						   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-						   -1);
-				
-				widget = gtk_builder_get_object (csr_popup_menu_gtkb, "extract_pkey_menuitem3");
-				if (widget)
-					gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-				
-				/* Get click position and show menu there */
-				window = gtk_widget_get_window (GTK_WIDGET(tree_view));
-				if (window) {
-					gdk_window_get_device_position (window, event_button->device, &x, &y, NULL);
-					
-					rect.x = x;
-					rect.y = y;
-					rect.width = 1;
-					rect.height = 1;
-					
-					/* Detach if already attached to avoid warning, then attach and show */
-					gtk_menu_detach (GTK_MENU(menu));
-					gtk_menu_attach_to_widget (GTK_MENU(menu), GTK_WIDGET(tree_view), NULL);
-					gtk_menu_popup_at_rect (GTK_MENU(menu), window, &rect,
-								GDK_GRAVITY_SOUTH_EAST, GDK_GRAVITY_NORTH_WEST,
-								(GdkEvent *)event_button);
-				}
-				gtk_tree_iter_free (iter);
-				return TRUE;  /* Event handled */
-			default:
-			case -1:
-				if (iter)
-					gtk_tree_iter_free (iter);
-				return FALSE;
-			}
-		}
+	/* Select the row under cursor before showing menu */
+	if (gtk_tree_view_get_path_at_pos(tree_view, (gint)x, (gint)y,
+	                                   &path, NULL, NULL, NULL)) {
+		selection = gtk_tree_view_get_selection(tree_view);
+		gtk_tree_selection_select_path(selection, path);
+		gtk_tree_path_free(path);
 	}
-	
-	return FALSE;
+
+	selection_type = __ca_selection_type (tree_view, &iter);
+
+	switch (selection_type) {
+	case CA_FILE_ELEMENT_TYPE_CERT:
+		if (!cert_popup_menu_gtkb) goto cleanup;
+		menu_model = G_MENU_MODEL (gtk_builder_get_object (
+		                 cert_popup_menu_gtkb, "certificate_popup_menu"));
+		break;
+	case CA_FILE_ELEMENT_TYPE_CSR:
+		if (!csr_popup_menu_gtkb) goto cleanup;
+		menu_model = G_MENU_MODEL (gtk_builder_get_object (
+		                 csr_popup_menu_gtkb, "csr_popup_menu"));
+		break;
+	default:
+		goto cleanup;
+	}
+
+	if (!menu_model) goto cleanup;
+
+	{
+		GtkWidget *popover = gtk_popover_menu_new_from_model (menu_model);
+		GdkRectangle rect = { (int)x, (int)y, 1, 1 };
+		gtk_popover_set_pointing_to (GTK_POPOVER (popover), &rect);
+		gtk_widget_set_parent (popover, GTK_WIDGET (tree_view));
+		gtk_popover_popup (GTK_POPOVER (popover));
+	}
+
+cleanup:
+	if (iter) gtk_tree_iter_free (iter);
 }
 
-G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data) 
+G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpointer user_data) 
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
@@ -2426,11 +2326,10 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 	gtk_builder_add_from_file (dialog_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "change_password_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 
 	if (ca_file_is_password_protected()) {
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
+		gtk_check_button_set_active (GTK_CHECK_BUTTON(widget), TRUE);
 
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label1");
 		g_object_set (G_OBJECT(widget), "visible", TRUE, NULL);
@@ -2455,7 +2354,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 
 	} else {
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_no_radiobutton");
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(widget), TRUE);
+		gtk_check_button_set_active (GTK_CHECK_BUTTON(widget), TRUE);
 
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label1");
 		g_object_set (G_OBJECT(widget), "visible", FALSE, NULL);
@@ -2494,19 +2393,19 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 
 		widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
 		gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
-		response = gtk_dialog_run(GTK_DIALOG(widget)); 
+		response = compat_dialog_run(GTK_DIALOG(widget)); 
 		
 		if (!response || response == GTK_RESPONSE_CANCEL) {
-			gtk_widget_destroy (GTK_WIDGET(widget));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 			g_object_unref (G_OBJECT(dialog_gtkb));
 			return;
 		} 
 		
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
-		newpwd = gtk_entry_get_text (GTK_ENTRY(widget));
+		newpwd = gtk_editable_get_text(GTK_EDITABLE(widget));
 		
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
-		currpwd = gtk_entry_get_text (GTK_ENTRY(widget));
+		currpwd = gtk_editable_get_text(GTK_EDITABLE(widget));
 
 		repeat = (ca_file_is_password_protected() && ! ca_file_check_password (currpwd));
 		
@@ -2520,7 +2419,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 	} while (repeat);
 	
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (widget))) {
 
 		if (ca_file_is_password_protected()) {
 			// It's a password change
@@ -2536,9 +2435,9 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 									    GTK_BUTTONS_CLOSE,
 									    "%s",
 									    _("Password changed successfully")));
-				gtk_dialog_run (GTK_DIALOG(dialog));
+				compat_dialog_run (GTK_DIALOG(dialog));
 				
-				gtk_widget_destroy (GTK_WIDGET(dialog));
+				gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 			}
 
 		} else {
@@ -2556,9 +2455,9 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 									    GTK_BUTTONS_CLOSE,
 									    "%s",
 									    _("Password established successfully")));
-				gtk_dialog_run (GTK_DIALOG(dialog));
+				compat_dialog_run (GTK_DIALOG(dialog));
 				
-				gtk_widget_destroy (GTK_WIDGET(dialog));
+				gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 			}
 		}
 	} else {
@@ -2575,9 +2474,9 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 									    GTK_BUTTONS_CLOSE,
 									    "%s",
 									    _("Password removed successfully")));
-				gtk_dialog_run (GTK_DIALOG(dialog));
+				compat_dialog_run (GTK_DIALOG(dialog));
 				
-				gtk_widget_destroy (GTK_WIDGET(dialog));
+				gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
 			}
 
@@ -2589,7 +2488,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, 
 	}
 
 	widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 
 }
 
@@ -2605,16 +2504,16 @@ G_MODULE_EXPORT gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gp
 	gboolean pwd_protect;
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	pwd_protect = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+	pwd_protect = gtk_check_button_get_active (GTK_CHECK_BUTTON (widget));
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
-	pwd1 = gtk_entry_get_text (GTK_ENTRY(widget));
+	pwd1 = gtk_editable_get_text(GTK_EDITABLE(widget));
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry2");
-	pwd2 = gtk_entry_get_text (GTK_ENTRY(widget));
+	pwd2 = gtk_editable_get_text(GTK_EDITABLE(widget));
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
-	currpwd = gtk_entry_get_text (GTK_ENTRY(widget));
+	currpwd = gtk_editable_get_text(GTK_EDITABLE(widget));
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_commit_button");
 	if (pwd_protect) {
@@ -2647,7 +2546,7 @@ G_MODULE_EXPORT gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget
 		return TRUE;
 
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (widget))) {
 		/* We want to password-protect the database */
 		
 		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_label2");
@@ -2697,14 +2596,13 @@ G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer us
 	gtk_builder_add_from_file (dialog_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "dh_parameters_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 	
 
 	dialog = GTK_DIALOG(gtk_builder_get_object (dialog_gtkb, "dh_parameters_dialog"));
-	response = gtk_dialog_run(dialog); 
+	response = compat_dialog_run(dialog); 
 	
 	if (!response) {
-		gtk_widget_destroy (GTK_WIDGET(dialog));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		return;
 	} 
@@ -2718,30 +2616,29 @@ G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer us
 							  _("_Cancel"), GTK_RESPONSE_CANCEL,
 							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
-	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog2), TRUE);
 	
-	if (gtk_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
+	if (compat_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
 
-		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog2));
+		filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog2)));
 
 		strerror = export_dh_param (dh_size, filename);
 
 		if (strerror) {
-			gtk_widget_destroy (GTK_WIDGET(dialog2));
-			gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog2)));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 			dialog_error (strerror);
 		} else {
-			gtk_widget_destroy (GTK_WIDGET(dialog2));
-			gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog2)));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 			dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 								    GTK_DIALOG_DESTROY_WITH_PARENT,
 								    GTK_MESSAGE_INFO,
 								    GTK_BUTTONS_CLOSE,
 								    "%s",
 								    _("Diffie-Hellman parameters saved successfully")));
-			gtk_dialog_run (GTK_DIALOG(dialog));
+			compat_dialog_run (GTK_DIALOG(dialog));
 			
-			gtk_widget_destroy (GTK_WIDGET(dialog));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		}
 
 
@@ -2759,30 +2656,30 @@ G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer us
  */ 
 
 
-G_MODULE_EXPORT void on_add_self_signed_ca_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_add_self_signed_ca_activate  (gpointer sender, gpointer     user_data)
 {
 	new_ca_window_display();
 	
 }
 
-G_MODULE_EXPORT void on_add_csr_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_add_csr_activate  (gpointer sender, gpointer     user_data)
 {
 	new_req_window_display();
 	
 }
 
-G_MODULE_EXPORT void on_wizard_web_activate  (GtkToolButton *toolbutton, gpointer user_data)
+G_MODULE_EXPORT void on_wizard_web_activate  (gpointer sender, gpointer user_data)
 {
 	wizard_window_display(WIZARD_CERT_TYPE_WEB_SERVER);
 }
 
-G_MODULE_EXPORT void on_wizard_email_activate  (GtkToolButton *toolbutton, gpointer user_data)
+G_MODULE_EXPORT void on_wizard_email_activate  (gpointer sender, gpointer user_data)
 {
 	wizard_window_display(WIZARD_CERT_TYPE_EMAIL_SERVER);
 }
 
 
-G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_data)
 {
 
 	gchar *filename;
@@ -2790,7 +2687,7 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
 	GObject *main_window_widget, *widget;
 	GtkWidget *dialog;
 	GtkBuilder * dialog_gtkb = NULL;
-        GtkToggleButton *radiobutton = NULL;
+        GtkCheckButton *radiobutton = NULL;
 	gint response = 0;
         gboolean import_file = TRUE;
 	
@@ -2800,21 +2697,20 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
 	gtk_builder_add_from_file (dialog_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_file_or_directory_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (dialog_gtkb, NULL);
 
         widget = gtk_builder_get_object (dialog_gtkb, "import_file_or_directory_dialog");
-        response = gtk_dialog_run (GTK_DIALOG(widget));
+        response = compat_dialog_run (GTK_DIALOG(widget));
 
         if (response < 0) {
-                gtk_widget_destroy (GTK_WIDGET(widget));
+                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
                 g_object_unref (G_OBJECT(dialog_gtkb));
                 return;
         }
 
-        radiobutton = GTK_TOGGLE_BUTTON(gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
-        import_file = gtk_toggle_button_get_active(radiobutton);
+        radiobutton = GTK_CHECK_BUTTON(gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
+        import_file = gtk_check_button_get_active(radiobutton);
 
-        gtk_widget_destroy (GTK_WIDGET(widget));
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 
         if (import_file) {
                 // Import single file
@@ -2825,12 +2721,12 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
                                                       _("_Open"), GTK_RESPONSE_ACCEPT,
                                                       NULL);
                 
-                if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+                if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
                 {
-                        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-                        gtk_widget_destroy (dialog);
+                        filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+                        gtk_window_destroy(GTK_WINDOW(dialog));
                 } else {
-                        gtk_widget_destroy (dialog);
+                        gtk_window_destroy(GTK_WINDOW(dialog));
                         return;
                 }		
                 
@@ -2842,9 +2738,9 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
                                                          _("Problem when importing '%s' file"),
                                                          filename);
                         
-                        gtk_dialog_run (GTK_DIALOG(dialog));
+                        compat_dialog_run (GTK_DIALOG(dialog));
                         
-                        gtk_widget_destroy (dialog);
+                        gtk_window_destroy(GTK_WINDOW(dialog));
                 }
                 return;
         } else {
@@ -2859,12 +2755,12 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
                                                       _("_Open"), GTK_RESPONSE_ACCEPT,
                                                       NULL);
                 
-                if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+                if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
                 {
-                        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-                        gtk_widget_destroy (dialog);
+                        filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
+                        gtk_window_destroy(GTK_WINDOW(dialog));
                 } else {
-                        gtk_widget_destroy (dialog);
+                        gtk_window_destroy(GTK_WINDOW(dialog));
                         return;
                 }		
 
@@ -2877,9 +2773,9 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
                                                          GTK_BUTTONS_CLOSE,
                                                          "%s", result);
                         
-                        gtk_dialog_run (GTK_DIALOG(dialog));
+                        compat_dialog_run (GTK_DIALOG(dialog));
                         
-                        gtk_widget_destroy (dialog);
+                        gtk_window_destroy(GTK_WINDOW(dialog));
                 }
                 return;
 
@@ -2895,12 +2791,12 @@ G_MODULE_EXPORT void on_import1_activate  (GtkMenuItem *menuitem, gpointer     u
 
 
 
-G_MODULE_EXPORT void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_preferences1_activate  (gpointer sender, gpointer     user_data)
 {
         preferences_window_display ();
 }
 
-G_MODULE_EXPORT void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data)
+G_MODULE_EXPORT void on_properties1_activate  (gpointer sender, gpointer     user_data)
 {
 	ca_treeview_row_activated (NULL, NULL, NULL, NULL);
 }

@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <glib/gi18n.h>
 #include <string.h>
 #include <arpa/inet.h>
@@ -148,7 +149,7 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 	value_entry = GTK_ENTRY(gtk_builder_get_object(data->editor_builder, "san_value_entry"));
 	
 	// Set parent window
-	parent = gtk_widget_get_toplevel(GTK_WIDGET(data->treeview));
+	parent = GTK_WIDGET(gtk_widget_get_root(GTK_WIDGET(data->treeview)));
 	if (GTK_IS_WINDOW(parent))
 		gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(parent));
 	
@@ -161,14 +162,14 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 	}
 	
 	if (initial_value)
-		gtk_entry_set_text(value_entry, initial_value);
+		gtk_editable_set_text(GTK_EDITABLE(value_entry), initial_value);
 	else
-		gtk_entry_set_text(value_entry, "");
+		gtk_editable_set_text(GTK_EDITABLE(value_entry), "");
 	
 	gtk_widget_grab_focus(GTK_WIDGET(value_entry));
 	
 	while (TRUE) {
-		response = gtk_dialog_run(dialog);
+		response = compat_dialog_run(dialog);
 		
 		if (response == GTK_RESPONSE_OK) {
 			GtkTreeIter iter;
@@ -186,7 +187,7 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 				type = SAN_TYPE_DNS;
 			}
 			
-			value = gtk_entry_get_text(value_entry);
+			value = gtk_editable_get_text(GTK_EDITABLE(value_entry));
 			
 			// Validate
 			if (san_validate(type, value, &error_msg)) {
@@ -202,8 +203,8 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 					GTK_MESSAGE_ERROR,
 					GTK_BUTTONS_OK,
 					"%s", error_msg);
-				gtk_dialog_run(GTK_DIALOG(error_dialog));
-				gtk_widget_destroy(error_dialog);
+				compat_dialog_run(GTK_DIALOG(error_dialog));
+				gtk_window_destroy(GTK_WINDOW(error_dialog));
 				g_free(error_msg);
 				// Continue loop to let user correct
 			}
