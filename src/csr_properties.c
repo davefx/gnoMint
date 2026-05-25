@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,7 +43,6 @@ void csr_properties_display(const char *csr_pem, gboolean privkey_in_db)
 	gtk_builder_add_from_file (csr_properties_window_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "csr_properties_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (csr_properties_window_gtkb, NULL);
 	
 	__csr_properties_populate (csr_pem, privkey_in_db);
        
@@ -91,6 +91,6 @@ G_MODULE_EXPORT void csr_properties_close_clicked (const char *csr_pem)
         GObject *widget = NULL;
 	widget = gtk_builder_get_object (csr_properties_window_gtkb, "csr_properties_dialog");
 	g_assert (widget);
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 }
 

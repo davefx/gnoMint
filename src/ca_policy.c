@@ -129,7 +129,7 @@ void ca_policy_populate (guint64 ca_id)
 	strvalue = ((gchar *) g_hash_table_lookup (policy_table, "CRL_DISTRIBUTION_POINT"));
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "crl_distribution_point_entry");
 	if (strvalue)
-		gtk_entry_set_text (GTK_ENTRY(widget), strvalue);
+		gtk_editable_set_text(GTK_EDITABLE(widget), strvalue);
 
 	strvalue = (gchar *) g_hash_table_lookup (policy_table, "MONTHS_TO_EXPIRE");
 	value = strvalue ? atoi(strvalue) : 0;
@@ -264,7 +264,7 @@ G_MODULE_EXPORT void ca_policy_crl_distribution_point_change(gpointer gtkentry, 
 
 	cert_id = atoll(cert_id_str);
 
-	ca_file_policy_set (cert_id, "CRL_DISTRIBUTION_POINT", gtk_entry_get_text(gtkentry));
+	ca_file_policy_set (cert_id, "CRL_DISTRIBUTION_POINT", gtk_editable_get_text(GTK_EDITABLE(gtkentry)));
 
 }
 
@@ -283,7 +283,7 @@ G_MODULE_EXPORT void ca_policy_toggle_button_toggled (gpointer button, gpointer 
 	if (! button)
 		return;
 
-	const gchar * widget_name = gtk_buildable_get_name(GTK_BUILDABLE(button));
+	const gchar * widget_name = gtk_buildable_get_buildable_id(GTK_BUILDABLE(button));
 
 
 	cert_id = atoll(cert_id_str);

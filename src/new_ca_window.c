@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,7 +54,6 @@ void new_ca_window_display()
 	gtk_builder_add_from_file(new_ca_window_gtkb, ui_file, NULL);
 	g_free(ui_file);
 	
-	gtk_builder_connect_signals (new_ca_window_gtkb, NULL); 	
 	
 	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_ca_window_gtkb, "country_combobox")));
 
@@ -70,8 +70,8 @@ void new_ca_window_display()
 	
 	if (san_manager_widget) {
 		alignment = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "san_alignment"));
-		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget);
-		gtk_widget_show_all(san_manager_widget);
+		gtk_box_append(GTK_BOX(alignment), san_manager_widget);
+		gtk_widget_set_visible(san_manager_widget, TRUE);
 	}
 
 	/* Force initial spinbutton/curve-combo visibility to match the
@@ -144,7 +144,7 @@ G_MODULE_EXPORT void on_cn_entry_changed (GtkEditable *editable,
 {
 	GtkButton *button = GTK_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_next1"));
 
-	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
+	if (strlen (gtk_editable_get_text(GTK_EDITABLE(editable)))) 
 		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
 	else
 		gtk_widget_set_sensitive (GTK_WIDGET(button), FALSE);
@@ -181,7 +181,7 @@ G_MODULE_EXPORT void on_new_ca_cancel_clicked (GtkButton *widget,
 	
 	GtkWindow *window = GTK_WINDOW(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window"));
 
-	gtk_widget_destroy(GTK_WIDGET(window));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 	
 }
 
@@ -196,8 +196,8 @@ G_MODULE_EXPORT void on_new_ca_pwd_entry_changed (GtkEntry *entry,
 	GtkEntry *pwd_entry_2 = GTK_ENTRY(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_pwd_entry_2"));
 	GtkButton *commit_button = GTK_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_commit"));
 
-	text1 = gtk_entry_get_text (pwd_entry_1);
-	text2 = gtk_entry_get_text (pwd_entry_2);
+	text1 = gtk_editable_get_text(GTK_EDITABLE(pwd_entry_1));
+	text2 = gtk_editable_get_text(GTK_EDITABLE(pwd_entry_2));
 
 	if (strlen(text1) && strlen(text2) && ! strcmp(text1, text2)) {
 		gtk_widget_set_sensitive (GTK_WIDGET(commit_button), TRUE);		
@@ -208,10 +208,10 @@ G_MODULE_EXPORT void on_new_ca_pwd_entry_changed (GtkEntry *entry,
 }
 
 
-G_MODULE_EXPORT void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton, 
+G_MODULE_EXPORT void on_new_ca_pwd_protect_radiobutton_toggled (GtkCheckButton *radiobutton, 
 						     gpointer user_data)
 {
-	GtkRadioButton *yes = GTK_RADIO_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, 
+	GtkCheckButton *yes = GTK_CHECK_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, 
 								     "new_ca_pwd_protect_yes_radiobutton"));
 	GtkLabel *pwd_label_1 = GTK_LABEL(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_pwd_label_1"));
 	GtkLabel *pwd_label_2 = GTK_LABEL(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_pwd_label_2"));
@@ -267,42 +267,42 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 	}
 		
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "st_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->state = g_strdup (text);
 	else
 		ca_creation_data->state = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "city_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->city = g_strdup (text);
 	else
 		ca_creation_data->city = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "o_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->org = g_strdup (text);
 	else
 		ca_creation_data->org = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "ou_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->ou = g_strdup (text);
 	else
 		ca_creation_data->ou = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "cn_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->cn = g_strdup (text);
 	else
 		ca_creation_data->cn = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "email_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->emailAddress = g_strdup (text);
 	else
@@ -378,7 +378,7 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "crl_distribution_point_entry"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		ca_creation_data->crl_distribution_point = g_strdup (text);
 	else
@@ -397,7 +397,7 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
         }
 
 	window = GTK_WINDOW(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window"));
-	gtk_widget_destroy(GTK_WIDGET(window));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 
 	creation_process_window_ca_display (ca_creation_data);
 	

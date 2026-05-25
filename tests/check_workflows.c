@@ -49,6 +49,7 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include "tls.h"
@@ -96,10 +97,10 @@ extern gboolean ca_file_check_if_is_csr_id (guint64 csr_id);
 extern GList * ca_file_get_revoked_certs (guint64 ca_id, gchar **error);
 
 /* Callbacks under test. All are G_MODULE_EXPORT in the production code. */
-extern void on_add_self_signed_ca_activate (GtkMenuItem *, gpointer);
-extern void ca_on_extractprivatekey1_activate (GtkMenuItem *, gpointer);
-extern void ca_on_sign1_activate (GtkMenuItem *, gpointer);
-extern void ca_on_revoke_activate (GtkMenuItem *, gpointer);
+extern void on_add_self_signed_ca_activate (gpointer sender, gpointer);
+extern void ca_on_extractprivatekey1_activate (gpointer sender, gpointer);
+extern void ca_on_sign1_activate (gpointer sender, gpointer);
+extern void ca_on_revoke_activate (gpointer sender, gpointer);
 extern gboolean ca_treeview_row_activated (GtkTreeView *, GtkTreePath *,
                                            GtkTreeViewColumn *, gpointer);
 
@@ -232,7 +233,7 @@ auto_dismiss_tick (gpointer user_data G_GNUC_UNUSED)
         if (GTK_IS_DIALOG (w)) {
             gtk_dialog_response (GTK_DIALOG (w), auto_dismiss_response);
         } else {
-            gtk_widget_destroy (w);
+            gtk_window_destroy(GTK_WINDOW(w));
         }
         auto_dismiss_count++;
         /* Treat the dismissed widget as now-known so we don't try a second
@@ -270,8 +271,8 @@ drain_events (void)
     /* Pump pending events long enough to flush any destroys queued by
      * auto_dismiss_tick. Capped by iteration count so we don't loop
      * forever if something keeps creating events. */
-    for (int i = 0; i < 200 && gtk_events_pending (); i++)
-        gtk_main_iteration_do (FALSE);
+    for (int i = 0; i < 200 && g_main_context_pending(NULL); i++)
+        g_main_context_iteration(NULL, FALSE);
 }
 
 /* ------------------------------------------------------------------ */
@@ -324,9 +325,6 @@ test_init_main_window (void)
     }
     g_free (path);
 
-    gtk_builder_connect_signals (main_window_gtkb, NULL);
-    gtk_builder_connect_signals (cert_popup_menu_gtkb, NULL);
-    gtk_builder_connect_signals (csr_popup_menu_gtkb, NULL);
 
     dialog_establish_refresh_function (ca_refresh_model_callback);
 
@@ -799,13 +797,12 @@ scenario_sign_csr_has_san_editor (void)
      * san_manager_widget added at runtime). */
     GObject *container = gtk_builder_get_object (new_cert_window_gtkb,
                                                   "san_alignment");
-    if (!container || !GTK_IS_CONTAINER (container)) {
+    if (!container || !GTK_IS_WIDGET (container)) {
         fail_test ("san-editor", "san_alignment widget missing from .ui");
         goto out;
     }
-    GList *kids = gtk_container_get_children (GTK_CONTAINER (container));
-    int n_kids = g_list_length (kids);
-    g_list_free (kids);
+    GtkWidget *first_child = gtk_widget_get_first_child (GTK_WIDGET (container));
+    int n_kids = first_child ? 1 : 0;
     if (n_kids == 0) {
         fail_test ("san-editor",
                    "san_alignment is empty — SAN editor wasn't attached");
@@ -823,7 +820,7 @@ scenario_sign_csr_has_san_editor (void)
     GObject *win = gtk_builder_get_object (new_cert_window_gtkb,
                                             "new_cert_window");
     if (win && GTK_IS_WIDGET (win))
-        gtk_widget_destroy (GTK_WIDGET (win));
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET (win)));
     drain_events ();
 
     int crits = critical_messages_check_and_reset ("san-editor");
@@ -1706,7 +1703,7 @@ out:
         GObject *win = gtk_builder_get_object (new_ca_window_gtkb,
                                                 "new_ca_window");
         if (win && GTK_IS_WIDGET (win))
-            gtk_widget_destroy (GTK_WIDGET (win));
+            gtk_window_destroy(GTK_WINDOW(GTK_WIDGET (win)));
         g_object_unref (new_ca_window_gtkb);
         new_ca_window_gtkb = NULL;
     }
@@ -1866,7 +1863,7 @@ scenario_search_filter (void)
 
     /* Apply a filter that should match a small subset. "gnoMint" appears
      * in cert id 3's CN ("gnoMint program"). */
-    gtk_entry_set_text (entry, "gnoMint");
+    gtk_editable_set_text(GTK_EDITABLE(entry), "gnoMint");
     /* search-changed has a debounce timeout in GtkSearchEntry; invoke
      * the handler directly so the test isn't time-dependent. */
     ca_on_search_changed ((GtkSearchEntry *) entry, NULL);
@@ -1886,7 +1883,7 @@ scenario_search_filter (void)
     }
 
     /* Apply a filter that should match nothing. */
-    gtk_entry_set_text (entry, "xx-no-such-cert-xx");
+    gtk_editable_set_text(GTK_EDITABLE(entry), "xx-no-such-cert-xx");
     ca_on_search_changed ((GtkSearchEntry *) entry, NULL);
     drain_events ();
     gint none = count_visible_leaves ();
@@ -1898,7 +1895,7 @@ scenario_search_filter (void)
     }
 
     /* Clear the filter — everything should come back. */
-    gtk_entry_set_text (entry, "");
+    gtk_editable_set_text(GTK_EDITABLE(entry), "");
     ca_on_search_changed ((GtkSearchEntry *) entry, NULL);
     drain_events ();
     gint restored = count_visible_leaves ();
@@ -1926,7 +1923,7 @@ out:
 int
 main (int argc, char **argv)
 {
-    if (!gtk_init_check (&argc, &argv)) {
+    if (!gtk_init_check()) {
         fprintf (stderr,
                  "FAIL: gtk_init_check failed under GDK_BACKEND=%s "
                  "(WAYLAND_DISPLAY=%s).\n"

@@ -1,772 +1,239 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
-  <object class="GtkImage" id="addcaimg">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">addca.png</property>
-  </object>
-  <object class="GtkImage" id="addcsrimg">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">addcsr.png</property>
-  </object>
-  <object class="GtkImage" id="extractpkeyimg">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">extractpkey.png</property>
-  </object>
-  <object class="GtkImage" id="signimg">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">sign.png</property>
-  </object>
-  <object class="GtkImage" id="wizardwebimg">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">wizard-webserver.png</property>
-  </object>
-  <object class="GtkImage" id="wizardwebimg_menu">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">wizard-webserver.png</property>
-  </object>
-  <object class="GtkImage" id="wizardemailimg">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">wizard-email.png</property>
-  </object>
-  <object class="GtkImage" id="wizardemailimg_menu">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">wizard-email.png</property>
-  </object>
+  <requires lib="gtk" version="4.0"/>
+  <menu id="menubar">
+    <submenu>
+      <attribute name="label" translatable="yes">_Certificates</attribute>
+      <section>
+        <item><attribute name="label" translatable="yes">_New certificate database</attribute><attribute name="action">win.new-db</attribute></item>
+        <item><attribute name="label" translatable="yes">_Open certificate database</attribute><attribute name="action">win.open-db</attribute></item>
+        <item><attribute name="label" translatable="yes">Open _recents</attribute><attribute name="action">win.open-recents</attribute></item>
+        <item><attribute name="label" translatable="yes">_Save certificate database as...</attribute><attribute name="action">win.save-as</attribute></item>
+      </section>
+      <section>
+        <submenu>
+          <attribute name="label" translatable="yes">Add</attribute>
+          <section>
+            <item><attribute name="label" translatable="yes">_Add self-signed CA</attribute><attribute name="action">win.add-ca</attribute></item>
+            <item><attribute name="label" translatable="yes">Add _Certificate Request</attribute><attribute name="action">win.add-csr</attribute></item>
+          </section>
+        </submenu>
+        <item><attribute name="label" translatable="yes">Add _Web Server Certificate (wizard)</attribute><attribute name="action">win.wizard-web</attribute></item>
+        <item><attribute name="label" translatable="yes">Add _Email Server Certificate (wizard)</attribute><attribute name="action">win.wizard-email</attribute></item>
+        <item><attribute name="label" translatable="yes">Extrac_t private key</attribute><attribute name="action">win.extract-pkey</attribute></item>
+        <item><attribute name="label" translatable="yes">Re_new with fresh key</attribute><attribute name="action">win.renew</attribute></item>
+        <item><attribute name="label" translatable="yes">Revo_ke</attribute><attribute name="action">win.revoke</attribute></item>
+        <item><attribute name="label" translatable="yes">_Sign</attribute><attribute name="action">win.sign</attribute></item>
+        <item><attribute name="label" translatable="yes">Delete</attribute><attribute name="action">win.delete</attribute></item>
+      </section>
+      <section><item><attribute name="label" translatable="yes">Generate _CRL</attribute><attribute name="action">win.generate-crl</attribute></item></section>
+      <section><item><attribute name="label" translatable="yes">Generate D_H parameters...</attribute><attribute name="action">win.generate-dh</attribute></item></section>
+      <section><item><attribute name="label" translatable="yes">Change database pass_word</attribute><attribute name="action">win.change-password</attribute></item></section>
+      <section>
+        <item><attribute name="label" translatable="yes">_Import</attribute><attribute name="action">win.import</attribute></item>
+        <item><attribute name="label" translatable="yes">E_xport</attribute><attribute name="action">win.export</attribute></item>
+        <item><attribute name="label" translatable="yes">Export full c_hain...</attribute><attribute name="action">win.export-chain</attribute></item>
+      </section>
+      <section>
+        <item><attribute name="label" translatable="yes">Revoke _all selected...</attribute><attribute name="action">win.bulk-revoke</attribute></item>
+        <item><attribute name="label" translatable="yes">Delete all selected _CSRs...</attribute><attribute name="action">win.bulk-delete-csrs</attribute></item>
+      </section>
+      <section><item><attribute name="label" translatable="yes">_Quit</attribute><attribute name="action">app.quit</attribute></item></section>
+    </submenu>
+    <submenu>
+      <attribute name="label" translatable="yes">_Edit</attribute>
+      <section><item><attribute name="label" translatable="yes">Properties</attribute><attribute name="action">win.properties</attribute></item></section>
+      <section><item><attribute name="label" translatable="yes">Preferences</attribute><attribute name="action">win.preferences</attribute></item></section>
+    </submenu>
+    <submenu>
+      <attribute name="label" translatable="yes">_View</attribute>
+      <section>
+        <item><attribute name="label" translatable="yes">Certificate _Signing Requests</attribute><attribute name="action">win.view-csrs</attribute></item>
+        <item><attribute name="label" translatable="yes">_Revoked Certificates</attribute><attribute name="action">win.view-revoked</attribute></item>
+        <item><attribute name="label" translatable="yes">E_xpired Certificates</attribute><attribute name="action">win.view-expired</attribute></item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name="label" translatable="yes">_Help</attribute>
+      <section><item><attribute name="label" translatable="yes">About</attribute><attribute name="action">app.about</attribute></item></section>
+    </submenu>
+  </menu>
   <object class="GtkWindow" id="main_window1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="title" translatable="yes">gnoMint</property>
-    <property name="role">gnoMint_main</property>
-    <property name="window_position">center</property>
+    <property name="title" translatable="1">gnoMint</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
-    <property name="icon">gnomint.png</property>
-    <signal name="delete-event" handler="on_main_window1_delete" swapped="no"/>
-    <signal name="key-press-event" handler="ca_on_main_window_key_press" swapped="no"/>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
+    <property name="child">
       <object class="GtkBox" id="vbox1">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkMenuBar" id="menubar1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkMenuItem" id="file1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Certificates</property>
-                <property name="use_underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu" id="file1_menu1">
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkImageMenuItem" id="new1">
-                        <property name="label" translatable="yes">_New certificate database</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_new1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="open1">
-                        <property name="label" translatable="yes">_Open certificate database</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_open1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="openrecentsmenuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Open _recents</property>
-                        <property name="use_underline">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="save_as1">
-                        <property name="label" translatable="yes">_Save certificate database as...</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_save_as1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separator1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="gtk-add">
-                        <property name="label">gtk-add</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <child type="submenu">
-                          <object class="GtkMenu" id="menu3">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkImageMenuItem" id="new2">
-                                <property name="label" translatable="yes">_Add self-signed CA</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_underline">True</property>
-                                <property name="use_stock">False</property>
-                                <signal name="activate" handler="on_add_self_signed_ca_activate" swapped="no"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkImageMenuItem" id="new_certificate1">
-                                <property name="label" translatable="yes">Add _Certificate Request</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_underline">True</property>
-                                <property name="use_stock">False</property>
-                                <signal name="activate" handler="on_add_csr_activate" swapped="no"/>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="wizard_web_menuitem">
-                        <property name="label" translatable="yes">Add _Web Server Certificate (wizard)</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">Quick certificate generation for a web server, signed by an existing CA</property>
-                        <property name="image">wizardwebimg_menu</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_wizard_web_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="wizard_email_menuitem">
-                        <property name="label" translatable="yes">Add _Email Server Certificate (wizard)</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">Quick certificate generation for an email server, signed by an existing CA</property>
-                        <property name="image">wizardemailimg_menu</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_wizard_email_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="extractprivatekey1">
-                        <property name="label" translatable="yes">Extrac_t private key</property>
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup">Extract the saved private key to an external file or device</property>
-                        <property name="tooltip_text" translatable="yes">Extract the saved private key to an external file or device</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="ca_on_extractprivatekey1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="renew1">
-                        <property name="label" translatable="yes">Re_new with fresh key</property>
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="tooltip_text" translatable="yes">Issue a new certificate with the same subject and SAN as this one, signed by the same CA with a freshly-generated keypair. The old certificate is left in place; revoke it manually after you have deployed the new one.</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="ca_on_renew_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="revoke1">
-                        <property name="label" translatable="yes">Revo_ke</property>
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="ca_on_revoke_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="sign1">
-                        <property name="label" translatable="yes">_Sign</property>
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="ca_on_sign1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="delete2">
-                        <property name="label">gtk-delete</property>
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="ca_on_delete2_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separatormenuitem4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="generate_crl_menuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup">Generate the current Certificate Revocation List</property>
-                        <property name="tooltip_text" translatable="yes">Generate the current Certificate Revocation List</property>
-                        <property name="label" translatable="yes">Generate _CRL</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_generate_crl" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separator3">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="generate_dh_menuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Generate D_H parameters...</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_generate_dh_param_show" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separator4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="change_pwd_menuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">Change database pass_word</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_on_change_pwd_menuitem_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separator5">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="import1">
-                        <property name="label" translatable="yes">_Import</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">False</property>
-                        <signal name="activate" handler="on_import1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="export1">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">E_xport</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="ca_on_export1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="export_chain1">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Export full c_hain...</property>
-                        <property name="use_underline">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">Export the selected certificate together with every intermediate CA up to the root, bundled into a single PEM file ready to deploy as a web server's chain file.</property>
-                        <signal name="activate" handler="ca_on_export_chain_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="bulk_separator">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="bulk_revoke1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Revoke _all selected...</property>
-                        <property name="use_underline">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">Revoke every selected certificate. Use Ctrl-click / Shift-click in the tree to build a multi-selection. CSRs in the selection are skipped.</property>
-                        <signal name="activate" handler="ca_on_bulk_revoke_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="bulk_delete_csrs1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Delete all selected _CSRs...</property>
-                        <property name="use_underline">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">Delete every selected Certificate Signing Request. Certificates in the selection are not affected; use Revoke for those.</property>
-                        <signal name="activate" handler="ca_on_bulk_delete_csrs_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="quit1">
-                        <property name="label">gtk-quit</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_quit1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="edit1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Edit</property>
-                <property name="use_underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu" id="edit1_menu1">
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkImageMenuItem" id="properties1">
-                        <property name="label">gtk-properties</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_properties1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparatorMenuItem" id="separator2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="preferences1">
-                        <property name="label">gtk-preferences</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_preferences1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="menuitem1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">_View</property>
-                <property name="use_underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu" id="menu1">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <child>
-                      <object class="GtkCheckMenuItem" id="csr_view_menuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">Certificate _Signing Requests</property>
-                        <property name="use_underline">True</property>
-                        <property name="active">True</property>
-                        <signal name="toggled" handler="ca_csr_view_toggled" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckMenuItem" id="revoked_view_menuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">_Revoked Certificates</property>
-                        <property name="use_underline">True</property>
-                        <property name="active">True</property>
-                        <signal name="toggled" handler="ca_rcrt_view_toggled" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckMenuItem" id="expired_view_menuitem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">E_xpired Certificates</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">When unchecked, certificates whose validity has already ended are hidden from the tree. A certificate is also considered expired if any of its issuing CAs has expired, so an expired CA's whole subtree is hidden alongside it.</property>
-                        <property name="use_underline">True</property>
-                        <property name="active">True</property>
-                        <signal name="toggled" handler="ca_expired_view_toggled" swapped="no"/>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="help1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Help</property>
-                <property name="use_underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu" id="help1_menu1">
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkImageMenuItem" id="about1">
-                        <property name="label">gtk-about</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_about1_activate" swapped="no"/>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
+          <object class="GtkPopoverMenuBar" id="menubar1">
+            <property name="menu-model">menubar</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
-          <object class="GtkToolbar" id="toolbar1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
+          <object class="GtkBox" id="toolbar1">
+            <property name="css-classes">toolbar</property>
+            <property name="valign">center</property>
             <child>
-              <object class="GtkToolButton" id="toolbutton1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Create a new database</property>
-                <property name="tooltip_text" translatable="yes">Create a new database</property>
-                <property name="stock_id">gtk-new</property>
-                <signal name="clicked" handler="on_new1_activate" swapped="no"/>
+              <object class="GtkButton" id="toolbutton1">
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Create a new database</property>
+                <property name="icon-name">document-new</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbutton2">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Open an existing database</property>
-                <property name="tooltip_text" translatable="yes">Open an existing database</property>
-                <property name="stock_id">gtk-open</property>
-                <signal name="clicked" handler="on_open1_activate" swapped="no"/>
+              <object class="GtkButton" id="toolbutton2">
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Open an existing database</property>
+                <property name="icon-name">document-open</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkSeparatorToolItem" id="toolbutton4">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
+              <object class="GtkSeparator" id="toolbutton4">
+                <property name="orientation">vertical</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="addca_toolbutton">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Add an autosigned CA</property>
-                <property name="tooltip_text" translatable="yes">Add an autosigned CA</property>
-                <property name="label" translatable="yes">Add autosigned CA certificate</property>
-                <property name="icon_widget">addcaimg</property>
-                <signal name="clicked" handler="on_add_self_signed_ca_activate" swapped="no"/>
+              <object class="GtkButton" id="addca_toolbutton">
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Add an autosigned CA</property>
+                <property name="label" translatable="1">Add autosigned CA certificate</property>
+                <property name="child">
+                  <object class="GtkImage" id="addcaimg">
+                    <property name="file">addca.png</property>
+                  </object>
+                </property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="addcsr_toolbutton">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Add a new Certificate Signing Request</property>
-                <property name="tooltip_text" translatable="yes">Add a new Certificate Signing Request</property>
-                <property name="label" translatable="yes">Add CSR</property>
-                <property name="icon_widget">addcsrimg</property>
-                <signal name="clicked" handler="on_add_csr_activate" swapped="no"/>
+              <object class="GtkButton" id="addcsr_toolbutton">
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Add a new Certificate Signing Request</property>
+                <property name="label" translatable="1">Add CSR</property>
+                <property name="child">
+                  <object class="GtkImage" id="addcsrimg">
+                    <property name="file">addcsr.png</property>
+                  </object>
+                </property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkSeparatorToolItem" id="toolbutton6">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
+              <object class="GtkSeparator" id="toolbutton6">
+                <property name="orientation">vertical</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="extractpkey_toolbutton">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Extract the private key of the selected item into a external file</property>
-                <property name="tooltip_text" translatable="yes">Extract the private key of the selected item into a external file</property>
-                <property name="label" translatable="yes">Extract Private Key</property>
-                <property name="icon_widget">extractpkeyimg</property>
-                <signal name="clicked" handler="ca_on_extractprivatekey1_activate" swapped="no"/>
+              <object class="GtkButton" id="extractpkey_toolbutton">
+                <property name="sensitive">0</property>
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Extract the private key of the selected item into a external file</property>
+                <property name="label" translatable="1">Extract Private Key</property>
+                <property name="child">
+                  <object class="GtkImage" id="extractpkeyimg">
+                    <property name="file">extractpkey.png</property>
+                  </object>
+                </property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="revoke_toolbutton">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Revoke the selected certificate</property>
-                <property name="tooltip_text" translatable="yes">Revoke the selected certificate</property>
-                <property name="label" translatable="yes">Revoke</property>
-                <property name="stock_id">gtk-cancel</property>
-                <signal name="clicked" handler="ca_on_revoke_activate" swapped="no"/>
+              <object class="GtkButton" id="revoke_toolbutton">
+                <property name="sensitive">0</property>
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Revoke the selected certificate</property>
+                <property name="label" translatable="1">Revoke</property>
+                <property name="icon-name">process-stop</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="sign_toolbutton">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Sign the selected Certificate Signing Request</property>
-                <property name="tooltip_text" translatable="yes">Sign the selected Certificate Signing Request</property>
-                <property name="label" translatable="yes">Sign</property>
-                <property name="icon_widget">signimg</property>
-                <signal name="clicked" handler="ca_on_sign1_activate" swapped="no"/>
+              <object class="GtkButton" id="sign_toolbutton">
+                <property name="sensitive">0</property>
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Sign the selected Certificate Signing Request</property>
+                <property name="label" translatable="1">Sign</property>
+                <property name="child">
+                  <object class="GtkImage" id="signimg">
+                    <property name="file">sign.png</property>
+                  </object>
+                </property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="delete_toolbutton">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Delete the selected Certificate Signing Request</property>
-                <property name="tooltip_text" translatable="yes">Delete the selected Certificate Signing Request</property>
-                <property name="stock_id">gtk-delete</property>
-                <signal name="clicked" handler="ca_on_delete2_activate" swapped="no"/>
+              <object class="GtkButton" id="delete_toolbutton">
+                <property name="sensitive">0</property>
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Delete the selected Certificate Signing Request</property>
+                <property name="icon-name">edit-delete</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkSeparatorToolItem" id="toolbutton7">
-                <property name="visible">True</property>
+              <object class="GtkSeparator" id="toolbutton7">
+                <property name="orientation">vertical</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="wizard_web_toolbutton">
-                <property name="visible">True</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Quick certificate generation for web server</property>
-                <property name="tooltip_text" translatable="yes">Quick certificate generation for web server</property>
-                <property name="label" translatable="yes">Web Server Wizard</property>
-                <property name="icon_widget">wizardwebimg</property>
-                <signal name="clicked" handler="on_wizard_web_activate"/>
+              <object class="GtkButton" id="wizard_web_toolbutton">
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Quick certificate generation for web server</property>
+                <property name="label" translatable="1">Web Server Wizard</property>
+                <property name="child">
+                  <object class="GtkImage" id="wizardwebimg">
+                    <property name="file">wizard-webserver.png</property>
+                  </object>
+                </property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="wizard_email_toolbutton">
-                <property name="visible">True</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup">Quick certificate generation for email server</property>
-                <property name="tooltip_text" translatable="yes">Quick certificate generation for email server</property>
-                <property name="label" translatable="yes">Email Server Wizard</property>
-                <property name="icon_widget">wizardemailimg</property>
-                <signal name="clicked" handler="on_wizard_email_activate"/>
+              <object class="GtkButton" id="wizard_email_toolbutton">
+                <property name="has_tooltip">1</property>
+                <property name="tooltip_text" translatable="1">Quick certificate generation for email server</property>
+                <property name="label" translatable="1">Email Server Wizard</property>
+                <property name="child">
+                  <object class="GtkImage" id="wizardemailimg">
+                    <property name="file">wizard-email.png</property>
+                  </object>
+                </property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">1</property>
-          </packing>
         </child>
         <child>
           <object class="GtkInfoBar" id="expiry_infobar">
-            <property name="visible">False</property>
-            <property name="no_show_all">True</property>
+            <property name="visible">0</property>
             <property name="message_type">warning</property>
-            <property name="show_close_button">True</property>
-            <signal name="response" handler="ca_expiry_infobar_response" swapped="no"/>
-            <child internal-child="content_area">
-              <object class="GtkBox" id="expiry_infobar_content">
-                <property name="visible">True</property>
-                <property name="spacing">8</property>
-                <child>
-                  <object class="GtkLabel" id="expiry_infobar_label">
-                    <property name="visible">True</property>
-                    <property name="label">…</property>
-                    <property name="xalign">0</property>
-                    <property name="wrap">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
+            <property name="show_close_button">1</property>
+            <child>
+              <object class="GtkLabel" id="expiry_infobar_label">
+                <property name="hexpand">1</property>
+                <property name="label">...</property>
+                <property name="xalign">0</property>
+                <property name="wrap">1</property>
               </object>
             </child>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
         </child>
         <child>
           <object class="GtkSearchEntry" id="search_entry">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="placeholder_text" translatable="yes">Filter certificates by subject or serial…</property>
-            <signal name="search-changed" handler="ca_on_search_changed" swapped="no"/>
+            <property name="focusable">1</property>
+            <property name="placeholder_text" translatable="1">Filter certificates by subject or serial...</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">3</property>
-          </packing>
         </child>
         <child>
           <object class="GtkScrolledWindow" id="scrolledwindow6">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="shadow_type">in</property>
-            <child>
+            <property name="vexpand">1</property>
+            <property name="focusable">1</property>
+            <property name="child">
               <object class="GtkTreeView" id="ca_treeview">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="rules_hint">True</property>
-                <signal name="button-press-event" handler="ca_treeview_popup_handler" swapped="no"/>
-                <signal name="cursor-changed" handler="ca_treeview_selection_change" swapped="no"/>
-                <signal name="row-activated" handler="ca_treeview_row_activated" swapped="no"/>
+                <property name="focusable">1</property>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection">
                     <property name="mode">multiple</property>
                   </object>
                 </child>
               </object>
-            </child>
+            </property>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">4</property>
-          </packing>
         </child>
       </object>
-    </child>
+    </property>
   </object>
 </interface>

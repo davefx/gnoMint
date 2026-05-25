@@ -19,6 +19,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -288,7 +289,7 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
     GtkWidget *dialog = GTK_WIDGET(user_data);
     GtkWidget *server_name_entry = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "server_name_entry"));
     GtkWidget *signing_ca_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "signing_ca_combo"));
-    const gchar *server_name = gtk_entry_get_text (GTK_ENTRY(server_name_entry));
+    const gchar *server_name = gtk_editable_get_text(GTK_EDITABLE(server_name_entry));
     
     // Validate server name
     if (!server_name || strlen(server_name) == 0) {
@@ -358,13 +359,13 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
     dialog_refresh_list();
     
     // Close dialog
-    gtk_widget_destroy (dialog);
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 static void on_wizard_cancel_button_clicked (GtkButton *button, gpointer user_data)
 {
     GtkWidget *dialog = GTK_WIDGET(user_data);
-    gtk_widget_destroy (dialog);
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 void wizard_window_display (WizardCertType cert_type)
@@ -465,7 +466,7 @@ void wizard_window_display (WizardCertType cert_type)
     gtk_combo_box_set_active (GTK_COMBO_BOX(cert_type_combo), cert_type);
     
     // Connect signals - builder will be unreferenced when dialog is destroyed
-    g_signal_connect (dialog, "destroy", G_CALLBACK(gtk_widget_destroyed), &wizard_window_gtkb);
+    g_object_add_weak_pointer (G_OBJECT(wizard_window_gtkb), (gpointer *)&wizard_window_gtkb);
     g_signal_connect_swapped (dialog, "destroy", G_CALLBACK(g_object_unref), wizard_window_gtkb);
     
     g_signal_connect (generate_button, "clicked", 
@@ -474,5 +475,5 @@ void wizard_window_display (WizardCertType cert_type)
                       G_CALLBACK(on_wizard_cancel_button_clicked), dialog);
     
     // Show dialog
-    gtk_widget_show_all (dialog);
+    gtk_widget_set_visible(dialog, TRUE);
 }

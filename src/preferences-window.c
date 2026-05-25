@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +40,6 @@ void preferences_window_display()
 	gtk_builder_add_from_file (preferences_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "preferences_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (preferences_window_gtkb, NULL);
 	
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_window_gtkb, "gnomekeyring_export_check")),
                                       preferences_get_gnome_keyring_export());
@@ -62,6 +62,6 @@ G_MODULE_EXPORT void preferences_window_gnomekeyring_export_toggled (GtkToggleBu
 G_MODULE_EXPORT void preferences_window_ok_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
        	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
-	gtk_widget_destroy (widget); 
+	gtk_window_destroy(GTK_WINDOW(widget)); 
 
 }

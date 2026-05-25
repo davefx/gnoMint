@@ -38,7 +38,7 @@ void on_new_ca_cancel_clicked (GtkButton *widget,
 			       gpointer user_data);
 void on_new_ca_pwd_entry_changed (GtkEntry *entry,
                                   gpointer user_data);
-void on_new_ca_pwd_protect_radiobutton_toggled (GtkRadioButton *radiobutton, 
+void on_new_ca_pwd_protect_radiobutton_toggled (GtkCheckButton *radiobutton, 
                                                 gpointer user_data);
 void on_new_ca_commit_clicked (GtkButton *widg,
 			       gpointer user_data);

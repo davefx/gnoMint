@@ -21,6 +21,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <gdk/gdk.h>
 #endif
 
@@ -54,7 +55,7 @@ gchar * __pkey_manage_aes_decrypt_aux (const gchar *string, const gchar *passwor
 #ifndef GNOMINTCLI
 
 // CALLBACKS
-G_MODULE_EXPORT gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data);
+G_MODULE_EXPORT gboolean pkey_manage_filechooser_file_set_cb (GtkWidget *widget, gpointer user_data);
 
 gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 {
@@ -69,7 +70,6 @@ gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 	gtk_builder_add_from_file (dialog_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_db_password_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals(dialog_gtkb, NULL);
 
 	password_widget = gtk_builder_get_object (dialog_gtkb, "cadb_password_entry");
 
@@ -85,19 +85,19 @@ gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 	gtk_widget_grab_focus (GTK_WIDGET(password_widget));
 	
 	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-	response = gtk_dialog_run(GTK_DIALOG(widget)); 
+	response = compat_dialog_run(GTK_DIALOG(widget)); 
 	
 	if (!response) {
-		gtk_widget_destroy (GTK_WIDGET(widget));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
 		g_free (message);
 		return NULL;
 	} else {
-		password = g_strdup ((gchar *) gtk_entry_get_text (GTK_ENTRY(password_widget)));
+		password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
 	}
 	
 	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 	g_object_unref (G_OBJECT(dialog_gtkb));
 
 	g_free (message);
@@ -106,7 +106,7 @@ gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 }
 
 
-gboolean pkey_manage_filechooser_file_set_cb (GtkFileChooserButton *widget, gpointer user_data)
+gboolean pkey_manage_filechooser_file_set_cb (GtkWidget *widget, gpointer user_data)
 {
 	GtkWidget *remember_filepath_widget = NULL;
 
@@ -216,7 +216,6 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 			gtk_builder_add_from_file (dialog_gtkb, 
 						   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_pkey_dialog.ui", NULL),
 						   NULL);
-			gtk_builder_connect_signals (dialog_gtkb, NULL);
 			
 			filepath_widget = gtk_builder_get_object (dialog_gtkb, "pkey_filechooser");
 			
@@ -224,25 +223,25 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 			g_object_set (G_OBJECT(remember_filepath_widget), "visible", FALSE, NULL);
 			
 			gtk_widget_grab_focus (GTK_WIDGET(filepath_widget));
-			gtk_file_chooser_set_filename (GTK_FILE_CHOOSER(filepath_widget), file_name); 
+			{ GFile *_f = g_file_new_for_path(file_name); gtk_file_chooser_set_file(GTK_FILE_CHOOSER(filepath_widget), _f, NULL); g_object_unref(_f); }; 
 			g_object_set_data (G_OBJECT(filepath_widget), "save_filename_checkbutton", remember_filepath_widget);
 
 			widget = gtk_builder_get_object (dialog_gtkb, "cert_dn_label");
 			gtk_label_set_text (GTK_LABEL(widget), cert->dn);
 			
 			widget = gtk_builder_get_object (dialog_gtkb, "get_pkey_dialog");
-			response = gtk_dialog_run(GTK_DIALOG(widget)); 
+			response = compat_dialog_run(GTK_DIALOG(widget)); 
 			
 			if (! response) {
 				cancel = TRUE;
 			} else {
 				g_free (file_name);
-				file_name = g_strdup ((gchar *) gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(filepath_widget)));
+				file_name = g_strdup ((gchar *) g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(filepath_widget))));
 				save_new_filename = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(remember_filepath_widget));
 			}
 			
 			widget = gtk_builder_get_object (dialog_gtkb, "get_pkey_dialog");
-			gtk_widget_destroy (GTK_WIDGET(widget));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 			g_object_unref (G_OBJECT(dialog_gtkb));
 
                         #else
@@ -726,7 +725,6 @@ gchar * pkey_manage_ask_password ()
 	gtk_builder_add_from_file (dialog_gtkb, 
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_db_password_dialog.ui", NULL),
 				   NULL);
-	gtk_builder_connect_signals (dialog_gtkb, NULL); 	
 	
 	password_widget = gtk_builder_get_object (dialog_gtkb, "cadb_password_entry");
 	remember_password_widget = gtk_builder_get_object (dialog_gtkb, "remember_password_checkbutton");
@@ -749,14 +747,14 @@ gchar * pkey_manage_ask_password ()
 			
 
 		widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-		response = gtk_dialog_run(GTK_DIALOG(widget)); 
+		response = compat_dialog_run(GTK_DIALOG(widget)); 
 	
 		if (!response) {
-			gtk_widget_destroy (GTK_WIDGET(widget));
+			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 			g_object_unref (G_OBJECT(dialog_gtkb));
 			return NULL;
 		} else {
-			password = g_strdup ((gchar *) gtk_entry_get_text (GTK_ENTRY(password_widget)));
+			password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
 			remember = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(remember_password_widget));
 		}
 
@@ -776,7 +774,7 @@ gchar * pkey_manage_ask_password ()
 	}
 
 	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-	gtk_widget_destroy (GTK_WIDGET(widget));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 	g_object_unref (G_OBJECT(dialog_gtkb));
 
 

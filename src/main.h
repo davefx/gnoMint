@@ -5,12 +5,12 @@
 //
 //  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 3 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
@@ -26,19 +26,19 @@
 #include <gtk/gtk.h>
 
 
-void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data);
-gboolean on_main_window1_delete (GtkWidget *widget, GdkEvent *event, gpointer user_data);
-void on_add_self_signed_ca_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_add_csr_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_new1_activate (GtkMenuItem *menuitem, gpointer     user_data);
-void on_open1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_open_recent_activate (GtkRecentChooser *chooser, gpointer user_data);
-void on_save_as1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_import1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_quit1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_clear1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_properties1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_preferences1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
-void on_about1_activate  (GtkMenuItem *menuitem, gpointer     user_data);
+gboolean on_main_window1_delete (GtkWindow *window);
+void on_add_self_signed_ca_activate  (gpointer sender, gpointer     user_data);
+void on_add_csr_activate  (gpointer sender, gpointer     user_data);
+void on_new1_activate (gpointer sender, gpointer     user_data);
+void on_open1_activate  (gpointer sender, gpointer     user_data);
+void on_save_as1_activate  (gpointer sender, gpointer     user_data);
+void on_import1_activate  (gpointer sender, gpointer     user_data);
+void on_quit1_activate  (gpointer sender, gpointer     user_data);
+void on_clear1_activate  (gpointer sender, gpointer     user_data);
+void on_properties1_activate  (gpointer sender, gpointer     user_data);
+void on_preferences1_activate  (gpointer sender, gpointer     user_data);
+void on_about1_activate  (gpointer sender, gpointer     user_data);
+
+void gnomint_register_actions(GtkWindow *window, GtkApplication *app);
 
 #endif

@@ -21,6 +21,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #endif
 
 #include <stdlib.h>
@@ -248,7 +249,6 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 				   NULL);
 	
 
-	gtk_builder_connect_signals (new_cert_window_gtkb, NULL); 	
 	
         object = gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window");
         g_object_set_data_full (G_OBJECT(object), "csr_info", csr_info, (GDestroyNotify) tls_csr_free);
@@ -298,8 +298,8 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 		if (new_cert_san_manager) {
 			GtkWidget *box = GTK_WIDGET (gtk_builder_get_object (
 			    new_cert_window_gtkb, "san_alignment"));
-			gtk_container_add (GTK_CONTAINER (box), new_cert_san_manager);
-			gtk_widget_show_all (new_cert_san_manager);
+			gtk_box_append(GTK_BOX(box), new_cert_san_manager);
+			gtk_widget_set_visible(new_cert_san_manager, TRUE);
 			if (csr_info->subject_alt_name && csr_info->subject_alt_name[0])
 				san_manager_set_string (new_cert_san_manager,
 				                        csr_info->subject_alt_name);
@@ -510,7 +510,7 @@ G_MODULE_EXPORT void on_new_cert_cancel_clicked (GtkButton *widget,
 			       gpointer user_data) 
 {
 	GtkWidget * window = GTK_WIDGET(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
-        gtk_widget_destroy(GTK_WIDGET(window));	
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));	
 	
 }
 
@@ -818,7 +818,7 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 	}
 
 	widget = G_OBJECT(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
-        gtk_widget_destroy(GTK_WIDGET(widget));	
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));	
 
 	dialog_refresh_list();
 

@@ -5,12 +5,12 @@
 //
 //  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 3 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
@@ -37,36 +37,35 @@ gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
 				    gpointer user_data);
 gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
 				       gpointer user_data);
-void ca_on_export1_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_on_export_chain_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_on_bulk_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_on_bulk_delete_csrs_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_export1_activate (gpointer sender, gpointer user_data);
+void ca_on_export_chain_activate (gpointer sender, gpointer user_data);
+void ca_on_bulk_revoke_activate (gpointer sender, gpointer user_data);
+void ca_on_bulk_delete_csrs_activate (gpointer sender, gpointer user_data);
 gint ca_bulk_revoke_ids (GSList *cert_ids, gchar **error_out);
 gint ca_bulk_delete_csr_ids (GSList *csr_ids, gchar **error_out);
-void ca_on_extractprivatekey1_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_on_revoke_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_on_delete2_activate (GtkMenuItem *menuitem, gpointer user_data);
-void ca_on_sign1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_extractprivatekey1_activate (gpointer sender, gpointer user_data);
+void ca_on_revoke_activate (gpointer sender, gpointer user_data);
+void ca_on_delete2_activate (gpointer sender, gpointer user_data);
+void ca_on_sign1_activate (gpointer sender, gpointer user_data);
 gboolean ca_open (gchar *filename, gboolean create);
 guint64 ca_get_selected_row_id (void);
 gchar * ca_get_selected_row_pem (void);
 void ca_update_csr_view (gboolean new_value, gboolean refresh);
-gboolean ca_csr_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
+gboolean ca_csr_view_toggled (gpointer sender, gpointer user_data);
 void ca_update_revoked_view (gboolean new_value, gboolean refresh);
-gboolean ca_rcrt_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
+gboolean ca_rcrt_view_toggled (gpointer sender, gpointer user_data);
 void ca_update_expired_view (gboolean new_value, gboolean refresh);
-gboolean ca_expired_view_toggled (GtkCheckMenuItem *button, gpointer user_data);
-void ca_generate_crl (GtkCheckMenuItem *button, gpointer user_data);
+gboolean ca_expired_view_toggled (gpointer sender, gpointer user_data);
+void ca_generate_crl (gpointer sender, gpointer user_data);
 gboolean ca_treeview_popup_timeout_program_cb (gpointer data);
-void ca_treeview_popup_timeout_program (GdkEventButton *event);
-gboolean ca_treeview_popup_handler (GtkTreeView *tree_view,
-				    GdkEvent *event, gpointer user_data);
-void ca_on_change_pwd_menuitem_activate (GtkMenuItem *menuitem, gpointer user_data);
+void ca_on_change_pwd_menuitem_activate (gpointer sender, gpointer user_data);
 gboolean ca_changepwd_newpwd_entry_changed (GtkWidget *entry, gpointer user_data);
 gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget *button, gpointer user_data);
 void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data);
+void ca_on_renew_activate(gpointer sender, gpointer user_data);
+void ca_on_compare_with_activate(gpointer sender, gpointer user_data);
 
-#else 
+#else
 
 #include "ca-cli.h"
 

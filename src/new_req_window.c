@@ -20,6 +20,7 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -242,7 +243,6 @@ void new_req_window_display()
 	gtk_builder_add_from_file (new_req_window_gtkb, ui_file, NULL);
 	g_free(ui_file);
 	
-	gtk_builder_connect_signals (new_req_window_gtkb, NULL); 	
 	
 	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_req_window_gtkb, "country_combobox1")));
 
@@ -263,8 +263,8 @@ void new_req_window_display()
 	
 	if (san_manager_widget1) {
 		alignment = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "san_alignment1"));
-		gtk_container_add(GTK_CONTAINER(alignment), san_manager_widget1);
-		gtk_widget_show_all(san_manager_widget1);
+		gtk_box_append(GTK_BOX(alignment), san_manager_widget1);
+		gtk_widget_set_visible(san_manager_widget1, TRUE);
 	}
 
 	/* Force initial spinbutton/curve-combo visibility to match the
@@ -331,7 +331,7 @@ G_MODULE_EXPORT void on_new_req_cn_entry_changed (GtkEditable *editable,
 {
 	GtkButton *button = GTK_BUTTON(gtk_builder_get_object (new_req_window_gtkb, "new_req_next2"));
 
-	if (strlen (gtk_entry_get_text (GTK_ENTRY(editable)))) 
+	if (strlen (gtk_editable_get_text(GTK_EDITABLE(editable)))) 
 		gtk_widget_set_sensitive (GTK_WIDGET(button), TRUE);
 	else
 		gtk_widget_set_sensitive (GTK_WIDGET(button), FALSE);
@@ -401,37 +401,37 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "ST_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "ST_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->st);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->st);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                        gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "L_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "L_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->l);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->l);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                        gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "O_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "O_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->o);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->o);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-                        gtk_entry_set_text(GTK_ENTRY(widget), "");
+                        gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 }
                 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "OU_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "OU_FORCE_SAME"));
-                        gtk_entry_set_text(GTK_ENTRY(widget), tlscert->ou);
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->ou);
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-			gtk_entry_set_text(GTK_ENTRY(widget), "");
+			gtk_editable_set_text(GTK_EDITABLE(widget), "");
 		}
                 
                 tls_cert_free (tlscert);
@@ -443,16 +443,16 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 		gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"city_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"o_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"ou_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_entry_set_text(GTK_ENTRY(widget), "");
+		gtk_editable_set_text(GTK_EDITABLE(widget), "");
         }
 
         g_free (value);
@@ -483,7 +483,7 @@ G_MODULE_EXPORT void on_new_req_cancel_clicked (GtkButton *widget,
 	
 	GtkWindow *window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
 
-	gtk_widget_destroy(GTK_WIDGET(window));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 	
 }
 
@@ -519,42 +519,42 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 	}
 		
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "st_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->state = g_strdup (text);
 	else
 		csr_creation_data->state = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "city_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->city = g_strdup (text);
 	else
 		csr_creation_data->city = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "o_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->org = g_strdup (text);
 	else
 		csr_creation_data->org = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "ou_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->ou = g_strdup (text);
 	else
 		csr_creation_data->ou = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "cn_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->cn = g_strdup (text);
 	else
 		csr_creation_data->cn = NULL;
 
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "email_entry1"));
-	text = (gchar *) gtk_entry_get_text (GTK_ENTRY(widget));
+	text = (gchar *) gtk_editable_get_text(GTK_EDITABLE(widget));
 	if (strlen (text))
 		csr_creation_data->emailAddress = g_strdup (text);
 	else
@@ -613,7 +613,7 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
         }
 
 	window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
-	gtk_widget_destroy(GTK_WIDGET(window));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 
 	creation_process_window_csr_display (csr_creation_data);	
 
