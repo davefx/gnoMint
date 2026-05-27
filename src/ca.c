@@ -1640,6 +1640,52 @@ void __ca_export_pkcs12_cv (GnomintCertRow *row, gint type)
 }
 
 
+/* ---- Async export-certificate dialog (Step 2.2) ---- */
+
+/* Context passed through the export-certificate dialog response. */
+typedef struct {
+    GnomintCertRow *row;
+    gint            type;
+    GtkBuilder     *dialog_gtkb;
+} ExportCertCtx;
+
+static void
+__ca_export_cert_response (GtkDialog *dialog,
+                           gint       response_id,
+                           gpointer   user_data)
+{
+    ExportCertCtx *ctx = (ExportCertCtx *) user_data;
+
+    if (!response_id || response_id == GTK_RESPONSE_CANCEL) {
+        gtk_window_destroy (GTK_WINDOW (dialog));
+        g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+        g_object_unref (ctx->row);
+        g_free (ctx);
+        return;
+    }
+
+    if (gtk_check_button_get_active (GTK_CHECK_BUTTON (
+            gtk_builder_get_object (ctx->dialog_gtkb, "publicpart_radiobutton1")))) {
+        __ca_export_public_pem_cv (ctx->row, ctx->type);
+    } else if (gtk_check_button_get_active (GTK_CHECK_BUTTON (
+            gtk_builder_get_object (ctx->dialog_gtkb, "privatepart_radiobutton2")))) {
+        g_free (__ca_export_private_pkcs8_cv (ctx->row, ctx->type));
+    } else if (gtk_check_button_get_active (GTK_CHECK_BUTTON (
+            gtk_builder_get_object (ctx->dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
+        __ca_export_private_pem_cv (ctx->row, ctx->type);
+    } else if (gtk_check_button_get_active (GTK_CHECK_BUTTON (
+            gtk_builder_get_object (ctx->dialog_gtkb, "bothparts_radiobutton3")))) {
+        __ca_export_pkcs12_cv (ctx->row, ctx->type);
+    } else {
+        dialog_error (_("Unexpected error"));
+    }
+
+    gtk_window_destroy (GTK_WINDOW (dialog));
+    g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+    g_object_unref (ctx->row);
+    g_free (ctx);
+}
+
 G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
@@ -1647,7 +1693,7 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 	gint type = __ca_selection_type_cv (&row);
 	GtkBuilder * dialog_gtkb = NULL;
 	gboolean has_pk_in_db = FALSE;
-	gint response = 0;
+	ExportCertCtx *ctx = NULL;
 
 	if (type == -1) {
 		if (row) g_object_unref (row);
@@ -1691,54 +1737,16 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 
 	}
 
+	ctx = g_new0 (ExportCertCtx, 1);
+	ctx->row = row;            /* transfer ownership */
+	ctx->type = type;
+	ctx->dialog_gtkb = dialog_gtkb; /* transfer ownership */
 
 	widget = gtk_builder_get_object (dialog_gtkb, "export_certificate_dialog");
 
-	response = compat_dialog_run(GTK_DIALOG(widget));
-
-	if (!response || response == GTK_RESPONSE_CANCEL) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		g_object_unref (row);
-		return;
-	}
-
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
-		__ca_export_public_pem_cv (row, type);
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		g_object_unref (row);
-		return;
-	}
-
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
-		g_free (__ca_export_private_pkcs8_cv (row, type));
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		g_object_unref (row);
-		return;
-	}
-
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
-		__ca_export_private_pem_cv (row, type);
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		g_object_unref (row);
-		return;
-	}
-
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
-		__ca_export_pkcs12_cv (row, type);
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		g_object_unref (row);
-		return;
-	}
-
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-	g_object_unref (G_OBJECT(dialog_gtkb));
-	g_object_unref (row);
-	dialog_error (_("Unexpected error"));
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__ca_export_cert_response), ctx);
+	gtk_window_present (GTK_WINDOW (widget));
 }
 
 /* Export the full certificate chain (leaf + intermediates + root) as a
@@ -2711,70 +2719,83 @@ G_MODULE_EXPORT gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget
 }
 
 
+/* ---- Async DH-parameters dialog (Step 2.3) ---- */
+
+static void
+__ca_dh_param_response (GtkDialog *dialog,
+                        gint       response_id,
+                        gpointer   user_data)
+{
+    GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
+
+    if (!response_id) {
+        gtk_window_destroy (GTK_WINDOW (dialog));
+        g_object_unref (G_OBJECT (dialog_gtkb));
+        return;
+    }
+
+    GObject *spin = gtk_builder_get_object (dialog_gtkb, "dh_prime_size_spinbutton");
+    guint dh_size = gtk_spin_button_get_value (GTK_SPIN_BUTTON (spin));
+
+    /* Inner file-save dialog stays compat_dialog_run for now (Phase 3). */
+    GtkDialog *dialog2 = GTK_DIALOG (gtk_file_chooser_dialog_new (
+        _("Save Diffie-Hellman parameters"),
+        GTK_WINDOW (dialog),
+        GTK_FILE_CHOOSER_ACTION_SAVE,
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Save"), GTK_RESPONSE_ACCEPT,
+        NULL));
+
+    if (compat_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
+        gchar *filename = g_file_get_path (
+            gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog2)));
+
+        gchar *strerror = export_dh_param (dh_size, filename);
+
+        gtk_window_destroy (GTK_WINDOW (dialog2));
+        gtk_window_destroy (GTK_WINDOW (dialog));
+
+        if (strerror) {
+            dialog_error (strerror);
+        } else {
+            GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+            GtkDialog *info = GTK_DIALOG (gtk_message_dialog_new (
+                GTK_WINDOW (parent),
+                GTK_DIALOG_DESTROY_WITH_PARENT,
+                GTK_MESSAGE_INFO,
+                GTK_BUTTONS_CLOSE,
+                "%s",
+                _("Diffie-Hellman parameters saved successfully")));
+            g_signal_connect (info, "response",
+                              G_CALLBACK (__ca_dialog_response_destroy), NULL);
+            gtk_window_present (GTK_WINDOW (info));
+        }
+
+        g_free (filename);
+    } else {
+        gtk_window_destroy (GTK_WINDOW (dialog2));
+        gtk_window_destroy (GTK_WINDOW (dialog));
+    }
+
+    g_object_unref (G_OBJECT (dialog_gtkb));
+}
+
 G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
 {
-	GObject * widget = NULL;
-	GtkDialog * dialog = NULL, * dialog2 = NULL;
+	GtkDialog * dialog = NULL;
 	GtkBuilder * dialog_gtkb = NULL;
-	gchar *filename;
-	gint response = 0;
-	guint dh_size;
-	gchar *strerror;
 
 	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
+	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "dh_parameters_dialog.ui", NULL),
 				   NULL);
-	
+
 
 	dialog = GTK_DIALOG(gtk_builder_get_object (dialog_gtkb, "dh_parameters_dialog"));
-	response = compat_dialog_run(dialog); 
-	
-	if (!response) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		return;
-	} 
 
-	widget = gtk_builder_get_object (dialog_gtkb, "dh_prime_size_spinbutton");
-	dh_size = gtk_spin_button_get_value (GTK_SPIN_BUTTON(widget));
-
-	dialog2 = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Save Diffie-Hellman parameters"),
-							  GTK_WINDOW(widget),
-							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  _("_Cancel"), GTK_RESPONSE_CANCEL,
-							  _("_Save"), GTK_RESPONSE_ACCEPT,
-							  NULL));
-	
-	if (compat_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
-
-		filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog2)));
-
-		strerror = export_dh_param (dh_size, filename);
-
-		if (strerror) {
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog2)));
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-			dialog_error (strerror);
-		} else {
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog2)));
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-			dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-								    GTK_DIALOG_DESTROY_WITH_PARENT,
-								    GTK_MESSAGE_INFO,
-								    GTK_BUTTONS_CLOSE,
-								    "%s",
-								    _("Diffie-Hellman parameters saved successfully")));
-			g_signal_connect (dialog, "response",
-			                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-			gtk_window_present (GTK_WINDOW (dialog));
-		}
-
-
-        }
-	
-	
-	return;
+	g_signal_connect (dialog, "response",
+	                  G_CALLBACK (__ca_dh_param_response), dialog_gtkb);
+	gtk_window_present (GTK_WINDOW (dialog));
 }
 
 
@@ -2808,107 +2829,118 @@ G_MODULE_EXPORT void on_wizard_email_activate  (gpointer sender, gpointer user_d
 }
 
 
+/* ---- Async import file-or-directory dialog (Step 2.4) ---- */
+
+static void
+__ca_import_file_or_dir_response (GtkDialog *dialog,
+                                  gint       response_id,
+                                  gpointer   user_data)
+{
+    GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
+
+    if (response_id < 0) {
+        gtk_window_destroy (GTK_WINDOW (dialog));
+        g_object_unref (G_OBJECT (dialog_gtkb));
+        return;
+    }
+
+    GtkCheckButton *radiobutton = GTK_CHECK_BUTTON (
+        gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
+    gboolean import_file = gtk_check_button_get_active (radiobutton);
+
+    gtk_window_destroy (GTK_WINDOW (dialog));
+
+    GObject *main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window");
+
+    if (import_file) {
+        /* Import single file — inner file chooser stays compat_dialog_run (Phase 3). */
+        gchar *filename;
+        GtkWidget *fc = gtk_file_chooser_dialog_new (
+            _("Select PEM file to import"),
+            GTK_WINDOW (main_window_widget),
+            GTK_FILE_CHOOSER_ACTION_OPEN,
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Open"), GTK_RESPONSE_ACCEPT,
+            NULL);
+
+        if (compat_dialog_run (GTK_DIALOG (fc)) == GTK_RESPONSE_ACCEPT) {
+            filename = g_file_get_path (
+                gtk_file_chooser_get_file (GTK_FILE_CHOOSER (fc)));
+            gtk_window_destroy (GTK_WINDOW (fc));
+        } else {
+            gtk_window_destroy (GTK_WINDOW (fc));
+            g_object_unref (G_OBJECT (dialog_gtkb));
+            return;
+        }
+
+        if (!import_single_file (filename, NULL, NULL)) {
+            GtkWidget *err = gtk_message_dialog_new (
+                GTK_WINDOW (main_window_widget),
+                GTK_DIALOG_DESTROY_WITH_PARENT,
+                GTK_MESSAGE_ERROR,
+                GTK_BUTTONS_CLOSE,
+                _("Problem when importing '%s' file"),
+                filename);
+            g_signal_connect (err, "response",
+                              G_CALLBACK (__ca_dialog_response_destroy), NULL);
+            gtk_window_present (GTK_WINDOW (err));
+        }
+        g_free (filename);
+    } else {
+        /* Import directory — inner file chooser stays compat_dialog_run (Phase 3). */
+        gchar *filename;
+        GtkWidget *fc = gtk_file_chooser_dialog_new (
+            _("Select directory to import"),
+            GTK_WINDOW (main_window_widget),
+            GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Open"), GTK_RESPONSE_ACCEPT,
+            NULL);
+
+        if (compat_dialog_run (GTK_DIALOG (fc)) == GTK_RESPONSE_ACCEPT) {
+            filename = g_file_get_path (
+                gtk_file_chooser_get_file (GTK_FILE_CHOOSER (fc)));
+            gtk_window_destroy (GTK_WINDOW (fc));
+        } else {
+            gtk_window_destroy (GTK_WINDOW (fc));
+            g_object_unref (G_OBJECT (dialog_gtkb));
+            return;
+        }
+
+        gchar *result = import_whole_dir (filename);
+
+        if (result) {
+            GtkWidget *err = gtk_message_dialog_new (
+                GTK_WINDOW (main_window_widget),
+                GTK_DIALOG_DESTROY_WITH_PARENT,
+                GTK_MESSAGE_ERROR,
+                GTK_BUTTONS_CLOSE,
+                "%s", result);
+            g_signal_connect (err, "response",
+                              G_CALLBACK (__ca_dialog_response_destroy), NULL);
+            gtk_window_present (GTK_WINDOW (err));
+        }
+        g_free (filename);
+    }
+
+    g_object_unref (G_OBJECT (dialog_gtkb));
+}
+
 G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_data)
 {
-
-	gchar *filename;
-
-	GObject *main_window_widget, *widget;
-	GtkWidget *dialog;
+	GObject *widget;
 	GtkBuilder * dialog_gtkb = NULL;
-        GtkCheckButton *radiobutton = NULL;
-	gint response = 0;
-        gboolean import_file = TRUE;
-	
-	main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window");
 
 	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
+	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_file_or_directory_dialog.ui", NULL),
 				   NULL);
 
         widget = gtk_builder_get_object (dialog_gtkb, "import_file_or_directory_dialog");
-        response = compat_dialog_run (GTK_DIALOG(widget));
 
-        if (response < 0) {
-                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-                g_object_unref (G_OBJECT(dialog_gtkb));
-                return;
-        }
-
-        radiobutton = GTK_CHECK_BUTTON(gtk_builder_get_object (dialog_gtkb, "importfile_radiobutton"));
-        import_file = gtk_check_button_get_active(radiobutton);
-
-        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-
-        if (import_file) {
-                // Import single file
-                dialog = gtk_file_chooser_dialog_new (_("Select PEM file to import"),
-                                                      GTK_WINDOW(main_window_widget),
-                                                      GTK_FILE_CHOOSER_ACTION_OPEN,
-                                                      _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                                      _("_Open"), GTK_RESPONSE_ACCEPT,
-                                                      NULL);
-                
-                if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-                {
-                        filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-                        gtk_window_destroy(GTK_WINDOW(dialog));
-                } else {
-                        gtk_window_destroy(GTK_WINDOW(dialog));
-                        return;
-                }		
-                
-                if (! import_single_file (filename, NULL, NULL)) {
-                        dialog = gtk_message_dialog_new (GTK_WINDOW(main_window_widget),
-                                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                         GTK_MESSAGE_ERROR,
-                                                         GTK_BUTTONS_CLOSE,
-                                                         _("Problem when importing '%s' file"),
-                                                         filename);
-                        
-                        g_signal_connect (dialog, "response",
-                                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                        gtk_window_present (GTK_WINDOW (dialog));
-                }
-                return;
-        } else {
-                // Import directory
-
-                gchar * result = NULL;
-
-                dialog = gtk_file_chooser_dialog_new (_("Select directory to import"),
-                                                      GTK_WINDOW(main_window_widget),
-                                                      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                                      _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                                      _("_Open"), GTK_RESPONSE_ACCEPT,
-                                                      NULL);
-                
-                if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-                {
-                        filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-                        gtk_window_destroy(GTK_WINDOW(dialog));
-                } else {
-                        gtk_window_destroy(GTK_WINDOW(dialog));
-                        return;
-                }		
-
-                result = import_whole_dir (filename);
-
-                if (result) {
-                        dialog = gtk_message_dialog_new (GTK_WINDOW(main_window_widget),
-                                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                         GTK_MESSAGE_ERROR,
-                                                         GTK_BUTTONS_CLOSE,
-                                                         "%s", result);
-                        
-                        g_signal_connect (dialog, "response",
-                                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                        gtk_window_present (GTK_WINDOW (dialog));
-                }
-                return;
-
-        }
+        g_signal_connect (widget, "response",
+                          G_CALLBACK (__ca_import_file_or_dir_response), dialog_gtkb);
+        gtk_window_present (GTK_WINDOW (widget));
 }
 
 
