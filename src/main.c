@@ -249,16 +249,19 @@ static void gnomint_activate(GtkApplication *app, gpointer user_data)
         preferences_init (0, NULL);
 
 	main_window_gtkb = gtk_builder_new();
+	gtk_builder_set_translation_domain (main_window_gtkb, GETTEXT_PACKAGE);
 	gtk_builder_add_from_file (main_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "main_window.ui", NULL),
 				   NULL);
 
 	csr_popup_menu_gtkb = gtk_builder_new();
+	gtk_builder_set_translation_domain (csr_popup_menu_gtkb, GETTEXT_PACKAGE);
 	gtk_builder_add_from_file (csr_popup_menu_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "csr_popup_menu.ui", NULL),
 				   NULL);
 
 	cert_popup_menu_gtkb = gtk_builder_new();
+	gtk_builder_set_translation_domain (cert_popup_menu_gtkb, GETTEXT_PACKAGE);
 	gtk_builder_add_from_file (cert_popup_menu_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_popup_menu.ui", NULL),
 				   NULL);
@@ -337,10 +340,12 @@ static void gnomint_activate(GtkApplication *app, gpointer user_data)
 	if (w) g_signal_connect(w, "response", G_CALLBACK(ca_expiry_infobar_response), NULL);
 	w = GTK_WIDGET(gtk_builder_get_object(main_window_gtkb, "search_entry"));
 	if (w) g_signal_connect(w, "search-changed", G_CALLBACK(ca_on_search_changed), NULL);
+	/* Selection-changed and activate signals are connected by
+	 * ca_refresh_model_callback when the GtkColumnView columns are
+	 * set up for the first time. Only the right-click popup
+	 * handler is wired here. */
 	w = GTK_WIDGET(gtk_builder_get_object(main_window_gtkb, "ca_treeview"));
 	if (w) {
-		g_signal_connect(w, "cursor-changed", G_CALLBACK(ca_treeview_selection_change), NULL);
-		g_signal_connect(w, "row-activated", G_CALLBACK(ca_treeview_row_activated), NULL);
 		/* Right-click context menu via GtkGestureClick (GTK 4) */
 		GtkGesture *click = gtk_gesture_click_new();
 		gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 3);
@@ -427,6 +432,7 @@ int main (int   argc,
 
     g_set_application_name (PACKAGE);
     g_set_prgname (PACKAGE);
+    gtk_window_set_default_icon_name ("gnomint");
 
     tls_init ();
 
@@ -699,6 +705,15 @@ G_MODULE_EXPORT void on_about1_activate  (gpointer sender, gpointer     user_dat
 	GtkAboutDialog *dlg = GTK_ABOUT_DIALOG (gtk_about_dialog_new ());
 	gtk_window_set_transient_for (GTK_WINDOW (dlg), GTK_WINDOW (widget));
 	gtk_window_set_modal (GTK_WINDOW (dlg), TRUE);
+
+	gchar *logo_path = g_build_filename (PACKAGE_DATA_DIR, "gnomint",
+	                                     "gnomint192x192.png", NULL);
+	GdkTexture *logo = gdk_texture_new_from_filename (logo_path, NULL);
+	if (logo) {
+		gtk_about_dialog_set_logo (dlg, GDK_PAINTABLE (logo));
+		g_object_unref (logo);
+	}
+	g_free (logo_path);
 
 	gtk_about_dialog_set_program_name (dlg, "gnoMint");
 	gtk_about_dialog_set_version (dlg, PACKAGE_VERSION);

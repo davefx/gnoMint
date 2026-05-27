@@ -1,17 +1,20 @@
-desktop_in_files = gnomint.desktop.in
 desktopdir = $(datadir)/applications
-desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
+desktop_DATA = gnomint.desktop
 
-@INTLTOOL_DESKTOP_RULE@
+appdatadir = $(datadir)/metainfo
+appdata_DATA = gnomint.appdata.xml
 
-appdata_in_files = gnomint.appdata.xml.in
-appdatadir = $(datadir)/appdata
-appdata_DATA = $(appdata_in_files:.xml.in=.xml)
+gnomint.desktop: gnomint.desktop.in $(top_srcdir)/po/*.po
+	$(AM_V_GEN)$(MSGFMT) --desktop --template $< -d $(top_srcdir)/po -o $@
 
-@INTLTOOL_XML_RULE@
+gnomint.appdata.xml: gnomint.appdata.xml.in $(top_srcdir)/po/*.po
+	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
 
 deskicondir = $(datadir)/pixmaps
 deskicon_DATA = gnomint.png
+
+icon48dir = $(datadir)/icons/hicolor/48x48/apps
+icon48_DATA = gnomint.png
 
 gtkbuilderdir = $(datadir)/gnomint
 gtkbuilder_DATA =   \
@@ -45,8 +48,18 @@ gtkbuilder_DATA =   \
 	extractpkey.png \
 	sign.png \
 	wizard-webserver.png \
-	wizard-email.png
+	wizard-email.png \
+	gnomint192x192.png
 
-EXTRA_DIST = $(gtkbuilder_DATA) $(deskicon_DATA) $(desktop_in_files) $(appdata_in_files)
+EXTRA_DIST = $(gtkbuilder_DATA) $(deskicon_DATA) gnomint.desktop.in gnomint.appdata.xml.in gnomint64x64.png
+
+install-data-hook:
+	$(MKDIR_P) $(DESTDIR)$(datadir)/icons/hicolor/64x64/apps
+	$(INSTALL_DATA) $(srcdir)/gnomint64x64.png $(DESTDIR)$(datadir)/icons/hicolor/64x64/apps/gnomint.png
+	-gtk-update-icon-cache -f -t $(DESTDIR)$(datadir)/icons/hicolor 2>/dev/null || true
+
+uninstall-hook:
+	rm -f $(DESTDIR)$(datadir)/icons/hicolor/64x64/apps/gnomint.png
+	-gtk-update-icon-cache -f -t $(DESTDIR)$(datadir)/icons/hicolor 2>/dev/null || true
 
 CLEANFILES = $(desktop_DATA) $(appdata_DATA)
