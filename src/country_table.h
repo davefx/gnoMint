@@ -21,6 +21,8 @@
 #define _COUNTRY_TABLE_H_
 
 void country_table_populate();
-void country_table_populate_combobox(GtkComboBox *country_combobox);
+void country_table_populate_dropdown(GtkDropDown *dropdown);
+const gchar * country_table_get_code(GtkDropDown *dropdown);
+guint country_table_find_code(GtkDropDown *dropdown, const gchar *code);
 
 #endif

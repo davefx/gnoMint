@@ -54,7 +54,7 @@ void new_ca_window_display()
 	g_free(ui_file);
 	
 	
-	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_ca_window_gtkb, "country_combobox")));
+	country_table_populate_dropdown(GTK_DROP_DOWN(gtk_builder_get_object(new_ca_window_gtkb, "country_combobox")));
 
 	gtk_check_button_set_active(GTK_CHECK_BUTTON(gtk_builder_get_object (new_ca_window_gtkb, "rsa_radiobutton")), TRUE);
 
@@ -148,8 +148,8 @@ G_MODULE_EXPORT void on_new_ca_privkey_type_toggle (GtkCheckButton *button,
 		gtk_widget_set_visible(spin, FALSE);
 		if (combo) {
 			gtk_widget_set_visible(combo, TRUE);
-			if (!gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo)))
-				gtk_combo_box_set_active_id (GTK_COMBO_BOX (combo), "256");
+			if (gtk_drop_down_get_selected (GTK_DROP_DOWN (combo)) == GTK_INVALID_LIST_POSITION)
+				gtk_drop_down_set_selected (GTK_DROP_DOWN (combo), 0);
 		}
 		if (label) {
 			gtk_label_set_text (label, _("ECDSA curve:"));
@@ -289,25 +289,18 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 	GtkWindow *window = NULL;
 	gint active = -1;
 	gchar *text = NULL;
-	GtkTreeModel *tree_model = NULL;
-	GtkTreeIter tree_iter;
-	
+
 	time_t tmp;
 	struct tm * expiration_time;
 
 	ca_creation_data = g_new0 (TlsCreationData, 1);
-	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "country_combobox"));
-	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
-
-	if (active < 0) {
+	{
+		GtkDropDown *country_dd = GTK_DROP_DOWN(gtk_builder_get_object (new_ca_window_gtkb, "country_combobox"));
+		const gchar *code = country_table_get_code (country_dd);
+		if (code)
+			ca_creation_data->country = g_strndup (code, 2);
+		else
 			ca_creation_data->country = NULL;
-	} else {
-		tree_model = gtk_combo_box_get_model (GTK_COMBO_BOX(widget));
-		gtk_combo_box_get_active_iter (GTK_COMBO_BOX(widget), &tree_iter);
-		gtk_tree_model_get (tree_model, &tree_iter, 1, &text, -1);
-
-		ca_creation_data->country = g_strdup (text);
-		g_free (text);
 	}
 		
 	widget = GTK_WIDGET(gtk_builder_get_object (new_ca_window_gtkb, "st_entry"));
@@ -385,12 +378,13 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 	}
 
 	if (ca_creation_data->key_type == 2 /* ECDSA */) {
-		/* Read the curve from the ECDSA combo. The combo's active_id is
-		 * the bit-length of the curve as a string (256/384/521). */
-		GtkComboBoxText *combo = GTK_COMBO_BOX_TEXT (
+		/* Read the curve from the ECDSA dropdown.
+		 * Index 0=P-256, 1=P-384, 2=P-521. */
+		static const int ecdsa_bitlengths[] = { 256, 384, 521 };
+		GtkDropDown *curve_dd = GTK_DROP_DOWN (
 			gtk_builder_get_object (new_ca_window_gtkb, "ecdsa_curve_combo"));
-		const gchar *id = combo ? gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo)) : NULL;
-		ca_creation_data->key_bitlength = id ? atoi (id) : 256;
+		guint sel = curve_dd ? gtk_drop_down_get_selected (curve_dd) : GTK_INVALID_LIST_POSITION;
+		ca_creation_data->key_bitlength = (sel < G_N_ELEMENTS (ecdsa_bitlengths)) ? ecdsa_bitlengths[sel] : 256;
 	} else if (ca_creation_data->key_type == 3 /* EdDSA */) {
 		ca_creation_data->key_bitlength = 0;  /* fixed by the curve */
 	} else {

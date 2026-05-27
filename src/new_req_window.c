@@ -60,10 +60,6 @@ typedef struct {
 
 int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
 void __new_req_populate_ca_treeview (GtkTreeView *treeview);
-gboolean __new_req_window_lookup_country (GtkTreeModel *model,
-                                          GtkTreePath *path,
-                                          GtkTreeIter *iter,
-                                          gpointer data);
 
 
 
@@ -243,7 +239,7 @@ void new_req_window_display()
 	g_free(ui_file);
 	
 	
-	country_table_populate_combobox(GTK_COMBO_BOX(gtk_builder_get_object(new_req_window_gtkb, "country_combobox1")));
+	country_table_populate_dropdown(GTK_DROP_DOWN(gtk_builder_get_object(new_req_window_gtkb, "country_combobox1")));
 
 	__new_req_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview")));
 
@@ -327,7 +323,11 @@ G_MODULE_EXPORT void on_new_req_privkey_type_toggle (GtkCheckButton *button,
 		}
 	} else if (ecdsatoggle && gtk_check_button_get_active(ecdsatoggle)) {
 		gtk_widget_set_visible(spin, FALSE);
-		if (combo) gtk_widget_set_visible(combo, TRUE);
+		if (combo) {
+			gtk_widget_set_visible(combo, TRUE);
+			if (gtk_drop_down_get_selected (GTK_DROP_DOWN (combo)) == GTK_INVALID_LIST_POSITION)
+				gtk_drop_down_set_selected (GTK_DROP_DOWN (combo), 0);
+		}
 		if (label) {
 			gtk_label_set_text (label, _("ECDSA curve:"));
 			gtk_widget_set_visible(GTK_WIDGET(label), TRUE);
@@ -352,25 +352,6 @@ G_MODULE_EXPORT void on_new_req_cn_entry_changed (GtkEditable *editable,
 }
 
 
-gboolean __new_req_window_lookup_country (GtkTreeModel *model,
-                                          GtkTreePath *path,
-                                          GtkTreeIter *iter,
-                                          gpointer data)
-{
-        gchar *country = (gchar *) data;
-        GValue *value = g_new0(GValue, 1);
-        
-        gtk_tree_model_get_value (model, iter, 1, value);
-        if (! strcmp (country, g_value_get_string(value))) {
-                gtk_combo_box_set_active_iter (GTK_COMBO_BOX(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1")), iter);
-		g_free (value);
-                return TRUE;
-        }
-        
-	g_free(value);
-        return FALSE;
-
-}
 
 G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 			      gpointer user_data) 
@@ -404,11 +385,14 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "C_INHERIT")) {
                         gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "C_FORCE_SAME"));
-                        model = GTK_TREE_MODEL(gtk_combo_box_get_model (GTK_COMBO_BOX(widget)));
-                        gtk_tree_model_foreach (model, __new_req_window_lookup_country, tlscert->c);
+                        {
+                                GtkDropDown *dd = GTK_DROP_DOWN (widget);
+                                guint idx = country_table_find_code (dd, tlscert->c);
+                                gtk_drop_down_set_selected (dd, idx);
+                        }
                 } else {
                         gtk_widget_set_sensitive (widget, TRUE);
-			gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
+			gtk_drop_down_set_selected (GTK_DROP_DOWN(widget), GTK_INVALID_LIST_POSITION);
                 }
                 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
@@ -453,7 +437,7 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 gtk_widget_set_sensitive (widget, TRUE);
-		gtk_combo_box_set_active (GTK_COMBO_BOX(widget), -1);
+		gtk_drop_down_set_selected (GTK_DROP_DOWN(widget), GTK_INVALID_LIST_POSITION);
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"st_entry1"));
                 gtk_widget_set_sensitive (widget, TRUE);
 		gtk_editable_set_text(GTK_EDITABLE(widget), "");
@@ -529,26 +513,19 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 	GtkWindow *window = NULL;
 	gint active = -1;
 	gchar *text = NULL;
-	GtkTreeModel *tree_model = NULL;
-	GtkTreeIter tree_iter;
-	
+
 	csr_creation_data = g_new0 (TlsCreationData, 1);
 
         if (new_req_ca_id_valid)
                 csr_creation_data->parent_ca_id_str = g_strdup_printf ("'%"G_GUINT64_FORMAT"'", new_req_ca_id);
 
-	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "country_combobox1"));
-	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
-
-	if (active < 0) {
+	{
+		GtkDropDown *country_dd = GTK_DROP_DOWN(gtk_builder_get_object (new_req_window_gtkb, "country_combobox1"));
+		const gchar *code = country_table_get_code (country_dd);
+		if (code)
+			csr_creation_data->country = g_strndup (code, 2);
+		else
 			csr_creation_data->country = NULL;
-	} else {
-		tree_model = gtk_combo_box_get_model (GTK_COMBO_BOX(widget));
-		gtk_combo_box_get_active_iter (GTK_COMBO_BOX(widget), &tree_iter);
-		gtk_tree_model_get (tree_model, &tree_iter, 1, &text, -1);
-
-		csr_creation_data->country = g_strdup (text);
-		
 	}
 		
 	widget = GTK_WIDGET(gtk_builder_get_object (new_req_window_gtkb, "st_entry1"));
@@ -624,10 +601,11 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 	}
 
 	if (csr_creation_data->key_type == 2 /* ECDSA */) {
-		GtkComboBoxText *combo = GTK_COMBO_BOX_TEXT (
+		static const int ecdsa_bitlengths[] = { 256, 384, 521 };
+		GtkDropDown *curve_dd = GTK_DROP_DOWN (
 			gtk_builder_get_object (new_req_window_gtkb, "ecdsa_curve_combo1"));
-		const gchar *id = combo ? gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo)) : NULL;
-		csr_creation_data->key_bitlength = id ? atoi (id) : 256;
+		guint sel = curve_dd ? gtk_drop_down_get_selected (curve_dd) : GTK_INVALID_LIST_POSITION;
+		csr_creation_data->key_bitlength = (sel < G_N_ELEMENTS (ecdsa_bitlengths)) ? ecdsa_bitlengths[sel] : 256;
 	} else if (csr_creation_data->key_type == 3 /* EdDSA */) {
 		csr_creation_data->key_bitlength = 0;
 	} else {

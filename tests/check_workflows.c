@@ -1680,14 +1680,16 @@ scenario_keylength_selector (void)
         fail_test ("keylength-selector", "ECDSA: combo should be visible");
         goto out;
     }
-    const gchar *id = gtk_combo_box_get_active_id (GTK_COMBO_BOX (combo));
-    if (!id || g_strcmp0 (id, "256") != 0) {
-        fail_test ("keylength-selector",
-                   "ECDSA: combo active_id = \"%s\", expected \"256\"",
-                   id ? id : "(null)");
-        goto out;
+    {
+        guint sel = gtk_drop_down_get_selected (GTK_DROP_DOWN (combo));
+        if (sel != 0) {
+            fail_test ("keylength-selector",
+                       "ECDSA: combo selected = %u, expected 0 (P-256)",
+                       sel);
+            goto out;
+        }
+        fprintf (stderr, "    ECDSA: combo shown (default idx=%u), spin hidden OK\n", sel);
     }
-    fprintf (stderr, "    ECDSA: combo shown (default %s), spin hidden OK\n", id);
 
     /* Ed25519: both hidden. */
     gtk_check_button_set_active (eddsa, TRUE);

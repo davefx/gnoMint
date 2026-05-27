@@ -540,26 +540,72 @@ void country_table_populate()
 	qsort (country_table, NUMBER_OF_COUNTRIES, sizeof(CountryItem), country_table_comp_countries);
 }
 
-void country_table_populate_combobox(GtkComboBox *country_combobox)
+void country_table_populate_dropdown(GtkDropDown *dropdown)
 {
 	int i = 0;
-	GtkTreeStore * new_store = NULL;
-	GtkTreeIter iter;
-	GtkCellRenderer *renderer = NULL;
+	GtkStringList *string_list;
+	const gchar * const empty_strv[] = { NULL };
 
 	country_table_populate();
-	new_store = gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	string_list = gtk_string_list_new (empty_strv);
 
-	for (i=0; i<NUMBER_OF_COUNTRIES; i++) {
-		gtk_tree_store_append (new_store, &iter, NULL);
-		gtk_tree_store_set (new_store, &iter, 0, country_table[i].name, 1, country_table[i].code, -1);
+	for (i = 0; i < NUMBER_OF_COUNTRIES; i++) {
+		gchar *display = g_strdup_printf ("%s (%s)", country_table[i].name, country_table[i].code);
+		gtk_string_list_append (string_list, display);
+		g_free (display);
 	}
 
-	gtk_combo_box_set_model (GTK_COMBO_BOX(country_combobox), GTK_TREE_MODEL (new_store));
+	gtk_drop_down_set_model (dropdown, G_LIST_MODEL (string_list));
+	gtk_drop_down_set_selected (dropdown, GTK_INVALID_LIST_POSITION);
+	g_object_unref (string_list);
+}
 
-	renderer = gtk_cell_renderer_text_new ();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (country_combobox), renderer, FALSE);
-	gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_combobox), renderer, "text", 0);
-	
+const gchar *
+country_table_get_code(GtkDropDown *dropdown)
+{
+	guint selected = gtk_drop_down_get_selected (dropdown);
+	GtkStringObject *obj;
+	const gchar *str;
+	gsize len;
+
+	if (selected == GTK_INVALID_LIST_POSITION)
+		return NULL;
+
+	obj = GTK_STRING_OBJECT (gtk_drop_down_get_selected_item (dropdown));
+	if (!obj)
+		return NULL;
+
+	str = gtk_string_object_get_string (obj);
+	len = strlen (str);
+	/* Display format is "Country Name (CC)" -- code is the 2 chars before ')' */
+	if (len >= 4 && str[len - 1] == ')')
+		return str + len - 3;
+
+	return NULL;
+}
+
+guint
+country_table_find_code(GtkDropDown *dropdown, const gchar *code)
+{
+	GListModel *model = gtk_drop_down_get_model (dropdown);
+	guint n, i;
+
+	if (!model || !code)
+		return GTK_INVALID_LIST_POSITION;
+
+	n = g_list_model_get_n_items (model);
+	for (i = 0; i < n; i++) {
+		GtkStringObject *obj = GTK_STRING_OBJECT (g_list_model_get_item (model, i));
+		const gchar *str = gtk_string_object_get_string (obj);
+		gsize len = strlen (str);
+		/* Match the 2-letter code inside trailing parens */
+		if (len >= 4 && str[len - 1] == ')' && str[len - 4] == '(' &&
+		    str[len - 3] == code[0] && str[len - 2] == code[1]) {
+			g_object_unref (obj);
+			return i;
+		}
+		g_object_unref (obj);
+	}
+	return GTK_INVALID_LIST_POSITION;
 }
 

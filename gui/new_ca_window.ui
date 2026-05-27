@@ -201,7 +201,8 @@ Common Name (CN):</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkComboBox" id="country_combobox">
+                      <object class="GtkDropDown" id="country_combobox">
+                        <property name="enable-search">1</property>
                         <layout>
                           <property name="column">1</property>
                           <property name="row">0</property>
@@ -359,15 +360,19 @@ Common Name (CN):</property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkComboBoxText" id="ecdsa_curve_combo">
+                          <object class="GtkDropDown" id="ecdsa_curve_combo">
                             <property name="visible">0</property>
                             <property name="hexpand">1</property>
-                            <property name="active_id">256</property>
-                            <items>
-                              <item id="256" translatable="yes">P-256 (256 bits)</item>
-                              <item id="384" translatable="yes">P-384 (384 bits)</item>
-                              <item id="521" translatable="yes">P-521 (521 bits)</item>
-                            </items>
+                            <property name="model">
+                              <object class="GtkStringList" id="ecdsa_curve_model">
+                                <items>
+                                  <item translatable="yes">P-256 (256 bits)</item>
+                                  <item translatable="yes">P-384 (384 bits)</item>
+                                  <item translatable="yes">P-521 (521 bits)</item>
+                                </items>
+                              </object>
+                            </property>
+                            <property name="selected">0</property>
                           </object>
                         </child>
                       </object>
