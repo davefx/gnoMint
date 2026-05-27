@@ -59,6 +59,7 @@ check_ui_consistency_SOURCES = \
 	check_ui_consistency.c \
 	$(top_srcdir)/src/main.c \
 	$(top_srcdir)/src/cert_row.c \
+	$(top_srcdir)/src/ca_selector.c \
 	$(top_srcdir)/src/country_table.c \
 	$(top_srcdir)/src/new_ca_window.c \
 	$(top_srcdir)/src/new_req_window.c \
@@ -125,6 +126,7 @@ check_workflows_SOURCES = \
 	check_workflows.c \
 	$(top_srcdir)/src/main.c \
 	$(top_srcdir)/src/cert_row.c \
+	$(top_srcdir)/src/ca_selector.c \
 	$(top_srcdir)/src/country_table.c \
 	$(top_srcdir)/src/new_ca_window.c \
 	$(top_srcdir)/src/new_req_window.c \

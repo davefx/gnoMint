@@ -32,192 +32,35 @@
 #include "pkey_manage.h"
 #include "new_req_window.h"
 #include "san_manager.h"
+#include "ca_selector.h"
 
 #include <glib/gi18n.h>
 
 GtkBuilder * new_req_window_gtkb = NULL;
-GtkTreeStore * new_req_ca_list_model = NULL;
+static GtkSingleSelection *new_req_ca_selection = NULL;
+static GListStore *new_req_ca_root_store = NULL;
 gboolean new_req_ca_id_valid = FALSE;
 guint64 new_req_ca_id;
 GtkWidget *san_manager_widget1 = NULL;
 
-enum {NEW_REQ_CA_MODEL_COLUMN_ID=0,
-      NEW_REQ_CA_MODEL_COLUMN_SERIAL=1,
-      NEW_REQ_CA_MODEL_COLUMN_SUBJECT=2,
-      NEW_REQ_CA_MODEL_COLUMN_DN=3,
-      NEW_REQ_CA_MODEL_COLUMN_PARENT_DN=4,
-      NEW_REQ_CA_MODEL_COLUMN_PEM=5,
-      NEW_REQ_CA_MODEL_COLUMN_EXPIRATION=6,
-      NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT=7,
-      NEW_REQ_CA_MODEL_COLUMN_NUMBER=8}
-        NewReqCaListModelColumns;
 
-typedef struct {
-        GtkTreeStore * new_model;
-        GtkTreeIter * last_parent_iter;
-        GtkTreeIter * last_ca_iter;
-} __NewReqWindowRefreshModelAddCaUserData;
-
-int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
-void __new_req_populate_ca_treeview (GtkTreeView *treeview);
-
-
-
-
-
-int __new_req_window_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
-{
-	GValue *last_dn_value = g_new0 (GValue, 1);
-	GValue *last_parent_dn_value = g_new0 (GValue, 1);
-	GtkTreeIter iter;
-        __NewReqWindowRefreshModelAddCaUserData *pdata = (__NewReqWindowRefreshModelAddCaUserData *) pArg;
-	GtkTreeStore * new_model = pdata->new_model;
-
-        const gchar * string_value;
-	gchar *subject_with_expiration = NULL;
-
-	// Format subject with expiration year
-	subject_with_expiration = ca_file_format_subject_with_expiration(
-		argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT], 
-		argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION],
-		argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT]);
-
-	// First we check if this is the first CA, or is a self-signed certificate
-	if (! pdata->last_ca_iter || (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_DN],argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN])) ) {
-
-		if (pdata->last_parent_iter)
-			gtk_tree_iter_free (pdata->last_parent_iter);
-
-		pdata->last_parent_iter = NULL;
-		
-	} else {
-		// If not, then we must find the parent of the current nod
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_DN, last_dn_value);
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_ca_iter, NEW_REQ_CA_MODEL_COLUMN_PARENT_DN, 
-					  last_parent_dn_value);
-		
-                string_value = g_value_get_string (last_dn_value);
-                g_assert (string_value);
-
-		if (! strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], string_value)) {
-			// Last node is parent of the current node
-			if (pdata->last_parent_iter)
-				gtk_tree_iter_free (pdata->last_parent_iter);
-			pdata->last_parent_iter = gtk_tree_iter_copy (pdata->last_ca_iter);
-		} else {
-			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
-			// current certificate.
-			
-			while (pdata->last_parent_iter && 
-			       strcmp (argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
-
-				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, pdata->last_parent_iter)) {
-					// Last ca iter is a top_level
-					if (pdata->last_parent_iter)
-						gtk_tree_iter_free (pdata->last_parent_iter);
-					pdata->last_parent_iter = NULL;
-				} else {
-					if (pdata->last_parent_iter)
-						gtk_tree_iter_free (pdata->last_parent_iter);
-					pdata->last_parent_iter = gtk_tree_iter_copy (&iter);
-				}
-
-				g_value_unset (last_parent_dn_value);
-
-				gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_parent_iter,
-							  NEW_REQ_CA_MODEL_COLUMN_DN, 
-							  last_parent_dn_value);
-
-			}
-		}
-
-		
-	}
-
-	gtk_tree_store_append (new_model, &iter, pdata->last_parent_iter);
-	
-	gtk_tree_store_set (new_model, &iter,
-			    0, atoll(argv[NEW_REQ_CA_MODEL_COLUMN_ID]), 
-			    1, argv[NEW_REQ_CA_MODEL_COLUMN_SERIAL],
-			    2, subject_with_expiration,
-			    3, argv[NEW_REQ_CA_MODEL_COLUMN_DN],
-			    4, argv[NEW_REQ_CA_MODEL_COLUMN_PARENT_DN],
-                            5, argv[NEW_REQ_CA_MODEL_COLUMN_PEM],
-			    6, argv[NEW_REQ_CA_MODEL_COLUMN_EXPIRATION],
-			    7, argv[NEW_REQ_CA_MODEL_COLUMN_SUBJECT_COUNT],
-			    -1);
-	if (pdata->last_ca_iter)
-		gtk_tree_iter_free (pdata->last_ca_iter);
-	pdata->last_ca_iter = gtk_tree_iter_copy (&iter);
-
-	g_free (last_dn_value);
-	g_free (last_parent_dn_value);
-	g_free (subject_with_expiration);
-
-	return 0;
-}
-
-
-
-
-void __new_req_populate_ca_treeview (GtkTreeView *treeview)
-{
-	GtkCellRenderer * renderer = NULL;
-        __NewReqWindowRefreshModelAddCaUserData pdata;
-
-	new_req_ca_list_model = gtk_tree_store_new (NEW_REQ_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_STRING, G_TYPE_STRING,
-						    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-
-        pdata.new_model = new_req_ca_list_model;
-        pdata.last_parent_iter = NULL;
-        pdata.last_ca_iter = NULL;
-
-	ca_file_foreach_ca (__new_req_window_refresh_model_add_ca, &pdata);
-
-        if (pdata.last_parent_iter)
-                gtk_tree_iter_free (pdata.last_parent_iter);
-
-        if (pdata.last_ca_iter)
-                gtk_tree_iter_free (pdata.last_ca_iter);
-
-	g_dataset_destroy (new_req_ca_list_model);
-
-	renderer = GTK_CELL_RENDERER (gtk_cell_renderer_text_new());
-
-	gtk_tree_view_insert_column_with_attributes (treeview,
-						     -1, _("Subject"), renderer,
-						     "markup", NEW_REQ_CA_MODEL_COLUMN_SUBJECT,
-						     NULL);
-
-	
-	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(new_req_ca_list_model));
-
-	gtk_tree_view_expand_all (treeview);
-
-	return;
-
-}
+/* (CA tree population and GtkColumnView setup is handled by
+ * ca_selector_populate() and ca_selector_setup() in ca_selector.c.) */
 
 G_MODULE_EXPORT void new_req_inherit_fields_toggled (GtkCheckButton *button, gpointer user_data)
 {
-	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
-	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
-	GtkTreeIter iter;
-
+	GtkWidget *colview = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
 
 	if (gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")))) {
-		/* Inherit */
-		gtk_widget_set_sensitive (GTK_WIDGET(treeview), TRUE);
-		gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
-
-		gtk_tree_model_get_iter_first (GTK_TREE_MODEL(new_req_ca_list_model), &iter);
-
-		gtk_tree_selection_select_iter (selection, &iter);
-
+		/* Inherit -- enable the column view and select the first row. */
+		gtk_widget_set_sensitive (colview, TRUE);
+		gtk_single_selection_set_can_unselect (new_req_ca_selection, FALSE);
+		gtk_single_selection_set_selected (new_req_ca_selection, 0);
 	} else {
-		/* Don't inherit */
-		gtk_widget_set_sensitive (GTK_WIDGET(treeview), FALSE);
-		gtk_tree_selection_set_mode (selection, GTK_SELECTION_NONE);
+		/* Don't inherit -- disable the column view and clear selection. */
+		gtk_widget_set_sensitive (colview, FALSE);
+		gtk_single_selection_set_can_unselect (new_req_ca_selection, TRUE);
+		gtk_single_selection_set_selected (new_req_ca_selection, GTK_INVALID_LIST_POSITION);
 	}
 }
 
@@ -241,7 +84,11 @@ void new_req_window_display()
 	
 	country_table_populate_dropdown(GTK_DROP_DOWN(gtk_builder_get_object(new_req_window_gtkb, "country_combobox1")));
 
-	__new_req_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview")));
+	/* Populate and set up CA selector (GtkColumnView). */
+	new_req_ca_root_store = ca_selector_populate ();
+	new_req_ca_selection = ca_selector_setup (
+	    GTK_COLUMN_VIEW (gtk_builder_get_object (new_req_window_gtkb, "new_req_ca_treeview")),
+	    new_req_ca_root_store, NULL);
 
 	new_req_inherit_fields_toggled (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
 
@@ -354,33 +201,26 @@ G_MODULE_EXPORT void on_new_req_cn_entry_changed (GtkEditable *editable,
 
 
 G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
-			      gpointer user_data) 
+			      gpointer user_data)
 {
-	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_treeview"));
-	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
-        GValue *value = g_new0(GValue, 1);
-        GtkTreeModel *model;
-	GtkTreeIter iter;
         TlsCert * tlscert;
-        GtkWidget * widget; 
+        GtkWidget * widget;
 	const gchar *pem;
 	gboolean inherit_fields;
 
 	inherit_fields = gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
 
-        if (inherit_fields && gtk_tree_selection_get_selected (selection, &model, &iter)) {
+	GnomintCertRow *sel_row = ca_selector_get_selected_row (new_req_ca_selection);
 
-                gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_PEM, value);
+        if (inherit_fields && sel_row) {
 
-		pem = g_value_get_string (value);
+		pem = gnomint_cert_row_get_pem (sel_row);
 		g_assert (pem);
                 tlscert = tls_parse_cert_pem (pem);
 
-                g_value_unset (value);
-
-                gtk_tree_model_get_value (model, &iter, NEW_REQ_CA_MODEL_COLUMN_ID, value);
                 new_req_ca_id_valid = TRUE;
-                new_req_ca_id = g_value_get_uint64(value);
+                new_req_ca_id = gnomint_cert_row_get_id (sel_row);
+		g_object_unref (sel_row);
 
 		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
                 if (ca_file_policy_get_int (new_req_ca_id, "C_INHERIT")) {
@@ -433,6 +273,8 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
                 
                 tls_cert_free (tlscert);
         } else {
+		if (sel_row)
+			g_object_unref (sel_row);
                 new_req_ca_id_valid = FALSE;
 
                 widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"country_combobox1"));
@@ -452,7 +294,6 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 		gtk_editable_set_text(GTK_EDITABLE(widget), "");
         }
 
-        g_free (value);
 	new_req_tab_activate (1);
 }
 

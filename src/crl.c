@@ -33,174 +33,26 @@
 #include "pkey_manage.h"
 #include "dialog.h"
 #include "tls.h"
+#ifndef GNOMINTCLI
+#include "ca_selector.h"
+#endif
 
 void __crl_gfree_gfunc (gpointer data, gpointer user_data);
 
 #ifndef GNOMINTCLI
 GtkBuilder *crl_window_gtkb = NULL;
-GtkTreeStore * crl_ca_list_model = NULL;
+static GtkSingleSelection *crl_ca_selection = NULL;
+static GListStore *crl_ca_root_store = NULL;
 
-
-enum {CRL_CA_MODEL_COLUMN_ID=0,
-      CRL_CA_MODEL_COLUMN_SERIAL=1,
-      CRL_CA_MODEL_COLUMN_SUBJECT=2,
-      CRL_CA_MODEL_COLUMN_DN=3,
-      CRL_CA_MODEL_COLUMN_PARENT_DN=4,
-      CRL_CA_MODEL_COLUMN_PEM=5,
-      CRL_CA_MODEL_COLUMN_EXPIRATION=6,
-      CRL_CA_MODEL_COLUMN_SUBJECT_COUNT=7,
-      CRL_CA_MODEL_COLUMN_NUMBER=8}
-        CrlCaListModelColumns;
-
-typedef struct {
-        GtkTreeStore * new_model;
-        GtkTreeIter * last_parent_iter;
-        GtkTreeIter * last_ca_iter;
-} __CrlRefreshModelAddCaUserData;
-
-int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames);
-void __crl_populate_ca_treeview (GtkTreeView *treeview);
-
-
-
-int __crl_refresh_model_add_ca (void *pArg, int argc, char **argv, char **columnNames)
+static void
+__crl_selection_changed (GObject *sel, GParamSpec *pspec G_GNUC_UNUSED,
+                         gpointer user_data G_GNUC_UNUSED)
 {
-	GValue *last_dn_value = g_new0 (GValue, 1);
-	GValue *last_parent_dn_value = g_new0 (GValue, 1);
-	GtkTreeIter iter;
-        __CrlRefreshModelAddCaUserData *pdata = (__CrlRefreshModelAddCaUserData *) pArg;
-	GtkTreeStore * new_model = pdata->new_model;
-
-        const gchar * string_value;
-	gchar *subject_with_expiration = NULL;
-
-	// Format subject with expiration year
-	subject_with_expiration = ca_file_format_subject_with_expiration(
-		argv[CRL_CA_MODEL_COLUMN_SUBJECT], 
-		argv[CRL_CA_MODEL_COLUMN_EXPIRATION],
-		argv[CRL_CA_MODEL_COLUMN_SUBJECT_COUNT]);
-
-	// First we check if this is the first CA, or is a self-signed certificate
-	if (! pdata->last_ca_iter || (! strcmp (argv[CRL_CA_MODEL_COLUMN_DN],argv[CRL_CA_MODEL_COLUMN_PARENT_DN])) ) {
-
-		if (pdata->last_parent_iter)
-			gtk_tree_iter_free (pdata->last_parent_iter);
-
-		pdata->last_parent_iter = NULL;
-		
-	} else {
-		// If not, then we must find the parent of the current nod
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_ca_iter, CRL_CA_MODEL_COLUMN_DN, last_dn_value);
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_ca_iter, CRL_CA_MODEL_COLUMN_PARENT_DN, 
-					  last_parent_dn_value);
-		
-                string_value = g_value_get_string (last_dn_value);
-                g_assert (string_value);
-
-		if (! strcmp (argv[CRL_CA_MODEL_COLUMN_PARENT_DN], string_value)) {
-			// Last node is parent of the current node
-			if (pdata->last_parent_iter)
-				gtk_tree_iter_free (pdata->last_parent_iter);
-			pdata->last_parent_iter = gtk_tree_iter_copy (pdata->last_ca_iter);
-		} else {
-			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
-			// current certificate.
-			
-			while (pdata->last_parent_iter && 
-			       strcmp (argv[CRL_CA_MODEL_COLUMN_PARENT_DN], g_value_get_string(last_parent_dn_value))) {
-
-				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, pdata->last_parent_iter)) {
-					// Last ca iter is a top_level
-					if (pdata->last_parent_iter)
-						gtk_tree_iter_free (pdata->last_parent_iter);
-					pdata->last_parent_iter = NULL;
-				} else {
-					if (pdata->last_parent_iter)
-						gtk_tree_iter_free (pdata->last_parent_iter);
-					pdata->last_parent_iter = gtk_tree_iter_copy (&iter);
-				}
-
-				g_value_unset (last_parent_dn_value);
-
-				gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), pdata->last_parent_iter,
-							  CRL_CA_MODEL_COLUMN_DN, 
-							  last_parent_dn_value);
-
-			}
-		}
-
-		
-	}
-
-	gtk_tree_store_append (new_model, &iter, pdata->last_parent_iter);
-	
-	gtk_tree_store_set (new_model, &iter,
-			    CRL_CA_MODEL_COLUMN_ID, atoi(argv[CRL_CA_MODEL_COLUMN_ID]), 
-			    CRL_CA_MODEL_COLUMN_SERIAL, atoll(argv[CRL_CA_MODEL_COLUMN_SERIAL]),
-			    CRL_CA_MODEL_COLUMN_SUBJECT, subject_with_expiration,
-			    CRL_CA_MODEL_COLUMN_DN, argv[CRL_CA_MODEL_COLUMN_DN],
-			    CRL_CA_MODEL_COLUMN_PARENT_DN, argv[CRL_CA_MODEL_COLUMN_PARENT_DN],
-                            CRL_CA_MODEL_COLUMN_PEM, argv[CRL_CA_MODEL_COLUMN_PEM],
-			    CRL_CA_MODEL_COLUMN_EXPIRATION, argv[CRL_CA_MODEL_COLUMN_EXPIRATION],
-			    CRL_CA_MODEL_COLUMN_SUBJECT_COUNT, argv[CRL_CA_MODEL_COLUMN_SUBJECT_COUNT],
-			    -1);
-	if (pdata->last_ca_iter)
-		gtk_tree_iter_free (pdata->last_ca_iter);
-	pdata->last_ca_iter = gtk_tree_iter_copy (&iter);
-
-	g_free (last_dn_value);
-	g_free (last_parent_dn_value);
-	g_free (subject_with_expiration);
-
-	return 0;
-}
-
-
-void __crl_populate_ca_treeview (GtkTreeView *treeview)
-{
-	GtkCellRenderer * renderer = NULL;
-        __CrlRefreshModelAddCaUserData pdata;
-
-	crl_ca_list_model = gtk_tree_store_new (CRL_CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT, G_TYPE_UINT64, G_TYPE_STRING,
-                                                G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-
-        pdata.new_model = crl_ca_list_model;
-        pdata.last_parent_iter = NULL;
-        pdata.last_ca_iter = NULL;
-
-	ca_file_foreach_ca (__crl_refresh_model_add_ca, &pdata);
-
-        if (pdata.last_parent_iter)
-                gtk_tree_iter_free (pdata.last_parent_iter);
-
-        if (pdata.last_ca_iter)
-                gtk_tree_iter_free (pdata.last_ca_iter);
-
-	g_dataset_destroy (crl_ca_list_model);
-
-	renderer = GTK_CELL_RENDERER (gtk_cell_renderer_text_new());
-
-	gtk_tree_view_insert_column_with_attributes (treeview,
-						     -1, _("Subject"), renderer,
-						     "markup", CRL_CA_MODEL_COLUMN_SUBJECT,
-						     NULL);
-
-	
-	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(crl_ca_list_model));
-
-	gtk_tree_view_expand_all (treeview);
-
-	return;
-
-}
-
-G_MODULE_EXPORT void crl_treeview_cursor_changed_cb (GtkTreeView *treeview, gpointer userdata)
-{
-        GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
-        if (gtk_tree_selection_count_selected_rows(selection) == 0)
-                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "crl_ok_button")), FALSE);
-        else
-                gtk_widget_set_sensitive (GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "crl_ok_button")), TRUE);
+	guint pos = gtk_single_selection_get_selected (GTK_SINGLE_SELECTION (sel));
+	gboolean has_sel = (pos != GTK_INVALID_LIST_POSITION);
+	gtk_widget_set_sensitive (
+	    GTK_WIDGET (gtk_builder_get_object (crl_window_gtkb, "crl_ok_button")),
+	    has_sel);
 }
 
 
@@ -210,15 +62,21 @@ void crl_window_display (void)
         GtkWidget * widget = NULL;
 
 	crl_window_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (crl_window_gtkb, 
+	gtk_builder_add_from_file (crl_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "new_crl_dialog.ui", NULL),
 				   NULL);
-	
+
         widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_widget_set_visible(widget, TRUE);
 
-        __crl_populate_ca_treeview (GTK_TREE_VIEW(gtk_builder_get_object (crl_window_gtkb, "crl_ca_treeview")));
+	/* Populate and set up CA selector (GtkColumnView). */
+	crl_ca_root_store = ca_selector_populate ();
+	crl_ca_selection = ca_selector_setup (
+	    GTK_COLUMN_VIEW (gtk_builder_get_object (crl_window_gtkb, "crl_ca_treeview")),
+	    crl_ca_root_store, NULL);
 
+	g_signal_connect (crl_ca_selection, "notify::selected",
+	                  G_CALLBACK (__crl_selection_changed), NULL);
 }
 
 
@@ -272,17 +130,9 @@ __crl_ok_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 
 G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 {
-	guint64 ca_id = 0;
-
-	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(crl_window_gtkb, "crl_ca_treeview"));
-	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
-        GValue *value = g_new0(GValue, 1);
-        GtkTreeModel *model;
-	GtkTreeIter iter;
-
-        gtk_tree_selection_get_selected (selection, &model, &iter);
-        gtk_tree_model_get_value (model, &iter, CRL_CA_MODEL_COLUMN_ID, value);
-        ca_id = g_value_get_uint(value);
+	guint64 ca_id = ca_selector_get_selected_id (crl_ca_selection);
+	if (ca_id == 0)
+		return;
 
 	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
 

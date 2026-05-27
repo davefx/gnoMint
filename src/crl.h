@@ -22,7 +22,6 @@
 
 #ifndef GNOMINTCLI
 void crl_window_display (void);
-void crl_treeview_cursor_changed_cb (GtkTreeView *treeview, gpointer userdata);
 void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata);
 void crl_ok_clicked_cb (GtkButton *button, gpointer userdata);
 #endif

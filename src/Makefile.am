@@ -20,6 +20,8 @@ gnomint_SOURCES = \
 	main.c \
 	cert_row.c \
 	cert_row.h \
+	ca_selector.c \
+	ca_selector.h \
 	country_table.c \
         new_ca_window.c \
         new_req_window.c \
@@ -111,6 +113,7 @@ EXTRA_DIST = \
 	ca_creation.h \
 	ca_file.h \
 	ca.h \
+	ca_selector.h \
 	ca_policy.h \
 	certificate_properties.h \
 	country_table.h \
