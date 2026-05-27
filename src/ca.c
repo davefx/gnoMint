@@ -159,6 +159,144 @@ __ca_dialog_response_destroy_and_free (GtkDialog *dialog,
     cert_diff_free ((CertDiff *) user_data);
 }
 
+/* ---- Async confirmation-dialog response callbacks (Step 2.1) ---- */
+
+/* Helper: free a GSList stored as "ids" data on the dialog. */
+static void
+__ca_gslist_free_notify (gpointer data)
+{
+    g_slist_free ((GSList *) data);
+}
+
+/* Response callback for the bulk-revoke confirmation dialog.
+ * cert_ids GSList is attached to the dialog as "ids". */
+static void
+__ca_bulk_revoke_response (GtkDialog *dialog,
+                           gint       response_id,
+                           gpointer   user_data G_GNUC_UNUSED)
+{
+    GSList *cert_ids = (GSList *) g_object_get_data (G_OBJECT (dialog), "ids");
+    gtk_window_destroy (GTK_WINDOW (dialog));
+
+    if (response_id != GTK_RESPONSE_YES)
+        return;
+
+    gchar *err = NULL;
+    gint done = ca_bulk_revoke_ids (cert_ids, &err);
+
+    if (err) {
+        dialog_error (g_strdup_printf (
+            _("Bulk revoke completed with errors. First error: %s"), err));
+        g_free (err);
+    }
+
+    GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+    gchar *summary = g_strdup_printf (
+        ngettext ("%d certificate revoked.",
+                  "%d certificates revoked.", done), done);
+    GtkWidget *info = gtk_message_dialog_new (
+        GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", summary);
+    g_free (summary);
+    g_signal_connect (info, "response",
+                      G_CALLBACK (__ca_dialog_response_destroy), NULL);
+    gtk_window_present (GTK_WINDOW (info));
+
+    dialog_refresh_list ();
+}
+
+/* Response callback for the bulk-delete-CSRs confirmation dialog.
+ * csr_ids GSList is attached to the dialog as "ids". */
+static void
+__ca_bulk_delete_csrs_response (GtkDialog *dialog,
+                                gint       response_id,
+                                gpointer   user_data G_GNUC_UNUSED)
+{
+    GSList *csr_ids = (GSList *) g_object_get_data (G_OBJECT (dialog), "ids");
+    gtk_window_destroy (GTK_WINDOW (dialog));
+
+    if (response_id != GTK_RESPONSE_YES)
+        return;
+
+    gchar *err = NULL;
+    ca_bulk_delete_csr_ids (csr_ids, &err);
+
+    if (err) {
+        dialog_error (g_strdup_printf (
+            _("Bulk delete completed with errors. First error: %s"), err));
+        g_free (err);
+    }
+    dialog_refresh_list ();
+}
+
+/* Response callback for the certificate-renewal confirmation dialog.
+ * cert_id is stored as a heap-allocated guint64 in user_data. */
+static void
+__ca_renew_response (GtkDialog *dialog,
+                     gint       response_id,
+                     gpointer   user_data)
+{
+    guint64 cert_id = *(guint64 *) user_data;
+    gtk_window_destroy (GTK_WINDOW (dialog));
+    g_free (user_data);
+
+    if (response_id != GTK_RESPONSE_YES)
+        return;
+
+    guint64 new_cert_id = 0;
+    gchar *err = cert_renewal_renew (cert_id, &new_cert_id);
+    if (err) {
+        dialog_error (err);
+        g_free (err);
+        return;
+    }
+
+    dialog_info (_("Certificate renewed. A new certificate with a fresh "
+                   "keypair has been added to the database alongside the "
+                   "original."));
+    ca_refresh_model_callback ();
+}
+
+/* Response callback for the single-certificate-revoke confirmation dialog.
+ * cert id is stored as a heap-allocated guint64 in user_data. */
+static void
+__ca_revoke_response (GtkDialog *dialog,
+                      gint       response_id,
+                      gpointer   user_data)
+{
+    guint64 id = *(guint64 *) user_data;
+    gtk_window_destroy (GTK_WINDOW (dialog));
+    g_free (user_data);
+
+    if (response_id != GTK_RESPONSE_YES)
+        return;
+
+    gchar *errmsg = ca_file_revoke_crt (id);
+    if (errmsg) {
+        dialog_error (_(errmsg));
+    }
+
+    dialog_refresh_list ();
+}
+
+/* Response callback for the single-CSR-delete confirmation dialog.
+ * csr id is stored as a heap-allocated guint64 in user_data. */
+static void
+__ca_delete_csr_response (GtkDialog *dialog,
+                          gint       response_id,
+                          gpointer   user_data)
+{
+    guint64 id = *(guint64 *) user_data;
+    gtk_window_destroy (GTK_WINDOW (dialog));
+    g_free (user_data);
+
+    if (response_id != GTK_RESPONSE_YES)
+        return;
+
+    ca_file_remove_csr (id);
+    dialog_refresh_list ();
+}
+
 static gboolean view_csr = TRUE;
 static gboolean view_rcrt = TRUE;
 static gboolean view_expired = TRUE;
@@ -1769,35 +1907,11 @@ ca_on_bulk_revoke_activate (gpointer sender G_GNUC_UNUSED,
 	      "it as invalid. CSRs in the selection (if any) are not affected; "
 	      "use \"Delete selected CSRs\" for those."));
 	g_free (msg);
-	gint resp = compat_dialog_run (GTK_DIALOG (dialog));
-	gtk_window_destroy(GTK_WINDOW(dialog));
-
-	if (resp != GTK_RESPONSE_YES) {
-		g_slist_free (cert_ids);
-		return;
-	}
-
-	gchar *err = NULL;
-	gint done = ca_bulk_revoke_ids (cert_ids, &err);
-	g_slist_free (cert_ids);
-
-	if (err) {
-		dialog_error (g_strdup_printf (
-		    _("Bulk revoke completed with errors. First error: %s"), err));
-		g_free (err);
-	}
-	gchar *summary = g_strdup_printf (
-	    ngettext ("%d certificate revoked.",
-	              "%d certificates revoked.", done), done);
-	GtkWidget *info = gtk_message_dialog_new (
-	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
-	    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", summary);
-	g_free (summary);
-	g_signal_connect (info, "response",
-	                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-	gtk_window_present (GTK_WINDOW (info));
-
-	dialog_refresh_list ();
+	g_object_set_data_full (G_OBJECT (dialog), "ids", cert_ids,
+	                        __ca_gslist_free_notify);
+	g_signal_connect (dialog, "response",
+	                  G_CALLBACK (__ca_bulk_revoke_response), NULL);
+	gtk_window_present (GTK_WINDOW (dialog));
 }
 
 /* GUI handler: bulk-delete CSRs from the current selection. */
@@ -1825,24 +1939,11 @@ ca_on_bulk_delete_csrs_activate (gpointer sender G_GNUC_UNUSED,
 	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
 	    GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "<b>%s</b>", msg);
 	g_free (msg);
-	gint resp = compat_dialog_run (GTK_DIALOG (dialog));
-	gtk_window_destroy(GTK_WINDOW(dialog));
-
-	if (resp != GTK_RESPONSE_YES) {
-		g_slist_free (csr_ids);
-		return;
-	}
-
-	gchar *err = NULL;
-	ca_bulk_delete_csr_ids (csr_ids, &err);
-	g_slist_free (csr_ids);
-
-	if (err) {
-		dialog_error (g_strdup_printf (
-		    _("Bulk delete completed with errors. First error: %s"), err));
-		g_free (err);
-	}
-	dialog_refresh_list ();
+	g_object_set_data_full (G_OBJECT (dialog), "ids", csr_ids,
+	                        __ca_gslist_free_notify);
+	g_signal_connect (dialog, "response",
+	                  G_CALLBACK (__ca_bulk_delete_csrs_response), NULL);
+	gtk_window_present (GTK_WINDOW (dialog));
 }
 
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (gpointer sender, gpointer user_data)
@@ -1884,11 +1985,8 @@ G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 	GnomintCertRow *row = NULL;
 	gint type = __ca_selection_type_cv (&row);
 	guint64 cert_id = 0;
-	guint64 new_cert_id = 0;
-	gchar  *err = NULL;
 	GObject *parent_win = NULL;
 	GtkDialog *confirm = NULL;
-	gint response = 0;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
 		if (row) g_object_unref (row);
@@ -1919,22 +2017,11 @@ G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 	      "freshly-generated keypair. The old certificate will remain in "
 	      "the database — revoke it manually after you have deployed the "
 	      "new one.")));
-	response = compat_dialog_run (confirm);
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET (confirm)));
-	if (response != GTK_RESPONSE_YES)
-		return;
-
-	err = cert_renewal_renew (cert_id, &new_cert_id);
-	if (err) {
-		dialog_error (err);
-		g_free (err);
-		return;
-	}
-
-	dialog_info (_("Certificate renewed. A new certificate with a fresh "
-	               "keypair has been added to the database alongside the "
-	               "original."));
-	ca_refresh_model_callback ();
+	guint64 *cert_id_heap = g_new (guint64, 1);
+	*cert_id_heap = cert_id;
+	g_signal_connect (confirm, "response",
+	                  G_CALLBACK (__ca_renew_response), cert_id_heap);
+	gtk_window_present (GTK_WINDOW (GTK_WIDGET (confirm)));
 }
 
 
@@ -2098,10 +2185,8 @@ G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
-        gchar * errmsg = NULL;
 	GnomintCertRow *row = NULL;
 	gint type = __ca_selection_type_cv (&row);
-	gint response = 0;
 	guint64 id = 0;
 
 	if (type == CA_FILE_ELEMENT_TYPE_CSR || type == -1) {
@@ -2133,21 +2218,11 @@ G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 							    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked). \n\nMoreover, revoking a CA certificate can invalidate all the certificates generated with it, so all them should be regenerated with a new CA certificate.")));
 	}
 
-	response = compat_dialog_run(dialog);
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-
-	if (response == GTK_RESPONSE_NO) {
-		return;
-	}
-
-        errmsg = ca_file_revoke_crt (id);
-	if (errmsg) {
-                dialog_error (_(errmsg));
-
-        }
-
-	dialog_refresh_list();
-  
+	guint64 *id_heap = g_new (guint64, 1);
+	*id_heap = id;
+	g_signal_connect (dialog, "response",
+	                  G_CALLBACK (__ca_revoke_response), id_heap);
+	gtk_window_present (GTK_WINDOW (GTK_WIDGET (dialog)));
 }
 
 
@@ -2157,7 +2232,6 @@ G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data
 	GtkDialog * dialog = NULL;
 	GnomintCertRow *row = NULL;
 	gint type = __ca_selection_type_cv (&row);
-	gint response = 0;
 	guint64 id = 0;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
@@ -2173,19 +2247,14 @@ G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data
 						    "%s",
 						    _("Are you sure you want to delete this Certificate Signing Request?")));
 
-	response = compat_dialog_run(dialog);
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-
-	if (response == GTK_RESPONSE_NO) {
-		g_object_unref (row);
-		return;
-	}
-
 	id = gnomint_cert_row_get_id (row);
-	ca_file_remove_csr (id);
-
 	g_object_unref (row);
-	dialog_refresh_list();
+
+	guint64 *id_heap = g_new (guint64, 1);
+	*id_heap = id;
+	g_signal_connect (dialog, "response",
+	                  G_CALLBACK (__ca_delete_csr_response), id_heap);
+	gtk_window_present (GTK_WINDOW (GTK_WIDGET (dialog)));
 }
 
 G_MODULE_EXPORT void ca_on_sign1_activate (gpointer sender, gpointer user_data)
