@@ -304,11 +304,13 @@ tls_generate_eddsa_keys (TlsCreationData *creation_data G_GNUC_UNUSED,
 		return g_strdup_printf (_("Error creating private key: %d"), error);
 
 	*private_key = NULL;
-	gnutls_x509_privkey_export (**key, GNUTLS_X509_FMT_PEM,
-	                            *private_key, &private_key_len);
+	gnutls_x509_privkey_export_pkcs8 (**key, GNUTLS_X509_FMT_PEM,
+	                                   NULL, GNUTLS_PKCS_PLAIN,
+	                                   *private_key, &private_key_len);
 	*private_key = g_new0 (gchar, private_key_len);
-	if (gnutls_x509_privkey_export (**key, GNUTLS_X509_FMT_PEM,
-	                                *private_key, &private_key_len) < 0)
+	if (gnutls_x509_privkey_export_pkcs8 (**key, GNUTLS_X509_FMT_PEM,
+	                                       NULL, GNUTLS_PKCS_PLAIN,
+	                                       *private_key, &private_key_len) < 0)
 		return g_strdup_printf (_("Error exporting private key to PEM structure."));
 
 	return NULL;
@@ -916,8 +918,14 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 	gnutls_x509_crt_import (ca_crt, &ca_cert_pem_datum, GNUTLS_X509_FMT_PEM);
 
 	gnutls_x509_privkey_init (&ca_pkey);
-	gnutls_x509_privkey_import (ca_pkey, &ca_priv_key_pem_datum, GNUTLS_X509_FMT_PEM);
-	
+	if (gnutls_x509_privkey_import2 (ca_pkey, &ca_priv_key_pem_datum,
+	                                  GNUTLS_X509_FMT_PEM, NULL, 0) < 0) {
+		gnutls_x509_crq_deinit (csr);
+		gnutls_x509_crt_deinit (ca_crt);
+		gnutls_x509_privkey_deinit (ca_pkey);
+		return g_strdup_printf(_("Error when importing CA private key"));
+	}
+
 	if (gnutls_x509_crt_init (&crt) < 0) {
 		gnutls_x509_crq_deinit (csr);
 		gnutls_x509_crt_deinit (ca_crt);
@@ -1147,12 +1155,31 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 	}
 		
 
-	if (gnutls_x509_crt_sign2(crt, ca_crt, ca_pkey, GNUTLS_DIG_SHA512, 0)) {
-		gnutls_x509_crq_deinit (csr);
-		gnutls_x509_crt_deinit (crt);
-		gnutls_x509_crt_deinit (ca_crt);
-		gnutls_x509_privkey_deinit (ca_pkey);
-		return g_strdup_printf(_("Error when signing certificate"));
+	{
+		int ca_pk = gnutls_x509_privkey_get_pk_algorithm (ca_pkey);
+		gnutls_digest_algorithm_t dig;
+		if (ca_pk == GNUTLS_PK_EDDSA_ED25519)
+			dig = GNUTLS_DIG_SHA512;
+		else if (ca_pk == GNUTLS_PK_ECDSA)
+			dig = GNUTLS_DIG_SHA256;
+		else
+			dig = GNUTLS_DIG_SHA512;
+		gnutls_privkey_t abstract_key;
+		gnutls_privkey_init (&abstract_key);
+		gnutls_privkey_import_x509 (abstract_key, ca_pkey, 0);
+		int sign_err = gnutls_x509_crt_privkey_sign (crt, ca_crt,
+		    abstract_key, dig, 0);
+		gnutls_privkey_deinit (abstract_key);
+		if (sign_err) {
+			gchar *msg = g_strdup_printf (
+			    _("Error when signing certificate: %s"),
+			    gnutls_strerror (sign_err));
+			gnutls_x509_crq_deinit (csr);
+			gnutls_x509_crt_deinit (crt);
+			gnutls_x509_crt_deinit (ca_crt);
+			gnutls_x509_privkey_deinit (ca_pkey);
+			return msg;
+		}
 	}
 	
 	/* Calculate certificate length */

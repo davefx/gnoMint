@@ -1870,9 +1870,6 @@ G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 		return;
 	}
 
-	/* Refuse to renew CA certificates: the new cert would carry a
-	 * different key, so every certificate previously signed by the
-	 * old CA would no longer chain to the renewed one. */
 	if (gnomint_cert_row_get_is_ca (row)) {
 		g_object_unref (row);
 		dialog_error (_("CA certificates cannot be renewed. A renewed CA "

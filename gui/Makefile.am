@@ -56,10 +56,13 @@ EXTRA_DIST = $(gtkbuilder_DATA) $(deskicon_DATA) gnomint.desktop.in gnomint.appd
 install-data-hook:
 	$(MKDIR_P) $(DESTDIR)$(datadir)/icons/hicolor/64x64/apps
 	$(INSTALL_DATA) $(srcdir)/gnomint64x64.png $(DESTDIR)$(datadir)/icons/hicolor/64x64/apps/gnomint.png
+	$(MKDIR_P) $(DESTDIR)$(datadir)/icons/hicolor/192x192/apps
+	$(INSTALL_DATA) $(srcdir)/gnomint192x192.png $(DESTDIR)$(datadir)/icons/hicolor/192x192/apps/gnomint.png
 	-gtk-update-icon-cache -f -t $(DESTDIR)$(datadir)/icons/hicolor 2>/dev/null || true
 
 uninstall-hook:
 	rm -f $(DESTDIR)$(datadir)/icons/hicolor/64x64/apps/gnomint.png
+	rm -f $(DESTDIR)$(datadir)/icons/hicolor/192x192/apps/gnomint.png
 	-gtk-update-icon-cache -f -t $(DESTDIR)$(datadir)/icons/hicolor 2>/dev/null || true
 
 CLEANFILES = $(desktop_DATA) $(appdata_DATA)

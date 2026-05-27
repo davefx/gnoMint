@@ -204,19 +204,23 @@ gint dialog_ask_for_number (gchar *message, gint minimum, gint maximum, gint def
 
 	while (keep_trying) {
 		line = readline (prompt);
-		
-		if (line == NULL || strlen (line) == 0) {
+
+		if (line == NULL) {
 			result = default_value;
-			keep_trying = FALSE;		
+			break;
+		}
+		if (strlen (line) == 0) {
+			result = default_value;
+			free (line);
+			break;
 		}
 		if (atoi (line) <= maximum && atoi(line) >= minimum) {
-			result = (atoi (line));
-			keep_trying = FALSE;
-		}
-		
-		if (line)
+			result = atoi (line);
 			free (line);
-	} 	
+			break;
+		}
+		free (line);
+	}
 
 	g_free (prompt);
 	return result;

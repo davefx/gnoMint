@@ -66,7 +66,17 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.8])
 dnl Define locale directory — replaces deprecated AM_GLIB_DEFINE_LOCALEDIR
-AC_DEFINE_UNQUOTED([PACKAGE_LOCALE_DIR], ["${prefix}/share/locale"],
+gnomint_save_prefix="$prefix"
+gnomint_save_exec_prefix="$exec_prefix"
+gnomint_save_datarootdir="$datarootdir"
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+test "x$exec_prefix" = xNONE && exec_prefix=$prefix
+datarootdir=`eval echo "${datarootdir}"`
+gnomint_localedir=`eval echo "${datadir}/locale"`
+prefix="$gnomint_save_prefix"
+exec_prefix="$gnomint_save_exec_prefix"
+datarootdir="$gnomint_save_datarootdir"
+AC_DEFINE_UNQUOTED([PACKAGE_LOCALE_DIR], ["$gnomint_localedir"],
   [Define the location where the catalogs will be installed])
 
 # required versions
