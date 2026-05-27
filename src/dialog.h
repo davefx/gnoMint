@@ -27,12 +27,21 @@
 #include <gtk/gtk.h>
 #endif
 
+typedef void (*DialogPasswordCallback)(gchar *password, gpointer user_data);
+
 void dialog_info (gchar *message);
 void dialog_error (gchar *message);
 
-gchar * dialog_get_password (gchar *info_message, 
-			     gchar *password_message, gchar *confirm_message, 
+#ifdef GNOMINTCLI
+gchar * dialog_get_password (gchar *info_message,
+			     gchar *password_message, gchar *confirm_message,
 			     gchar *distinct_error_message, guint minimum_length);
+#else
+void dialog_get_password (gchar *info_message,
+			  gchar *password_message, gchar *confirm_message,
+			  gchar *distinct_error_message, guint minimum_length,
+			  DialogPasswordCallback cb, gpointer user_data);
+#endif
 
 void dialog_todo_callback (void);
 

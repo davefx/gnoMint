@@ -320,22 +320,77 @@ void dialog_error (gchar *message) {
 
 }
 
-gchar * dialog_get_password (gchar *info_message, 
-			     gchar *password_message, gchar *confirm_message, 
-			     gchar *distinct_error_message, guint minimum_length)
+/* --- Async password dialog (GUI) --- */
+
+typedef struct {
+	GtkBuilder             *dialog_gtkb;
+	gchar                  *distinct_error_message;
+	DialogPasswordCallback  cb;
+	gpointer                user_data;
+} _DialogGetPasswordCtx;
+
+static void
+_dialog_get_password_response (GtkDialog *dialog,
+                               gint       response_id,
+                               gpointer   user_data)
+{
+	_DialogGetPasswordCtx *ctx = (_DialogGetPasswordCtx *) user_data;
+	GObject *widget;
+	gchar *password;
+	const gchar *passwordagain;
+
+	if (!response_id || response_id == GTK_RESPONSE_CANCEL
+	    || response_id == GTK_RESPONSE_DELETE_EVENT) {
+		gtk_window_destroy (GTK_WINDOW (dialog));
+		g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+		ctx->cb (NULL, ctx->user_data);
+		g_free (ctx->distinct_error_message);
+		g_free (ctx);
+		return;
+	}
+
+	/* OK pressed -- validate */
+	widget = gtk_builder_get_object (ctx->dialog_gtkb, "password_entry");
+	password = g_strdup (gtk_editable_get_text (GTK_EDITABLE (widget)));
+	widget = gtk_builder_get_object (ctx->dialog_gtkb, "confirm_entry");
+	passwordagain = gtk_editable_get_text (GTK_EDITABLE (widget));
+
+	if (strcmp (password, passwordagain)) {
+		g_free (password);
+		dialog_error (ctx->distinct_error_message);
+		/* Re-present the dialog so the user can try again */
+		widget = gtk_builder_get_object (ctx->dialog_gtkb, "password_entry");
+		gtk_editable_set_text (GTK_EDITABLE (widget), "");
+		widget = gtk_builder_get_object (ctx->dialog_gtkb, "confirm_entry");
+		gtk_editable_set_text (GTK_EDITABLE (widget), "");
+		widget = gtk_builder_get_object (ctx->dialog_gtkb, "password_entry");
+		gtk_widget_grab_focus (GTK_WIDGET (widget));
+		gtk_window_present (GTK_WINDOW (dialog));
+		return;
+	}
+
+	/* Passwords match -- success */
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+	ctx->cb (password, ctx->user_data);
+	g_free (ctx->distinct_error_message);
+	g_free (ctx);
+}
+
+void dialog_get_password (gchar *info_message,
+			  gchar *password_message, gchar *confirm_message,
+			  gchar *distinct_error_message, guint minimum_length,
+			  DialogPasswordCallback cb, gpointer user_data)
 {
 	GObject * widget = NULL, * password_widget = NULL;
-	//GtkDialog * dialog = NULL;
 	GtkBuilder * dialog_gtkb = NULL;
-	gint response = 0;
-	gchar *password = NULL;
-	const gchar *passwordagain = NULL;
+	_DialogGetPasswordCtx *ctx;
 
 	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
+	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_password_dialog.ui", NULL ),
 				   NULL);
-	
+
 	widget = gtk_builder_get_object (dialog_gtkb, "info_message");
 	gtk_label_set_text (GTK_LABEL(widget), info_message);
 	widget = gtk_builder_get_object (dialog_gtkb, "password_message");
@@ -345,41 +400,22 @@ gchar * dialog_get_password (gchar *info_message,
 
 	password_widget = gtk_builder_get_object (dialog_gtkb, "password_entry");
 	widget = gtk_builder_get_object (dialog_gtkb, "password_dialog_ok_button");
-	g_object_set_data (G_OBJECT(password_widget), "minimum_length", 
+	g_object_set_data (G_OBJECT(password_widget), "minimum_length",
                            GINT_TO_POINTER(minimum_length));
 	g_object_set_data (G_OBJECT(password_widget), "ok_button", widget);
 
-	do {
-		gtk_widget_grab_focus (GTK_WIDGET(password_widget));
-
-		if (password)
-			g_free (password);
-
-		widget = gtk_builder_get_object (dialog_gtkb, "get_password_dialog");
-		response = compat_dialog_run(GTK_DIALOG(widget)); 
-	
-		if (!response) {
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-			g_object_unref (G_OBJECT(dialog_gtkb));
-			return NULL;
-		} else {
-			widget = gtk_builder_get_object (dialog_gtkb, "password_entry");
-			password = g_strdup(gtk_editable_get_text(GTK_EDITABLE(widget)));
-			widget = gtk_builder_get_object (dialog_gtkb, "confirm_entry");
-			passwordagain = gtk_editable_get_text(GTK_EDITABLE(widget));
-		}
-		
-		if (strcmp (password, passwordagain)) {
-			dialog_error (distinct_error_message);
-		}
-
-	} while (strcmp (password, passwordagain));
+	ctx = g_new0 (_DialogGetPasswordCtx, 1);
+	ctx->dialog_gtkb = dialog_gtkb;
+	ctx->distinct_error_message = g_strdup (distinct_error_message);
+	ctx->cb = cb;
+	ctx->user_data = user_data;
 
 	widget = gtk_builder_get_object (dialog_gtkb, "get_password_dialog");
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-	g_object_unref (G_OBJECT(dialog_gtkb));
-	
-	return password;
+	g_signal_connect (GTK_DIALOG (widget), "response",
+	                  G_CALLBACK (_dialog_get_password_response), ctx);
+
+	gtk_widget_grab_focus (GTK_WIDGET (password_widget));
+	gtk_window_present (GTK_WINDOW (widget));
 }
 
 G_MODULE_EXPORT void dialog_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data)

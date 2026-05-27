@@ -25,10 +25,25 @@
 
 gchar *export_dh_param (guint dh_size, gchar *filename);
 
-gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename);
-
 gchar * export_private_pem (guint64 id, gint type, gchar *filename);
 
+#ifdef GNOMINTCLI
+
+gchar * export_private_pkcs8 (guint64 id, gint type, gchar *filename);
+
 gchar * export_pkcs12 (guint64 id, gint type, gchar *filename);
+
+#else
+
+typedef void (*ExportPkcs8Callback)(const gchar *error_msg, gpointer user_data);
+typedef void (*ExportPkcs12Callback)(const gchar *error_msg, gpointer user_data);
+
+void export_private_pkcs8 (guint64 id, gint type, gchar *filename,
+                           ExportPkcs8Callback cb, gpointer user_data);
+
+void export_pkcs12 (guint64 id, gint type, gchar *filename,
+                    ExportPkcs12Callback cb, gpointer user_data);
+
+#endif
 
 #endif
