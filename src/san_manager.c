@@ -125,34 +125,135 @@ static void san_manager_selection_changed(GtkTreeSelection *selection, gpointer 
 	gtk_widget_set_sensitive(GTK_WIDGET(data->remove_button), has_selection);
 }
 
-static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initial_type, const gchar *initial_value, gchar **out_type, gchar **out_value) {
+/* Context for the async SAN editor dialog. */
+typedef struct {
+	SanManagerData *data;
+	gboolean        editing;       /* TRUE = edit existing row, FALSE = add new */
+	GtkTreeIter     edit_iter;     /* valid only when editing == TRUE */
+	gulong          response_handler_id;
+} SanEditorCtx;
+
+/* Forward declaration. */
+static void san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data);
+
+/* Fire-and-forget handler for the validation error dialog. */
+static void
+san_editor_error_response (GtkDialog *dialog,
+                           gint       response_id G_GNUC_UNUSED,
+                           gpointer   user_data   G_GNUC_UNUSED)
+{
+	gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
+/* Response callback for the SAN editor dialog.
+ * On OK: validate; if invalid show error and re-present; if valid update model.
+ * On CANCEL / DELETE_EVENT: destroy dialog, clean up. */
+static void
+san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data)
+{
+	SanEditorCtx *ctx = (SanEditorCtx *) user_data;
+	SanManagerData *data = ctx->data;
+
+	if (response_id != GTK_RESPONSE_OK) {
+		/* Cancel / close / delete-event */
+		g_signal_handler_disconnect (dialog, ctx->response_handler_id);
+		gtk_window_destroy (GTK_WINDOW (dialog));
+		g_free (ctx);
+		return;
+	}
+
+	/* OK pressed — validate input. */
+	GtkComboBox *type_combo = GTK_COMBO_BOX (
+		gtk_builder_get_object (data->editor_builder, "san_type_combo"));
+	GtkEntry *value_entry = GTK_ENTRY (
+		gtk_builder_get_object (data->editor_builder, "san_value_entry"));
+
+	GtkTreeIter combo_iter;
+	SanType type;
+	if (gtk_combo_box_get_active_iter (type_combo, &combo_iter)) {
+		GtkTreeModel *combo_model = gtk_combo_box_get_model (type_combo);
+		gint type_int;
+		gtk_tree_model_get (combo_model, &combo_iter, 1, &type_int, -1);
+		type = (SanType) type_int;
+	} else {
+		type = SAN_TYPE_DNS;
+	}
+
+	const gchar *value = gtk_editable_get_text (GTK_EDITABLE (value_entry));
+	gchar *error_msg = NULL;
+
+	if (!san_validate (type, value, &error_msg)) {
+		/* Show fire-and-forget error dialog, then re-present editor. */
+		GtkWidget *err_dlg = gtk_message_dialog_new (
+			GTK_WINDOW (dialog),
+			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_MESSAGE_ERROR,
+			GTK_BUTTONS_OK,
+			"%s", error_msg);
+		g_signal_connect (err_dlg, "response",
+		                  G_CALLBACK (san_editor_error_response), NULL);
+		gtk_window_present (GTK_WINDOW (err_dlg));
+		g_free (error_msg);
+		/* Re-present the same editor dialog so the user can correct. */
+		gtk_window_present (GTK_WINDOW (dialog));
+		return;
+	}
+
+	/* Valid — update the model. */
+	gchar *type_str = g_strdup (san_type_to_string (type));
+	gchar *value_str = g_strdup (value);
+
+	if (ctx->editing) {
+		gtk_list_store_set (data->model, &ctx->edit_iter,
+		                    0, type_str,
+		                    1, value_str,
+		                    -1);
+	} else {
+		GtkTreeIter new_iter;
+		gtk_list_store_append (data->model, &new_iter);
+		gtk_list_store_set (data->model, &new_iter,
+		                    0, type_str,
+		                    1, value_str,
+		                    -1);
+	}
+
+	g_free (type_str);
+	g_free (value_str);
+
+	g_signal_handler_disconnect (dialog, ctx->response_handler_id);
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	g_free (ctx);
+}
+
+/* Present the SAN editor dialog asynchronously.  When the user confirms,
+ * the response callback validates and updates the model. */
+static void san_manager_show_editor_async(SanManagerData *data, const gchar *initial_type, const gchar *initial_value, gboolean editing, GtkTreeIter *edit_iter) {
 	GtkDialog *dialog;
 	GtkComboBox *type_combo;
 	GtkEntry *value_entry;
 	GtkWidget *parent;
-	gint response;
 	gchar *ui_file;
-	
+
 	// Load editor dialog if not already loaded
 	if (!data->editor_builder) {
 		data->editor_builder = gtk_builder_new();
 		ui_file = g_build_filename(PACKAGE_DATA_DIR, "gnomint", "san_editor_dialog.ui", NULL);
 		if (!gtk_builder_add_from_file(data->editor_builder, ui_file, NULL)) {
 			g_free(ui_file);
-			return FALSE;
+			return;
 		}
 		g_free(ui_file);
 	}
-	
+
 	dialog = GTK_DIALOG(gtk_builder_get_object(data->editor_builder, "san_editor_dialog"));
 	type_combo = GTK_COMBO_BOX(gtk_builder_get_object(data->editor_builder, "san_type_combo"));
 	value_entry = GTK_ENTRY(gtk_builder_get_object(data->editor_builder, "san_value_entry"));
-	
+
 	// Set parent window
 	parent = GTK_WIDGET(gtk_widget_get_root(GTK_WIDGET(data->treeview)));
 	if (GTK_IS_WINDOW(parent))
 		gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(parent));
-	
+
 	// Set initial values
 	if (initial_type) {
 		SanType type = san_type_from_string(initial_type);
@@ -160,76 +261,30 @@ static gboolean san_manager_show_editor(SanManagerData *data, const gchar *initi
 	} else {
 		gtk_combo_box_set_active(type_combo, 0);
 	}
-	
+
 	if (initial_value)
 		gtk_editable_set_text(GTK_EDITABLE(value_entry), initial_value);
 	else
 		gtk_editable_set_text(GTK_EDITABLE(value_entry), "");
-	
+
 	gtk_widget_grab_focus(GTK_WIDGET(value_entry));
-	
-	while (TRUE) {
-		response = compat_dialog_run(dialog);
-		
-		if (response == GTK_RESPONSE_OK) {
-			GtkTreeIter iter;
-			SanType type;
-			const gchar *value;
-			gchar *error_msg = NULL;
-			
-			// Get selected type
-			if (gtk_combo_box_get_active_iter(type_combo, &iter)) {
-				GtkTreeModel *model = gtk_combo_box_get_model(type_combo);
-				gint type_int;
-				gtk_tree_model_get(model, &iter, 1, &type_int, -1);
-				type = (SanType)type_int;
-			} else {
-				type = SAN_TYPE_DNS;
-			}
-			
-			value = gtk_editable_get_text(GTK_EDITABLE(value_entry));
-			
-			// Validate
-			if (san_validate(type, value, &error_msg)) {
-				*out_type = g_strdup(san_type_to_string(type));
-				*out_value = g_strdup(value);
-				gtk_widget_set_visible(GTK_WIDGET(dialog), FALSE);
-				return TRUE;
-			} else {
-				// Show error
-				GtkWidget *error_dialog = gtk_message_dialog_new(
-					GTK_WINDOW(dialog),
-					GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_MESSAGE_ERROR,
-					GTK_BUTTONS_OK,
-					"%s", error_msg);
-				compat_dialog_run(GTK_DIALOG(error_dialog));
-				gtk_window_destroy(GTK_WINDOW(error_dialog));
-				g_free(error_msg);
-				// Continue loop to let user correct
-			}
-		} else {
-			gtk_widget_set_visible(GTK_WIDGET(dialog), FALSE);
-			return FALSE;
-		}
-	}
+
+	/* Build async context and connect response. */
+	SanEditorCtx *ctx = g_new0 (SanEditorCtx, 1);
+	ctx->data = data;
+	ctx->editing = editing;
+	if (editing && edit_iter)
+		ctx->edit_iter = *edit_iter;
+
+	ctx->response_handler_id = g_signal_connect (
+		dialog, "response", G_CALLBACK (san_editor_response), ctx);
+
+	gtk_window_present (GTK_WINDOW (dialog));
 }
 
 static void san_manager_add_clicked(GtkButton *button, gpointer user_data) {
 	SanManagerData *data = (SanManagerData *)user_data;
-	gchar *type = NULL;
-	gchar *value = NULL;
-	
-	if (san_manager_show_editor(data, NULL, NULL, &type, &value)) {
-		GtkTreeIter iter;
-		gtk_list_store_append(data->model, &iter);
-		gtk_list_store_set(data->model, &iter,
-		                   0, type,
-		                   1, value,
-		                   -1);
-		g_free(type);
-		g_free(value);
-	}
+	san_manager_show_editor_async (data, NULL, NULL, FALSE, NULL);
 }
 
 static void san_manager_edit_clicked(GtkButton *button, gpointer user_data) {
@@ -237,22 +292,14 @@ static void san_manager_edit_clicked(GtkButton *button, gpointer user_data) {
 	GtkTreeSelection *selection = gtk_tree_view_get_selection(data->treeview);
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	
+
 	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
 		gchar *old_type, *old_value;
-		gchar *new_type = NULL, *new_value = NULL;
-		
+
 		gtk_tree_model_get(model, &iter, 0, &old_type, 1, &old_value, -1);
-		
-		if (san_manager_show_editor(data, old_type, old_value, &new_type, &new_value)) {
-			gtk_list_store_set(data->model, &iter,
-			                   0, new_type,
-			                   1, new_value,
-			                   -1);
-			g_free(new_type);
-			g_free(new_value);
-		}
-		
+
+		san_manager_show_editor_async (data, old_type, old_value, TRUE, &iter);
+
 		g_free(old_type);
 		g_free(old_value);
 	}
