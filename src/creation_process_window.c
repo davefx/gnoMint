@@ -39,26 +39,37 @@ gint timer=0;
 GThread * creation_process_window_thread = NULL;
 
 
-void creation_process_window_error_dialog (gchar *message) 
+static void
+__cpw_response_destroy (GtkDialog *dialog, gint response_id, gpointer user_data)
 {
+	gtk_window_destroy (GTK_WINDOW (dialog));
+}
 
+static void
+__cpw_response_destroy_both (GtkDialog *dialog, gint response_id, gpointer user_data)
+{
+	GtkWindow *parent = GTK_WINDOW (user_data);
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	gtk_window_destroy (parent);
+}
+
+void creation_process_window_error_dialog (gchar *message)
+{
 	GtkWidget *dialog;
 	GObject *widget;
-   
+
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
-   
-	/* Create the widgets */
-   
+
 	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
 					 GTK_MESSAGE_ERROR,
 					 GTK_BUTTONS_CLOSE,
 					 "%s",
 					 message);
-   
-	compat_dialog_run (GTK_DIALOG(dialog));
-   
-	gtk_window_destroy(GTK_WINDOW(dialog));
+
+	g_signal_connect (dialog, "response",
+			  G_CALLBACK (__cpw_response_destroy), NULL);
+	gtk_window_present (GTK_WINDOW (dialog));
 }
 
 void creation_process_window_ca_finish (void) 
@@ -80,10 +91,10 @@ void creation_process_window_ca_finish (void)
                                          GTK_BUTTONS_CLOSE,
                                          "%s",
                                          _("CA creation process finished"));
-        compat_dialog_run (GTK_DIALOG(dialog));
-        
-        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
+        g_signal_connect (dialog, "response",
+                          G_CALLBACK (__cpw_response_destroy_both),
+                          widget);
+        gtk_window_present (GTK_WINDOW (dialog));
 			
 
 }
@@ -212,12 +223,11 @@ G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 					 GTK_BUTTONS_CLOSE,
 					 "%s",
 					 _("Creation process cancelled"));
-   
-	compat_dialog_run (GTK_DIALOG(dialog));
 
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-
-	gtk_window_destroy(GTK_WINDOW(widget));
+	g_signal_connect (dialog, "response",
+			  G_CALLBACK (__cpw_response_destroy_both),
+			  widget);
+	gtk_window_present (GTK_WINDOW (dialog));
 	
 }
 
@@ -240,10 +250,10 @@ void creation_process_window_csr_finish (void) {
 					 GTK_BUTTONS_CLOSE,
 					 "%s",
 					 _("CSR creation process finished"));
-	compat_dialog_run (GTK_DIALOG(dialog));
-	
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	gtk_window_destroy(GTK_WINDOW(widget));
+	g_signal_connect (dialog, "response",
+			  G_CALLBACK (__cpw_response_destroy_both),
+			  widget);
+	gtk_window_present (GTK_WINDOW (dialog));
 
 	dialog_refresh_list ();
 }
