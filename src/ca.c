@@ -1383,110 +1383,128 @@ ca_treeview_selection_change (GtkSelectionModel *model G_GNUC_UNUSED,
 }
 
 
+typedef struct {
+    GnomintCertRow *row;
+    gint            type;
+} _ExportPublicPemCtx;
+
+static void
+__ca_export_public_pem_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	_ExportPublicPemCtx *ctx = (_ExportPublicPemCtx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *error = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &error);
+
+	if (!gfile) {
+		g_clear_error (&error);
+		g_free (ctx);
+		return;
+	}
+
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
+
+	GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	GIOChannel *file = g_io_channel_new_file (filename, "w", &error);
+	g_free (filename);
+	if (error) {
+		g_clear_error (&error);
+		if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
+			dialog_error (_("There was an error while exporting certificate."));
+		else
+			dialog_error (_("There was an error while exporting CSR."));
+		g_free (ctx);
+		return;
+	}
+
+	const gchar *pem = gnomint_cert_row_get_pem (ctx->row);
+	const gchar *parent_route = NULL;
+	if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
+		parent_route = gnomint_cert_row_get_parent_route (ctx->row);
+
+	if (pem)
+		g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+
+	if (!error && parent_route && strcmp (parent_route, ":")) {
+		gchar ** tokens = g_strsplit (parent_route, ":", -1);
+		guint num_tokens = g_strv_length (tokens) - 2;
+		gint i;
+
+		for (i=num_tokens; i>=1; i--) {
+			gchar * parent_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, atoll(tokens[i]));
+			if (parent_pem) {
+				g_io_channel_write_chars (file, parent_pem, strlen(parent_pem), NULL, &error);
+				g_free (parent_pem);
+			}
+		}
+
+		g_strfreev (tokens);
+	}
+
+	if (error) {
+		g_clear_error (&error);
+		g_io_channel_unref (file);
+		if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
+			dialog_error (_("There was an error while exporting certificate."));
+		else
+			dialog_error (_("There was an error while exporting CSR."));
+		g_free (ctx);
+		return;
+	}
+
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		g_clear_error (&error);
+		g_io_channel_unref (file);
+		if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
+			dialog_error (_("There was an error while exporting certificate."));
+		else
+			dialog_error (_("There was an error while exporting CSR."));
+		g_free (ctx);
+		return;
+	}
+
+	g_io_channel_unref (file);
+
+	GtkDialog *info;
+	if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
+		info = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+							  GTK_DIALOG_DESTROY_WITH_PARENT,
+							  GTK_MESSAGE_INFO,
+							  GTK_BUTTONS_CLOSE,
+							  "%s",
+							  _("Certificate exported successfully")));
+	else
+		info = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+							  GTK_DIALOG_DESTROY_WITH_PARENT,
+							  GTK_MESSAGE_INFO,
+							  GTK_BUTTONS_CLOSE,
+							  "%s",
+							  _("Certificate signing request exported successfully")));
+	g_signal_connect (info, "response",
+			  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+	gtk_window_present (GTK_WINDOW (info));
+
+	g_free (ctx);
+}
+
 void __ca_export_public_pem_cv (GnomintCertRow *row, gint type)
 {
-	GObject *widget = NULL;
-	GIOChannel * file = NULL;
-	gchar * filename = NULL;
-	const gchar * pem = NULL;
-	const gchar * parent_route = NULL;
-	GtkDialog * dialog = NULL;
-	GError * error = NULL;
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	_ExportPublicPemCtx *ctx = g_new0 (_ExportPublicPemCtx, 1);
+	ctx->row = row;
+	ctx->type = type;
 
+	GtkFileDialog *fd = gtk_file_dialog_new ();
 	if (type == CA_FILE_ELEMENT_TYPE_CERT)
-		dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export certificate"),
-								  GTK_WINDOW(widget),
-								  GTK_FILE_CHOOSER_ACTION_SAVE,
-								  _("_Cancel"), GTK_RESPONSE_CANCEL,
-								  _("_Save"), GTK_RESPONSE_ACCEPT,
-								  NULL));
+		gtk_file_dialog_set_title (fd, _("Export certificate"));
 	else
-		dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export certificate signing request"),
-								  GTK_WINDOW(widget),
-								  GTK_FILE_CHOOSER_ACTION_SAVE,
-								  _("_Cancel"), GTK_RESPONSE_CANCEL,
-								  _("_Save"), GTK_RESPONSE_ACCEPT,
-								  NULL));
+		gtk_file_dialog_set_title (fd, _("Export certificate signing request"));
 
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
-		filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-		file = g_io_channel_new_file (filename, "w", &error);
-		if (error) {
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-			if (type == CA_FILE_ELEMENT_TYPE_CERT)
-				dialog_error (_("There was an error while exporting certificate."));
-			else
-				dialog_error (_("There was an error while exporting CSR."));
-			return;
-		}
-
-                pem = gnomint_cert_row_get_pem (row);
-                if (type == CA_FILE_ELEMENT_TYPE_CERT)
-			parent_route = gnomint_cert_row_get_parent_route (row);
-
-                if (pem)
-                        g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-
-		if (parent_route && strcmp (parent_route, ":")) {
-			gchar ** tokens = g_strsplit (parent_route, ":", -1);
-			guint num_tokens = g_strv_length (tokens) - 2;
-			gint i;
-
-			for (i=num_tokens; i>=1; i--) {
-				gchar * parent_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, atoll(tokens[i]));
-				if (parent_pem) {
-					g_io_channel_write_chars (file, parent_pem, strlen(parent_pem), NULL, &error);
-					g_free (parent_pem);
-				}
-			}
-
-			g_strfreev (tokens);
-		}
-
-                if (error) {
-                        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-                        if (type == CA_FILE_ELEMENT_TYPE_CERT)
-                                dialog_error (_("There was an error while exporting certificate."));
-                        else
-                                dialog_error (_("There was an error while exporting CSR."));
-                        return;
-                }
-
-                g_io_channel_shutdown (file, TRUE, &error);
-                if (error) {
-                        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-                        if (type == CA_FILE_ELEMENT_TYPE_CERT)
-                                dialog_error (_("There was an error while exporting certificate."));
-                        else
-                                dialog_error (_("There was an error while exporting CSR."));
-                        return;
-                }
-
-                g_io_channel_unref (file);
-
-                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-                if (type == CA_FILE_ELEMENT_TYPE_CERT)
-                        dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-                                                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                                    GTK_MESSAGE_INFO,
-                                                                    GTK_BUTTONS_CLOSE,
-                                                                    "%s",
-                                                                    _("Certificate exported successfully")));
-                else
-                        dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-                                                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                                    GTK_MESSAGE_INFO,
-                                                                    GTK_BUTTONS_CLOSE,
-                                                                    "%s",
-                                                                    _("Certificate signing request exported successfully")));
-                g_signal_connect (dialog, "response",
-                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                gtk_window_present (GTK_WINDOW (dialog));
-
-        }
+	gtk_file_dialog_save (fd, parent, NULL, __ca_export_public_pem_save_cb, ctx);
+	g_object_unref (fd);
 }
 
 
@@ -1513,35 +1531,47 @@ __ca_export_pkcs8_done (const gchar *error_msg, gpointer user_data)
 	g_free (filename);
 }
 
-void __ca_export_private_pkcs8_cv (GnomintCertRow *row, gint type)
+typedef struct {
+    GnomintCertRow *row;
+    gint            type;
+} _ExportPrivatePkcs8Ctx;
+
+static void
+__ca_export_private_pkcs8_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-	GObject *widget = NULL;
-	gchar * filename = NULL;
-	GtkDialog * dialog = NULL;
-	guint64 id;
+	_ExportPrivatePkcs8Ctx *ctx = (_ExportPrivatePkcs8Ctx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export crypted private key"),
-							  GTK_WINDOW(widget),
-							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  _("_Cancel"), GTK_RESPONSE_CANCEL,
-							  _("_Save"), GTK_RESPONSE_ACCEPT,
-							  NULL));
-
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	if (!gfile) {
+		g_clear_error (&err);
+		g_free (ctx);
 		return;
 	}
 
-	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
 
-	id = gnomint_cert_row_get_id (row);
+	guint64 id = gnomint_cert_row_get_id (ctx->row);
 
-	export_private_pkcs8 (id, type, filename,
+	export_private_pkcs8 (id, ctx->type, filename,
 	                      __ca_export_pkcs8_done, filename);
+	g_free (ctx);
+}
+
+void __ca_export_private_pkcs8_cv (GnomintCertRow *row, gint type)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+
+	_ExportPrivatePkcs8Ctx *ctx = g_new0 (_ExportPrivatePkcs8Ctx, 1);
+	ctx->row = row;
+	ctx->type = type;
+
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Export crypted private key"));
+	gtk_file_dialog_save (fd, parent, NULL, __ca_export_private_pkcs8_save_cb, ctx);
+	g_object_unref (fd);
 }
 
 
@@ -1565,36 +1595,48 @@ __ca_export_private_pem_done_cb (const gchar *error_msg, gpointer user_data)
 	}
 }
 
-void __ca_export_private_pem_cv (GnomintCertRow *row, gint type)
+typedef struct {
+    GnomintCertRow *row;
+    gint            type;
+} _ExportPrivatePemCtx;
+
+static void
+__ca_export_private_pem_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-	GObject *widget = NULL;
-	gchar * filename = NULL;
-	GtkDialog * dialog = NULL;
-	guint64 id;
+	_ExportPrivatePemCtx *ctx = (_ExportPrivatePemCtx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export unencrypted private key"),
-							  GTK_WINDOW(widget),
-							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  _("_Cancel"), GTK_RESPONSE_CANCEL,
-							  _("_Save"), GTK_RESPONSE_ACCEPT,
-							  NULL));
-
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	if (!gfile) {
+		g_clear_error (&err);
+		g_free (ctx);
 		return;
 	}
 
-	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
 
-	id = gnomint_cert_row_get_id (row);
+	guint64 id = gnomint_cert_row_get_id (ctx->row);
 
-	export_private_pem (id, type, filename,
+	export_private_pem (id, ctx->type, filename,
 	                    __ca_export_private_pem_done_cb, NULL);
 	g_free (filename);
+	g_free (ctx);
+}
+
+void __ca_export_private_pem_cv (GnomintCertRow *row, gint type)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+
+	_ExportPrivatePemCtx *ctx = g_new0 (_ExportPrivatePemCtx, 1);
+	ctx->row = row;
+	ctx->type = type;
+
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Export unencrypted private key"));
+	gtk_file_dialog_save (fd, parent, NULL, __ca_export_private_pem_save_cb, ctx);
+	g_object_unref (fd);
 }
 
 
@@ -1625,35 +1667,47 @@ __ca_export_pkcs12_done (const gchar *error_msg, gpointer user_data)
 	gtk_window_present (GTK_WINDOW (dlg));
 }
 
-void __ca_export_pkcs12_cv (GnomintCertRow *row, gint type)
+typedef struct {
+    GnomintCertRow *row;
+    gint            type;
+} _ExportPkcs12Ctx;
+
+static void
+__ca_export_pkcs12_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-	GObject *widget = NULL;
-	gchar * filename = NULL;
-	GtkDialog * dialog = NULL;
-	guint64 id;
+	_ExportPkcs12Ctx *ctx = (_ExportPkcs12Ctx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new
-			       (_("Export whole certificate in PKCS#12 package"),
-				GTK_WINDOW(widget),
-				GTK_FILE_CHOOSER_ACTION_SAVE,
-				_("_Cancel"), GTK_RESPONSE_CANCEL,
-				_("_Save"), GTK_RESPONSE_ACCEPT,
-				NULL));
-
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	if (!gfile) {
+		g_clear_error (&err);
+		g_free (ctx);
 		return;
 	}
 
-	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	id = gnomint_cert_row_get_id (row);
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
 
-	export_pkcs12 (id, type, filename,
+	guint64 id = gnomint_cert_row_get_id (ctx->row);
+
+	export_pkcs12 (id, ctx->type, filename,
 	               __ca_export_pkcs12_done, filename);
+	g_free (ctx);
+}
+
+void __ca_export_pkcs12_cv (GnomintCertRow *row, gint type)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+
+	_ExportPkcs12Ctx *ctx = g_new0 (_ExportPkcs12Ctx, 1);
+	ctx->row = row;
+	ctx->type = type;
+
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Export whole certificate in PKCS#12 package"));
+	gtk_file_dialog_save (fd, parent, NULL, __ca_export_pkcs12_save_cb, ctx);
+	g_object_unref (fd);
 }
 
 
@@ -1766,6 +1820,58 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 	gtk_window_present (GTK_WINDOW (widget));
 }
 
+/* Context for the async export-chain file dialog. */
+typedef struct {
+    guint64 cert_id;
+} _ExportChainCtx;
+
+static void
+__ca_export_chain_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	_ExportChainCtx *ctx = (_ExportChainCtx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
+
+	if (!gfile) {
+		g_clear_error (&err);
+		g_free (ctx);
+		return;
+	}
+
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
+
+	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+
+	gchar *chain_pem = ca_file_get_chain_pem_from_id (ctx->cert_id);
+	if (! chain_pem) {
+		dialog_error (_("Could not build certificate chain."));
+		g_free (filename);
+		g_free (ctx);
+		return;
+	}
+
+	if (! g_file_set_contents (filename, chain_pem, -1, &err)) {
+		dialog_error (g_strdup_printf (_("Failed to write chain: %s"),
+		                               err ? err->message : "?"));
+		g_clear_error (&err);
+	} else {
+		GtkWidget *info = gtk_message_dialog_new (
+		    GTK_WINDOW (parent),
+		    GTK_DIALOG_DESTROY_WITH_PARENT,
+		    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+		    "%s", _("Certificate chain exported successfully."));
+		g_signal_connect (info, "response",
+		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (info));
+	}
+
+	g_free (chain_pem);
+	g_free (filename);
+	g_free (ctx);
+}
+
 /* Export the full certificate chain (leaf + intermediates + root) as a
  * single PEM bundle. Intended use: deploy the bundle as a web server's
  * SSLCertificateChainFile / ssl_certificate. See #52. */
@@ -1788,7 +1894,6 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (gpointer sender G_GNUC_UNUSED,
 	{
 		gchar *dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id);
 		if (dn) {
-			/* Best-effort CN extraction for the default filename. */
 			const gchar *p = strstr (dn, "CN=");
 			if (p) {
 				p += 3;
@@ -1799,55 +1904,22 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (gpointer sender G_GNUC_UNUSED,
 		}
 	}
 
-	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	GtkWidget *dialog = gtk_file_chooser_dialog_new (
-	    _("Export certificate chain"), GTK_WINDOW (parent),
-	    GTK_FILE_CHOOSER_ACTION_SAVE,
-	    _("_Cancel"), GTK_RESPONSE_CANCEL,
-	    _("_Save"),   GTK_RESPONSE_ACCEPT, NULL);
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Export certificate chain"));
 	if (cn && cn[0]) {
 		gchar *fname = g_strdup_printf ("%s.chain.pem", cn);
-		gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), fname);
+		gtk_file_dialog_set_initial_name (fd, fname);
 		g_free (fname);
 	}
-
-	gint resp = compat_dialog_run (GTK_DIALOG (dialog));
-	if (resp != GTK_RESPONSE_ACCEPT) {
-		gtk_window_destroy(GTK_WINDOW(dialog));
-		g_free (cn);
-		return;
-	}
-
-	gchar *filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-	gtk_window_destroy(GTK_WINDOW(dialog));
-
-	gchar *chain_pem = ca_file_get_chain_pem_from_id (cert_id);
-	if (! chain_pem) {
-		dialog_error (_("Could not build certificate chain."));
-		g_free (filename);
-		g_free (cn);
-		return;
-	}
-
-	GError *err = NULL;
-	if (! g_file_set_contents (filename, chain_pem, -1, &err)) {
-		dialog_error (g_strdup_printf (_("Failed to write chain: %s"),
-		                               err ? err->message : "?"));
-		g_clear_error (&err);
-	} else {
-		GtkWidget *info = gtk_message_dialog_new (
-		    GTK_WINDOW (parent),
-		    GTK_DIALOG_DESTROY_WITH_PARENT,
-		    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-		    "%s", _("Certificate chain exported successfully."));
-		g_signal_connect (info, "response",
-		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (info));
-	}
-
-	g_free (chain_pem);
-	g_free (filename);
 	g_free (cn);
+
+	_ExportChainCtx *ctx = g_new0 (_ExportChainCtx, 1);
+	ctx->cert_id = cert_id;
+
+	gtk_file_dialog_save (fd, parent, NULL, __ca_export_chain_save_cb, ctx);
+	g_object_unref (fd);
 }
 
 /* ------------------------------------------------------------------ */
@@ -2010,15 +2082,46 @@ __ca_extract_pkey_done (const gchar *error_msg, gpointer user_data)
 	g_free (ctx);
 }
 
+/* Context for the async extract-pkey file dialog launch. */
+typedef struct {
+    GnomintCertRow *row;
+    gint            type;
+    guint64         id;
+} _ExtractPkeyLaunchCtx;
+
+static void
+__ca_extract_pkey_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	_ExtractPkeyLaunchCtx *lctx = (_ExtractPkeyLaunchCtx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
+
+	if (!gfile) {
+		g_clear_error (&err);
+		g_object_unref (lctx->row);
+		g_free (lctx);
+		return;
+	}
+
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
+
+	_ExtractPkeyCtx *ctx = g_new0 (_ExtractPkeyCtx, 1);
+	ctx->filename = filename;
+	ctx->id = lctx->id;
+	ctx->type = lctx->type;
+	ctx->row = lctx->row;  /* transfer ownership */
+
+	export_private_pkcs8 (lctx->id, lctx->type, filename,
+	                      __ca_extract_pkey_done, ctx);
+	g_free (lctx);
+}
+
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (gpointer sender, gpointer user_data)
 {
 	GnomintCertRow *row = NULL;
 	gint type;
-	gchar *filename = NULL;
-	guint64 id;
-	GObject *widget = NULL;
-	GtkDialog *dialog = NULL;
-	_ExtractPkeyCtx *ctx;
 
 	type = __ca_selection_type_cv (&row);
 	if (type == -1 || !row) {
@@ -2026,34 +2129,19 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (gpointer sender, gpointe
 		return;
 	}
 
-	id = gnomint_cert_row_get_id (row);
+	guint64 id = gnomint_cert_row_get_id (row);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export crypted private key"),
-							  GTK_WINDOW(widget),
-							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  _("_Cancel"), GTK_RESPONSE_CANCEL,
-							  _("_Save"), GTK_RESPONSE_ACCEPT,
-							  NULL));
+	_ExtractPkeyLaunchCtx *lctx = g_new0 (_ExtractPkeyLaunchCtx, 1);
+	lctx->row = row;   /* transfer ownership */
+	lctx->type = type;
+	lctx->id = id;
 
-	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-		g_object_unref (row);
-		return;
-	}
-
-	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-
-	ctx = g_new0 (_ExtractPkeyCtx, 1);
-	ctx->filename = filename;
-	ctx->id = id;
-	ctx->type = type;
-	ctx->row = row;
-
-	export_private_pkcs8 (id, type, filename,
-	                      __ca_extract_pkey_done, ctx);
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Export crypted private key"));
+	gtk_file_dialog_save (fd, parent, NULL, __ca_extract_pkey_save_cb, lctx);
+	g_object_unref (fd);
 }
 
 
@@ -2201,7 +2289,55 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 	gtk_window_present (GTK_WINDOW (dlg));
 }
 
-/* Menu callback: prompt for a PEM file via GtkFileChooser, then diff
+/* Context for the async compare-with-PEM file dialog. */
+typedef struct {
+    gchar *left_pem;
+    gchar *left_subject;
+} _CompareWithCtx;
+
+static void
+__ca_compare_with_open_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	_CompareWithCtx *ctx = (_CompareWithCtx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_open_finish (fd, result, &err);
+
+	if (!gfile) {
+		g_clear_error (&err);
+		g_free (ctx->left_pem);
+		g_free (ctx->left_subject);
+		g_free (ctx);
+		return;
+	}
+
+	gchar *path = g_file_get_path (gfile);
+	g_object_unref (gfile);
+
+	gchar *right_pem = NULL;
+	if (!g_file_get_contents (path, &right_pem, NULL, &err)) {
+		dialog_error (err ? err->message : _("Cannot read file."));
+		g_clear_error (&err);
+		g_free (path);
+		g_free (ctx->left_pem);
+		g_free (ctx->left_subject);
+		g_free (ctx);
+		return;
+	}
+
+	gchar *right_label = g_path_get_basename (path);
+	__ca_show_diff_dialog (ctx->left_pem, right_pem,
+	                       ctx->left_subject ? ctx->left_subject : _("Selected"),
+	                       right_label);
+	g_free (right_label);
+	g_free (right_pem);
+	g_free (path);
+	g_free (ctx->left_pem);
+	g_free (ctx->left_subject);
+	g_free (ctx);
+}
+
+/* Menu callback: prompt for a PEM file via GtkFileDialog, then diff
  * against the currently-selected cert. */
 G_MODULE_EXPORT void
 ca_on_compare_with_activate (gpointer sender G_GNUC_UNUSED,
@@ -2222,40 +2358,16 @@ ca_on_compare_with_activate (gpointer sender G_GNUC_UNUSED,
 		return;
 	}
 
-	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	GtkWidget *chooser = gtk_file_chooser_dialog_new (
-	    _("Compare with PEM file…"),
-	    (parent && GTK_IS_WINDOW (parent)) ? GTK_WINDOW (parent) : NULL,
-	    GTK_FILE_CHOOSER_ACTION_OPEN,
-	    _("_Cancel"), GTK_RESPONSE_CANCEL,
-	    _("_Open"),   GTK_RESPONSE_ACCEPT, NULL);
-	gint resp = compat_dialog_run (GTK_DIALOG (chooser));
-	gchar *path = (resp == GTK_RESPONSE_ACCEPT)
-	              ? g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser)))
-	              : NULL;
-	gtk_window_destroy(GTK_WINDOW(chooser));
-	if (!path) {
-		g_free (left_pem); g_free (left_subject);
-		return;
-	}
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
-	gchar *right_pem = NULL;
-	GError *err = NULL;
-	if (!g_file_get_contents (path, &right_pem, NULL, &err)) {
-		dialog_error (err ? err->message : _("Cannot read file."));
-		g_clear_error (&err);
-		g_free (path); g_free (left_pem); g_free (left_subject);
-		return;
-	}
-	gchar *right_label = g_path_get_basename (path);
-	__ca_show_diff_dialog (left_pem, right_pem,
-	                       left_subject ? left_subject : _("Selected"),
-	                       right_label);
-	g_free (right_label);
-	g_free (right_pem);
-	g_free (left_pem);
-	g_free (left_subject);
-	g_free (path);
+	_CompareWithCtx *ctx = g_new0 (_CompareWithCtx, 1);
+	ctx->left_pem = left_pem;
+	ctx->left_subject = left_subject;
+
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Compare with PEM file\xe2\x80\xa6"));
+	gtk_file_dialog_open (fd, parent, NULL, __ca_compare_with_open_cb, ctx);
+	g_object_unref (fd);
 }
 
 G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
@@ -2793,6 +2905,55 @@ G_MODULE_EXPORT gboolean ca_changepwd_pwd_protect_radiobutton_toggled (GtkWidget
 
 /* ---- Async DH-parameters dialog (Step 2.3) ---- */
 
+typedef struct {
+    guint       dh_size;
+    GtkBuilder *dialog_gtkb;
+    GtkDialog  *outer_dialog;
+} _DhParamSaveCtx;
+
+static void
+__ca_dh_param_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+    _DhParamSaveCtx *ctx = (_DhParamSaveCtx *) user_data;
+    GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+    GError *err = NULL;
+    GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
+
+    if (!gfile) {
+        g_clear_error (&err);
+        /* User cancelled the file dialog — don't close the outer dialog. */
+        g_free (ctx);
+        return;
+    }
+
+    gchar *filename = g_file_get_path (gfile);
+    g_object_unref (gfile);
+
+    gchar *strerror = export_dh_param (ctx->dh_size, filename);
+
+    gtk_window_destroy (GTK_WINDOW (ctx->outer_dialog));
+
+    if (strerror) {
+        dialog_error (strerror);
+    } else {
+        GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+        GtkDialog *info = GTK_DIALOG (gtk_message_dialog_new (
+            GTK_WINDOW (parent),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_INFO,
+            GTK_BUTTONS_CLOSE,
+            "%s",
+            _("Diffie-Hellman parameters saved successfully")));
+        g_signal_connect (info, "response",
+                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
+        gtk_window_present (GTK_WINDOW (info));
+    }
+
+    g_free (filename);
+    g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+    g_free (ctx);
+}
+
 static void
 __ca_dh_param_response (GtkDialog *dialog,
                         gint       response_id,
@@ -2809,47 +2970,16 @@ __ca_dh_param_response (GtkDialog *dialog,
     GObject *spin = gtk_builder_get_object (dialog_gtkb, "dh_prime_size_spinbutton");
     guint dh_size = gtk_spin_button_get_value (GTK_SPIN_BUTTON (spin));
 
-    /* Inner file-save dialog stays compat_dialog_run for now (Phase 3). */
-    GtkDialog *dialog2 = GTK_DIALOG (gtk_file_chooser_dialog_new (
-        _("Save Diffie-Hellman parameters"),
-        GTK_WINDOW (dialog),
-        GTK_FILE_CHOOSER_ACTION_SAVE,
-        _("_Cancel"), GTK_RESPONSE_CANCEL,
-        _("_Save"), GTK_RESPONSE_ACCEPT,
-        NULL));
+    _DhParamSaveCtx *ctx = g_new0 (_DhParamSaveCtx, 1);
+    ctx->dh_size = dh_size;
+    ctx->dialog_gtkb = dialog_gtkb;  /* transfer ownership */
+    ctx->outer_dialog = dialog;
 
-    if (compat_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_ACCEPT) {
-        gchar *filename = g_file_get_path (
-            gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog2)));
-
-        gchar *strerror = export_dh_param (dh_size, filename);
-
-        gtk_window_destroy (GTK_WINDOW (dialog2));
-        gtk_window_destroy (GTK_WINDOW (dialog));
-
-        if (strerror) {
-            dialog_error (strerror);
-        } else {
-            GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
-            GtkDialog *info = GTK_DIALOG (gtk_message_dialog_new (
-                GTK_WINDOW (parent),
-                GTK_DIALOG_DESTROY_WITH_PARENT,
-                GTK_MESSAGE_INFO,
-                GTK_BUTTONS_CLOSE,
-                "%s",
-                _("Diffie-Hellman parameters saved successfully")));
-            g_signal_connect (info, "response",
-                              G_CALLBACK (__ca_dialog_response_destroy), NULL);
-            gtk_window_present (GTK_WINDOW (info));
-        }
-
-        g_free (filename);
-    } else {
-        gtk_window_destroy (GTK_WINDOW (dialog2));
-        gtk_window_destroy (GTK_WINDOW (dialog));
-    }
-
-    g_object_unref (G_OBJECT (dialog_gtkb));
+    GtkFileDialog *fd = gtk_file_dialog_new ();
+    gtk_file_dialog_set_title (fd, _("Save Diffie-Hellman parameters"));
+    gtk_file_dialog_save (fd, GTK_WINDOW (dialog), NULL,
+                          __ca_dh_param_save_cb, ctx);
+    g_object_unref (fd);
 }
 
 G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer user_data)
@@ -2903,6 +3033,81 @@ G_MODULE_EXPORT void on_wizard_email_activate  (gpointer sender, gpointer user_d
 
 /* ---- Async import file-or-directory dialog (Step 2.4) ---- */
 
+/* Callback for the import-file open dialog. */
+static void
+__ca_import_file_open_cb (GObject *source, GAsyncResult *result,
+                          gpointer user_data)
+{
+    GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
+    GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+    GError *err = NULL;
+    GFile *gfile = gtk_file_dialog_open_finish (fd, result, &err);
+
+    if (!gfile) {
+        g_clear_error (&err);
+        g_object_unref (G_OBJECT (dialog_gtkb));
+        return;
+    }
+
+    gchar *filename = g_file_get_path (gfile);
+    g_object_unref (gfile);
+
+    GObject *main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+
+    if (!import_single_file (filename, NULL, NULL)) {
+        GtkWidget *errdlg = gtk_message_dialog_new (
+            GTK_WINDOW (main_window_widget),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR,
+            GTK_BUTTONS_CLOSE,
+            _("Problem when importing '%s' file"),
+            filename);
+        g_signal_connect (errdlg, "response",
+                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
+        gtk_window_present (GTK_WINDOW (errdlg));
+    }
+    g_free (filename);
+    g_object_unref (G_OBJECT (dialog_gtkb));
+}
+
+/* Callback for the import-directory select-folder dialog. */
+static void
+__ca_import_dir_select_cb (GObject *source, GAsyncResult *result,
+                           gpointer user_data)
+{
+    GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
+    GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+    GError *err = NULL;
+    GFile *gfile = gtk_file_dialog_select_folder_finish (fd, result, &err);
+
+    if (!gfile) {
+        g_clear_error (&err);
+        g_object_unref (G_OBJECT (dialog_gtkb));
+        return;
+    }
+
+    gchar *filename = g_file_get_path (gfile);
+    g_object_unref (gfile);
+
+    GObject *main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+
+    gchar *import_result = import_whole_dir (filename);
+
+    if (import_result) {
+        GtkWidget *errdlg = gtk_message_dialog_new (
+            GTK_WINDOW (main_window_widget),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR,
+            GTK_BUTTONS_CLOSE,
+            "%s", import_result);
+        g_signal_connect (errdlg, "response",
+                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
+        gtk_window_present (GTK_WINDOW (errdlg));
+    }
+    g_free (filename);
+    g_object_unref (G_OBJECT (dialog_gtkb));
+}
+
 static void
 __ca_import_file_or_dir_response (GtkDialog *dialog,
                                   gint       response_id,
@@ -2922,80 +3127,21 @@ __ca_import_file_or_dir_response (GtkDialog *dialog,
 
     gtk_window_destroy (GTK_WINDOW (dialog));
 
-    GObject *main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window");
+    GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
     if (import_file) {
-        /* Import single file — inner file chooser stays compat_dialog_run (Phase 3). */
-        gchar *filename;
-        GtkWidget *fc = gtk_file_chooser_dialog_new (
-            _("Select PEM file to import"),
-            GTK_WINDOW (main_window_widget),
-            GTK_FILE_CHOOSER_ACTION_OPEN,
-            _("_Cancel"), GTK_RESPONSE_CANCEL,
-            _("_Open"), GTK_RESPONSE_ACCEPT,
-            NULL);
-
-        if (compat_dialog_run (GTK_DIALOG (fc)) == GTK_RESPONSE_ACCEPT) {
-            filename = g_file_get_path (
-                gtk_file_chooser_get_file (GTK_FILE_CHOOSER (fc)));
-            gtk_window_destroy (GTK_WINDOW (fc));
-        } else {
-            gtk_window_destroy (GTK_WINDOW (fc));
-            g_object_unref (G_OBJECT (dialog_gtkb));
-            return;
-        }
-
-        if (!import_single_file (filename, NULL, NULL)) {
-            GtkWidget *err = gtk_message_dialog_new (
-                GTK_WINDOW (main_window_widget),
-                GTK_DIALOG_DESTROY_WITH_PARENT,
-                GTK_MESSAGE_ERROR,
-                GTK_BUTTONS_CLOSE,
-                _("Problem when importing '%s' file"),
-                filename);
-            g_signal_connect (err, "response",
-                              G_CALLBACK (__ca_dialog_response_destroy), NULL);
-            gtk_window_present (GTK_WINDOW (err));
-        }
-        g_free (filename);
+        GtkFileDialog *fd = gtk_file_dialog_new ();
+        gtk_file_dialog_set_title (fd, _("Select PEM file to import"));
+        gtk_file_dialog_open (fd, parent, NULL,
+                              __ca_import_file_open_cb, dialog_gtkb);
+        g_object_unref (fd);
     } else {
-        /* Import directory — inner file chooser stays compat_dialog_run (Phase 3). */
-        gchar *filename;
-        GtkWidget *fc = gtk_file_chooser_dialog_new (
-            _("Select directory to import"),
-            GTK_WINDOW (main_window_widget),
-            GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-            _("_Cancel"), GTK_RESPONSE_CANCEL,
-            _("_Open"), GTK_RESPONSE_ACCEPT,
-            NULL);
-
-        if (compat_dialog_run (GTK_DIALOG (fc)) == GTK_RESPONSE_ACCEPT) {
-            filename = g_file_get_path (
-                gtk_file_chooser_get_file (GTK_FILE_CHOOSER (fc)));
-            gtk_window_destroy (GTK_WINDOW (fc));
-        } else {
-            gtk_window_destroy (GTK_WINDOW (fc));
-            g_object_unref (G_OBJECT (dialog_gtkb));
-            return;
-        }
-
-        gchar *result = import_whole_dir (filename);
-
-        if (result) {
-            GtkWidget *err = gtk_message_dialog_new (
-                GTK_WINDOW (main_window_widget),
-                GTK_DIALOG_DESTROY_WITH_PARENT,
-                GTK_MESSAGE_ERROR,
-                GTK_BUTTONS_CLOSE,
-                "%s", result);
-            g_signal_connect (err, "response",
-                              G_CALLBACK (__ca_dialog_response_destroy), NULL);
-            gtk_window_present (GTK_WINDOW (err));
-        }
-        g_free (filename);
+        GtkFileDialog *fd = gtk_file_dialog_new ();
+        gtk_file_dialog_set_title (fd, _("Select directory to import"));
+        gtk_file_dialog_select_folder (fd, parent, NULL,
+                                       __ca_import_dir_select_cb, dialog_gtkb);
+        g_object_unref (fd);
     }
-
-    g_object_unref (G_OBJECT (dialog_gtkb));
 }
 
 G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_data)

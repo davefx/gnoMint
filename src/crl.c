@@ -242,11 +242,37 @@ __crl_generate_done_cb (gchar *error, gpointer user_data)
 	}
 }
 
+typedef struct {
+    guint64 ca_id;
+} _CrlOkCtx;
+
+static void
+__crl_ok_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	_CrlOkCtx *ctx = (_CrlOkCtx *) user_data;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_save_finish (fd, result, &err);
+
+	if (!gfile) {
+		g_clear_error (&err);
+		g_free (ctx);
+		return;
+	}
+
+	gchar *filename = g_file_get_path (gfile);
+	g_object_unref (gfile);
+
+	crl_generate (ctx->ca_id, filename, __crl_generate_done_cb, NULL);
+
+	GtkDialog *crl_dlg = GTK_DIALOG(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(crl_dlg)));
+
+	g_free (ctx);
+}
+
 G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 {
-	GtkWidget *widget = NULL;
-	gchar * filename = NULL;
-	GtkDialog * dialog = NULL;
 	guint64 ca_id = 0;
 
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(crl_window_gtkb, "crl_ca_treeview"));
@@ -259,30 +285,15 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
         gtk_tree_model_get_value (model, &iter, CRL_CA_MODEL_COLUMN_ID, value);
         ca_id = g_value_get_uint(value);
 
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
 
-	widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-	
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export Certificate Revocation List"),
-							  GTK_WINDOW(widget),
-							  GTK_FILE_CHOOSER_ACTION_SAVE,
-							  _("_Cancel"), GTK_RESPONSE_CANCEL,
-							  _("_Save"), GTK_RESPONSE_ACCEPT,
-							  NULL));
-		
-	
-	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-		return;
-	}
+	_CrlOkCtx *ctx = g_new0 (_CrlOkCtx, 1);
+	ctx->ca_id = ca_id;
 
-	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	
-	crl_generate (ca_id, filename, __crl_generate_done_cb, NULL);
-
-        dialog = GTK_DIALOG(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
-        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));	
-			
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Export Certificate Revocation List"));
+	gtk_file_dialog_save (fd, parent, NULL, __crl_ok_save_cb, ctx);
+	g_object_unref (fd);
 }
 
 #endif /*GNOMINTCLI*/

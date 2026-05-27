@@ -514,156 +514,146 @@ void __recent_add_utf8_filename (const gchar *utf8_filename)
 
 }
 
-G_MODULE_EXPORT void on_new1_activate (gpointer sender, gpointer     user_data)
+static void
+__on_new1_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-	gchar *filename;
-        gchar *error = NULL;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *file = gtk_file_dialog_save_finish (fd, result, &err);
+	(void) user_data;
 
-	GtkWidget *dialog, *widget;
-
-	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
-
-	dialog = gtk_file_chooser_dialog_new (_("Create new CA database"),
-					      GTK_WINDOW(widget),
-					      GTK_FILE_CHOOSER_ACTION_SAVE,
-					      _("_Cancel"), GTK_RESPONSE_CANCEL,
-					      _("_Open"), GTK_RESPONSE_ACCEPT,
-					      NULL);
-
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-	{
-		GFile *file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-		filename = g_file_get_path (file);
-		g_object_unref (file);
-		gtk_window_destroy (GTK_WINDOW (dialog));
-	} else {
-		gtk_window_destroy (GTK_WINDOW (dialog));
+	if (!file) {
+		g_clear_error (&err);
 		return;
 	}
 
-        if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
-                /* The file already exists. The user has confirmed its overwriting.
-                   So we, first, rename it to "filename~", after deleting "filename~" if it already exists */
+	gchar *filename = g_file_get_path (file);
+	g_object_unref (file);
 
-                gchar *backup_filename = g_strdup_printf ("%s~", filename);
-                if (g_file_test (backup_filename, G_FILE_TEST_EXISTS)) {
-                        g_remove (backup_filename);
-                }
+	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
-                g_rename (filename, backup_filename);
+	if (g_file_test(filename, G_FILE_TEST_EXISTS)) {
+		gchar *backup_filename = g_strdup_printf ("%s~", filename);
+		if (g_file_test (backup_filename, G_FILE_TEST_EXISTS)) {
+			g_remove (backup_filename);
+		}
+		g_rename (filename, backup_filename);
+		g_free (backup_filename);
+	}
 
-                g_free (backup_filename);
-        }
-
-        error = ca_file_create (filename);
-        if (error) {
-		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+	gchar *error = ca_file_create (filename);
+	if (error) {
+		GtkWidget *dlg = gtk_message_dialog_new (GTK_WINDOW(widget),
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
 						 GTK_MESSAGE_ERROR,
 						 GTK_BUTTONS_CLOSE,
 						 _("Problem when creating '%s' CA database:\n%s"),
 						 filename, error);
-
-		g_signal_connect (dialog, "response",
+		g_signal_connect (dlg, "response",
 				  G_CALLBACK (gtk_window_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dialog));
-
-                return;
-        }
+		gtk_window_present (GTK_WINDOW (dlg));
+		g_free (filename);
+		return;
+	}
 
 	if (! ca_open (filename, FALSE)) {
-		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+		GtkWidget *dlg = gtk_message_dialog_new (GTK_WINDOW(widget),
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
 						 GTK_MESSAGE_ERROR,
 						 GTK_BUTTONS_CLOSE,
 						 _("Problem when opening new '%s' CA database"),
 						 filename);
-
-		g_signal_connect (dialog, "response",
+		g_signal_connect (dlg, "response",
 				  G_CALLBACK (gtk_window_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dialog));
+		gtk_window_present (GTK_WINDOW (dlg));
 	} else {
 		__recent_add_utf8_filename (filename);
-        }
-	return;
-
+	}
+	g_free (filename);
 }
 
-G_MODULE_EXPORT void on_open1_activate  (gpointer sender, gpointer     user_data)
+G_MODULE_EXPORT void on_new1_activate (gpointer sender, gpointer     user_data)
 {
-	gchar *filename;
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Create new CA database"));
+	gtk_file_dialog_save (fd, parent, NULL, __on_new1_save_cb, NULL);
+	g_object_unref (fd);
+}
 
-	GtkWidget *dialog, *widget;
+static void
+__on_open1_open_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *file = gtk_file_dialog_open_finish (fd, result, &err);
+	(void) user_data;
 
-	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
-
-	dialog = gtk_file_chooser_dialog_new (_("Open CA database"),
-					      GTK_WINDOW(widget),
-					      GTK_FILE_CHOOSER_ACTION_OPEN,
-					      _("_Cancel"), GTK_RESPONSE_CANCEL,
-					      _("_Open"), GTK_RESPONSE_ACCEPT,
-					      NULL);
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-	{
-		GFile *file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-		filename = g_file_get_path (file);
-		g_object_unref (file);
-		gtk_window_destroy (GTK_WINDOW (dialog));
-	} else {
-		gtk_window_destroy (GTK_WINDOW (dialog));
+	if (!file) {
+		g_clear_error (&err);
 		return;
 	}
 
+	gchar *filename = g_file_get_path (file);
+	g_object_unref (file);
 
+	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
 	if (! ca_open (filename, FALSE)) {
-		dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+		GtkWidget *dlg = gtk_message_dialog_new (GTK_WINDOW(widget),
 						 GTK_DIALOG_DESTROY_WITH_PARENT,
 						 GTK_MESSAGE_ERROR,
 						 GTK_BUTTONS_CLOSE,
 						 _("Problem when opening '%s' CA database"),
 						 filename);
-
-		g_signal_connect (dialog, "response",
+		g_signal_connect (dlg, "response",
 				  G_CALLBACK (gtk_window_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dialog));
+		gtk_window_present (GTK_WINDOW (dlg));
 	} else {
 		__recent_add_utf8_filename (filename);
 	}
-	return;
+	g_free (filename);
+}
+
+G_MODULE_EXPORT void on_open1_activate  (gpointer sender, gpointer     user_data)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Open CA database"));
+	gtk_file_dialog_open (fd, parent, NULL, __on_open1_open_cb, NULL);
+	g_object_unref (fd);
 }
 
 
-G_MODULE_EXPORT void on_save_as1_activate  (gpointer sender, gpointer     user_data)
+static void
+__on_save_as1_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-	gchar *filename;
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *file = gtk_file_dialog_save_finish (fd, result, &err);
+	(void) user_data;
 
-	GtkWidget *dialog, *widget;
-
-	widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
-
-	dialog = gtk_file_chooser_dialog_new (_("Save CA database as..."),
-					      GTK_WINDOW(widget),
-					      GTK_FILE_CHOOSER_ACTION_SAVE,
-					      _("_Cancel"), GTK_RESPONSE_CANCEL,
-					      _("_Open"), GTK_RESPONSE_ACCEPT,
-					      NULL);
-
-	if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
-		GFile *file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-		filename = g_file_get_path (file);
-		g_object_unref (file);
-		gtk_window_destroy (GTK_WINDOW (dialog));
-	} else {
-		gtk_window_destroy (GTK_WINDOW (dialog));
+	if (!file) {
+		g_clear_error (&err);
 		return;
 	}
 
-	if (ca_file_save_as (filename))
-                __recent_add_utf8_filename (filename);
+	gchar *filename = g_file_get_path (file);
+	g_object_unref (file);
 
+	if (ca_file_save_as (filename))
+		__recent_add_utf8_filename (filename);
+
+	g_free (filename);
+}
+
+G_MODULE_EXPORT void on_save_as1_activate  (gpointer sender, gpointer     user_data)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Save CA database as..."));
+	gtk_file_dialog_save (fd, parent, NULL, __on_save_as1_save_cb, NULL);
+	g_object_unref (fd);
 }
 
 
