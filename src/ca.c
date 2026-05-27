@@ -22,7 +22,6 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include "gtk4-compat.h"
 #include <gdk/gdk.h>
 #include <glib/gi18n.h>
 

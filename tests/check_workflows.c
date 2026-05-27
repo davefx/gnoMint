@@ -49,7 +49,6 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
-#include "gtk4-compat.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include "tls.h"

@@ -20,7 +20,6 @@
 #ifndef GNOMINTCLI
 
 #include <gtk/gtk.h>
-#include "gtk4-compat.h"
 #endif
 
 #include <glib-object.h>
@@ -106,21 +105,32 @@ __import_ask_password_async (const gchar *crypted_part_description,
 
 #endif
 
-/* Synchronous version kept for CLI and for import flows that
- * still use a synchronous loop (import_openssl_private_key etc.) */
+#ifndef GNOMINTCLI
+typedef struct {
+	gint response;
+	GMainLoop *loop;
+} _ImportPwdSyncCtx;
+
+static void
+__import_pwd_sync_response (GtkDialog *dialog, gint response_id, gpointer user_data)
+{
+	_ImportPwdSyncCtx *ctx = user_data;
+	ctx->response = response_id;
+	g_main_loop_quit (ctx->loop);
+}
+#endif
+
 gchar * __import_ask_password (const gchar *crypted_part_description)
 {
 #ifndef GNOMINTCLI
-	/* For the synchronous callers in import_pkcs8/import_pkcs12/import_openssl_private_key
-	 * we still use compat_dialog_run.  Converting all of those import loops to async
-	 * is a separate step. */
-	gchar *password;
-	GObject * widget = NULL, * password_widget = NULL, *description_widget = NULL;
-	GtkBuilder * dialog_gtkb = NULL;
-        gchar     * label = NULL;
-	gint response = 0;
+	gchar *password = NULL;
+	GObject *widget = NULL, *password_widget = NULL, *description_widget = NULL;
+	GtkBuilder *dialog_gtkb = NULL;
+	gchar *label = NULL;
+	_ImportPwdSyncCtx ctx = { GTK_RESPONSE_NONE, g_main_loop_new (NULL, FALSE) };
 
 	dialog_gtkb = gtk_builder_new();
+	gtk_builder_set_translation_domain (dialog_gtkb, GETTEXT_PACKAGE);
 	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_password_dialog.ui", NULL),
 				   NULL);
@@ -128,24 +138,24 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	password_widget = gtk_builder_get_object (dialog_gtkb, "import_password_entry");
 	description_widget = gtk_builder_get_object (dialog_gtkb, "import_crypted_part_description");
 
-        label = g_strdup_printf ("<small><i>%s</i></small>", crypted_part_description);
-        gtk_label_set_markup (GTK_LABEL(description_widget), (const gchar *) label);
-        g_free (label);
+	label = g_strdup_printf ("<small><i>%s</i></small>", crypted_part_description);
+	gtk_label_set_markup (GTK_LABEL(description_widget), label);
+	g_free (label);
 
-        gtk_widget_grab_focus (GTK_WIDGET(password_widget));
-        widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
-        response = compat_dialog_run(GTK_DIALOG(widget));
-
-        if (!response) {
-                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-                g_object_unref (G_OBJECT(dialog_gtkb));
-                return NULL;
-        } else {
-                password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
-        }
-
+	gtk_widget_grab_focus (GTK_WIDGET(password_widget));
 	widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
+
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__import_pwd_sync_response), &ctx);
+	gtk_widget_set_visible (GTK_WIDGET(widget), TRUE);
+	gtk_window_present (GTK_WINDOW(widget));
+	g_main_loop_run (ctx.loop);
+	g_main_loop_unref (ctx.loop);
+
+	if (ctx.response == GTK_RESPONSE_OK || ctx.response == GTK_RESPONSE_ACCEPT)
+		password = g_strdup (gtk_editable_get_text (GTK_EDITABLE(password_widget)));
+
+	gtk_window_destroy (GTK_WINDOW(widget));
 	g_object_unref (G_OBJECT(dialog_gtkb));
 
 	return password;

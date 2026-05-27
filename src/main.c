@@ -31,7 +31,6 @@
 #include "tls.h"
 #include "ca_file.h"
 #include "preferences-gui.h"
-#include "gtk4-compat.h"
 
 #define GNOMINT_MIME_TYPE "application/x-gnomint"
 

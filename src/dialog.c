@@ -280,7 +280,6 @@ gchar * dialog_ask_for_string (gchar *message, gchar *default_answer)
 
 
 #include <gtk/gtk.h>
-#include "gtk4-compat.h"
 #include <gdk/gdk.h>
 
 static void

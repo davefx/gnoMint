@@ -26,7 +26,6 @@
 #include <glib-object.h>
 
 #include <gtk/gtk.h>
-#include "gtk4-compat.h"
 #endif
 
 #include "crl.h"

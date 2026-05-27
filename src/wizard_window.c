@@ -19,7 +19,6 @@
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include "gtk4-compat.h"
 #include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
