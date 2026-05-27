@@ -283,39 +283,40 @@ gchar * dialog_ask_for_string (gchar *message, gchar *default_answer)
 #include "gtk4-compat.h"
 #include <gdk/gdk.h>
 
+static void
+__dialog_response_destroy (GtkDialog *dialog, gint response_id, gpointer user_data)
+{
+        gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
 void dialog_info (gchar *message) {
         GtkWidget *dialog;
-   
-        /* Create the widgets */
-   
+
         dialog = gtk_message_dialog_new (NULL,
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          GTK_MESSAGE_INFO,
                                          GTK_BUTTONS_CLOSE,
                                          "%s",
                                          message);
-   
-        compat_dialog_run (GTK_DIALOG(dialog));
-   
-        gtk_window_destroy(GTK_WINDOW(dialog));
 
+        g_signal_connect (dialog, "response",
+                          G_CALLBACK (__dialog_response_destroy), NULL);
+        gtk_window_present (GTK_WINDOW (dialog));
 }
 
 void dialog_error (gchar *message) {
         GtkWidget *dialog;
-   
-        /* Create the widgets */
-   
+
         dialog = gtk_message_dialog_new (NULL,
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          GTK_MESSAGE_ERROR,
                                          GTK_BUTTONS_CLOSE,
                                          "%s",
                                          message);
-   
-        compat_dialog_run (GTK_DIALOG(dialog));
-   
-        gtk_window_destroy(GTK_WINDOW(dialog));
+
+        g_signal_connect (dialog, "response",
+                          G_CALLBACK (__dialog_response_destroy), NULL);
+        gtk_window_present (GTK_WINDOW (dialog));
 
 }
 
