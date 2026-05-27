@@ -36,6 +36,7 @@
 
 GtkBuilder * wizard_window_gtkb = NULL;
 static WizardCertType current_wizard_type = WIZARD_CERT_TYPE_WEB_SERVER;
+static GArray *ca_ids = NULL;  /* parallel array of guint64 CA IDs for signing_ca_combo */
 
 typedef struct {
     guint64 ca_id;
@@ -308,17 +309,15 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
         return;
     }
     
-    // Get selected CA
-    GtkTreeIter iter;
-    if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX(signing_ca_combo), &iter)) {
+    // Get selected CA from GtkDropDown + parallel ca_ids array
+    guint selected = gtk_drop_down_get_selected (GTK_DROP_DOWN(signing_ca_combo));
+    if (selected == GTK_INVALID_LIST_POSITION || !ca_ids || selected >= ca_ids->len) {
         dialog_error (_("Please select a Certificate Authority."));
         return;
     }
-    
-    guint64 ca_id = 0;
-    GtkTreeModel *model = gtk_combo_box_get_model (GTK_COMBO_BOX(signing_ca_combo));
-    gtk_tree_model_get (model, &iter, 0, &ca_id, -1);
-    
+
+    guint64 ca_id = g_array_index (ca_ids, guint64, selected);
+
     if (ca_id == 0) {
         dialog_error (_("Invalid Certificate Authority selected."));
         return;
@@ -373,7 +372,7 @@ void wizard_window_display (WizardCertType cert_type)
     GtkWidget *cancel_button;
     GtkWidget *cert_type_combo;
     GtkWidget *signing_ca_combo;
-    GtkListStore *ca_list_store;
+    GtkStringList *ca_string_list;
     GError *error = NULL;
     
     current_wizard_type = cert_type;
@@ -403,32 +402,39 @@ void wizard_window_display (WizardCertType cert_type)
     cert_type_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "cert_type_combo"));
     signing_ca_combo = GTK_WIDGET(gtk_builder_get_object (wizard_window_gtkb, "signing_ca_combo"));
     
-    // Populate CA list
-    ca_list_store = GTK_LIST_STORE(gtk_builder_get_object (wizard_window_gtkb, "ca_list_model"));
+    // Populate CA list using GtkStringList + parallel GArray of ca_ids
     GList *ca_list = __wizard_get_ca_list();
-    
+
     if (!ca_list) {
         dialog_error (_("No Certificate Authority found. Please create a CA first."));
         g_object_unref (wizard_window_gtkb);
         return;
     }
-    
+
+    /* Create fresh GtkStringList and parallel ca_ids array */
+    const gchar * const empty_strv[] = { NULL };
+    ca_string_list = gtk_string_list_new (empty_strv);
+
+    if (ca_ids) {
+        g_array_unref (ca_ids);
+    }
+    ca_ids = g_array_new (FALSE, FALSE, sizeof (guint64));
+
     guint64 default_ca_id = __wizard_get_default_ca_id();
-    gint default_index = 0;
-    gint current_index = 0;
+    guint default_index = 0;
+    guint current_index = 0;
     time_t now = time(NULL);
-    
+
     for (GList *l = ca_list; l != NULL; l = l->next) {
         CAInfo *ca = (CAInfo *)l->data;
-        GtkTreeIter iter;
         gchar *display_text;
-        
+
         // Format display text with expiration date to distinguish CAs with same name
         if (ca->expiration > 0) {
             struct tm *exp_tm = localtime(&ca->expiration);
             gchar exp_date[20];
             strftime(exp_date, sizeof(exp_date), "%Y-%m-%d", exp_tm);
-            
+
             if (ca->expiration < now) {
                 display_text = g_strdup_printf("%s (exp: %s, expired)", ca->subject, exp_date);
             } else {
@@ -437,31 +443,30 @@ void wizard_window_display (WizardCertType cert_type)
         } else {
             display_text = g_strdup(ca->subject);
         }
-        
-        gtk_list_store_append (ca_list_store, &iter);
-        gtk_list_store_set (ca_list_store, &iter,
-                           0, ca->ca_id,
-                           1, display_text,
-                           -1);
-        
+
+        gtk_string_list_append (ca_string_list, display_text);
+        g_array_append_val (ca_ids, ca->ca_id);
+
         g_free(display_text);
-        
+
         if (ca->ca_id == default_ca_id) {
             default_index = current_index;
         }
         current_index++;
-        
+
         g_free(ca->subject);
         g_free(ca);
     }
-    
+
     g_list_free(ca_list);
-    
-    // Set default CA selection
-    gtk_combo_box_set_active (GTK_COMBO_BOX(signing_ca_combo), default_index);
-    
-    // Set certificate type combo
-    gtk_combo_box_set_active (GTK_COMBO_BOX(cert_type_combo), cert_type);
+
+    // Set the model on the signing CA dropdown and select default
+    gtk_drop_down_set_model (GTK_DROP_DOWN(signing_ca_combo), G_LIST_MODEL(ca_string_list));
+    g_object_unref (ca_string_list);
+    gtk_drop_down_set_selected (GTK_DROP_DOWN(signing_ca_combo), default_index);
+
+    // Set certificate type dropdown
+    gtk_drop_down_set_selected (GTK_DROP_DOWN(cert_type_combo), cert_type);
     
     // Connect signals - builder will be unreferenced when dialog is destroyed
     g_object_add_weak_pointer (G_OBJECT(wizard_window_gtkb), (gpointer *)&wizard_window_gtkb);

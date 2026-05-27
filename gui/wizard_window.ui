@@ -46,48 +46,61 @@ Enter the server name (e.g., my.server.dns.name) and select the CA to sign it.</
                   <object class="GtkLabel" id="server_name_label">
                     <property name="xalign">0</property>
                     <property name="label" translatable="1">Server Name:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkEntry" id="server_name_entry">
                     <property name="focusable">1</property>
+                    <property name="hexpand">1</property>
                     <property name="has_tooltip">1</property>
                     <property name="tooltip_text" translatable="1">Enter the server DNS name (e.g., my.server.dns.name)</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkLabel" id="signing_ca_label">
                     <property name="xalign">0</property>
                     <property name="label" translatable="1">Signing CA:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkComboBox" id="signing_ca_combo">
-                    <property name="model">ca_list_model</property>
-                    <child>
-                      <object class="GtkCellRendererText" id="ca_renderer"/>
-                      <attributes>
-                        <attribute name="text">1</attribute>
-                      </attributes>
-                    </child>
+                  <object class="GtkDropDown" id="signing_ca_combo">
+                    <property name="hexpand">1</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkLabel" id="cert_type_label">
                     <property name="xalign">0</property>
                     <property name="label" translatable="1">Certificate Type:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">2</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkComboBox" id="cert_type_combo">
-                    <property name="model">cert_type_model</property>
-                    <property name="active">0</property>
-                    <child>
-                      <object class="GtkCellRendererText" id="cert_type_renderer"/>
-                      <attributes>
-                        <attribute name="text">0</attribute>
-                      </attributes>
-                    </child>
+                  <object class="GtkDropDown" id="cert_type_combo">
+                    <property name="hexpand">1</property>
+                    <property name="model">cert_type_string_list</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">2</property>
+                    </layout>
                   </object>
                 </child>
               </object>
@@ -121,23 +134,10 @@ Enter the server name (e.g., my.server.dns.name) and select the CA to sign it.</
       </object>
     </child>
   </object>
-  <object class="GtkListStore" id="cert_type_model">
-    <columns>
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">Web Server (TLS)</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Email Server (TLS)</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkListStore" id="ca_list_model">
-    <columns>
-      <column type="guint64"/>
-      <column type="gchararray"/>
-    </columns>
+  <object class="GtkStringList" id="cert_type_string_list">
+    <items>
+      <item translatable="yes">Web Server (TLS)</item>
+      <item translatable="yes">Email Server (TLS)</item>
+    </items>
   </object>
 </interface>
