@@ -31,12 +31,13 @@ const gchar *ca_compute_row_foreground (time_t effective_expiration,
                                         time_t now, gint warn_days);
 
 gboolean ca_refresh_model_callback ();
-gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
-				    GtkTreePath *path,
-				    GtkTreeViewColumn *column,
+gboolean ca_treeview_row_activated (GtkColumnView *colview,
+				    guint position,
 				    gpointer user_data);
-gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
-				       gpointer user_data);
+void ca_treeview_selection_change (GtkSelectionModel *model,
+				   guint position,
+				   guint n_items,
+				   gpointer user_data);
 void ca_on_export1_activate (gpointer sender, gpointer user_data);
 void ca_on_export_chain_activate (gpointer sender, gpointer user_data);
 void ca_on_bulk_revoke_activate (gpointer sender, gpointer user_data);

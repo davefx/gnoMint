@@ -13,11 +13,13 @@ gnomint_CFLAGS = \
 	-DCOMPILATION_DATE=`date +%s` \
 	-DHAVE_CONFIG_H \
 	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_6 \
-	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_6 \
+	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_10 \
 	-Wall -Werror
 
 gnomint_SOURCES = \
 	main.c \
+	cert_row.c \
+	cert_row.h \
 	country_table.c \
         new_ca_window.c \
         new_req_window.c \

@@ -1,8 +1,8 @@
 [Desktop Entry]
-_Name=gnoMint X.509 CA Manager
+Name=gnoMint X.509 CA Manager
 GenericName=gnoMint X.509 CA Manager
-_Comment=Manage X.509 certificates and CAs, easily and graphically
-_Keywords=certificate;x.509;encryption;
+Comment=Manage X.509 certificates and CAs, easily and graphically
+Keywords=certificate;x.509;encryption;
 Exec=gnomint %f
 Terminal=false
 Type=Application

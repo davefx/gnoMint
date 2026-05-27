@@ -57,6 +57,7 @@ check_y2k38_CFLAGS = \
 check_ui_consistency_SOURCES = \
 	check_ui_consistency.c \
 	$(top_srcdir)/src/main.c \
+	$(top_srcdir)/src/cert_row.c \
 	$(top_srcdir)/src/country_table.c \
 	$(top_srcdir)/src/new_ca_window.c \
 	$(top_srcdir)/src/new_req_window.c \
@@ -96,6 +97,8 @@ check_ui_consistency_CFLAGS = \
 	-DGNOMINT_UI_DIR=\""$(abs_top_srcdir)/gui"\" \
 	-DCOMPILATION_DATE=`date +%s` \
 	-DHAVE_CONFIG_H \
+	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_6 \
+	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_10 \
 	-DGNOMINT_UI_TEST
 
 check_ui_consistency_LDADD = \
@@ -119,6 +122,7 @@ check_ui_consistency_LDFLAGS = \
 check_workflows_SOURCES = \
 	check_workflows.c \
 	$(top_srcdir)/src/main.c \
+	$(top_srcdir)/src/cert_row.c \
 	$(top_srcdir)/src/country_table.c \
 	$(top_srcdir)/src/new_ca_window.c \
 	$(top_srcdir)/src/new_req_window.c \
@@ -160,6 +164,8 @@ check_workflows_CFLAGS = \
 	-DTEST_FIXTURE_PATH=\""$(abs_top_srcdir)/certs/example-ca.gnomint"\" \
 	-DCOMPILATION_DATE=`date +%s` \
 	-DHAVE_CONFIG_H \
+	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_6 \
+	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_10 \
 	-DGNOMINT_UI_TEST
 
 check_workflows_LDADD = \

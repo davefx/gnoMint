@@ -1,9 +1,4 @@
 mimedir = $(datadir)/mime/packages
-mime_in_files = gnomint.xml.in
-mime_DATA = $(mime_in_files:.xml.in=.xml)
+mime_DATA = gnomint.xml
 
-@INTLTOOL_XML_RULE@
-
-EXTRA_DIST = $(mime_in_files)
-
-CLEANFILES = $(mime_DATA)
+EXTRA_DIST = $(mime_DATA)

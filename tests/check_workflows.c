@@ -55,6 +55,7 @@
 #include "tls.h"
 #include "wizard_window.h"
 #include "ca.h"
+#include "cert_row.h"
 
 #ifndef GNOMINT_UI_DIR
 # error "GNOMINT_UI_DIR must be set at compile time (path to gui/)"
@@ -65,14 +66,6 @@
 #ifndef TEST_FIXTURE_PATH
 # error "TEST_FIXTURE_PATH must be set at compile time (path to certs/example-ca.gnomint)"
 #endif
-
-/* Mirror of the enum in src/ca.c. CA_MODEL_COLUMN_ID is the GtkTreeStore
- * column holding the database id of each row; we walk ca_model and select
- * a known cert / CSR by id. Tied to the enum in ca.c — if that changes,
- * update here too. */
-enum {
-    CA_MODEL_COLUMN_ID = 0,
-};
 
 /* External symbols from the linked gnomint GUI object files. */
 extern GtkBuilder *certificate_properties_window_gtkb;
@@ -101,8 +94,7 @@ extern void on_add_self_signed_ca_activate (gpointer sender, gpointer);
 extern void ca_on_extractprivatekey1_activate (gpointer sender, gpointer);
 extern void ca_on_sign1_activate (gpointer sender, gpointer);
 extern void ca_on_revoke_activate (gpointer sender, gpointer);
-extern gboolean ca_treeview_row_activated (GtkTreeView *, GtkTreePath *,
-                                           GtkTreeViewColumn *, gpointer);
+extern gboolean ca_treeview_row_activated (GtkColumnView *, guint, gpointer);
 
 extern void on_new_ca_privkey_type_toggle (GtkCheckButton *button, gpointer user_data);
 extern void gnomint_register_actions (GtkWindow *window, GtkApplication *app);
@@ -395,71 +387,48 @@ fixture_teardown (void)
 }
 
 /* ------------------------------------------------------------------ */
-/*  Tree-model navigation helper                                      */
+/*  GtkColumnView model navigation helper                             */
 /* ------------------------------------------------------------------ */
 
-typedef struct {
-    guint64       wanted_id;
-    GtkTreePath  *subtree_prefix;     /* match only descendants */
-    GtkTreePath  *found_path;
-    gboolean      found;
-} FindByIdData;
+/* Access the static selection model from ca.c (linked into this binary). */
+extern GtkMultiSelection *ca_selection_model;
 
-static gboolean
-find_by_id_cb (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
-               gpointer user_data)
-{
-    FindByIdData *fd = user_data;
-    /* Only consider rows under the requested top-level subtree
-     * (Certificates vs Pending CSRs). */
-    if (fd->subtree_prefix &&
-        !gtk_tree_path_is_descendant (path, fd->subtree_prefix))
-        return FALSE;
-    guint64 row_id = 0;
-    gtk_tree_model_get (model, iter, CA_MODEL_COLUMN_ID, &row_id, -1);
-    if (row_id == fd->wanted_id) {
-        fd->found_path = gtk_tree_path_copy (path);
-        fd->found = TRUE;
-        return TRUE;     /* stop iteration */
-    }
-    return FALSE;
-}
-
-/* Find and select the row with a given database id in ca_treeview,
- * restricted to descendants of the given top-level path string ("0"
- * for the Certificates group, "1" for the Pending CSRs group — see
- * __ca_refresh_model_add_certificate / _add_csr in ca.c which add
- * certs first, then CSRs).
- *
- * The fixture has cert id=1 AND CSR id=1, so the subtree filter is
- * load-bearing: without it foreach returns the first match (a cert)
- * and ca_on_sign1_activate would bail with "not a CSR". */
+/* Find and select the row with a given database id in the GtkColumnView.
+ * item_type restricts the match: CA_FILE_ELEMENT_TYPE_CERT matches
+ * GNOMINT_ROW_TYPE_CA and _CERT; CA_FILE_ELEMENT_TYPE_CSR matches _CSR.
+ * This replaces the old subtree_root_str approach. */
 static int
 select_row_by_id (const char *subtree_root_str, guint64 wanted_id)
 {
-    GtkTreeView *tv = GTK_TREE_VIEW (
-        gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-    GtkTreeModel *model = gtk_tree_view_get_model (tv);
-    if (!model)
+    if (!ca_selection_model)
         return 0;
 
-    FindByIdData fd = {
-        wanted_id,
-        gtk_tree_path_new_from_string (subtree_root_str),
-        NULL,
-        FALSE
-    };
-    gtk_tree_model_foreach (model, find_by_id_cb, &fd);
-    gtk_tree_path_free (fd.subtree_prefix);
+    gint want_csr = (g_strcmp0 (subtree_root_str, "1") == 0);
+    GListModel *model = G_LIST_MODEL (ca_selection_model);
+    guint n = g_list_model_get_n_items (model);
 
-    if (!fd.found)
-        return 0;
+    for (guint i = 0; i < n; i++) {
+        GtkTreeListRow *tlr = GTK_TREE_LIST_ROW (g_list_model_get_item (model, i));
+        if (!tlr) continue;
+        GnomintCertRow *row = GNOMINT_CERT_ROW (gtk_tree_list_row_get_item (tlr));
+        g_object_unref (tlr);
+        if (!row) continue;
 
-    GtkTreeSelection *sel = gtk_tree_view_get_selection (tv);
-    gtk_tree_view_expand_to_path (tv, fd.found_path);
-    gtk_tree_selection_select_path (sel, fd.found_path);
-    gtk_tree_path_free (fd.found_path);
-    return 1;
+        gint type = gnomint_cert_row_get_item_type (row);
+        guint64 id = gnomint_cert_row_get_id (row);
+        g_object_unref (row);
+
+        gboolean is_csr = (type == GNOMINT_ROW_TYPE_CSR);
+        if ((want_csr && !is_csr) || (!want_csr && is_csr))
+            continue;
+        if (id != wanted_id)
+            continue;
+
+        gtk_selection_model_select_item (
+            GTK_SELECTION_MODEL (ca_selection_model), i, TRUE);
+        return 1;
+    }
+    return 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -658,7 +627,7 @@ scenario_view_properties_full (void)
     }
 
     auto_dismiss_start (GTK_RESPONSE_CANCEL);
-    ca_treeview_row_activated (NULL, NULL, NULL, NULL);
+    ca_treeview_row_activated (NULL, 0, NULL);
     drain_events ();
     int dismissed = auto_dismiss_stop ();
     drain_events ();
@@ -1802,42 +1771,27 @@ out:
 /*  Scenario: search/filter box (issue #53)                           */
 /* ------------------------------------------------------------------ */
 
-/* Counts the rows in the tree view's model whose IS_CA flag is FALSE
- * — i.e. leaf certificates and CSRs. We use it before/after applying
- * a search filter to confirm the filter actually hides rows. */
-static void
-__count_leaves_recursive (GtkTreeModel *m, GtkTreeIter *iter, gint *out)
-{
-    do {
-        /* Counts rows that are neither title headers (id=0) nor CAs
-         * (IS_CA=TRUE in column 1). */
-        gboolean is_ca = FALSE;
-        guint64 id = 0;
-        gtk_tree_model_get (m, iter,
-                            CA_MODEL_COLUMN_ID, &id,
-                            1 /* IS_CA */, &is_ca,
-                            -1);
-        if (!is_ca && id != 0)
-            (*out)++;
-        GtkTreeIter child;
-        if (gtk_tree_model_iter_children (m, &child, iter))
-            __count_leaves_recursive (m, &child, out);
-    } while (gtk_tree_model_iter_next (m, iter));
-}
-
+/* Counts the non-CA leaf rows in the GtkColumnView's flat model. */
 static gint
 count_visible_leaves (void)
 {
-    GtkTreeView *tv = GTK_TREE_VIEW (
-        gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-    if (!tv) return -1;
-    GtkTreeModel *m = gtk_tree_view_get_model (tv);
-    if (!m) return -1;
-    gint n = 0;
-    GtkTreeIter iter;
-    if (gtk_tree_model_get_iter_first (m, &iter))
-        __count_leaves_recursive (m, &iter, &n);
-    return n;
+    if (!ca_selection_model) return -1;
+    GListModel *model = G_LIST_MODEL (ca_selection_model);
+    guint n = g_list_model_get_n_items (model);
+    gint count = 0;
+    for (guint i = 0; i < n; i++) {
+        GtkTreeListRow *tlr = GTK_TREE_LIST_ROW (g_list_model_get_item (model, i));
+        if (!tlr) continue;
+        GnomintCertRow *row = GNOMINT_CERT_ROW (gtk_tree_list_row_get_item (tlr));
+        g_object_unref (tlr);
+        if (!row) continue;
+        gint type = gnomint_cert_row_get_item_type (row);
+        guint64 id = gnomint_cert_row_get_id (row);
+        g_object_unref (row);
+        if (type != GNOMINT_ROW_TYPE_CA && id != 0)
+            count++;
+    }
+    return count;
 }
 
 static int
@@ -2039,11 +1993,11 @@ scenario_application_startup (void)
         fail_test ("app-startup", "search_entry is not a GtkSearchEntry");
         goto out;
     }
-    if (!GTK_IS_TREE_VIEW (tree)) {
-        fail_test ("app-startup", "ca_treeview is not a GtkTreeView");
+    if (!GTK_IS_COLUMN_VIEW (tree)) {
+        fail_test ("app-startup", "ca_treeview is not a GtkColumnView");
         goto out;
     }
-    fprintf (stderr, "    core widgets (infobar, search, tree, menubar) present and typed correctly\n");
+    fprintf (stderr, "    core widgets (infobar, search, columnview, menubar) present and typed correctly\n");
 
     rc = 0;
 out:;

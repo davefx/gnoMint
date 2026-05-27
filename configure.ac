@@ -63,11 +63,11 @@ AC_CHECK_FUNCS([memset strcasecmp strdup])
 GETTEXT_PACKAGE=${PACKAGE}
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
-AC_DEFINE_UNQUOTED(BONOBO_EXPLICIT_TRANSLATION_DOMAIN, "$GETTEXT_PACKAGE")
-ALL_LINGUAS="ca cs de es fi fr it pt_BR oc ru sk sv"
-AM_GLIB_GNU_GETTEXT
-AM_GLIB_DEFINE_LOCALEDIR(PACKAGE_LOCALE_DIR)
-IT_PROG_INTLTOOL([0.23])
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.19.8])
+dnl Define locale directory — replaces deprecated AM_GLIB_DEFINE_LOCALEDIR
+AC_DEFINE_UNQUOTED([PACKAGE_LOCALE_DIR], ["${prefix}/share/locale"],
+  [Define the location where the catalogs will be installed])
 
 # required versions
 GNUTLS_REQUIRED=2.0

@@ -1,7 +1,6 @@
-[encoding: UTF-8]
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
-gconf/gnomint.schemas.in
+gconf/org.gnome.gnomint.gschema.xml
 gui/certificate_popup_menu.ui
 gui/certificate_properties_dialog.ui
 gui/change_password_dialog.ui
@@ -26,7 +25,6 @@ gui/preferences_dialog.ui
 gui/san_editor_dialog.ui
 gui/san_manager_widget.ui
 gui/wizard_window.ui
-mime/gnomint.xml.in
 src/ca.c
 src/cert_diff.c
 src/cert_renewal.c
