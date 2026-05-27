@@ -565,7 +565,9 @@ G_MODULE_EXPORT void on_new1_activate (gpointer sender, gpointer     user_data)
 						 _("Problem when creating '%s' CA database:\n%s"),
 						 filename, error);
 
-		compat_dialog_run (GTK_DIALOG(dialog));
+		g_signal_connect (dialog, "response",
+				  G_CALLBACK (gtk_window_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (dialog));
 
                 return;
         }
@@ -578,9 +580,9 @@ G_MODULE_EXPORT void on_new1_activate (gpointer sender, gpointer     user_data)
 						 _("Problem when opening new '%s' CA database"),
 						 filename);
 
-		compat_dialog_run (GTK_DIALOG(dialog));
-
-		gtk_window_destroy (GTK_WINDOW (dialog));
+		g_signal_connect (dialog, "response",
+				  G_CALLBACK (gtk_window_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (dialog));
 	} else {
 		__recent_add_utf8_filename (filename);
         }
@@ -624,9 +626,9 @@ G_MODULE_EXPORT void on_open1_activate  (gpointer sender, gpointer     user_data
 						 _("Problem when opening '%s' CA database"),
 						 filename);
 
-		compat_dialog_run (GTK_DIALOG(dialog));
-
-		gtk_window_destroy (GTK_WINDOW (dialog));
+		g_signal_connect (dialog, "response",
+				  G_CALLBACK (gtk_window_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (dialog));
 	} else {
 		__recent_add_utf8_filename (filename);
 	}
