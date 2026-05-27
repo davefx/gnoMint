@@ -136,6 +136,29 @@ ca_compute_row_foreground (time_t effective_expiration, time_t now,
     return NULL;
 }
 
+/* Simple "response" signal handler: destroy the dialog on any response.
+ * Used for fire-and-forget informational dialogs presented with
+ * gtk_window_present instead of the deprecated compat_dialog_run. */
+static void
+__ca_dialog_response_destroy (GtkDialog *dialog,
+                              gint       response_id G_GNUC_UNUSED,
+                              gpointer   user_data   G_GNUC_UNUSED)
+{
+    gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
+/* Variant that also frees user_data with g_free after destroying the
+ * dialog.  Used for the cert-diff viewer where a CertDiff* must be
+ * released when the user closes the dialog. */
+static void
+__ca_dialog_response_destroy_and_free (GtkDialog *dialog,
+                                       gint       response_id G_GNUC_UNUSED,
+                                       gpointer   user_data)
+{
+    gtk_window_destroy (GTK_WINDOW (dialog));
+    cert_diff_free ((CertDiff *) user_data);
+}
+
 static gboolean view_csr = TRUE;
 static gboolean view_rcrt = TRUE;
 static gboolean view_expired = TRUE;
@@ -1316,9 +1339,9 @@ void __ca_export_public_pem_cv (GnomintCertRow *row, gint type)
                                                                     GTK_BUTTONS_CLOSE,
                                                                     "%s",
                                                                     _("Certificate signing request exported successfully")));
-                compat_dialog_run (GTK_DIALOG(dialog));
-
-                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+                g_signal_connect (dialog, "response",
+                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                gtk_window_present (GTK_WINDOW (dialog));
 
         }
 }
@@ -1362,9 +1385,9 @@ gchar * __ca_export_private_pkcs8_cv (GnomintCertRow *row, gint type)
 							    GTK_BUTTONS_CLOSE,
 							    "%s",
 							    _("Private key exported successfully")));
-		compat_dialog_run (GTK_DIALOG(dialog));
-
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+		g_signal_connect (dialog, "response",
+		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (dialog));
 	} else {
 		dialog_error (strerror);
 	}
@@ -1413,9 +1436,9 @@ void __ca_export_private_pem_cv (GnomintCertRow *row, gint type)
                                                             GTK_BUTTONS_CLOSE,
                                                             "%s",
                                                             _("Private key exported successfully")));
-                compat_dialog_run (GTK_DIALOG(dialog));
-
-                gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+                g_signal_connect (dialog, "response",
+                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                gtk_window_present (GTK_WINDOW (dialog));
         }
 
 }
@@ -1471,9 +1494,9 @@ void __ca_export_pkcs12_cv (GnomintCertRow *row, gint type)
 						    GTK_BUTTONS_CLOSE,
 						    "%s",
 						    _("Certificate exported successfully")));
-	compat_dialog_run (GTK_DIALOG(dialog));
-
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	g_signal_connect (dialog, "response",
+	                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+	gtk_window_present (GTK_WINDOW (dialog));
 
 
 }
@@ -1654,8 +1677,9 @@ G_MODULE_EXPORT void ca_on_export_chain_activate (gpointer sender G_GNUC_UNUSED,
 		    GTK_DIALOG_DESTROY_WITH_PARENT,
 		    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 		    "%s", _("Certificate chain exported successfully."));
-		compat_dialog_run (GTK_DIALOG (info));
-		gtk_window_destroy(GTK_WINDOW(info));
+		g_signal_connect (info, "response",
+		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (info));
 	}
 
 	g_free (chain_pem);
@@ -1769,8 +1793,9 @@ ca_on_bulk_revoke_activate (gpointer sender G_GNUC_UNUSED,
 	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
 	    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", summary);
 	g_free (summary);
-	compat_dialog_run (GTK_DIALOG (info));
-	gtk_window_destroy(GTK_WINDOW(info));
+	g_signal_connect (info, "response",
+	                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+	gtk_window_present (GTK_WINDOW (info));
 
 	dialog_refresh_list ();
 }
@@ -2007,9 +2032,9 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 	}
 
 	gtk_widget_set_visible(dlg, TRUE);
-	compat_dialog_run (GTK_DIALOG (dlg));
-	gtk_window_destroy(GTK_WINDOW(dlg));
-	cert_diff_free (diff);
+	g_signal_connect (dlg, "response",
+	                  G_CALLBACK (__ca_dialog_response_destroy_and_free), diff);
+	gtk_window_present (GTK_WINDOW (dlg));
 }
 
 /* Menu callback: prompt for a PEM file via GtkFileChooser, then diff
@@ -2470,9 +2495,9 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 									    GTK_BUTTONS_CLOSE,
 									    "%s",
 									    _("Password changed successfully")));
-				compat_dialog_run (GTK_DIALOG(dialog));
-				
-				gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+				g_signal_connect (dialog, "response",
+				                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+				gtk_window_present (GTK_WINDOW (dialog));
 			}
 
 		} else {
@@ -2490,9 +2515,9 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 									    GTK_BUTTONS_CLOSE,
 									    "%s",
 									    _("Password established successfully")));
-				compat_dialog_run (GTK_DIALOG(dialog));
-				
-				gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+				g_signal_connect (dialog, "response",
+				                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+				gtk_window_present (GTK_WINDOW (dialog));
 			}
 		}
 	} else {
@@ -2509,9 +2534,9 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 									    GTK_BUTTONS_CLOSE,
 									    "%s",
 									    _("Password removed successfully")));
-				compat_dialog_run (GTK_DIALOG(dialog));
-				
-				gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+				g_signal_connect (dialog, "response",
+				                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+				gtk_window_present (GTK_WINDOW (dialog));
 
 			}
 
@@ -2671,9 +2696,9 @@ G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer us
 								    GTK_BUTTONS_CLOSE,
 								    "%s",
 								    _("Diffie-Hellman parameters saved successfully")));
-			compat_dialog_run (GTK_DIALOG(dialog));
-			
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+			g_signal_connect (dialog, "response",
+			                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+			gtk_window_present (GTK_WINDOW (dialog));
 		}
 
 
@@ -2773,9 +2798,9 @@ G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_da
                                                          _("Problem when importing '%s' file"),
                                                          filename);
                         
-                        compat_dialog_run (GTK_DIALOG(dialog));
-                        
-                        gtk_window_destroy(GTK_WINDOW(dialog));
+                        g_signal_connect (dialog, "response",
+                                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                        gtk_window_present (GTK_WINDOW (dialog));
                 }
                 return;
         } else {
@@ -2808,9 +2833,9 @@ G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_da
                                                          GTK_BUTTONS_CLOSE,
                                                          "%s", result);
                         
-                        compat_dialog_run (GTK_DIALOG(dialog));
-                        
-                        gtk_window_destroy(GTK_WINDOW(dialog));
+                        g_signal_connect (dialog, "response",
+                                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                        gtk_window_present (GTK_WINDOW (dialog));
                 }
                 return;
 
