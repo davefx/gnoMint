@@ -44,6 +44,8 @@ gnomint_SOURCES = \
 	uint160.c \
 	import.c \
 	export.c \
+	san_entry.c \
+	san_entry.h \
 	san_manager.c \
 	san_manager.h \
 	wizard_window.c

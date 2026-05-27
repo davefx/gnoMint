@@ -5,12 +5,12 @@
 //
 //  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 3 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
@@ -24,15 +24,17 @@
 #include <regex.h>
 
 #include "san_manager.h"
+#include "san_entry.h"
 
 // Private data structure for SAN manager
 typedef struct {
-	GtkTreeView *treeview;
-	GtkListStore *model;
-	GtkButton *add_button;
-	GtkButton *edit_button;
-	GtkButton *remove_button;
-	GtkBuilder *editor_builder;
+	GtkColumnView      *columnview;
+	GListStore         *model;
+	GtkSingleSelection *selection;
+	GtkButton          *add_button;
+	GtkButton          *edit_button;
+	GtkButton          *remove_button;
+	GtkBuilder         *editor_builder;
 } SanManagerData;
 
 static const gchar * san_type_to_string(SanType type) {
@@ -48,7 +50,7 @@ static const gchar * san_type_to_string(SanType type) {
 static SanType san_type_from_string(const gchar *type_str) {
 	if (g_ascii_strcasecmp(type_str, "IP") == 0 || g_ascii_strcasecmp(type_str, "IP Address") == 0)
 		return SAN_TYPE_IP;
-	if (g_ascii_strcasecmp(type_str, "EMAIL") == 0 || g_ascii_strcasecmp(type_str, "Email") == 0 || 
+	if (g_ascii_strcasecmp(type_str, "EMAIL") == 0 || g_ascii_strcasecmp(type_str, "Email") == 0 ||
 	    g_ascii_strcasecmp(type_str, "RFC822") == 0)
 		return SAN_TYPE_EMAIL;
 	if (g_ascii_strcasecmp(type_str, "URI") == 0)
@@ -62,7 +64,7 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 			*error_message = g_strdup(_("Value cannot be empty"));
 		return FALSE;
 	}
-	
+
 	switch (type) {
 		case SAN_TYPE_DNS: {
 			// Basic DNS validation - must be alphanumeric with dots, dashes, and asterisk for wildcards
@@ -80,7 +82,7 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 				*error_message = g_strdup(_("Invalid DNS name. Use format: example.com or *.example.com"));
 			return FALSE;
 		}
-		
+
 		case SAN_TYPE_IP: {
 			// Validate IPv4 or IPv6
 			struct in_addr ipv4;
@@ -91,7 +93,7 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 				*error_message = g_strdup(_("Invalid IP address. Use IPv4 (e.g., 192.168.1.1) or IPv6 format"));
 			return FALSE;
 		}
-		
+
 		case SAN_TYPE_EMAIL: {
 			// Basic email validation
 			const gchar *at = strchr(value, '@');
@@ -101,7 +103,7 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 				*error_message = g_strdup(_("Invalid email address. Use format: user@example.com"));
 			return FALSE;
 		}
-		
+
 		case SAN_TYPE_URI: {
 			// Basic URI validation - must start with a scheme
 			if (g_str_has_prefix(value, "http://") || g_str_has_prefix(value, "https://") ||
@@ -112,14 +114,68 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 			return FALSE;
 		}
 	}
-	
+
 	return TRUE;
 }
 
-static void san_manager_selection_changed(GtkTreeSelection *selection, gpointer user_data) {
+/* ------------------------------------------------------------------ */
+/*  GtkColumnView factory callbacks                                    */
+/* ------------------------------------------------------------------ */
+
+static void
+san_type_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                GtkListItem *list_item,
+                gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_list_item_set_child (list_item, label);
+}
+
+static void
+san_type_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+               GtkListItem *list_item,
+               gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintSanEntry *entry = GNOMINT_SAN_ENTRY (gtk_list_item_get_item (list_item));
+	GtkWidget *label = gtk_list_item_get_child (list_item);
+	gtk_label_set_text (GTK_LABEL (label),
+	                    gnomint_san_entry_get_san_type (entry));
+}
+
+static void
+san_value_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                 GtkListItem *list_item,
+                 gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_label_set_ellipsize (GTK_LABEL (label), PANGO_ELLIPSIZE_END);
+	gtk_list_item_set_child (list_item, label);
+}
+
+static void
+san_value_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                GtkListItem *list_item,
+                gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintSanEntry *entry = GNOMINT_SAN_ENTRY (gtk_list_item_get_item (list_item));
+	GtkWidget *label = gtk_list_item_get_child (list_item);
+	gtk_label_set_text (GTK_LABEL (label),
+	                    gnomint_san_entry_get_value (entry));
+}
+
+/* ------------------------------------------------------------------ */
+/*  Selection changed                                                  */
+/* ------------------------------------------------------------------ */
+
+static void san_manager_selection_changed(GtkSingleSelection *sel,
+                                          GParamSpec *pspec G_GNUC_UNUSED,
+                                          gpointer user_data)
+{
 	SanManagerData *data = (SanManagerData *)user_data;
-	gboolean has_selection = gtk_tree_selection_get_selected(selection, NULL, NULL);
-	
+	gboolean has_selection = (gtk_single_selection_get_selected (sel) != GTK_INVALID_LIST_POSITION);
+
 	gtk_widget_set_sensitive(GTK_WIDGET(data->edit_button), has_selection);
 	gtk_widget_set_sensitive(GTK_WIDGET(data->remove_button), has_selection);
 }
@@ -128,7 +184,7 @@ static void san_manager_selection_changed(GtkTreeSelection *selection, gpointer 
 typedef struct {
 	SanManagerData *data;
 	gboolean        editing;       /* TRUE = edit existing row, FALSE = add new */
-	GtkTreeIter     edit_iter;     /* valid only when editing == TRUE */
+	guint           edit_position; /* valid only when editing == TRUE */
 	gulong          response_handler_id;
 } SanEditorCtx;
 
@@ -161,22 +217,14 @@ san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data)
 		return;
 	}
 
-	/* OK pressed — validate input. */
-	GtkComboBox *type_combo = GTK_COMBO_BOX (
+	/* OK pressed -- validate input. */
+	GtkDropDown *type_dropdown = GTK_DROP_DOWN (
 		gtk_builder_get_object (data->editor_builder, "san_type_combo"));
 	GtkEntry *value_entry = GTK_ENTRY (
 		gtk_builder_get_object (data->editor_builder, "san_value_entry"));
 
-	GtkTreeIter combo_iter;
-	SanType type;
-	if (gtk_combo_box_get_active_iter (type_combo, &combo_iter)) {
-		GtkTreeModel *combo_model = gtk_combo_box_get_model (type_combo);
-		gint type_int;
-		gtk_tree_model_get (combo_model, &combo_iter, 1, &type_int, -1);
-		type = (SanType) type_int;
-	} else {
-		type = SAN_TYPE_DNS;
-	}
+	guint selected = gtk_drop_down_get_selected (type_dropdown);
+	SanType type = (SanType) selected;
 
 	const gchar *value = gtk_editable_get_text (GTK_EDITABLE (value_entry));
 	gchar *error_msg = NULL;
@@ -198,26 +246,24 @@ san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data)
 		return;
 	}
 
-	/* Valid — update the model. */
-	gchar *type_str = g_strdup (san_type_to_string (type));
-	gchar *value_str = g_strdup (value);
+	/* Valid -- update the model. */
+	const gchar *type_str = san_type_to_string (type);
 
 	if (ctx->editing) {
-		gtk_list_store_set (data->model, &ctx->edit_iter,
-		                    0, type_str,
-		                    1, value_str,
-		                    -1);
+		GnomintSanEntry *entry = g_list_model_get_item (
+			G_LIST_MODEL (data->model), ctx->edit_position);
+		if (entry) {
+			gnomint_san_entry_set_san_type (entry, type_str);
+			gnomint_san_entry_set_value (entry, value);
+			/* Notify the model of the change so the view refreshes. */
+			g_list_store_splice (data->model, ctx->edit_position, 1, (gpointer *) &entry, 1);
+			g_object_unref (entry);
+		}
 	} else {
-		GtkTreeIter new_iter;
-		gtk_list_store_append (data->model, &new_iter);
-		gtk_list_store_set (data->model, &new_iter,
-		                    0, type_str,
-		                    1, value_str,
-		                    -1);
+		GnomintSanEntry *entry = gnomint_san_entry_new (type_str, value);
+		g_list_store_append (data->model, entry);
+		g_object_unref (entry);
 	}
-
-	g_free (type_str);
-	g_free (value_str);
 
 	g_signal_handler_disconnect (dialog, ctx->response_handler_id);
 	gtk_window_destroy (GTK_WINDOW (dialog));
@@ -226,9 +272,9 @@ san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data)
 
 /* Present the SAN editor dialog asynchronously.  When the user confirms,
  * the response callback validates and updates the model. */
-static void san_manager_show_editor_async(SanManagerData *data, const gchar *initial_type, const gchar *initial_value, gboolean editing, GtkTreeIter *edit_iter) {
+static void san_manager_show_editor_async(SanManagerData *data, const gchar *initial_type, const gchar *initial_value, gboolean editing, guint edit_position) {
 	GtkDialog *dialog;
-	GtkComboBox *type_combo;
+	GtkDropDown *type_dropdown;
 	GtkEntry *value_entry;
 	GtkWidget *parent;
 	gchar *ui_file;
@@ -245,20 +291,20 @@ static void san_manager_show_editor_async(SanManagerData *data, const gchar *ini
 	}
 
 	dialog = GTK_DIALOG(gtk_builder_get_object(data->editor_builder, "san_editor_dialog"));
-	type_combo = GTK_COMBO_BOX(gtk_builder_get_object(data->editor_builder, "san_type_combo"));
+	type_dropdown = GTK_DROP_DOWN(gtk_builder_get_object(data->editor_builder, "san_type_combo"));
 	value_entry = GTK_ENTRY(gtk_builder_get_object(data->editor_builder, "san_value_entry"));
 
 	// Set parent window
-	parent = GTK_WIDGET(gtk_widget_get_root(GTK_WIDGET(data->treeview)));
+	parent = GTK_WIDGET(gtk_widget_get_root(GTK_WIDGET(data->columnview)));
 	if (GTK_IS_WINDOW(parent))
 		gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(parent));
 
 	// Set initial values
 	if (initial_type) {
 		SanType type = san_type_from_string(initial_type);
-		gtk_combo_box_set_active(type_combo, type);
+		gtk_drop_down_set_selected(type_dropdown, (guint) type);
 	} else {
-		gtk_combo_box_set_active(type_combo, 0);
+		gtk_drop_down_set_selected(type_dropdown, 0);
 	}
 
 	if (initial_value)
@@ -272,8 +318,7 @@ static void san_manager_show_editor_async(SanManagerData *data, const gchar *ini
 	SanEditorCtx *ctx = g_new0 (SanEditorCtx, 1);
 	ctx->data = data;
 	ctx->editing = editing;
-	if (editing && edit_iter)
-		ctx->edit_iter = *edit_iter;
+	ctx->edit_position = edit_position;
 
 	ctx->response_handler_id = g_signal_connect (
 		dialog, "response", G_CALLBACK (san_editor_response), ctx);
@@ -281,78 +326,103 @@ static void san_manager_show_editor_async(SanManagerData *data, const gchar *ini
 	gtk_window_present (GTK_WINDOW (dialog));
 }
 
-static void san_manager_add_clicked(GtkButton *button, gpointer user_data) {
+static void san_manager_add_clicked(GtkButton *button G_GNUC_UNUSED, gpointer user_data) {
 	SanManagerData *data = (SanManagerData *)user_data;
-	san_manager_show_editor_async (data, NULL, NULL, FALSE, NULL);
+	san_manager_show_editor_async (data, NULL, NULL, FALSE, 0);
 }
 
-static void san_manager_edit_clicked(GtkButton *button, gpointer user_data) {
+static void san_manager_edit_clicked(GtkButton *button G_GNUC_UNUSED, gpointer user_data) {
 	SanManagerData *data = (SanManagerData *)user_data;
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(data->treeview);
-	GtkTreeIter iter;
-	GtkTreeModel *model;
+	guint pos = gtk_single_selection_get_selected (data->selection);
 
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		gchar *old_type, *old_value;
-
-		gtk_tree_model_get(model, &iter, 0, &old_type, 1, &old_value, -1);
-
-		san_manager_show_editor_async (data, old_type, old_value, TRUE, &iter);
-
-		g_free(old_type);
-		g_free(old_value);
+	if (pos != GTK_INVALID_LIST_POSITION) {
+		GnomintSanEntry *entry = g_list_model_get_item (
+			G_LIST_MODEL (data->model), pos);
+		if (entry) {
+			san_manager_show_editor_async (data,
+				gnomint_san_entry_get_san_type (entry),
+				gnomint_san_entry_get_value (entry),
+				TRUE, pos);
+			g_object_unref (entry);
+		}
 	}
 }
 
-static void san_manager_remove_clicked(GtkButton *button, gpointer user_data) {
+static void san_manager_remove_clicked(GtkButton *button G_GNUC_UNUSED, gpointer user_data) {
 	SanManagerData *data = (SanManagerData *)user_data;
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(data->treeview);
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-	
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		gtk_list_store_remove(data->model, &iter);
+	guint pos = gtk_single_selection_get_selected (data->selection);
+
+	if (pos != GTK_INVALID_LIST_POSITION) {
+		g_list_store_remove (data->model, pos);
 	}
 }
 
 GtkWidget * san_manager_create(GtkBuilder *builder, const gchar *widget_id) {
 	GtkWidget *vbox;
-	GtkTreeView *treeview;
-	GtkListStore *model;
+	GtkColumnView *columnview;
 	GtkButton *add_button, *edit_button, *remove_button;
-	GtkTreeSelection *selection;
 	SanManagerData *data;
-	
+
 	vbox = GTK_WIDGET(gtk_builder_get_object(builder, widget_id));
 	if (!vbox)
 		return NULL;
-	
-	treeview = GTK_TREE_VIEW(gtk_builder_get_object(builder, "san_treeview"));
-	model = GTK_LIST_STORE(gtk_builder_get_object(builder, "san_list_model"));
+
+	columnview = GTK_COLUMN_VIEW(gtk_builder_get_object(builder, "san_treeview"));
 	add_button = GTK_BUTTON(gtk_builder_get_object(builder, "add_button"));
 	edit_button = GTK_BUTTON(gtk_builder_get_object(builder, "edit_button"));
 	remove_button = GTK_BUTTON(gtk_builder_get_object(builder, "remove_button"));
-	
+
+	/* Create GListStore of GnomintSanEntry objects. */
+	GListStore *model = g_list_store_new (GNOMINT_TYPE_SAN_ENTRY);
+
+	/* Wrap in a GtkSingleSelection for the column view. */
+	GtkSingleSelection *sel = gtk_single_selection_new (G_LIST_MODEL (model));
+	gtk_single_selection_set_autoselect (sel, FALSE);
+	gtk_single_selection_set_can_unselect (sel, TRUE);
+	gtk_column_view_set_model (columnview, GTK_SELECTION_MODEL (sel));
+
 	// Create data structure
 	data = g_new0(SanManagerData, 1);
-	data->treeview = treeview;
+	data->columnview = columnview;
 	data->model = model;
+	data->selection = sel;
 	data->add_button = add_button;
 	data->edit_button = edit_button;
 	data->remove_button = remove_button;
 	data->editor_builder = NULL;
-	
+
 	// Store data in widget
 	g_object_set_data_full(G_OBJECT(vbox), "san_manager_data", data, g_free);
-	
+
+	/* Set up columns programmatically. */
+
+	/* Type column */
+	{
+		GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+		g_signal_connect (f, "setup", G_CALLBACK (san_type_setup), NULL);
+		g_signal_connect (f, "bind",  G_CALLBACK (san_type_bind),  NULL);
+		GtkColumnViewColumn *col = gtk_column_view_column_new (_("Type"), f);
+		gtk_column_view_append_column (columnview, col);
+		g_object_unref (col);
+	}
+
+	/* Value column */
+	{
+		GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+		g_signal_connect (f, "setup", G_CALLBACK (san_value_setup), NULL);
+		g_signal_connect (f, "bind",  G_CALLBACK (san_value_bind),  NULL);
+		GtkColumnViewColumn *col = gtk_column_view_column_new (_("Value"), f);
+		gtk_column_view_column_set_expand (col, TRUE);
+		gtk_column_view_append_column (columnview, col);
+		g_object_unref (col);
+	}
+
 	// Connect signals
-	selection = gtk_tree_view_get_selection(treeview);
-	gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-	g_signal_connect(selection, "changed", G_CALLBACK(san_manager_selection_changed), data);
+	g_signal_connect(sel, "notify::selected", G_CALLBACK(san_manager_selection_changed), data);
 	g_signal_connect(add_button, "clicked", G_CALLBACK(san_manager_add_clicked), data);
 	g_signal_connect(edit_button, "clicked", G_CALLBACK(san_manager_edit_clicked), data);
 	g_signal_connect(remove_button, "clicked", G_CALLBACK(san_manager_remove_clicked), data);
-	
+
 	return vbox;
 }
 
@@ -360,31 +430,24 @@ gchar * san_manager_get_string(GtkWidget *san_manager) {
 	SanManagerData *data = (SanManagerData *)g_object_get_data(G_OBJECT(san_manager), "san_manager_data");
 	if (!data)
 		return g_strdup("");
-	
+
 	GString *result = g_string_new(NULL);
-	GtkTreeIter iter;
-	gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(data->model), &iter);
-	gboolean first = TRUE;
-	
-	while (valid) {
-		gchar *type, *value;
-		gtk_tree_model_get(GTK_TREE_MODEL(data->model), &iter,
-		                   0, &type,
-		                   1, &value,
-		                   -1);
-		
-		if (!first)
+	guint n = g_list_model_get_n_items (G_LIST_MODEL (data->model));
+
+	for (guint i = 0; i < n; i++) {
+		GnomintSanEntry *entry = g_list_model_get_item (G_LIST_MODEL (data->model), i);
+		if (!entry)
+			continue;
+
+		if (i > 0)
 			g_string_append(result, ",");
-		first = FALSE;
-		
-		g_string_append_printf(result, "%s:%s", type, value);
-		
-		g_free(type);
-		g_free(value);
-		
-		valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(data->model), &iter);
+
+		g_string_append_printf(result, "%s:%s",
+		                       gnomint_san_entry_get_san_type (entry),
+		                       gnomint_san_entry_get_value (entry));
+		g_object_unref (entry);
 	}
-	
+
 	return g_string_free(result, FALSE);
 }
 
@@ -392,23 +455,22 @@ void san_manager_set_string(GtkWidget *san_manager, const gchar *san_string) {
 	SanManagerData *data = (SanManagerData *)g_object_get_data(G_OBJECT(san_manager), "san_manager_data");
 	if (!data || !san_string || !san_string[0])
 		return;
-	
+
 	// Clear existing
-	gtk_list_store_clear(data->model);
-	
+	g_list_store_remove_all (data->model);
+
 	// Parse and add entries
 	gchar **entries = g_strsplit(san_string, ",", -1);
 	for (int i = 0; entries[i] != NULL; i++) {
-		gchar *entry = g_strstrip(entries[i]);
-		if (entry[0]) {
-			gchar **parts = g_strsplit(entry, ":", 2);
+		gchar *entry_str = g_strstrip(entries[i]);
+		if (entry_str[0]) {
+			gchar **parts = g_strsplit(entry_str, ":", 2);
 			if (parts[0] && parts[1]) {
-				GtkTreeIter iter;
-				gtk_list_store_append(data->model, &iter);
-				gtk_list_store_set(data->model, &iter,
-				                   0, g_strstrip(parts[0]),
-				                   1, g_strstrip(parts[1]),
-				                   -1);
+				GnomintSanEntry *entry = gnomint_san_entry_new (
+					g_strstrip(parts[0]),
+					g_strstrip(parts[1]));
+				g_list_store_append (data->model, entry);
+				g_object_unref (entry);
 			}
 			g_strfreev(parts);
 		}
