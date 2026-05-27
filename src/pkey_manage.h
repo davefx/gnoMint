@@ -31,7 +31,15 @@ typedef struct {
 	gchar *external_file;
 } PkeyManageData;
 
+typedef void (*PkeyManageGetPkeyCallback)(PkeyManageData *result, gpointer user_data);
+
+#ifdef GNOMINTCLI
 PkeyManageData * pkey_manage_get_certificate_pkey (guint64 id);
+#else
+void pkey_manage_get_certificate_pkey (guint64 id,
+                                       PkeyManageGetPkeyCallback cb,
+                                       gpointer user_data);
+#endif
 PkeyManageData * pkey_manage_get_csr_pkey (guint64 id);
 
 void pkey_manage_data_free (PkeyManageData *pkeydata);
@@ -43,11 +51,26 @@ void pkey_manage_crypt_auto (gchar *password,
 			     gchar **pem_private_key,
 			     const gchar *pem_root_certificate);
 
-gchar * pkey_manage_ask_password (void);
 gboolean pkey_manage_check_password (const gchar *checking_password, const gchar *hashed_password);
 
-gchar * pkey_manage_crypt   (const gchar *pem_private_key, const gchar *dn);
+#ifdef GNOMINTCLI
+
+gchar * pkey_manage_ask_password (void);
 gchar * pkey_manage_uncrypt (PkeyManageData *pkey, const gchar *dn);
+
+#else
+
+typedef void (*PkeyManagePasswordCallback)(gchar *password, gpointer user_data);
+typedef void (*PkeyManageUncryptCallback)(gchar *clear_pem, gpointer user_data);
+
+void pkey_manage_ask_password (PkeyManagePasswordCallback cb, gpointer user_data);
+void pkey_manage_uncrypt (PkeyManageData *pkey, const gchar *dn,
+                          PkeyManageUncryptCallback cb, gpointer user_data);
+
+#endif
+
+gchar * pkey_manage_crypt   (const gchar *pem_private_key, const gchar *dn);
+
 gchar * pkey_manage_crypt_w_pwd   (const gchar *pem_private_key, const gchar *dn, const gchar *pwd);
 gchar * pkey_manage_uncrypt_w_pwd (PkeyManageData *pkey, const gchar *dn, const gchar *pwd);
 

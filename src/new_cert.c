@@ -729,8 +729,18 @@ G_MODULE_EXPORT void on_new_cert_property_toggled (GtkWidget *button, gpointer u
         
 }
 
+static void
+__new_cert_commit_done_cb (const gchar *error, gpointer user_data)
+{
+	(void) user_data;
+	if (error) {
+		dialog_error ((gchar *) error);
+	}
+	dialog_refresh_list ();
+}
+
 G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
-				 gpointer user_data) 
+				 gpointer user_data)
 {
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(new_cert_window_gtkb, "signing_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
@@ -745,8 +755,6 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 	guint64 ca_id;
 	gchar * csr_id_str = g_object_get_data (G_OBJECT(gtk_builder_get_object(new_cert_window_gtkb, "new_cert_window")), "csr_id");
 	guint64 csr_id = atoll(csr_id_str);
-
-	const gchar *strerror = NULL;
 
         gtk_tree_selection_get_selected (selection, &model, &iter);
         gtk_tree_model_get_value (model, &iter, NEW_CERT_CA_MODEL_COLUMN_ID, value);
@@ -811,38 +819,91 @@ G_MODULE_EXPORT void on_new_cert_commit_clicked (GtkButton *widg,
 	cert_creation_data->subject_alt_name = NULL;
 #endif
 
-	strerror = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
-
-	if (strerror) {
-		dialog_error ((gchar *) strerror);
-	}
-
 	widget = G_OBJECT(gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window"));
-        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));	
+        gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 
-	dialog_refresh_list();
+	new_cert_sign_csr (csr_id, ca_id, cert_creation_data,
+	                   __new_cert_commit_done_cb, NULL);
 
 }
 #endif
 
-const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data)
+/* Shared helper: given the decrypted CA private key, generate and insert the cert. */
+static const gchar *
+__new_cert_sign_with_pkey (guint64 csr_id, guint64 ca_id,
+                           TlsCertCreationData *cert_creation_data,
+                           gchar *csr_pem, gchar *pem,
+                           gchar *pkey_pem)
 {
-	gchar *csr_pem = NULL;
-	
-	gchar *certificate;
-        gchar *error = NULL;
+	gchar *certificate = NULL;
+	gchar *error = NULL;
+	PkeyManageData *csr_pkey = NULL;
 
-	gchar *pem;
-	gchar *dn;
-	gchar *pkey_pem;
-	PkeyManageData *crypted_pkey;
+	TlsCert *ca_cert = tls_parse_cert_pem (pem);
 
+	if (cert_creation_data->expiration > ca_cert->expiration_time) {
+		dialog_info (_("The expiration date of the new certificate is after the expiration date of the CA certificate.\n\n"
+			       "According to the current standards, this is not allowed. The new certificate will be created with the same "
+			       "expiration date as the CA certificate."));
+		cert_creation_data->expiration = ca_cert->expiration_time;
+	}
+
+	tls_cert_free (ca_cert);
+
+	error = tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
+
+	if (! error) {
+		csr_pkey = pkey_manage_get_csr_pkey (csr_id);
+
+		if (csr_pkey)
+			if (csr_pkey->is_in_db)
+				error = ca_file_insert_cert (cert_creation_data->ca, 1, csr_pkey->pkey_data, certificate);
+			else
+				error = ca_file_insert_cert (cert_creation_data->ca, 0, csr_pkey->external_file, certificate);
+		else
+			error = ca_file_insert_cert (cert_creation_data->ca, 0, NULL, certificate);
+
+		if (!error)
+			ca_file_remove_csr (csr_id);
+		else
+			dialog_error (error);
+
+		pkey_manage_data_free (csr_pkey);
+	}
+
+	if (!error && preferences_get_gnome_keyring_export()) {
+		TlsCert * cert = NULL;
+		gchar *filename = NULL;
+		gchar *directory = NULL;
+		gchar *aux = NULL;
+		cert = tls_parse_cert_pem (certificate);
+
+		aux = g_strdup_printf ("%s_%s_%s.pem", cert->dn, cert->i_dn, cert->sha1);
+
+		aux = g_strcanon (aux,
+		                  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.",
+		                  '_');
+
+		directory = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", NULL);
+		filename = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", aux, NULL);
+
+		if (! g_mkdir_with_parents (directory, 0700)) {
+			g_file_set_contents (filename, certificate, strlen(certificate), NULL);
+		}
+	}
+
+	return error;
+}
+
+static void
+__new_cert_prepare_expiration (TlsCertCreationData *cert_creation_data)
+{
 	time_t tmp;
 	struct tm * expiration_time;
 
-	tmp = time (NULL);	
+	tmp = time (NULL);
 	cert_creation_data->activation = tmp;
-	
+
 #ifndef WIN32
 	expiration_time = g_new (struct tm,1);
 	localtime_r (&tmp, expiration_time);
@@ -851,38 +912,33 @@ const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationDa
 #endif
 	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
-	expiration_time->tm_mon = expiration_time->tm_mon % 12;		
+	expiration_time->tm_mon = expiration_time->tm_mon % 12;
 	cert_creation_data->expiration = mktime(expiration_time);
 #ifndef WIN32
 	g_free (expiration_time);
 #endif
+}
 
-        ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
+#ifdef GNOMINTCLI
+
+const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data)
+{
+	gchar *csr_pem = NULL;
+	gchar *pem = NULL;
+	gchar *dn = NULL;
+	gchar *pkey_pem = NULL;
+	PkeyManageData *crypted_pkey = NULL;
+	const gchar *error = NULL;
+
+	__new_cert_prepare_expiration (cert_creation_data);
+	ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
 
 	csr_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, csr_id);
 	pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
 	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-					      
+
 	if (pem && crypted_pkey && dn) {
-
-		TlsCert * ca_cert = tls_parse_cert_pem (pem);
-		
-		/* Check if expiration of the new cert is due after the expiration of the CA certificate.
-		   In that case, we reset the expiration date to the CA certificate expiration date, and
-		   show a info message.
-		*/
-		if (cert_creation_data->expiration > ca_cert->expiration_time) {
-			dialog_info (_("The expiration date of the new certificate is after the expiration date of the CA certificate.\n\n"
-				       "According to the current standards, this is not allowed. The new certificate will be created with the same "
-				       "expiration date as the CA certificate."));
-			cert_creation_data->expiration = ca_cert->expiration_time;
-		}
-		
-		tls_cert_free (ca_cert);
-		
-		PkeyManageData *csr_pkey = NULL;
-
 		pkey_pem = pkey_manage_uncrypt (crypted_pkey, dn);
 
 		if (! pkey_pem) {
@@ -892,56 +948,10 @@ const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationDa
 			return (_("Error while signing CSR."));
 		}
 
-		error = tls_generate_certificate (cert_creation_data, csr_pem, pem, pkey_pem, &certificate);
-
+		error = __new_cert_sign_with_pkey (csr_id, ca_id, cert_creation_data,
+		                                    csr_pem, pem, pkey_pem);
 		g_free (pkey_pem);
-                if (! error) {
-		
-                        csr_pkey = pkey_manage_get_csr_pkey (csr_id);
-                        
-                        if (csr_pkey)
-                                if (csr_pkey->is_in_db)
-                                        error = ca_file_insert_cert (cert_creation_data->ca, 1, csr_pkey->pkey_data, certificate);
-                                else
-                                        error = ca_file_insert_cert (cert_creation_data->ca, 0, csr_pkey->external_file, certificate);			
-                        else
-                                error = ca_file_insert_cert (cert_creation_data->ca, 0, NULL, certificate);
-                        
-                        if (!error)
-                                ca_file_remove_csr (csr_id);
-                        else 
-                                dialog_error (error);
-                        
-                        pkey_manage_data_free (csr_pkey);
-		}
 	}
-		
-        if (!error && preferences_get_gnome_keyring_export()) {
-                TlsCert * cert = NULL;
-                gchar *filename = NULL;
-                gchar *directory = NULL;
-                gchar *aux = NULL;
-                cert = tls_parse_cert_pem (certificate);
-
-                // We must calculate the name of the file. 
-                // Basically, it will be the subject DN + issuer DN + sha1 fingerprint
-                // with substitution of non-valid filename characters
-
-                aux = g_strdup_printf ("%s_%s_%s.pem", cert->dn, cert->i_dn, cert->sha1);
-                
-                aux = g_strcanon (aux,
-                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.",
-                                  '_');
-                
-                directory = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", NULL);
-                filename = g_build_filename (g_get_home_dir(), ".gnome2", "keystore", aux, NULL);
-
-                if (! g_mkdir_with_parents (directory, 0700)) {
-                        g_file_set_contents (filename, certificate, strlen(certificate), NULL);
-                }
-
-        }
-
 
 	g_free (pem);
 	pkey_manage_data_free (crypted_pkey);
@@ -949,4 +959,90 @@ const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationDa
 
 	return error;
 }
+
+#else /* GUI async new_cert_sign_csr */
+
+typedef struct {
+	guint64                 csr_id;
+	guint64                 ca_id;
+	TlsCertCreationData    *cert_creation_data;
+	gchar                  *csr_pem;
+	gchar                  *pem;
+	gchar                  *dn;
+	PkeyManageData         *crypted_pkey;
+	NewCertSignCsrCallback  cb;
+	gpointer                cb_user_data;
+} _NewCertSignCtx;
+
+static void
+_new_cert_sign_uncrypt_cb (gchar *pkey_pem, gpointer data)
+{
+	_NewCertSignCtx *ctx = (_NewCertSignCtx *) data;
+	const gchar *error = NULL;
+
+	if (! pkey_pem) {
+		g_free (ctx->pem);
+		pkey_manage_data_free (ctx->crypted_pkey);
+		g_free (ctx->dn);
+		ctx->cb (_("Error while signing CSR."), ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	error = __new_cert_sign_with_pkey (ctx->csr_id, ctx->ca_id,
+	                                    ctx->cert_creation_data,
+	                                    ctx->csr_pem, ctx->pem, pkey_pem);
+	g_free (pkey_pem);
+
+	g_free (ctx->pem);
+	pkey_manage_data_free (ctx->crypted_pkey);
+	g_free (ctx->dn);
+
+	ctx->cb (error, ctx->cb_user_data);
+	g_free (ctx);
+}
+
+static void
+_new_cert_sign_got_pkey_cb (PkeyManageData *crypted_pkey, gpointer data)
+{
+	_NewCertSignCtx *ctx = (_NewCertSignCtx *) data;
+
+	ctx->crypted_pkey = crypted_pkey;
+
+	if (!ctx->pem || !crypted_pkey || !ctx->dn) {
+		g_free (ctx->pem);
+		pkey_manage_data_free (crypted_pkey);
+		g_free (ctx->dn);
+		ctx->cb (_("Error while signing CSR."), ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	pkey_manage_uncrypt (crypted_pkey, ctx->dn,
+	                     _new_cert_sign_uncrypt_cb, ctx);
+}
+
+void new_cert_sign_csr (guint64 csr_id, guint64 ca_id,
+                        TlsCertCreationData *cert_creation_data,
+                        NewCertSignCsrCallback cb, gpointer user_data)
+{
+	_NewCertSignCtx *ctx;
+
+	__new_cert_prepare_expiration (cert_creation_data);
+	ca_file_get_next_serial (&cert_creation_data->serial, ca_id);
+
+	ctx = g_new0 (_NewCertSignCtx, 1);
+	ctx->csr_id = csr_id;
+	ctx->ca_id = ca_id;
+	ctx->cert_creation_data = cert_creation_data;
+	ctx->csr_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CSR, csr_id);
+	ctx->pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	ctx->dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	ctx->cb = cb;
+	ctx->cb_user_data = user_data;
+
+	pkey_manage_get_certificate_pkey (ca_id, _new_cert_sign_got_pkey_cb, ctx);
+}
+
+#endif /* GNOMINTCLI */
 

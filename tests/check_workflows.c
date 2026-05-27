@@ -1402,6 +1402,35 @@ scenario_ecdsa_eddsa_keygen (void)
 #include "cert_renewal.h"
 #include "ca_file.h"
 
+#ifndef GNOMINTCLI
+/* Blocking wrapper around the async cert_renewal_renew for tests. */
+typedef struct {
+    gchar   *error;
+    gboolean done;
+} _TestRenewalCtx;
+
+static void
+_test_renewal_cb (gchar *error, gpointer data)
+{
+    _TestRenewalCtx *ctx = (_TestRenewalCtx *) data;
+    ctx->error = error;
+    ctx->done = TRUE;
+}
+
+static gchar *
+cert_renewal_renew_sync (guint64 cert_id, guint64 *new_cert_id_out)
+{
+    _TestRenewalCtx ctx = { NULL, FALSE };
+    cert_renewal_renew (cert_id, new_cert_id_out, _test_renewal_cb, &ctx);
+    /* The test DB is not password protected, so the async call
+     * should resolve immediately without entering a main loop.
+     * But in case any GTK dialog machinery gets involved, spin. */
+    while (!ctx.done)
+        g_main_context_iteration (NULL, TRUE);
+    return ctx.error;
+}
+#endif
+
 /* Renews a leaf cert from the fixture and asserts:
  *   - cert_renewal_renew returns NULL (no error)
  *   - new cert id is non-zero
@@ -1440,7 +1469,11 @@ scenario_certificate_renewal (void)
     }
 
     guint64 new_id = 0;
+#ifdef GNOMINTCLI
     gchar *err = cert_renewal_renew (old_id, &new_id);
+#else
+    gchar *err = cert_renewal_renew_sync (old_id, &new_id);
+#endif
     if (err) {
         fail_test ("renewal", "cert_renewal_renew error: %s", err);
         g_free (err);

@@ -42,7 +42,14 @@ void on_new_cert_commit_clicked (GtkButton *widg,
 				 gpointer user_data);
 #endif
 
+#ifdef GNOMINTCLI
 const gchar *new_cert_sign_csr (guint64 csr_id, guint64 ca_id, TlsCertCreationData *cert_creation_data);
+#else
+typedef void (*NewCertSignCsrCallback)(const gchar *error, gpointer user_data);
+void new_cert_sign_csr (guint64 csr_id, guint64 ca_id,
+                        TlsCertCreationData *cert_creation_data,
+                        NewCertSignCsrCallback cb, gpointer user_data);
+#endif
 
 
 #endif

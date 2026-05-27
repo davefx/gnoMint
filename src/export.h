@@ -25,7 +25,18 @@
 
 gchar *export_dh_param (guint dh_size, gchar *filename);
 
+#ifdef GNOMINTCLI
+
 gchar * export_private_pem (guint64 id, gint type, gchar *filename);
+
+#else
+
+typedef void (*ExportPrivatePemCallback)(const gchar *error_msg, gpointer user_data);
+
+void export_private_pem (guint64 id, gint type, gchar *filename,
+                         ExportPrivatePemCallback cb, gpointer user_data);
+
+#endif
 
 #ifdef GNOMINTCLI
 

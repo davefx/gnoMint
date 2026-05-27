@@ -229,6 +229,21 @@ __ca_bulk_delete_csrs_response (GtkDialog *dialog,
     dialog_refresh_list ();
 }
 
+static void
+__ca_renew_done_cb (gchar *error, gpointer user_data)
+{
+    (void) user_data;
+    if (error) {
+        dialog_error (error);
+        g_free (error);
+        return;
+    }
+    dialog_info (_("Certificate renewed. A new certificate with a fresh "
+                   "keypair has been added to the database alongside the "
+                   "original."));
+    ca_refresh_model_callback ();
+}
+
 /* Response callback for the certificate-renewal confirmation dialog.
  * cert_id is stored as a heap-allocated guint64 in user_data. */
 static void
@@ -243,18 +258,8 @@ __ca_renew_response (GtkDialog *dialog,
     if (response_id != GTK_RESPONSE_YES)
         return;
 
-    guint64 new_cert_id = 0;
-    gchar *err = cert_renewal_renew (cert_id, &new_cert_id);
-    if (err) {
-        dialog_error (err);
-        g_free (err);
-        return;
-    }
-
-    dialog_info (_("Certificate renewed. A new certificate with a fresh "
-                   "keypair has been added to the database alongside the "
-                   "original."));
-    ca_refresh_model_callback ();
+    cert_renewal_renew (cert_id, NULL,
+                        __ca_renew_done_cb, NULL);
 }
 
 /* Response callback for the single-certificate-revoke confirmation dialog.
@@ -1540,13 +1545,32 @@ void __ca_export_private_pkcs8_cv (GnomintCertRow *row, gint type)
 }
 
 
+static void
+__ca_export_private_pem_done_cb (const gchar *error_msg, gpointer user_data)
+{
+	(void) user_data;
+	if (error_msg) {
+		dialog_error ((gchar *) error_msg);
+	} else {
+		GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+		GtkDialog *info = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
+		                                                      GTK_DIALOG_DESTROY_WITH_PARENT,
+		                                                      GTK_MESSAGE_INFO,
+		                                                      GTK_BUTTONS_CLOSE,
+		                                                      "%s",
+		                                                      _("Private key exported successfully")));
+		g_signal_connect (info, "response",
+		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+		gtk_window_present (GTK_WINDOW (info));
+	}
+}
+
 void __ca_export_private_pem_cv (GnomintCertRow *row, gint type)
 {
 	GObject *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
 	guint64 id;
-        gchar * error_msg = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 
@@ -1568,23 +1592,9 @@ void __ca_export_private_pem_cv (GnomintCertRow *row, gint type)
 
 	id = gnomint_cert_row_get_id (row);
 
-        error_msg = export_private_pem (id, type, filename);
-        g_free (filename);
-
-        if (error_msg) {
-                dialog_error (error_msg);
-        } else {
-                dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-                                                            GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                            GTK_MESSAGE_INFO,
-                                                            GTK_BUTTONS_CLOSE,
-                                                            "%s",
-                                                            _("Private key exported successfully")));
-                g_signal_connect (dialog, "response",
-                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                gtk_window_present (GTK_WINDOW (dialog));
-        }
-
+	export_private_pem (id, type, filename,
+	                    __ca_export_private_pem_done_cb, NULL);
+	g_free (filename);
 }
 
 

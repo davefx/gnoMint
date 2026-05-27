@@ -42,8 +42,21 @@
 #define PKEY_MANAGE_ENCRYPTED_PKCS8_HEADER "-----BEGIN ENCRYPTED PRIVATE KEY-----"
 #define PKEY_MANAGE_UNCRYPTED_PKCS8_HEADER "-----BEGIN PRIVATE KEY-----"
 
+typedef void (*__PkeyExternalFilePasswordCallback)(gchar *password, gpointer user_data);
+typedef void (*__PkeyRetrieveFromFileCallback)(gchar *pem_pkey, gchar *final_filename,
+                                                gboolean save_new_filename, gpointer user_data);
+
+#ifdef GNOMINTCLI
 gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn);
 gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem);
+#else
+void __pkey_manage_ask_external_file_password (const gchar *cert_dn,
+                                               __PkeyExternalFilePasswordCallback cb,
+                                               gpointer user_data);
+void __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem,
+                                __PkeyRetrieveFromFileCallback cb,
+                                gpointer user_data);
+#endif
 gchar * __pkey_manage_to_hex (const guchar *buffer, size_t len);
 guchar * __pkey_manage_from_hex (const gchar *input);
 guchar *__pkey_manage_create_key(const gchar *password);
@@ -57,17 +70,46 @@ gchar * __pkey_manage_aes_decrypt_aux (const gchar *string, const gchar *passwor
 // CALLBACKS
 G_MODULE_EXPORT gboolean pkey_manage_filechooser_file_set_cb (GtkWidget *widget, gpointer user_data);
 
-gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
+typedef struct {
+	GtkBuilder *dialog_gtkb;
+	GObject *password_widget;
+	gchar *message;
+	__PkeyExternalFilePasswordCallback cb;
+	gpointer user_data;
+} __AskExternalFilePasswordCtx;
+
+static void
+__pkey_manage_ask_external_file_password_response (GtkDialog *dialog,
+                                                    gint response_id,
+                                                    gpointer data)
 {
-	gchar *password;
+	__AskExternalFilePasswordCtx *ctx = (__AskExternalFilePasswordCtx *) data;
+	gchar *password = NULL;
+
+	if (response_id == GTK_RESPONSE_OK || response_id == GTK_RESPONSE_ACCEPT ||
+	    response_id == GTK_RESPONSE_YES || response_id > 0) {
+		password = g_strdup ((gchar *) gtk_editable_get_text (GTK_EDITABLE (ctx->password_widget)));
+	}
+
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+	g_free (ctx->message);
+
+	ctx->cb (password, ctx->user_data);
+	g_free (ctx);
+}
+
+void __pkey_manage_ask_external_file_password (const gchar *cert_dn,
+                                               __PkeyExternalFilePasswordCallback cb,
+                                               gpointer user_data)
+{
 	GObject * widget = NULL, * password_widget = NULL, *remember_password_widget = NULL;
 	GtkBuilder * dialog_gtkb = NULL;
-
-	gint response = 0;
 	gchar *message = NULL;
+	__AskExternalFilePasswordCtx *ctx;
 
 	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
+	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_db_password_dialog.ui", NULL),
 				   NULL);
 
@@ -83,26 +125,19 @@ gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 	gtk_label_set_text (GTK_LABEL(widget), message);
 
 	gtk_widget_grab_focus (GTK_WIDGET(password_widget));
-	
-	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-	response = compat_dialog_run(GTK_DIALOG(widget)); 
-	
-	if (!response) {
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		g_free (message);
-		return NULL;
-	} else {
-		password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
-	}
-	
-	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-	g_object_unref (G_OBJECT(dialog_gtkb));
 
-	g_free (message);
+	ctx = g_new0 (__AskExternalFilePasswordCtx, 1);
+	ctx->dialog_gtkb = dialog_gtkb;
+	ctx->password_widget = password_widget;
+	ctx->message = message;
+	ctx->cb = cb;
+	ctx->user_data = user_data;
 
-	return password;
+	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__pkey_manage_ask_external_file_password_response), ctx);
+	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_present (GTK_WINDOW (widget));
 }
 
 
@@ -139,6 +174,8 @@ gchar * __pkey_manage_ask_external_file_password (const gchar *cert_dn)
 
 #endif
 
+#ifdef GNOMINTCLI
+
 gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 {
 	gsize file_length = 0;
@@ -155,7 +192,7 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 	gint tls_error = 0;
 	gchar *password = NULL;
 
-	TlsCert *cert = tls_parse_cert_pem (cert_pem);		
+	TlsCert *cert = tls_parse_cert_pem (cert_pem);
 
 	do {
 		if (g_file_test(file_name, G_FILE_TEST_EXISTS)) {
@@ -163,96 +200,47 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 			if (gc) {
 				g_io_channel_read_to_end (gc, &file_contents, &file_length, &error);
 				g_io_channel_shutdown (gc, TRUE, NULL);
-				
+
 				do {
 					pem_pkey = tls_load_pkcs8_private_key (file_contents, password, cert->key_id, &tls_error);
-					
+
 					if (tls_error == TLS_INVALID_PASSWORD) {
 						if (password)
 							dialog_error (_("The given password doesn't match with the one used while crypting the file."));
 
 						// We ask for a password
 						password = __pkey_manage_ask_external_file_password (cert->dn);
-						
+
 						if (! password)
 							cancel = TRUE;
-					} 
-					
+					}
+
 				} while (tls_error == TLS_INVALID_PASSWORD && ! cancel);
-				
+
 				g_free (password);
-				
+
 				if (! pem_pkey) {
 					if (tls_error == TLS_NON_MATCHING_PRIVATE_KEY) {
-						// The file could be opened, but it didn't contain any recognized private key
 						dialog_error (_("The file designated in database contains a private key, but it "
 								   "is not the private key corresponding to the certificate."));
 					} else {
-						// The file could be opened, but it didn't contain any recognized private key
 						dialog_error (_("The file designated in database doesn't contain any recognized private key."));
 					}
 				}
 			} else {
-				// The file cannot be opened
 				dialog_error (_("The file designated in database couldn't be opened."));
-				
 			}
 		} else {
-			// The file doesn't exist
 			dialog_error (_("The file designated in database doesn't exist."));
-			
 		}
-		
+
 		if (! pem_pkey && ! cancel) {
-
-                        #ifndef GNOMINTCLI
-			// Show file open dialog
-			
-			GObject * widget = NULL, * filepath_widget = NULL, *remember_filepath_widget = NULL;
-			GtkBuilder * dialog_gtkb = NULL;
-			gint response = 0;
-
-			dialog_gtkb = gtk_builder_new();
-			gtk_builder_add_from_file (dialog_gtkb, 
-						   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_pkey_dialog.ui", NULL),
-						   NULL);
-			
-			filepath_widget = gtk_builder_get_object (dialog_gtkb, "pkey_filechooser");
-			
-			remember_filepath_widget = gtk_builder_get_object (dialog_gtkb, "save_filename_checkbutton");
-			g_object_set (G_OBJECT(remember_filepath_widget), "visible", FALSE, NULL);
-			
-			gtk_widget_grab_focus (GTK_WIDGET(filepath_widget));
-			{ GFile *_f = g_file_new_for_path(file_name); gtk_file_chooser_set_file(GTK_FILE_CHOOSER(filepath_widget), _f, NULL); g_object_unref(_f); }; 
-			g_object_set_data (G_OBJECT(filepath_widget), "save_filename_checkbutton", remember_filepath_widget);
-
-			widget = gtk_builder_get_object (dialog_gtkb, "cert_dn_label");
-			gtk_label_set_text (GTK_LABEL(widget), cert->dn);
-			
-			widget = gtk_builder_get_object (dialog_gtkb, "get_pkey_dialog");
-			response = compat_dialog_run(GTK_DIALOG(widget)); 
-			
-			if (! response) {
-				cancel = TRUE;
-			} else {
-				g_free (file_name);
-				file_name = g_strdup ((gchar *) g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(filepath_widget))));
-				save_new_filename = gtk_check_button_get_active (GTK_CHECK_BUTTON(remember_filepath_widget));
-			}
-			
-			widget = gtk_builder_get_object (dialog_gtkb, "get_pkey_dialog");
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-			g_object_unref (G_OBJECT(dialog_gtkb));
-
-                        #else
                         cancel = TRUE;
-                        #endif
-
 		}
 	} while (! pem_pkey && ! cancel);
 
 	tls_cert_free (cert);
-	g_free (file_contents);					
+	g_free (file_contents);
 	if (error)
 		g_error_free (error);
 
@@ -265,17 +253,250 @@ gchar * __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem)
 		g_free (*fn);
 		(* fn) = file_name;
 	}
-	
-	return pem_pkey;						
+
+	return pem_pkey;
 }
 
+#else /* GUI async __pkey_retrieve_from_file */
+
+typedef struct {
+	gchar *file_name;
+	gchar *file_contents;
+	gsize file_length;
+	gchar *cert_pem;
+	TlsCert *cert;
+	gchar *password;
+	gboolean save_new_filename;
+	__PkeyRetrieveFromFileCallback cb;
+	gpointer user_data;
+} __RetrieveFromFileCtx;
+
+static void __pkey_retrieve_try_file (__RetrieveFromFileCtx *ctx);
+
+static void
+__pkey_retrieve_external_password_cb (gchar *password, gpointer data)
+{
+	__RetrieveFromFileCtx *ctx = (__RetrieveFromFileCtx *) data;
+	gchar *pem_pkey = NULL;
+	gint tls_error = 0;
+
+	if (!password) {
+		/* User cancelled the password dialog */
+		tls_cert_free (ctx->cert);
+		g_free (ctx->file_contents);
+		g_free (ctx->file_name);
+		g_free (ctx->password);
+		ctx->cb (NULL, NULL, FALSE, ctx->user_data);
+		g_free (ctx);
+		return;
+	}
+
+	g_free (ctx->password);
+	ctx->password = password;
+
+	pem_pkey = tls_load_pkcs8_private_key (ctx->file_contents, ctx->password,
+	                                        ctx->cert->key_id, &tls_error);
+
+	if (tls_error == TLS_INVALID_PASSWORD) {
+		dialog_error (_("The given password doesn't match with the one used while crypting the file."));
+		/* Re-ask for password */
+		__pkey_manage_ask_external_file_password (ctx->cert->dn,
+		                                          __pkey_retrieve_external_password_cb, ctx);
+		return;
+	}
+
+	g_free (ctx->password);
+	ctx->password = NULL;
+
+	if (!pem_pkey) {
+		if (tls_error == TLS_NON_MATCHING_PRIVATE_KEY) {
+			dialog_error (_("The file designated in database contains a private key, but it "
+					   "is not the private key corresponding to the certificate."));
+		} else {
+			dialog_error (_("The file designated in database doesn't contain any recognized private key."));
+		}
+		/* Show file chooser to pick a different file */
+		g_free (ctx->file_contents);
+		ctx->file_contents = NULL;
+		__pkey_retrieve_try_file (ctx);
+		return;
+	}
+
+	/* Success */
+	{
+		gchar *final_filename = g_strdup (ctx->file_name);
+		gboolean save = ctx->save_new_filename;
+		tls_cert_free (ctx->cert);
+		g_free (ctx->file_contents);
+		g_free (ctx->file_name);
+		ctx->cb (pem_pkey, final_filename, save, ctx->user_data);
+		g_free (ctx);
+	}
+}
+
+static void
+__pkey_retrieve_filechooser_response (GtkDialog *dialog, gint response_id, gpointer data)
+{
+	__RetrieveFromFileCtx *ctx = (__RetrieveFromFileCtx *) data;
+	GtkBuilder *dialog_gtkb = g_object_get_data (G_OBJECT (dialog), "dialog_gtkb");
+	GObject *filepath_widget = gtk_builder_get_object (dialog_gtkb, "pkey_filechooser");
+	GObject *remember_filepath_widget = gtk_builder_get_object (dialog_gtkb, "save_filename_checkbutton");
+
+	if (response_id != GTK_RESPONSE_OK && response_id != GTK_RESPONSE_ACCEPT &&
+	    response_id != GTK_RESPONSE_YES && response_id <= 0) {
+		/* Cancel */
+		gtk_window_destroy (GTK_WINDOW (dialog));
+		g_object_unref (G_OBJECT (dialog_gtkb));
+		tls_cert_free (ctx->cert);
+		g_free (ctx->file_contents);
+		g_free (ctx->file_name);
+		g_free (ctx->password);
+		ctx->cb (NULL, NULL, FALSE, ctx->user_data);
+		g_free (ctx);
+		return;
+	}
+
+	g_free (ctx->file_name);
+	ctx->file_name = g_strdup ((gchar *) g_file_get_path (
+		gtk_file_chooser_get_file (GTK_FILE_CHOOSER (filepath_widget))));
+	ctx->save_new_filename = gtk_check_button_get_active (
+		GTK_CHECK_BUTTON (remember_filepath_widget));
+
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	g_object_unref (G_OBJECT (dialog_gtkb));
+
+	/* Retry with the new file */
+	g_free (ctx->file_contents);
+	ctx->file_contents = NULL;
+	g_free (ctx->password);
+	ctx->password = NULL;
+	__pkey_retrieve_try_file (ctx);
+}
+
+static void
+__pkey_retrieve_show_filechooser (__RetrieveFromFileCtx *ctx)
+{
+	GObject *widget = NULL, *filepath_widget = NULL, *remember_filepath_widget = NULL;
+	GtkBuilder *dialog_gtkb = NULL;
+
+	dialog_gtkb = gtk_builder_new ();
+	gtk_builder_add_from_file (dialog_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_pkey_dialog.ui", NULL),
+				   NULL);
+
+	filepath_widget = gtk_builder_get_object (dialog_gtkb, "pkey_filechooser");
+
+	remember_filepath_widget = gtk_builder_get_object (dialog_gtkb, "save_filename_checkbutton");
+	g_object_set (G_OBJECT (remember_filepath_widget), "visible", FALSE, NULL);
+
+	gtk_widget_grab_focus (GTK_WIDGET (filepath_widget));
+	{
+		GFile *_f = g_file_new_for_path (ctx->file_name);
+		gtk_file_chooser_set_file (GTK_FILE_CHOOSER (filepath_widget), _f, NULL);
+		g_object_unref (_f);
+	}
+	g_object_set_data (G_OBJECT (filepath_widget), "save_filename_checkbutton",
+	                   remember_filepath_widget);
+
+	widget = gtk_builder_get_object (dialog_gtkb, "cert_dn_label");
+	gtk_label_set_text (GTK_LABEL (widget), ctx->cert->dn);
+
+	widget = gtk_builder_get_object (dialog_gtkb, "get_pkey_dialog");
+	g_object_set_data (G_OBJECT (widget), "dialog_gtkb", dialog_gtkb);
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__pkey_retrieve_filechooser_response), ctx);
+	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_present (GTK_WINDOW (widget));
+}
+
+static void
+__pkey_retrieve_try_file (__RetrieveFromFileCtx *ctx)
+{
+	GError *error = NULL;
+	gchar *pem_pkey = NULL;
+	gint tls_error = 0;
+
+	if (g_file_test (ctx->file_name, G_FILE_TEST_EXISTS)) {
+		GIOChannel *gc = g_io_channel_new_file (ctx->file_name, "r", &error);
+		if (gc) {
+			g_io_channel_read_to_end (gc, &ctx->file_contents, &ctx->file_length, &error);
+			g_io_channel_shutdown (gc, TRUE, NULL);
+
+			pem_pkey = tls_load_pkcs8_private_key (ctx->file_contents, NULL,
+			                                        ctx->cert->key_id, &tls_error);
+
+			if (tls_error == TLS_INVALID_PASSWORD) {
+				/* Need password -- ask asynchronously */
+				__pkey_manage_ask_external_file_password (ctx->cert->dn,
+				                                          __pkey_retrieve_external_password_cb, ctx);
+				return;
+			}
+
+			if (!pem_pkey) {
+				if (tls_error == TLS_NON_MATCHING_PRIVATE_KEY) {
+					dialog_error (_("The file designated in database contains a private key, but it "
+							   "is not the private key corresponding to the certificate."));
+				} else {
+					dialog_error (_("The file designated in database doesn't contain any recognized private key."));
+				}
+				/* Show file chooser */
+				g_free (ctx->file_contents);
+				ctx->file_contents = NULL;
+				__pkey_retrieve_show_filechooser (ctx);
+				return;
+			}
+
+			/* Success */
+			{
+				gchar *final_filename = g_strdup (ctx->file_name);
+				gboolean save = ctx->save_new_filename;
+				tls_cert_free (ctx->cert);
+				g_free (ctx->file_contents);
+				g_free (ctx->file_name);
+				ctx->cb (pem_pkey, final_filename, save, ctx->user_data);
+				g_free (ctx);
+			}
+			return;
+		} else {
+			dialog_error (_("The file designated in database couldn't be opened."));
+		}
+	} else {
+		dialog_error (_("The file designated in database doesn't exist."));
+	}
+
+	if (error)
+		g_error_free (error);
+
+	/* File didn't exist or couldn't be opened -- show file chooser */
+	__pkey_retrieve_show_filechooser (ctx);
+}
+
+void __pkey_retrieve_from_file (gchar **fn, gchar *cert_pem,
+                                __PkeyRetrieveFromFileCallback cb,
+                                gpointer user_data)
+{
+	__RetrieveFromFileCtx *ctx = g_new0 (__RetrieveFromFileCtx, 1);
+
+	ctx->file_name = g_strdup (*fn);
+	ctx->cert_pem = cert_pem;
+	ctx->cert = tls_parse_cert_pem (cert_pem);
+	ctx->cb = cb;
+	ctx->user_data = user_data;
+
+	__pkey_retrieve_try_file (ctx);
+}
+
+#endif /* GNOMINTCLI */
+
+
+#ifdef GNOMINTCLI
 
 PkeyManageData * pkey_manage_get_certificate_pkey (guint64 id)
 {
 	PkeyManageData *res = NULL;
-	
+
 	res = g_new0 (PkeyManageData, 1);
-	
+
 	if (ca_file_get_pkey_in_db_from_id (CA_FILE_ELEMENT_TYPE_CERT, id)) {
 		res->pkey_data = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
 		res->is_in_db = TRUE;
@@ -288,7 +509,6 @@ PkeyManageData * pkey_manage_get_certificate_pkey (guint64 id)
 		gchar *file_contents = __pkey_retrieve_from_file (&file_name, cert_pem);
 
 		if (strcmp (file_name, old_filename)) {
-			/* The private key location has changed, and the user wants us to remember it */
 			ca_file_set_pkey_field_for_id (CA_FILE_ELEMENT_TYPE_CERT, file_name, id);
 		}
 
@@ -308,6 +528,71 @@ PkeyManageData * pkey_manage_get_certificate_pkey (guint64 id)
 
 	return res;
 }
+
+#else /* GUI async pkey_manage_get_certificate_pkey */
+
+typedef struct {
+	guint64 id;
+	gchar *old_filename;
+	PkeyManageGetPkeyCallback cb;
+	gpointer user_data;
+} __GetCertPkeyCtx;
+
+static void
+__get_cert_pkey_retrieve_cb (gchar *pem_pkey, gchar *final_filename,
+                             gboolean save_new_filename, gpointer data)
+{
+	__GetCertPkeyCtx *ctx = (__GetCertPkeyCtx *) data;
+	PkeyManageData *res = NULL;
+
+	if (pem_pkey) {
+		res = g_new0 (PkeyManageData, 1);
+		res->pkey_data = pem_pkey;
+		res->is_in_db = FALSE;
+		if (final_filename) {
+			res->external_file = final_filename;
+			if (save_new_filename && strcmp (final_filename, ctx->old_filename)) {
+				ca_file_set_pkey_field_for_id (CA_FILE_ELEMENT_TYPE_CERT,
+				                               final_filename, ctx->id);
+			}
+		}
+	} else {
+		g_free (final_filename);
+	}
+
+	g_free (ctx->old_filename);
+	ctx->cb (res, ctx->user_data);
+	g_free (ctx);
+}
+
+void pkey_manage_get_certificate_pkey (guint64 id,
+                                       PkeyManageGetPkeyCallback cb,
+                                       gpointer user_data)
+{
+	if (ca_file_get_pkey_in_db_from_id (CA_FILE_ELEMENT_TYPE_CERT, id)) {
+		PkeyManageData *res = g_new0 (PkeyManageData, 1);
+		res->pkey_data = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		res->is_in_db = TRUE;
+		res->is_ciphered_with_db_pwd = ca_file_is_password_protected();
+		cb (res, user_data);
+	} else {
+		gchar *cert_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		gchar *file_name = ca_file_get_pkey_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+
+		__GetCertPkeyCtx *ctx = g_new0 (__GetCertPkeyCtx, 1);
+		ctx->id = id;
+		ctx->old_filename = g_strdup (file_name);
+		ctx->cb = cb;
+		ctx->user_data = user_data;
+
+		__pkey_retrieve_from_file (&file_name, cert_pem,
+		                           __get_cert_pkey_retrieve_cb, ctx);
+		g_free (file_name);
+		g_free (cert_pem);
+	}
+}
+
+#endif /* GNOMINTCLI */
 
 PkeyManageData * pkey_manage_get_csr_pkey (guint64 id)
 {
@@ -710,76 +995,100 @@ void pkey_manage_crypt_auto (gchar *password,
 }
 
 #ifndef GNOMINTCLI
-gchar * pkey_manage_ask_password ()
+
+typedef struct {
+	GtkBuilder *dialog_gtkb;
+	GObject *password_widget;
+	GObject *remember_password_widget;
+	PkeyManagePasswordCallback cb;
+	gpointer user_data;
+} __AskPasswordCtx;
+
+static void
+__pkey_manage_ask_password_response (GtkDialog *dialog,
+                                      gint response_id,
+                                      gpointer data)
 {
+	__AskPasswordCtx *ctx = (__AskPasswordCtx *) data;
 	gchar *password = NULL;
-	gboolean is_key_ok;
-	gboolean remember = 0;
-	GObject * widget = NULL, * password_widget = NULL, *remember_password_widget = NULL;
-	GtkBuilder * dialog_gtkb = NULL;
-	gint response = 0;
+	gboolean remember = FALSE;
 
-	if (! ca_file_is_password_protected())
-		return NULL;
-	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
-				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_db_password_dialog.ui", NULL),
-				   NULL);
-	
-	password_widget = gtk_builder_get_object (dialog_gtkb, "cadb_password_entry");
-	remember_password_widget = gtk_builder_get_object (dialog_gtkb, "remember_password_checkbutton");
-	widget = gtk_builder_get_object (dialog_gtkb, "cadb_password_dialog_ok_button");
-
-	is_key_ok = FALSE;
-
-	if (saved_password && ca_file_check_password (saved_password)) {
-		is_key_ok = TRUE;
-		password = g_strdup (saved_password);
+	if (response_id != GTK_RESPONSE_OK && response_id != GTK_RESPONSE_ACCEPT &&
+	    response_id != GTK_RESPONSE_YES && response_id <= 0) {
+		/* Cancel */
+		gtk_window_destroy (GTK_WINDOW (dialog));
+		g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+		ctx->cb (NULL, ctx->user_data);
+		g_free (ctx);
+		return;
 	}
 
-	while (! is_key_ok) {
-		gtk_widget_grab_focus (GTK_WIDGET(password_widget));
+	password = g_strdup ((gchar *) gtk_editable_get_text (GTK_EDITABLE (ctx->password_widget)));
+	remember = gtk_check_button_get_active (GTK_CHECK_BUTTON (ctx->remember_password_widget));
 
-		if (password) {
-			g_free (password);
-			password = NULL;
-		}
-			
-
-		widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-		response = compat_dialog_run(GTK_DIALOG(widget)); 
-	
-		if (!response) {
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-			g_object_unref (G_OBJECT(dialog_gtkb));
-			return NULL;
-		} else {
-			password = g_strdup ((gchar *) gtk_editable_get_text(GTK_EDITABLE(password_widget)));
-			remember = gtk_check_button_get_active (GTK_CHECK_BUTTON(remember_password_widget));
-		}
-
-		is_key_ok = ca_file_check_password (password);
-		
-		if (! is_key_ok) {
-			dialog_error (_("The given password doesn't match the one used in the database"));
-		}
-
+	if (! ca_file_check_password (password)) {
+		dialog_error (_("The given password doesn't match the one used in the database"));
+		g_free (password);
+		/* Clear and re-present the dialog for another attempt */
+		gtk_editable_set_text (GTK_EDITABLE (ctx->password_widget), "");
+		gtk_widget_grab_focus (GTK_WIDGET (ctx->password_widget));
+		return;
 	}
 
+	/* Password correct */
 	if (remember) {
 		if (saved_password)
 			g_free (saved_password);
-
-		saved_password = g_strdup(password);
+		saved_password = g_strdup (password);
 	}
 
-	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-	g_object_unref (G_OBJECT(dialog_gtkb));
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	g_object_unref (G_OBJECT (ctx->dialog_gtkb));
 
-
-	return password;
+	ctx->cb (password, ctx->user_data);
+	g_free (ctx);
 }
+
+void pkey_manage_ask_password (PkeyManagePasswordCallback cb, gpointer user_data)
+{
+	GObject * widget = NULL, * password_widget = NULL, *remember_password_widget = NULL;
+	GtkBuilder * dialog_gtkb = NULL;
+	__AskPasswordCtx *ctx;
+
+	if (! ca_file_is_password_protected()) {
+		cb (NULL, user_data);
+		return;
+	}
+
+	if (saved_password && ca_file_check_password (saved_password)) {
+		cb (g_strdup (saved_password), user_data);
+		return;
+	}
+
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "get_db_password_dialog.ui", NULL),
+				   NULL);
+
+	password_widget = gtk_builder_get_object (dialog_gtkb, "cadb_password_entry");
+	remember_password_widget = gtk_builder_get_object (dialog_gtkb, "remember_password_checkbutton");
+
+	gtk_widget_grab_focus (GTK_WIDGET (password_widget));
+
+	ctx = g_new0 (__AskPasswordCtx, 1);
+	ctx->dialog_gtkb = dialog_gtkb;
+	ctx->password_widget = password_widget;
+	ctx->remember_password_widget = remember_password_widget;
+	ctx->cb = cb;
+	ctx->user_data = user_data;
+
+	widget = gtk_builder_get_object (dialog_gtkb, "get_db_password_dialog");
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__pkey_manage_ask_password_response), ctx);
+	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_present (GTK_WINDOW (widget));
+}
+
 #else
 gchar * pkey_manage_ask_password ()
 {
@@ -824,10 +1133,27 @@ gchar * pkey_manage_ask_password ()
 
 gchar * pkey_manage_crypt (const gchar *pem_private_key, const gchar *dn)
 {
- 	gchar *res; 	
-	gchar *password;
-	
-	password = pkey_manage_ask_password();
+	gchar *res;
+	gchar *password = NULL;
+
+	if (! ca_file_is_password_protected())
+		return pkey_manage_crypt_w_pwd (pem_private_key, dn, "");
+
+	/* Use the cached password if available. In the CLI path,
+	 * pkey_manage_ask_password() is called which may prompt.
+	 * In the GUI path, the password should already be cached
+	 * by a prior pkey_manage_ask_password() call. */
+	if (saved_password && ca_file_check_password (saved_password)) {
+		password = g_strdup (saved_password);
+	}
+#ifdef GNOMINTCLI
+	else {
+		password = pkey_manage_ask_password ();
+	}
+#endif
+
+	if (!password)
+		return NULL;
 
 	res = pkey_manage_crypt_w_pwd (pem_private_key, dn, password);
 
@@ -853,17 +1179,19 @@ gchar * pkey_manage_crypt_w_pwd (const gchar *pem_private_key, const gchar *dn, 
 	return res;
 }
 
+#ifdef GNOMINTCLI
+
 gchar * pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn)
 {
- 	gchar *res = NULL; 	
+	gchar *res = NULL;
 	gchar *password = NULL;
-	
+
 	if (pem_private_key->is_in_db) {
                 if (pem_private_key->is_ciphered_with_db_pwd) {
                         password = pkey_manage_ask_password();
-                        
+
                         if (password) {
-                                res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);		
+                                res = pkey_manage_uncrypt_w_pwd (pem_private_key, dn, password);
                                 g_free (password);
                         }
 
@@ -875,6 +1203,53 @@ gchar * pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn)
 	}
 	return res;
 }
+
+#else /* GUI async pkey_manage_uncrypt */
+
+typedef struct {
+	PkeyManageData *pem_private_key;
+	gchar *dn;
+	PkeyManageUncryptCallback cb;
+	gpointer user_data;
+} __UncryptCtx;
+
+static void
+__pkey_manage_uncrypt_password_cb (gchar *password, gpointer data)
+{
+	__UncryptCtx *ctx = (__UncryptCtx *) data;
+	gchar *res = NULL;
+
+	if (password) {
+		res = pkey_manage_uncrypt_w_pwd (ctx->pem_private_key, ctx->dn, password);
+		g_free (password);
+	}
+
+	g_free (ctx->dn);
+	ctx->cb (res, ctx->user_data);
+	g_free (ctx);
+}
+
+void pkey_manage_uncrypt (PkeyManageData *pem_private_key, const gchar *dn,
+                          PkeyManageUncryptCallback cb, gpointer user_data)
+{
+	if (pem_private_key->is_in_db) {
+		if (pem_private_key->is_ciphered_with_db_pwd) {
+			__UncryptCtx *ctx = g_new0 (__UncryptCtx, 1);
+			ctx->pem_private_key = pem_private_key;
+			ctx->dn = g_strdup (dn);
+			ctx->cb = cb;
+			ctx->user_data = user_data;
+
+			pkey_manage_ask_password (__pkey_manage_uncrypt_password_cb, ctx);
+		} else {
+			cb (g_strdup (pem_private_key->pkey_data), user_data);
+		}
+	} else {
+		cb (g_strdup (pem_private_key->pkey_data), user_data);
+	}
+}
+
+#endif /* GNOMINTCLI */
 
 gchar * pkey_manage_uncrypt_w_pwd (PkeyManageData *pem_private_key, const gchar *dn, const gchar *pwd)
 {

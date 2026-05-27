@@ -33,13 +33,87 @@
 #include "ca_file.h"
 
 
+#ifndef GNOMINTCLI
+typedef void (*__ImportPasswordCallback)(gchar *password, gpointer user_data);
+#endif
+
 gchar * __import_ask_password (const gchar *crypted_part_description);
 gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id);
 gint __import_cert (gnutls_x509_crt_t *cert, gchar ** cert_dn, guint64 *id);
 
+#ifndef GNOMINTCLI
+
+typedef struct {
+	GtkBuilder *dialog_gtkb;
+	GObject *password_widget;
+	__ImportPasswordCallback cb;
+	gpointer user_data;
+} __ImportAskPasswordCtx;
+
+static void
+__import_ask_password_response (GtkDialog *dialog, gint response_id, gpointer data)
+{
+	__ImportAskPasswordCtx *ctx = (__ImportAskPasswordCtx *) data;
+	gchar *password = NULL;
+
+	if (response_id == GTK_RESPONSE_OK || response_id == GTK_RESPONSE_ACCEPT ||
+	    response_id == GTK_RESPONSE_YES || response_id > 0) {
+		password = g_strdup ((gchar *) gtk_editable_get_text (GTK_EDITABLE (ctx->password_widget)));
+	}
+
+	gtk_window_destroy (GTK_WINDOW (dialog));
+	g_object_unref (G_OBJECT (ctx->dialog_gtkb));
+
+	ctx->cb (password, ctx->user_data);
+	g_free (ctx);
+}
+
+G_GNUC_UNUSED static void
+__import_ask_password_async (const gchar *crypted_part_description,
+                             __ImportPasswordCallback cb, gpointer user_data)
+{
+	GObject * widget = NULL, * password_widget = NULL, *description_widget = NULL;
+	GtkBuilder * dialog_gtkb = NULL;
+	gchar     * label = NULL;
+	__ImportAskPasswordCtx *ctx;
+
+	dialog_gtkb = gtk_builder_new();
+	gtk_builder_add_from_file (dialog_gtkb,
+				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_password_dialog.ui", NULL),
+				   NULL);
+
+	password_widget = gtk_builder_get_object (dialog_gtkb, "import_password_entry");
+	description_widget = gtk_builder_get_object (dialog_gtkb, "import_crypted_part_description");
+
+	label = g_strdup_printf ("<small><i>%s</i></small>", crypted_part_description);
+	gtk_label_set_markup (GTK_LABEL(description_widget), (const gchar *) label);
+	g_free (label);
+
+	gtk_widget_grab_focus (GTK_WIDGET(password_widget));
+
+	ctx = g_new0 (__ImportAskPasswordCtx, 1);
+	ctx->dialog_gtkb = dialog_gtkb;
+	ctx->password_widget = password_widget;
+	ctx->cb = cb;
+	ctx->user_data = user_data;
+
+	widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__import_ask_password_response), ctx);
+	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_present (GTK_WINDOW (widget));
+}
+
+#endif
+
+/* Synchronous version kept for CLI and for import flows that
+ * still use a synchronous loop (import_openssl_private_key etc.) */
 gchar * __import_ask_password (const gchar *crypted_part_description)
 {
 #ifndef GNOMINTCLI
+	/* For the synchronous callers in import_pkcs8/import_pkcs12/import_openssl_private_key
+	 * we still use compat_dialog_run.  Converting all of those import loops to async
+	 * is a separate step. */
 	gchar *password;
 	GObject * widget = NULL, * password_widget = NULL, *description_widget = NULL;
 	GtkBuilder * dialog_gtkb = NULL;
@@ -50,7 +124,7 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "import_password_dialog.ui", NULL),
 				   NULL);
-	
+
 	password_widget = gtk_builder_get_object (dialog_gtkb, "import_password_entry");
 	description_widget = gtk_builder_get_object (dialog_gtkb, "import_crypted_part_description");
 
@@ -60,8 +134,8 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 
         gtk_widget_grab_focus (GTK_WIDGET(password_widget));
         widget = gtk_builder_get_object (dialog_gtkb, "import_password_dialog");
-        response = compat_dialog_run(GTK_DIALOG(widget)); 
-	
+        response = compat_dialog_run(GTK_DIALOG(widget));
+
         if (!response) {
                 gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
                 g_object_unref (G_OBJECT(dialog_gtkb));
@@ -87,7 +161,7 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	prompt = g_strdup_printf (_("Please introduce password for `%s'"), crypted_part_description);
 	password = dialog_ask_for_password (prompt);
 	g_free (prompt);
-	
+
 	return password;
 #endif
 }

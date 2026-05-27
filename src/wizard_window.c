@@ -283,6 +283,18 @@ static guint64 __wizard_create_csr (const gchar *server_name, WizardCertType cer
     return csr_id;
 }
 
+static void
+__wizard_sign_csr_done_cb (const gchar *error, gpointer user_data)
+{
+    (void) user_data;
+    if (error) {
+        dialog_error (g_strdup_printf (_("Failed to sign certificate:\n%s"), error));
+        return;
+    }
+    dialog_info (_("Certificate generated successfully!"));
+    dialog_refresh_list();
+}
+
 // Button click handlers
 static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_data)
 {
@@ -341,25 +353,12 @@ static void on_wizard_generate_button_clicked (GtkButton *button, gpointer user_
         cert_creation_data->key_encipherment = TRUE;
     }
     
-    // Sign the CSR
-    const gchar *error = new_cert_sign_csr (csr_id, ca_id, cert_creation_data);
-    
-    if (error) {
-        dialog_error (g_strdup_printf (_("Failed to sign certificate:\n%s"), error));
-        g_free (cert_creation_data);
-        return;
-    }
-    
-    g_free (cert_creation_data);
-    
-    // Show success message
-    dialog_info (_("Certificate generated successfully!"));
-    
-    // Refresh the main list to show the new certificate
-    dialog_refresh_list();
-    
-    // Close dialog
+    // Close dialog before async sign
     gtk_window_destroy(GTK_WINDOW(dialog));
+
+    // Sign the CSR (async in GUI)
+    new_cert_sign_csr (csr_id, ca_id, cert_creation_data,
+                       __wizard_sign_csr_done_cb, NULL);
 }
 
 static void on_wizard_cancel_button_clicked (GtkButton *button, gpointer user_data)

@@ -261,8 +261,28 @@ G_MODULE_EXPORT void on_new_ca_pwd_protect_radiobutton_toggled (GtkCheckButton *
 }
 
 
+static void
+__new_ca_commit_password_cb (gchar *password, gpointer user_data)
+{
+	TlsCreationData *ca_creation_data = (TlsCreationData *) user_data;
+	GtkWindow *window;
+
+	if (!password) {
+		/* The user hasn't provided a valid password */
+		tls_creation_data_free (ca_creation_data);
+		return;
+	}
+
+	ca_creation_data->password = password;
+
+	window = GTK_WINDOW(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window"));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
+
+	creation_process_window_ca_display (ca_creation_data);
+}
+
 G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
-			       gpointer user_data) 
+			       gpointer user_data)
 {
 	TlsCreationData *ca_creation_data = NULL;
 
@@ -411,14 +431,8 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 
 
 	if (ca_file_is_password_protected()) {
-		ca_creation_data->password = pkey_manage_ask_password();
-
-                if (! ca_creation_data->password) {
-                        /* The user hasn't provided a valid password */
-			tls_creation_data_free (ca_creation_data);
-                        return;
-                }
-
+		pkey_manage_ask_password (__new_ca_commit_password_cb, ca_creation_data);
+		return;
         }
 
 	window = GTK_WINDOW(gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window"));

@@ -230,13 +230,24 @@ G_MODULE_EXPORT void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata
 
 }
 
+static void
+__crl_generate_done_cb (gchar *error, gpointer user_data)
+{
+	(void) user_data;
+	if (error) {
+		dialog_error (error);
+		g_free (error);
+	} else {
+		dialog_info (_("CRL generated successfully"));
+	}
+}
+
 G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 {
 	GtkWidget *widget = NULL;
 	gchar * filename = NULL;
 	GtkDialog * dialog = NULL;
 	guint64 ca_id = 0;
-        gchar * strerror = NULL;
 
 	GtkTreeView *treeview = GTK_TREE_VIEW(gtk_builder_get_object(crl_window_gtkb, "crl_ca_treeview"));
 	GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
@@ -267,23 +278,7 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	
-	strerror = crl_generate (ca_id, filename);
-	if (strerror) {
-		dialog_error (strerror);
-	} else {
-		
-	}
-
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_INFO,
-						    GTK_BUTTONS_CLOSE,
-						    "%s",
-						    _("CRL generated successfully")));
-	compat_dialog_run (GTK_DIALOG(dialog));
-	
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
+	crl_generate (ca_id, filename, __crl_generate_done_cb, NULL);
 
         dialog = GTK_DIALOG(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
         gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));	
@@ -292,16 +287,73 @@ G_MODULE_EXPORT void crl_ok_clicked_cb (GtkButton *button, gpointer userdata)
 
 #endif /*GNOMINTCLI*/
 
+/* Shared helper: given a decrypted private key, generate the CRL and write it. */
+static gchar *
+__crl_generate_with_pkey (guint64 ca_id, GIOChannel *file,
+                          gchar *ca_pem, gchar *dn,
+                          PkeyManageData *crypted_pkey,
+                          gchar *private_key,
+                          GList *revoked_certs,
+                          gint crl_version, time_t timestamp)
+{
+	gchar *pem = NULL;
+	GError *error = NULL;
+
+	pem = tls_generate_crl (revoked_certs,
+	                        (guchar *) ca_pem,
+	                        (guchar *) private_key,
+	                        crl_version,
+	                        timestamp,
+	                        timestamp + (3600 * ca_file_policy_get_int (ca_id, "HOURS_BETWEEN_CRL_UPDATES")));
+
+	g_free (ca_pem);
+	pkey_manage_data_free (crypted_pkey);
+	g_free (dn);
+
+	if (!pem) {
+		g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
+		g_list_free (revoked_certs);
+		ca_file_rollback_new_crl_transaction ();
+		return g_strdup (_("There was an error while generating CRL."));
+	}
+	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+
+	if (error) {
+		g_free (pem);
+		g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
+		g_list_free (revoked_certs);
+		ca_file_rollback_new_crl_transaction ();
+		return g_strdup (_("There was an error while writing CRL."));
+	}
+	g_free (pem);
+
+	ca_file_commit_new_crl_transaction (ca_id, revoked_certs);
+
+	g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
+	g_list_free (revoked_certs);
+
+	g_io_channel_shutdown (file, TRUE, &error);
+	if (error) {
+		g_io_channel_unref (file);
+		return g_strdup (_("There was an error while exporting CRL."));
+	}
+
+	g_io_channel_unref (file);
+
+	return NULL;
+}
+
+#ifdef GNOMINTCLI
+
 gchar * crl_generate (guint64 ca_id, gchar *filename)
 {
-        time_t timestamp;
-        gint crl_version = 0;
+	time_t timestamp;
+	gint crl_version = 0;
 	gchar * dn = NULL;
 	gchar * ca_pem = NULL;
 	gchar * private_key = NULL;
 	PkeyManageData * crypted_pkey = NULL;
-	gchar * pem = NULL;
-        GList * revoked_certs = NULL;
+	GList * revoked_certs = NULL;
 	GIOChannel * file = NULL;
 	GError * error = NULL;
 	gchar *strerror = NULL;
@@ -311,84 +363,156 @@ gchar * crl_generate (guint64 ca_id, gchar *filename)
 	if (error) {
 		return (_("There was an error while exporting CRL."));
 	}
-	
+
 	ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
 	crypted_pkey = pkey_manage_get_certificate_pkey (ca_id);
 	dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
-        timestamp = time (NULL);
+	timestamp = time (NULL);
 
-        revoked_certs = ca_file_get_revoked_certs (ca_id, &strerror);
-	
+	revoked_certs = ca_file_get_revoked_certs (ca_id, &strerror);
+
 	if (strerror) {
 		return (_("There was an error while getting revoked certificates."));
 	}
 
+	crl_version = ca_file_begin_new_crl_transaction (1, timestamp);
 
-        crl_version = ca_file_begin_new_crl_transaction (1, timestamp);
-
-        if (ca_id && ca_pem && crypted_pkey && dn) {
+	if (ca_id && ca_pem && crypted_pkey && dn) {
 
 		private_key = pkey_manage_uncrypt (crypted_pkey, dn);
-                if (!private_key) {
+		if (!private_key) {
 			g_free (ca_pem);
 			pkey_manage_data_free (crypted_pkey);
 			g_free (dn);
-                        g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return (_("There was an error while generating CRL."));
-                }
+			g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
+			g_list_free (revoked_certs);
+			ca_file_rollback_new_crl_transaction ();
+			return (_("There was an error while generating CRL."));
+		}
 
-                pem = tls_generate_crl (revoked_certs,
-                                        (guchar *) ca_pem,
-                                        (guchar *) private_key,
-                                        crl_version,
-                                        timestamp,
-                                        timestamp + (3600 * ca_file_policy_get_int (ca_id, "HOURS_BETWEEN_CRL_UPDATES")));
-                
-
-		g_free (ca_pem);
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-
-                if (!pem) {
-                        g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return (_("There was an error while generating CRL."));
-                }
-                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
-
-                if (error) {
-                        g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return (_("There was an error while writing CRL."));
-                }
-                g_free (pem);
+		{
+			gchar *result = __crl_generate_with_pkey (
+				ca_id, file, ca_pem, dn, crypted_pkey,
+				private_key, revoked_certs, crl_version, timestamp);
+			g_free (private_key);
+			return result;
+		}
 
 	} else {
-                        g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
-                        g_list_free (revoked_certs);
-                        ca_file_rollback_new_crl_transaction ();
-                        return (_("There was an error while exporting CRL."));
-        }
-        
-        ca_file_commit_new_crl_transaction (ca_id, revoked_certs);
-		
-        g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
-        g_list_free (revoked_certs);
-	
-	g_io_channel_shutdown (file, TRUE, &error);
-	if (error) {
-		g_io_channel_unref (file);
+		g_list_foreach (revoked_certs, __crl_gfree_gfunc, NULL);
+		g_list_free (revoked_certs);
+		ca_file_rollback_new_crl_transaction ();
 		return (_("There was an error while exporting CRL."));
 	}
-	
-	g_io_channel_unref (file);
-	
-	return NULL;
 }
+
+#else /* GUI async crl_generate */
+
+typedef struct {
+	guint64              ca_id;
+	GIOChannel          *file;
+	gchar               *ca_pem;
+	gchar               *dn;
+	PkeyManageData      *crypted_pkey;
+	GList               *revoked_certs;
+	gint                 crl_version;
+	time_t               timestamp;
+	CrlGenerateCallback  cb;
+	gpointer             cb_user_data;
+} _CrlGenerateCtx;
+
+static void
+_crl_generate_uncrypt_cb (gchar *private_key, gpointer data)
+{
+	_CrlGenerateCtx *ctx = (_CrlGenerateCtx *) data;
+
+	if (!private_key) {
+		g_free (ctx->ca_pem);
+		pkey_manage_data_free (ctx->crypted_pkey);
+		g_free (ctx->dn);
+		g_list_foreach (ctx->revoked_certs, __crl_gfree_gfunc, NULL);
+		g_list_free (ctx->revoked_certs);
+		ca_file_rollback_new_crl_transaction ();
+		ctx->cb (g_strdup (_("There was an error while generating CRL.")),
+		         ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	{
+		gchar *result = __crl_generate_with_pkey (
+			ctx->ca_id, ctx->file, ctx->ca_pem, ctx->dn,
+			ctx->crypted_pkey, private_key,
+			ctx->revoked_certs, ctx->crl_version, ctx->timestamp);
+		g_free (private_key);
+		ctx->cb (result, ctx->cb_user_data);
+		g_free (ctx);
+	}
+}
+
+static void
+_crl_generate_got_pkey_cb (PkeyManageData *crypted_pkey, gpointer data)
+{
+	_CrlGenerateCtx *ctx = (_CrlGenerateCtx *) data;
+
+	ctx->crypted_pkey = crypted_pkey;
+
+	if (!ctx->ca_pem || !crypted_pkey || !ctx->dn) {
+		g_free (ctx->ca_pem);
+		pkey_manage_data_free (crypted_pkey);
+		g_free (ctx->dn);
+		g_list_foreach (ctx->revoked_certs, __crl_gfree_gfunc, NULL);
+		g_list_free (ctx->revoked_certs);
+		ca_file_rollback_new_crl_transaction ();
+		ctx->cb (g_strdup (_("There was an error while exporting CRL.")),
+		         ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	pkey_manage_uncrypt (crypted_pkey, ctx->dn,
+	                     _crl_generate_uncrypt_cb, ctx);
+}
+
+void crl_generate (guint64 ca_id, gchar *filename,
+                   CrlGenerateCallback cb, gpointer user_data)
+{
+	GIOChannel * file = NULL;
+	GError * error = NULL;
+	gchar *strerror = NULL;
+	_CrlGenerateCtx *ctx;
+
+	file = g_io_channel_new_file (filename, "w", &error);
+	g_free (filename);
+	if (error) {
+		cb (g_strdup (_("There was an error while exporting CRL.")), user_data);
+		return;
+	}
+
+	ctx = g_new0 (_CrlGenerateCtx, 1);
+	ctx->ca_id = ca_id;
+	ctx->file = file;
+	ctx->ca_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	ctx->dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, ca_id);
+	ctx->timestamp = time (NULL);
+	ctx->revoked_certs = ca_file_get_revoked_certs (ca_id, &strerror);
+	ctx->cb = cb;
+	ctx->cb_user_data = user_data;
+
+	if (strerror) {
+		g_free (ctx->ca_pem);
+		g_free (ctx->dn);
+		g_free (ctx);
+		cb (g_strdup (_("There was an error while getting revoked certificates.")), user_data);
+		return;
+	}
+
+	ctx->crl_version = ca_file_begin_new_crl_transaction (1, ctx->timestamp);
+
+	pkey_manage_get_certificate_pkey (ca_id, _crl_generate_got_pkey_cb, ctx);
+}
+
+#endif /* GNOMINTCLI */
 
 void __crl_gfree_gfunc (gpointer data, gpointer user_data)
 {

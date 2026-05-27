@@ -220,65 +220,44 @@ _export_private_pkcs8_password_cb (gchar *password, gpointer user_data)
 	g_free (ctx);
 }
 
-void export_private_pkcs8 (guint64 id, gint type, gchar *filename,
-                           ExportPkcs8Callback cb, gpointer user_data)
+typedef struct {
+	GIOChannel         *file;
+	PkeyManageData     *crypted_pkey;
+	gchar              *dn;
+	gchar              *filename;
+	guint64             id;
+	gint                type;
+	ExportPkcs8Callback cb;
+	gpointer            cb_user_data;
+} _ExportPkcs8UncryptCtx;
+
+static void
+_export_pkcs8_uncrypt_cb (gchar *privatekey, gpointer data)
 {
-	GIOChannel * file = NULL;
-	GError * error = NULL;
-	gchar * dn = NULL;
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * privatekey = NULL;
+	_ExportPkcs8UncryptCtx *uctx = (_ExportPkcs8UncryptCtx *) data;
 	_ExportPkcs8Ctx *ctx;
 
-	file = g_io_channel_new_file (filename, "w", &error);
-	if (error) {
-		if (file)
-			g_io_channel_unref (file);
-		cb (_("There was an error while exporting private key."), user_data);
-		return;
-	}
-
-	switch (type) {
-	case CA_FILE_ELEMENT_TYPE_CERT:
-		crypted_pkey = pkey_manage_get_certificate_pkey (id);
-		break;
-	case CA_FILE_ELEMENT_TYPE_CSR:
-		crypted_pkey = pkey_manage_get_csr_pkey (id);
-		break;
-	default:
-		break;
-	}
-	dn = ca_file_get_dn_from_id (type, id);
-
-	if (!crypted_pkey || !dn) {
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-		if (file)
-			g_io_channel_unref (file);
-		cb (_("There was an error while getting private key."), user_data);
-		return;
-	}
-
-	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
-
-	pkey_manage_data_free (crypted_pkey);
-	g_free (dn);
+	pkey_manage_data_free (uctx->crypted_pkey);
+	g_free (uctx->dn);
 
 	if (! privatekey) {
-		if (file)
-			g_io_channel_unref (file);
-		cb (_("There was an error while uncrypting private key."), user_data);
+		if (uctx->file)
+			g_io_channel_unref (uctx->file);
+		uctx->cb (_("There was an error while uncrypting private key."), uctx->cb_user_data);
+		g_free (uctx->filename);
+		g_free (uctx);
 		return;
 	}
 
 	ctx = g_new0 (_ExportPkcs8Ctx, 1);
-	ctx->file = file;
+	ctx->file = uctx->file;
 	ctx->privatekey = privatekey;
-	ctx->filename = g_strdup (filename);
-	ctx->id = id;
-	ctx->type = type;
-	ctx->cb = cb;
-	ctx->cb_user_data = user_data;
+	ctx->filename = uctx->filename;
+	ctx->id = uctx->id;
+	ctx->type = uctx->type;
+	ctx->cb = uctx->cb;
+	ctx->cb_user_data = uctx->cb_user_data;
+	g_free (uctx);
 
 	dialog_get_password (_("You need to supply a passphrase for protecting the exported private key, "
 			       "so nobody else but authorized people can use it. This passphrase will be asked "
@@ -288,7 +267,62 @@ void export_private_pkcs8 (guint64 id, gint type, gchar *filename,
 			     _export_private_pkcs8_password_cb, ctx);
 }
 
+static void
+_export_pkcs8_got_pkey_cb (PkeyManageData *crypted_pkey, gpointer data)
+{
+	_ExportPkcs8UncryptCtx *uctx = (_ExportPkcs8UncryptCtx *) data;
+
+	uctx->crypted_pkey = crypted_pkey;
+
+	if (!crypted_pkey || !uctx->dn) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (uctx->dn);
+		if (uctx->file)
+			g_io_channel_unref (uctx->file);
+		uctx->cb (_("There was an error while getting private key."), uctx->cb_user_data);
+		g_free (uctx->filename);
+		g_free (uctx);
+		return;
+	}
+
+	pkey_manage_uncrypt (crypted_pkey, uctx->dn, _export_pkcs8_uncrypt_cb, uctx);
+}
+
+void export_private_pkcs8 (guint64 id, gint type, gchar *filename,
+                           ExportPkcs8Callback cb, gpointer user_data)
+{
+	GIOChannel * file = NULL;
+	GError * error = NULL;
+	_ExportPkcs8UncryptCtx *uctx;
+
+	file = g_io_channel_new_file (filename, "w", &error);
+	if (error) {
+		if (file)
+			g_io_channel_unref (file);
+		cb (_("There was an error while exporting private key."), user_data);
+		return;
+	}
+
+	uctx = g_new0 (_ExportPkcs8UncryptCtx, 1);
+	uctx->file = file;
+	uctx->filename = g_strdup (filename);
+	uctx->id = id;
+	uctx->type = type;
+	uctx->cb = cb;
+	uctx->cb_user_data = user_data;
+	uctx->dn = ca_file_get_dn_from_id (type, id);
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
+		pkey_manage_get_certificate_pkey (id, _export_pkcs8_got_pkey_cb, uctx);
+	} else {
+		PkeyManageData *crypted_pkey = pkey_manage_get_csr_pkey (id);
+		_export_pkcs8_got_pkey_cb (crypted_pkey, uctx);
+	}
+}
+
 #endif /* GNOMINTCLI */
+
+#ifdef GNOMINTCLI
 
 gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 {
@@ -297,14 +331,14 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 	gchar * dn = NULL;
 	gchar * pem = NULL;
 	GError * error = NULL;
-        
+
         file = g_io_channel_new_file (filename, "w", &error);
 	if (error) {
 		if (file)
 			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
-	} 
-	
+	}
+
 	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
 		crypted_pkey = pkey_manage_get_certificate_pkey (id);
 		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
@@ -312,7 +346,7 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 		crypted_pkey = pkey_manage_get_csr_pkey (id);
 		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
 	}
-	
+
 	if (!crypted_pkey || !dn) {
 		pkey_manage_data_free(crypted_pkey);
 		g_free (dn);
@@ -320,39 +354,141 @@ gchar * export_private_pem (guint64 id, gint type, gchar *filename)
 			g_io_channel_unref (file);
 		return (_("There was an error while getting private key."));
 	}
-	
+
 	pem = pkey_manage_uncrypt (crypted_pkey, dn);
 
 	pkey_manage_data_free (crypted_pkey);
 	g_free (dn);
-	
+
 	if (!pem) {
 		if (file)
 			g_io_channel_unref (file);
 		return (_("There was an error while decrypting private key."));
 	}
-	
+
 	g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 	if (error) {
 		g_free (pem);
 		if (file)
 			g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
-	} 
+	}
 	g_free (pem);
-	
-	
+
+
 	g_io_channel_shutdown (file, TRUE, &error);
 	if (error) {
 		g_io_channel_unref (file);
 		return (_("There was an error while exporting private key."));
-	} 
-	
+	}
+
 	g_io_channel_unref (file);
-        
+
         return NULL;
 
 }
+
+#else /* GUI async export_private_pem */
+
+typedef struct {
+	GIOChannel     *file;
+	PkeyManageData *crypted_pkey;
+	gchar          *dn;
+	ExportPrivatePemCallback cb;
+	gpointer        cb_user_data;
+} _ExportPrivatePemCtx;
+
+static void
+_export_private_pem_uncrypt_cb (gchar *pem, gpointer data)
+{
+	_ExportPrivatePemCtx *ctx = (_ExportPrivatePemCtx *) data;
+	GError *error = NULL;
+
+	pkey_manage_data_free (ctx->crypted_pkey);
+	g_free (ctx->dn);
+
+	if (!pem) {
+		if (ctx->file)
+			g_io_channel_unref (ctx->file);
+		ctx->cb (_("There was an error while decrypting private key."), ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	g_io_channel_write_chars (ctx->file, pem, strlen(pem), NULL, &error);
+	if (error) {
+		g_free (pem);
+		g_io_channel_unref (ctx->file);
+		ctx->cb (_("There was an error while exporting private key."), ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+	g_free (pem);
+
+	g_io_channel_shutdown (ctx->file, TRUE, &error);
+	if (error) {
+		g_io_channel_unref (ctx->file);
+		ctx->cb (_("There was an error while exporting private key."), ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	g_io_channel_unref (ctx->file);
+	ctx->cb (NULL, ctx->cb_user_data);
+	g_free (ctx);
+}
+
+static void
+_export_private_pem_got_pkey_cb (PkeyManageData *crypted_pkey, gpointer data)
+{
+	_ExportPrivatePemCtx *ctx = (_ExportPrivatePemCtx *) data;
+
+	ctx->crypted_pkey = crypted_pkey;
+
+	if (!crypted_pkey || !ctx->dn) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (ctx->dn);
+		if (ctx->file)
+			g_io_channel_unref (ctx->file);
+		ctx->cb (_("There was an error while getting private key."), ctx->cb_user_data);
+		g_free (ctx);
+		return;
+	}
+
+	pkey_manage_uncrypt (crypted_pkey, ctx->dn, _export_private_pem_uncrypt_cb, ctx);
+}
+
+void export_private_pem (guint64 id, gint type, gchar *filename,
+                         ExportPrivatePemCallback cb, gpointer user_data)
+{
+	GIOChannel * file = NULL;
+	GError * error = NULL;
+	_ExportPrivatePemCtx *ctx;
+
+	file = g_io_channel_new_file (filename, "w", &error);
+	if (error) {
+		if (file)
+			g_io_channel_unref (file);
+		cb (_("There was an error while exporting private key."), user_data);
+		return;
+	}
+
+	ctx = g_new0 (_ExportPrivatePemCtx, 1);
+	ctx->file = file;
+	ctx->cb = cb;
+	ctx->cb_user_data = user_data;
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
+		ctx->dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+		pkey_manage_get_certificate_pkey (id, _export_private_pem_got_pkey_cb, ctx);
+	} else {
+		PkeyManageData *crypted_pkey = pkey_manage_get_csr_pkey (id);
+		ctx->dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CSR, id);
+		_export_private_pem_got_pkey_cb (crypted_pkey, ctx);
+	}
+}
+
+#endif /* GNOMINTCLI */
 
 #ifdef GNOMINTCLI
 
@@ -535,50 +671,41 @@ _export_pkcs12_password_cb (gchar *password, gpointer user_data)
 	g_free (ctx);
 }
 
-void export_pkcs12 (guint64 id, gint type, gchar *filename,
-                    ExportPkcs12Callback cb, gpointer user_data)
+typedef struct {
+	PkeyManageData        *crypted_pkey;
+	gchar                 *dn;
+	gchar                 *crt_pem;
+	gchar                 *filename;
+	ExportPkcs12Callback   cb;
+	gpointer               cb_user_data;
+} _ExportPkcs12UncryptCtx;
+
+static void
+_export_pkcs12_uncrypt_cb (gchar *privatekey, gpointer data)
 {
-	PkeyManageData * crypted_pkey = NULL;
-	gchar * dn = NULL;
-	gchar * crt_pem = NULL;
-	gchar * privatekey = NULL;
+	_ExportPkcs12UncryptCtx *uctx = (_ExportPkcs12UncryptCtx *) data;
 	_ExportPkcs12Ctx *ctx;
 
-	if (type == CA_FILE_ELEMENT_TYPE_CERT) {
-		crypted_pkey = pkey_manage_get_certificate_pkey (id);
-		dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
-		crt_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
-	} else {
-		cb (_("Unsupported operation: you cannot generate a PKCS#12 for a CSR."), user_data);
-		return;
-	}
-
-	if (! crypted_pkey || ! dn || ! crt_pem) {
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-		g_free (crt_pem);
-		cb (_("There was an error while getting the certificate and private key from the internal database."), user_data);
-		return;
-	}
-
-	privatekey = pkey_manage_uncrypt (crypted_pkey, dn);
-
 	if (! privatekey) {
-		pkey_manage_data_free (crypted_pkey);
-		g_free (dn);
-		g_free (crt_pem);
-		cb (_("There was an error while getting the certificate and private key from the internal database."), user_data);
+		pkey_manage_data_free (uctx->crypted_pkey);
+		g_free (uctx->dn);
+		g_free (uctx->crt_pem);
+		uctx->cb (_("There was an error while getting the certificate and private key from the internal database."),
+		          uctx->cb_user_data);
+		g_free (uctx->filename);
+		g_free (uctx);
 		return;
 	}
 
 	ctx = g_new0 (_ExportPkcs12Ctx, 1);
-	ctx->crt_pem = crt_pem;
+	ctx->crt_pem = uctx->crt_pem;
 	ctx->privatekey = privatekey;
-	ctx->crypted_pkey = crypted_pkey;
-	ctx->dn = dn;
-	ctx->filename = g_strdup (filename);
-	ctx->cb = cb;
-	ctx->cb_user_data = user_data;
+	ctx->crypted_pkey = uctx->crypted_pkey;
+	ctx->dn = uctx->dn;
+	ctx->filename = uctx->filename;
+	ctx->cb = uctx->cb;
+	ctx->cb_user_data = uctx->cb_user_data;
+	g_free (uctx);
 
 	dialog_get_password (_("You need to supply a passphrase for protecting the exported certificate, "
 			       "so nobody else but authorized people can use it. This passphrase will be asked "
@@ -586,6 +713,47 @@ void export_pkcs12 (guint64 id, gint type, gchar *filename,
 			     _("Insert passphrase (8 characters or more):"), _("Insert passphrase (confirm):"),
 			     _("The introduced passphrases are distinct."), 8,
 			     _export_pkcs12_password_cb, ctx);
+}
+
+static void
+_export_pkcs12_got_pkey_cb (PkeyManageData *crypted_pkey, gpointer data)
+{
+	_ExportPkcs12UncryptCtx *uctx = (_ExportPkcs12UncryptCtx *) data;
+
+	uctx->crypted_pkey = crypted_pkey;
+
+	if (! crypted_pkey || ! uctx->dn || ! uctx->crt_pem) {
+		pkey_manage_data_free (crypted_pkey);
+		g_free (uctx->dn);
+		g_free (uctx->crt_pem);
+		uctx->cb (_("There was an error while getting the certificate and private key from the internal database."),
+		          uctx->cb_user_data);
+		g_free (uctx->filename);
+		g_free (uctx);
+		return;
+	}
+
+	pkey_manage_uncrypt (crypted_pkey, uctx->dn, _export_pkcs12_uncrypt_cb, uctx);
+}
+
+void export_pkcs12 (guint64 id, gint type, gchar *filename,
+                    ExportPkcs12Callback cb, gpointer user_data)
+{
+	_ExportPkcs12UncryptCtx *uctx;
+
+	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
+		cb (_("Unsupported operation: you cannot generate a PKCS#12 for a CSR."), user_data);
+		return;
+	}
+
+	uctx = g_new0 (_ExportPkcs12UncryptCtx, 1);
+	uctx->dn = ca_file_get_dn_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	uctx->crt_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, id);
+	uctx->filename = g_strdup (filename);
+	uctx->cb = cb;
+	uctx->cb_user_data = user_data;
+
+	pkey_manage_get_certificate_pkey (id, _export_pkcs12_got_pkey_cb, uctx);
 }
 
 #endif /* GNOMINTCLI */

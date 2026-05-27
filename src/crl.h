@@ -27,6 +27,12 @@ void crl_cancel_clicked_cb (GtkButton *button, gpointer userdata);
 void crl_ok_clicked_cb (GtkButton *button, gpointer userdata);
 #endif
 
+#ifdef GNOMINTCLI
 gchar * crl_generate (guint64 ca_id, gchar *filename);
+#else
+typedef void (*CrlGenerateCallback)(gchar *error, gpointer user_data);
+void crl_generate (guint64 ca_id, gchar *filename,
+                   CrlGenerateCallback cb, gpointer user_data);
+#endif
 
 #endif

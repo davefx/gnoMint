@@ -501,8 +501,28 @@ G_MODULE_EXPORT void on_new_req_cancel_clicked (GtkButton *widget,
 	
 }
 
+static void
+__new_req_commit_password_cb (gchar *password, gpointer user_data)
+{
+	TlsCreationData *csr_creation_data = (TlsCreationData *) user_data;
+	GtkWindow *window;
+
+	if (!password) {
+		/* The user hasn't provided a valid password */
+		tls_creation_data_free (csr_creation_data);
+		return;
+	}
+
+	csr_creation_data->password = password;
+
+	window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
+	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
+
+	creation_process_window_csr_display (csr_creation_data);
+}
+
 G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
-			       gpointer user_data) 
+			       gpointer user_data)
 {
 	TlsCreationData *csr_creation_data = NULL;
 
@@ -618,18 +638,14 @@ G_MODULE_EXPORT void on_new_req_commit_clicked (GtkButton *widg,
 	}
 
 	if (ca_file_is_password_protected()) {
-		csr_creation_data->password = pkey_manage_ask_password();
-
-                if (! csr_creation_data->password) {
-                        /* The user hasn't provided a valid password */
-                        return;
-                }
+		pkey_manage_ask_password (__new_req_commit_password_cb, csr_creation_data);
+		return;
         }
 
 	window = GTK_WINDOW(gtk_builder_get_object (new_req_window_gtkb, "new_req_window"));
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(window)));
 
-	creation_process_window_csr_display (csr_creation_data);	
+	creation_process_window_csr_display (csr_creation_data);
 
 }
 
