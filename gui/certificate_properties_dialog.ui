@@ -589,12 +589,10 @@
                         <property name="vexpand">1</property>
                         <property name="focusable">1</property>
                         <property name="child">
-                          <object class="GtkTreeView" id="certTreeView">
+                          <object class="GtkColumnView" id="certTreeView">
                             <property name="focusable">1</property>
-                            <property name="headers_visible">0</property>
-                            <child internal-child="selection">
-                              <object class="GtkTreeSelection"/>
-                            </child>
+                            <property name="show-column-separators">0</property>
+                            <property name="show-row-separators">0</property>
                           </object>
                         </property>
                       </object>

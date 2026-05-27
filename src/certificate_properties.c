@@ -5,12 +5,12 @@
 //
 //  gnoMint is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 3 of the License, or   
+//  the Free Software Foundation; either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
@@ -28,6 +28,7 @@
 #include "tls.h"
 #include "ca_policy.h"
 #include "certificate_properties.h"
+#include "prop_node.h"
 
 #include <glib/gi18n.h>
 
@@ -37,14 +38,7 @@ typedef struct
 	const gchar *label;
 } certificate_properties_oid_label_couple_t;
 
-enum
-{
-	CERTIFICATE_PROPERTIES_COL_NAME = 0,
-	CERTIFICATE_PROPERTIES_COL_VALUE,
-	CERTIFICATE_PROPERTIES_N_COLUMNS
-};
-
-typedef void (*certificate_properties_fill_t) (GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+typedef void (*certificate_properties_fill_t) (GnomintPropNode *, gnutls_x509_crt_t *);
 
 typedef struct
 {
@@ -78,33 +72,33 @@ const certificate_properties_oid_label_couple_t certificate_properties_oid_label
 	{0, 0},
 };
 
-void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_cert_ext_KeyUsage(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_cert_ext_SubjectAltName(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_cert_ext_BasicConstraints(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_cert_ext_CRLDistributionPoints(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
-void __certificate_properties_fill_cert_ext_ExtKeyUsage(GtkTreeStore *, GtkTreeIter *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier(GnomintPropNode *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_KeyUsage(GnomintPropNode *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_SubjectAltName(GnomintPropNode *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_BasicConstraints(GnomintPropNode *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_CRLDistributionPoints(GnomintPropNode *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier(GnomintPropNode *, gnutls_x509_crt_t *);
+void __certificate_properties_fill_cert_ext_ExtKeyUsage(GnomintPropNode *, gnutls_x509_crt_t *);
 gchar * __certificate_properties_dump_raw_data(const unsigned char *buffer, size_t buffer_size);
 const gchar * __certificate_properties_lookup_oid_label(const certificate_properties_oid_label_couple_t *oid_label_table, const gchar *oid);
-certificate_properties_fill_t __certificate_properties_lookup_oid_function (const certificate_properties_oid_function_couple_t *oid_func_table, 
+certificate_properties_fill_t __certificate_properties_lookup_oid_function (const certificate_properties_oid_function_couple_t *oid_func_table,
 									    const gchar *oid);
 gchar * __certificate_properties_dump_RDNSequence(const gchar *buffer, gsize buffer_size);
 gchar * __certificate_properties_dump_key_usage(guint key_usage);
-void __certificate_properties_fill_cert_version(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_signature(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_subjectPublicKeyInfo (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_issuerUniqueID (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_subjectUniqueID (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert_ext (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_cert (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_signatureAlgorithm (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate);
-void __certificate_properties_fill_certificate(GtkTreeStore *store, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_version(GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_serialNumber(GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_signature(GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_issuer(GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_validity (GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_subject (GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_subjectPublicKeyInfo (GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_issuerUniqueID (GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_subjectUniqueID (GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert_ext (GnomintPropNode *parent, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_cert (GListStore *root_store, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_signatureAlgorithm (GListStore *root_store, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_signatureValue (GListStore *root_store, gnutls_x509_crt_t *certificate);
+void __certificate_properties_fill_certificate(GListStore *root_store, gnutls_x509_crt_t *certificate);
 
 
 
@@ -134,10 +128,10 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	gtk_builder_add_from_file (certificate_properties_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_properties_dialog.ui", NULL),
 				   NULL);
-	
+
 	__certificate_properties_populate (certificate_pem);
 	__certificate_details_populate (certificate_pem);
-       
+
 	if (! is_ca) {
 		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "notebook2");
 		gtk_notebook_remove_page (GTK_NOTEBOOK(widget), 2);
@@ -147,7 +141,7 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certificate_properties_dialog");
 
-	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT, 
+	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT,
                                                                         cert_id));
 
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
@@ -174,10 +168,10 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certActivationDateLabel");
 #ifndef WIN32
 	gmtime_r (&cert->activation_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 #else
 	tim = gmtime (&cert->activation_time);
-	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);	
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);
 #endif
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
@@ -191,15 +185,15 @@ void __certificate_properties_populate (const char *certificate_pem)
 #endif
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");
         aux = uint160_strdup_printf (serial_number);
 	gtk_label_set_text (GTK_LABEL(widget), aux);
         g_free (aux);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectCNLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectCNLabel");
 	gtk_label_set_text (GTK_LABEL(widget), cert->cn);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOLabel");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOLabel");
 	gtk_label_set_text (GTK_LABEL(widget), cert->o);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSubjectOULabel");
@@ -229,28 +223,28 @@ void __certificate_properties_populate (const char *certificate_pem)
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha1Label");
 	gtk_label_set_text (GTK_LABEL(widget), cert->sha1);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "md5Label");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "md5Label");
 	gtk_label_set_text (GTK_LABEL(widget), cert->md5);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha256Label");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha256Label");
 	gtk_label_set_text (GTK_LABEL(widget), cert->sha256);
 
-	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha512Label");	
+	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "sha512Label");
 	gtk_label_set_text (GTK_LABEL(widget), cert->sha512);
 
 
 	if (g_list_length (cert->uses)) {
 		GValue * valtrue = g_new0 (GValue, 1);
 		int i;
-		
+
 		g_value_init (valtrue, G_TYPE_BOOLEAN);
 		g_value_set_boolean (valtrue, TRUE);
 
 		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certPropSeparator");
 		gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
-		
+
 		widget = gtk_builder_get_object (certificate_properties_window_gtkb, "vboxCertCapabilities");
-		
+
 		for (i = g_list_length(cert->uses) - 1; i >= 0; i--) {
 			GtkLabel *label = NULL;
 			label = GTK_LABEL(gtk_label_new ((gchar *) g_list_nth_data (cert->uses, i)));
@@ -259,14 +253,14 @@ void __certificate_properties_populate (const char *certificate_pem)
 			gtk_box_append(GTK_BOX(widget), GTK_WIDGET(label));
 		}
 		gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
-		
+
 		g_free (valtrue);
 	}
 
 
 
 	tls_cert_free (cert);
-	
+
 	return;
 }
 
@@ -292,7 +286,7 @@ gchar * __certificate_properties_dump_raw_data(const unsigned char *buffer, size
 	{
 		size_t remaining = 4 * buffer_size - (result_iterator - result);
 		int written = snprintf(result_iterator, remaining, "%02x:", buffer[i]);
-		if (written < 0 || written >= remaining)
+		if (written < 0 || written >= (int) remaining)
 			break;
 		result_iterator += written;
 		if ((i % BYTES_PER_LINE) == BYTES_PER_LINE - 1)
@@ -314,7 +308,7 @@ const gchar * __certificate_properties_lookup_oid_label(const certificate_proper
 	for (i = certificate_properties_oid_label_table; i->oid; i++)
 		if (strcmp(i->oid, oid) == 0)
 			break;
-	
+
 	if (i->label)
 		return _(i->label);
 	else
@@ -322,7 +316,7 @@ const gchar * __certificate_properties_lookup_oid_label(const certificate_proper
 }
 
 
-certificate_properties_fill_t __certificate_properties_lookup_oid_function (const certificate_properties_oid_function_couple_t *oid_func_table, 
+certificate_properties_fill_t __certificate_properties_lookup_oid_function (const certificate_properties_oid_function_couple_t *oid_func_table,
 									    const gchar *oid)
 {
 	const certificate_properties_oid_function_couple_t *i;
@@ -399,23 +393,23 @@ gchar * __certificate_properties_dump_key_usage(guint key_usage)
 	return result;
 }
 
-void __certificate_properties_fill_cert_version(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_version(GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	gint result;
 	gchar value[4];
-	GtkTreeIter j;
 
 	result = gnutls_x509_crt_get_version(*certificate);
 	sprintf(value, "v%d", result);
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Version"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+
+	GnomintPropNode *child = gnomint_prop_node_new(_("Version"), value);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
 }
 
-void __certificate_properties_fill_cert_serialNumber(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_serialNumber(GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	gint result;
 	gsize buffer_size = 0;
-	GtkTreeIter j;
 	gchar *buffer = NULL;
 	gchar *value = NULL;
 
@@ -442,39 +436,41 @@ void __certificate_properties_fill_cert_serialNumber(GtkTreeStore *store, GtkTre
 
 	g_free(buffer);
 
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Serial Number"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	GnomintPropNode *child = gnomint_prop_node_new(_("Serial Number"), value);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
 
 	g_free(value);
 }
 
-void __certificate_properties_fill_cert_signature(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_signature(GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	int result;
-	GtkTreeIter j;
-	GtkTreeIter k;
         const gchar *name = NULL;
 
 	result = gnutls_x509_crt_get_signature_algorithm(*certificate);
 	name = gnutls_sign_algorithm_get_name(result);
 
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Signature"), -1);
+	GnomintPropNode *sig_node = gnomint_prop_node_new(_("Signature"), NULL);
+	g_list_store_append(gnomint_prop_node_get_children(parent), sig_node);
 
-	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
+	GnomintPropNode *alg_child = gnomint_prop_node_new(_("Algorithm"), name);
+	g_list_store_append(gnomint_prop_node_get_children(sig_node), alg_child);
+	g_object_unref(alg_child);
 
-	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
+	GnomintPropNode *params_child = gnomint_prop_node_new(_("Parameters"), _("(unknown)"));
+	g_list_store_append(gnomint_prop_node_get_children(sig_node), params_child);
+	g_object_unref(params_child);
+
+	g_object_unref(sig_node);
 }
 
-void __certificate_properties_fill_cert_issuer(GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_issuer(GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	int result;
 	size_t buffer_size = 0;
 	gchar * buffer = NULL;
 	gchar * value = NULL;
-	GtkTreeIter j;
 
 	result = gnutls_x509_crt_get_issuer_dn(*certificate, 0, &buffer_size);
 	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER) {
@@ -491,18 +487,19 @@ void __certificate_properties_fill_cert_issuer(GtkTreeStore *store, GtkTreeIter 
 		fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
 		return;
 	}
-	
+
 	value = __certificate_properties_dump_RDNSequence(buffer, buffer_size);
 
 	g_free(buffer);
 
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Issuer"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	GnomintPropNode *child = gnomint_prop_node_new(_("Issuer"), value);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
 
 	g_free(value);
 }
 
-void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_validity (GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	time_t not_before;
 #ifndef WIN32
@@ -518,8 +515,6 @@ void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIt
 	struct tm *not_after_broken_down_time = NULL;
 #endif
 	gchar not_after_asctime[32];
-	GtkTreeIter j;
-	GtkTreeIter k;
 
 #ifndef WIN32
 	not_before = gnutls_x509_crt_get_activation_time(*certificate);
@@ -545,23 +540,26 @@ void __certificate_properties_fill_cert_validity (GtkTreeStore *store, GtkTreeIt
 	// not_after_asctime[strlen(not_after_asctime) - 1] = 0; // ???
 #endif
 
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Validity"), -1);
+	GnomintPropNode *validity_node = gnomint_prop_node_new(_("Validity"), NULL);
+	g_list_store_append(gnomint_prop_node_get_children(parent), validity_node);
 
-	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Not Before"), CERTIFICATE_PROPERTIES_COL_VALUE, not_before_asctime, -1);
+	GnomintPropNode *nb_child = gnomint_prop_node_new(_("Not Before"), not_before_asctime);
+	g_list_store_append(gnomint_prop_node_get_children(validity_node), nb_child);
+	g_object_unref(nb_child);
 
-	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Not After"), CERTIFICATE_PROPERTIES_COL_VALUE, not_after_asctime, -1);
+	GnomintPropNode *na_child = gnomint_prop_node_new(_("Not After"), not_after_asctime);
+	g_list_store_append(gnomint_prop_node_get_children(validity_node), na_child);
+	g_object_unref(na_child);
+
+	g_object_unref(validity_node);
 }
 
-void __certificate_properties_fill_cert_subject (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_subject (GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	int result;
 	size_t buffer_size = 0;
 	gchar *buffer = NULL;
 	gchar *value = NULL;
-	GtkTreeIter j;
 
 	result = gnutls_x509_crt_get_dn(*certificate, 0, &buffer_size);
 	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER) {
@@ -583,126 +581,151 @@ void __certificate_properties_fill_cert_subject (GtkTreeStore *store, GtkTreeIte
 
 	g_free(buffer);
 
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+	GnomintPropNode *child = gnomint_prop_node_new(_("Subject"), value);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
 
 	g_free(value);
 }
 
-void __certificate_properties_fill_cert_subjectPublicKeyInfo (GtkTreeStore *store, 
-                                                              GtkTreeIter *parent, 
+void __certificate_properties_fill_cert_subjectPublicKeyInfo (GnomintPropNode *parent,
                                                               gnutls_x509_crt_t *certificate)
 {
 	int result;
 	unsigned int bits = 0;
 	const gchar * name = NULL;
-	GtkTreeIter j;
-	GtkTreeIter k;
-	GtkTreeIter l;
 	gchar *value;
-	GtkTreeIter m;
 	gnutls_datum_t modulus, publicExponent;
 	gnutls_datum_t p, q, g, y;
 
 	result = gnutls_x509_crt_get_pk_algorithm(*certificate, &bits);
 	name = gnutls_pk_algorithm_get_name(result);
 
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Public Key Info"), -1);
+	GnomintPropNode *spki_node = gnomint_prop_node_new(_("Subject Public Key Info"), NULL);
+	g_list_store_append(gnomint_prop_node_get_children(parent), spki_node);
 
-	gtk_tree_store_append(store, &k, &j);
-	gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), -1);
+	GnomintPropNode *alg_node = gnomint_prop_node_new(_("Algorithm"), NULL);
+	g_list_store_append(gnomint_prop_node_get_children(spki_node), alg_node);
 
-	gtk_tree_store_append(store, &l, &k);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
+	GnomintPropNode *alg_child = gnomint_prop_node_new(_("Algorithm"), name);
+	g_list_store_append(gnomint_prop_node_get_children(alg_node), alg_child);
+	g_object_unref(alg_child);
 
 	switch (result) {
 	case GNUTLS_PK_RSA:
-		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
-		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("RSA PublicKey"), -1);
+	{
+		GnomintPropNode *params_child = gnomint_prop_node_new(_("Parameters"), _("(unknown)"));
+		g_list_store_append(gnomint_prop_node_get_children(alg_node), params_child);
+		g_object_unref(params_child);
+
+		GnomintPropNode *rsa_node = gnomint_prop_node_new(_("RSA PublicKey"), NULL);
+		g_list_store_append(gnomint_prop_node_get_children(spki_node), rsa_node);
+
 		result = gnutls_x509_crt_get_pk_rsa_raw(*certificate, &modulus, &publicExponent);
 		if (result < 0) {
 			fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
+			g_object_unref(rsa_node);
 			break;
 		}
 		value = __certificate_properties_dump_raw_data(modulus.data, modulus.size);
 		gnutls_free(modulus.data);
 
-		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Modulus"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+		GnomintPropNode *mod_child = gnomint_prop_node_new(_("Modulus"), value);
+		g_list_store_append(gnomint_prop_node_get_children(rsa_node), mod_child);
+		g_object_unref(mod_child);
 		g_free(value);
 
 		value = __certificate_properties_dump_raw_data(publicExponent.data, publicExponent.size);
 		gnutls_free(publicExponent.data);
-		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Public Exponent"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+
+		GnomintPropNode *exp_child = gnomint_prop_node_new(_("Public Exponent"), value);
+		g_list_store_append(gnomint_prop_node_get_children(rsa_node), exp_child);
+		g_object_unref(exp_child);
 		g_free(value);
+
+		g_object_unref(rsa_node);
 		break;
+	}
 	case GNUTLS_PK_DSA:
+	{
 		result = gnutls_x509_crt_get_pk_dsa_raw(*certificate, &p, &q, &g, &y);
 		if (result < 0) {
 			fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
 			break;
 		}
-		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), -1);
+
+		GnomintPropNode *params_node = gnomint_prop_node_new(_("Parameters"), NULL);
+		g_list_store_append(gnomint_prop_node_get_children(alg_node), params_node);
 
 		value = __certificate_properties_dump_raw_data(p.data, p.size);
 		gnutls_free(p.data);
-		gtk_tree_store_append(store, &m, &l);
-		gtk_tree_store_set(store, &m, CERTIFICATE_PROPERTIES_COL_NAME, "p", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+		GnomintPropNode *p_child = gnomint_prop_node_new("p", value);
+		g_list_store_append(gnomint_prop_node_get_children(params_node), p_child);
+		g_object_unref(p_child);
 		g_free(value);
 
 		value = __certificate_properties_dump_raw_data(q.data, q.size);
 		gnutls_free(q.data);
-		gtk_tree_store_append(store, &m, &l);
-		gtk_tree_store_set(store, &m, CERTIFICATE_PROPERTIES_COL_NAME, "p", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+		GnomintPropNode *q_child = gnomint_prop_node_new("p", value);
+		g_list_store_append(gnomint_prop_node_get_children(params_node), q_child);
+		g_object_unref(q_child);
 		g_free(value);
 
 		value = __certificate_properties_dump_raw_data(g.data, g.size);
 		gnutls_free(g.data);
-		gtk_tree_store_append(store, &m, &l);
-		gtk_tree_store_set(store, &m, CERTIFICATE_PROPERTIES_COL_NAME, "g", CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+		GnomintPropNode *g_child = gnomint_prop_node_new("g", value);
+		g_list_store_append(gnomint_prop_node_get_children(params_node), g_child);
+		g_object_unref(g_child);
 		g_free(value);
+
+		g_object_unref(params_node);
 
 		value = __certificate_properties_dump_raw_data(y.data, y.size);
 		gnutls_free(y.data);
-		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("DSA PublicKey"), CERTIFICATE_PROPERTIES_COL_VALUE, value, -1);
+
+		GnomintPropNode *dsa_child = gnomint_prop_node_new(_("DSA PublicKey"), value);
+		g_list_store_append(gnomint_prop_node_get_children(spki_node), dsa_child);
+		g_object_unref(dsa_child);
 		g_free(value);
 		break;
+	}
 	default:
-		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
-		gtk_tree_store_append(store, &k, &j);
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Public Key"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
+	{
+		GnomintPropNode *params_child = gnomint_prop_node_new(_("Parameters"), _("(unknown)"));
+		g_list_store_append(gnomint_prop_node_get_children(alg_node), params_child);
+		g_object_unref(params_child);
+
+		GnomintPropNode *spk_child = gnomint_prop_node_new(_("Subject Public Key"), _("(unknown)"));
+		g_list_store_append(gnomint_prop_node_get_children(spki_node), spk_child);
+		g_object_unref(spk_child);
 		break;
 	}
+	}
+
+	g_object_unref(alg_node);
+	g_object_unref(spki_node);
 }
 
-void __certificate_properties_fill_cert_issuerUniqueID (GtkTreeStore *store, 
-								  GtkTreeIter *parent, 
-								  gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_issuerUniqueID (GnomintPropNode *parent,
+							  gnutls_x509_crt_t *certificate)
 {
-	GtkTreeIter j;
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Issuer Unique ID"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
-} 
+	GnomintPropNode *child = gnomint_prop_node_new(_("Issuer Unique ID"), _("(unknown)"));
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
+	(void)certificate;
+}
 
-void __certificate_properties_fill_cert_subjectUniqueID (GtkTreeStore *store, 
-								   GtkTreeIter *parent, 
+void __certificate_properties_fill_cert_subjectUniqueID (GnomintPropNode *parent,
+							   gnutls_x509_crt_t *certificate)
+{
+	GnomintPropNode *child = gnomint_prop_node_new(_("Subject Unique ID"), _("(unknown)"));
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
+	(void)certificate;
+}
+
+void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier (GnomintPropNode *parent,
 								   gnutls_x509_crt_t *certificate)
-{
-	GtkTreeIter j;
-	gtk_tree_store_append(store, &j, parent);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Subject Unique ID"), CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
-}
-
-void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier (GtkTreeStore *store, 
-										   GtkTreeIter *parent, 
-										   gnutls_x509_crt_t *certificate)
 {
 	guint critical;
 	gint result;
@@ -710,7 +733,6 @@ void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier (GtkTreeStore *
 	gchar buffer[BUFFER_SIZE_MAX];
 	gsize buffer_size = BUFFER_SIZE_MAX;
 	gchar *hex_buffer;
-	GtkTreeIter l;
 
 	result = gnutls_x509_crt_get_subject_key_id(*certificate, buffer, &buffer_size, &critical);
 	if (result < 0) {
@@ -718,20 +740,21 @@ void __certificate_properties_fill_cert_ext_SubjectKeyIdentifier (GtkTreeStore *
 		return;
 	}
 	hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
-	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+
+	GnomintPropNode *child = gnomint_prop_node_new(_("Value"), hex_buffer);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
+
 	g_free(hex_buffer);
 }
 
-void __certificate_properties_fill_cert_ext_KeyUsage (GtkTreeStore *store, 
-								       GtkTreeIter *parent, 
-								       gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext_KeyUsage (GnomintPropNode *parent,
+						       gnutls_x509_crt_t *certificate)
 {
 	guint critical;
 	guint key_usage;
 	gint result;
         gchar * buffer = NULL;
-        GtkTreeIter l;
 
 	result = gnutls_x509_crt_get_key_usage(*certificate, &key_usage, &critical);
 
@@ -741,14 +764,15 @@ void __certificate_properties_fill_cert_ext_KeyUsage (GtkTreeStore *store,
 	}
 	buffer = __certificate_properties_dump_key_usage(key_usage);
 
-	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+	GnomintPropNode *child = gnomint_prop_node_new(_("Value"), buffer);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
+
 	g_free(buffer);
 }
 
-void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store, 
-									     GtkTreeIter *parent, 
-									     gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext_SubjectAltName (GnomintPropNode *parent,
+							     gnutls_x509_crt_t *certificate)
 {
 	gint i = 0;
 	while (1)
@@ -759,7 +783,6 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 		gchar buffer[BUFFER_SIZE_MAX];
 		gsize buffer_size = BUFFER_SIZE_MAX;
 		gchar *hex_buffer;
-		GtkTreeIter l;
 
 		result = gnutls_x509_crt_get_subject_alt_name(*certificate, i, buffer, &buffer_size, &critical);
 
@@ -779,88 +802,96 @@ void __certificate_properties_fill_cert_ext_SubjectAltName (GtkTreeStore *store,
 
 		switch (result) {
 		case GNUTLS_SAN_DNSNAME:
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("DNS Name"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+		{
+			GnomintPropNode *child = gnomint_prop_node_new(_("DNS Name"), buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			break;
+		}
 		case GNUTLS_SAN_RFC822NAME:
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("RFC822 Name"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+		{
+			GnomintPropNode *child = gnomint_prop_node_new(_("RFC822 Name"), buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			break;
+		}
 		case GNUTLS_SAN_URI:
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("URI"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+		{
+			GnomintPropNode *child = gnomint_prop_node_new(_("URI"), buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			break;
+		}
 		case GNUTLS_SAN_IPADDRESS:
 			// Convert binary IP to readable format
 			if (buffer_size == 4) {
 				// IPv4
 				gchar ip_str[INET_ADDRSTRLEN];
 				if (inet_ntop(AF_INET, buffer, ip_str, sizeof(ip_str))) {
-					gtk_tree_store_append(store, &l, parent);
-					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
-							   CERTIFICATE_PROPERTIES_COL_VALUE, ip_str, -1);
+					GnomintPropNode *child = gnomint_prop_node_new(_("IP Address"), ip_str);
+					g_list_store_append(gnomint_prop_node_get_children(parent), child);
+					g_object_unref(child);
 				} else {
 					hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
-					gtk_tree_store_append(store, &l, parent);
-					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
-							   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+					GnomintPropNode *child = gnomint_prop_node_new(_("IP"), hex_buffer);
+					g_list_store_append(gnomint_prop_node_get_children(parent), child);
+					g_object_unref(child);
 					g_free(hex_buffer);
 				}
 			} else if (buffer_size == 16) {
 				// IPv6
 				gchar ip_str[INET6_ADDRSTRLEN];
 				if (inet_ntop(AF_INET6, buffer, ip_str, sizeof(ip_str))) {
-					gtk_tree_store_append(store, &l, parent);
-					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
-							   CERTIFICATE_PROPERTIES_COL_VALUE, ip_str, -1);
+					GnomintPropNode *child = gnomint_prop_node_new(_("IP Address"), ip_str);
+					g_list_store_append(gnomint_prop_node_get_children(parent), child);
+					g_object_unref(child);
 				} else {
 					hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
-					gtk_tree_store_append(store, &l, parent);
-					gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
-							   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+					GnomintPropNode *child = gnomint_prop_node_new(_("IP"), hex_buffer);
+					g_list_store_append(gnomint_prop_node_get_children(parent), child);
+					g_object_unref(child);
 					g_free(hex_buffer);
 				}
 			} else {
 				// Unknown format, fall back to hex
 				hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
-				gtk_tree_store_append(store, &l, parent);
-				gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP"), 
-						   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+				GnomintPropNode *child = gnomint_prop_node_new(_("IP"), hex_buffer);
+				g_list_store_append(gnomint_prop_node_get_children(parent), child);
+				g_object_unref(child);
 				g_free(hex_buffer);
 			}
 			break;
 		case GNUTLS_SAN_DN:
+		{
 			hex_buffer = __certificate_properties_dump_RDNSequence (buffer, buffer_size);
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Directory Name"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+			GnomintPropNode *child = gnomint_prop_node_new(_("Directory Name"), hex_buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			g_free(hex_buffer);
 			break;
+		}
 		default:
+		{
 			hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
-			gtk_tree_store_append (store, &l, parent);
-			gtk_tree_store_set (store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
-					    CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+			GnomintPropNode *child = gnomint_prop_node_new(_("Value"), hex_buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			g_free(hex_buffer);
 			break;
+		}
 		}
 		i++;
 	}
 }
 
-void __certificate_properties_fill_cert_ext_BasicConstraints (GtkTreeStore *store, 
-									       GtkTreeIter *parent, 
-									       gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext_BasicConstraints (GnomintPropNode *parent,
+							       gnutls_x509_crt_t *certificate)
 {
 	guint critical;
 	gint result;
 	guint ca;
 	gint path_len_constraint;
 	gchar *pathlen_as_string = NULL;
-	GtkTreeIter l;
         gchar *ca_as_string = NULL;
 
 	result = gnutls_x509_crt_get_basic_constraints(*certificate, &critical, &ca, &path_len_constraint);
@@ -871,23 +902,22 @@ void __certificate_properties_fill_cert_ext_BasicConstraints (GtkTreeStore *stor
 	}
 
 	ca_as_string = ca ? _("TRUE") : _("FALSE");
-	
+
 	pathlen_as_string = g_strdup_printf ("%d", path_len_constraint);
 
-	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("CA"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, ca_as_string, -1);
+	GnomintPropNode *ca_child = gnomint_prop_node_new(_("CA"), ca_as_string);
+	g_list_store_append(gnomint_prop_node_get_children(parent), ca_child);
+	g_object_unref(ca_child);
 
-	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Path Length Constraint"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, pathlen_as_string, -1);
+	GnomintPropNode *pl_child = gnomint_prop_node_new(_("Path Length Constraint"), pathlen_as_string);
+	g_list_store_append(gnomint_prop_node_get_children(parent), pl_child);
+	g_object_unref(pl_child);
 
 	g_free (pathlen_as_string);
 }
 
-void __certificate_properties_fill_cert_ext_CRLDistributionPoints (GtkTreeStore *store, 
-										    GtkTreeIter *parent, 
-										    gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext_CRLDistributionPoints (GnomintPropNode *parent,
+								    gnutls_x509_crt_t *certificate)
 {
 	gint i;
 	for (i = 0;; i++)
@@ -898,7 +928,6 @@ void __certificate_properties_fill_cert_ext_CRLDistributionPoints (GtkTreeStore 
 		gchar buffer[BUFFER_SIZE_MAX];
 		gsize buffer_size = BUFFER_SIZE_MAX;
 		gchar *hex_buffer;
-		GtkTreeIter l;
 
 		result = gnutls_x509_crt_get_crl_dist_points(*certificate, i, buffer, &buffer_size, 0, &critical);
 		if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -916,48 +945,59 @@ void __certificate_properties_fill_cert_ext_CRLDistributionPoints (GtkTreeStore 
 
 		switch (result)	{
 		case GNUTLS_SAN_DNSNAME:
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("DNS Name"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+		{
+			GnomintPropNode *child = gnomint_prop_node_new(_("DNS Name"), buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			break;
+		}
 		case GNUTLS_SAN_RFC822NAME:
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("RFC822 Name"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+		{
+			GnomintPropNode *child = gnomint_prop_node_new(_("RFC822 Name"), buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			break;
+		}
 		case GNUTLS_SAN_URI:
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("URI"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, buffer, -1);
+		{
+			GnomintPropNode *child = gnomint_prop_node_new(_("URI"), buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			break;
+		}
 		case GNUTLS_SAN_IPADDRESS:
+		{
 			hex_buffer = __certificate_properties_dump_raw_data ((guchar *) buffer, buffer_size);
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("IP Address"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+			GnomintPropNode *child = gnomint_prop_node_new(_("IP Address"), hex_buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			g_free(hex_buffer);
 			break;
+		}
 		case GNUTLS_SAN_DN:
+		{
 			hex_buffer = __certificate_properties_dump_RDNSequence (buffer, buffer_size);
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Directory Name"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+			GnomintPropNode *child = gnomint_prop_node_new(_("Directory Name"), hex_buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			g_free(hex_buffer);
 			break;
+		}
 		default:
+		{
 			hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
-			gtk_tree_store_append(store, &l, parent);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+			GnomintPropNode *child = gnomint_prop_node_new(_("Value"), hex_buffer);
+			g_list_store_append(gnomint_prop_node_get_children(parent), child);
+			g_object_unref(child);
 			g_free(hex_buffer);
 			break;
+		}
 		}
 	}
 }
 
-void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier (GtkTreeStore *store, 
-										     GtkTreeIter *parent, 
-										     gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier (GnomintPropNode *parent,
+								     gnutls_x509_crt_t *certificate)
 {
 	gint result;
 	guint critical;
@@ -965,7 +1005,6 @@ void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier (GtkTreeStore
 	gchar buffer[BUFFER_SIZE_MAX];
 	gsize buffer_size = BUFFER_SIZE_MAX;
 	gchar *hex_buffer = NULL;
-	GtkTreeIter l;
 
 	result = gnutls_x509_crt_get_authority_key_id(*certificate, buffer, &buffer_size, &critical);
 	if (result < 0) {
@@ -974,22 +1013,20 @@ void __certificate_properties_fill_cert_ext_AuthorityKeyIdentifier (GtkTreeStore
 	}
 	hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 
-	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+	GnomintPropNode *child = gnomint_prop_node_new(_("Value"), hex_buffer);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
 
 	g_free(hex_buffer);
 }
 
-void __certificate_properties_fill_cert_ext_ExtKeyUsage (GtkTreeStore *store, 
-									  GtkTreeIter *parent, 
-									  gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext_ExtKeyUsage (GnomintPropNode *parent,
+							  gnutls_x509_crt_t *certificate)
 {
 	gint i;
 	const gint BUFFER_SIZE_MAX = 1024;
 	gchar usage_buffer[BUFFER_SIZE_MAX];
 	gchar *usage_buffer_iterator = usage_buffer;
-	GtkTreeIter l;
 
 	for (i = 0;; i++) {
 		gint result;
@@ -1014,14 +1051,14 @@ void __certificate_properties_fill_cert_ext_ExtKeyUsage (GtkTreeStore *store,
 	}
 
 	*(usage_buffer_iterator - 1) = 0;
-	gtk_tree_store_append(store, &l, parent);
-	gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, usage_buffer, -1);
+
+	GnomintPropNode *child = gnomint_prop_node_new(_("Value"), usage_buffer);
+	g_list_store_append(gnomint_prop_node_get_children(parent), child);
+	g_object_unref(child);
 }
 
-void __certificate_properties_fill_cert_ext (GtkTreeStore *store, 
-							      GtkTreeIter *parent, 
-							      gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert_ext (GnomintPropNode *parent,
+					      gnutls_x509_crt_t *certificate)
 {
 	gint result;
 	const gint OID_SIZE_MAX = 128;
@@ -1029,9 +1066,7 @@ void __certificate_properties_fill_cert_ext (GtkTreeStore *store,
 	gsize oid_size = OID_SIZE_MAX;
 	guint critical;
 	guint i;
-	GtkTreeIter j;
-	GtkTreeIter k;
-	GtkTreeIter l;
+	GnomintPropNode *ext_node = NULL;
 
 	for (i = 0;; i++) {
                 const gchar *label = NULL;
@@ -1047,21 +1082,25 @@ void __certificate_properties_fill_cert_ext (GtkTreeStore *store,
 			break;
 		}
 		if (i == 0) {
-			gtk_tree_store_append(store, &j, parent);
-			gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Extensions"), -1);
+			ext_node = gnomint_prop_node_new(_("Extensions"), NULL);
+			g_list_store_append(gnomint_prop_node_get_children(parent), ext_node);
 		}
 		label = __certificate_properties_lookup_oid_label(certificate_properties_oid_label_table, oid);
-		gtk_tree_store_append(store, &k, &j);
 		if (!label)
 			label = oid;
-		gtk_tree_store_set(store, &k, CERTIFICATE_PROPERTIES_COL_NAME, label, -1);
+
+		GnomintPropNode *ext_item = gnomint_prop_node_new(label, NULL);
+		g_list_store_append(gnomint_prop_node_get_children(ext_node), ext_item);
+
 		critical_as_string = critical ? _("TRUE") : _("FALSE");
-		gtk_tree_store_append(store, &l, &k);
-		gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Critical"), 
-				   CERTIFICATE_PROPERTIES_COL_VALUE, critical_as_string, -1);
+
+		GnomintPropNode *crit_child = gnomint_prop_node_new(_("Critical"), critical_as_string);
+		g_list_store_append(gnomint_prop_node_get_children(ext_item), crit_child);
+		g_object_unref(crit_child);
+
 		function = __certificate_properties_lookup_oid_function(certificate_properties_oid_function_table, oid);
 		if (function)
-			function(store, &k, certificate);
+			function(ext_item, certificate);
 		else {
 			const gint BUFFER_SIZE_MAX = 1024;
 			gchar buffer[BUFFER_SIZE_MAX];
@@ -1070,70 +1109,77 @@ void __certificate_properties_fill_cert_ext (GtkTreeStore *store,
 
 			gnutls_x509_crt_get_extension_data(*certificate, i, buffer, &buffer_size);
 			hex_buffer = __certificate_properties_dump_raw_data((unsigned char *) buffer, buffer_size);
-			gtk_tree_store_append(store, &l, &k);
-			gtk_tree_store_set(store, &l, CERTIFICATE_PROPERTIES_COL_NAME, _("Value"), 
-					   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+
+			GnomintPropNode *val_child = gnomint_prop_node_new(_("Value"), hex_buffer);
+			g_list_store_append(gnomint_prop_node_get_children(ext_item), val_child);
+			g_object_unref(val_child);
+
 			g_free(hex_buffer);
 		}
+
+		g_object_unref(ext_item);
 	}
+
+	if (ext_node)
+		g_object_unref(ext_node);
 }
 
-void __certificate_properties_fill_cert (GtkTreeStore *store, 
-						   GtkTreeIter *parent, 
-						   gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_cert (GListStore *root_store,
+					   gnutls_x509_crt_t *certificate)
 {
-	GtkTreeIter i;
-	gtk_tree_store_append(store, &i, parent);
-	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Certificate"), -1);
-	__certificate_properties_fill_cert_version(store, &i, certificate);
-	__certificate_properties_fill_cert_serialNumber(store, &i, certificate);
-	__certificate_properties_fill_cert_signature(store, &i, certificate);
-	__certificate_properties_fill_cert_issuer(store, &i, certificate);
-	__certificate_properties_fill_cert_validity(store, &i, certificate);
-	__certificate_properties_fill_cert_subject(store, &i, certificate);
-	__certificate_properties_fill_cert_subjectPublicKeyInfo(store, &i, certificate);
-	__certificate_properties_fill_cert_issuerUniqueID(store, &i, certificate);
-	__certificate_properties_fill_cert_subjectUniqueID(store, &i, certificate);
-	__certificate_properties_fill_cert_ext(store, &i, certificate);
+	GnomintPropNode *cert_node = gnomint_prop_node_new(_("Certificate"), NULL);
+	g_list_store_append(root_store, cert_node);
+
+	__certificate_properties_fill_cert_version(cert_node, certificate);
+	__certificate_properties_fill_cert_serialNumber(cert_node, certificate);
+	__certificate_properties_fill_cert_signature(cert_node, certificate);
+	__certificate_properties_fill_cert_issuer(cert_node, certificate);
+	__certificate_properties_fill_cert_validity(cert_node, certificate);
+	__certificate_properties_fill_cert_subject(cert_node, certificate);
+	__certificate_properties_fill_cert_subjectPublicKeyInfo(cert_node, certificate);
+	__certificate_properties_fill_cert_issuerUniqueID(cert_node, certificate);
+	__certificate_properties_fill_cert_subjectUniqueID(cert_node, certificate);
+	__certificate_properties_fill_cert_ext(cert_node, certificate);
+
+	g_object_unref(cert_node);
 }
 
-void __certificate_properties_fill_signatureAlgorithm (GtkTreeStore *store, 
-						       GtkTreeIter *parent, 
+void __certificate_properties_fill_signatureAlgorithm (GListStore *root_store,
 						       gnutls_x509_crt_t *certificate)
 {
-	GtkTreeIter i;
 	gint result;
         const gchar *name = NULL;
-	GtkTreeIter j;
 
-	gtk_tree_store_append(store, &i, parent);
 	result = gnutls_x509_crt_get_signature_algorithm(*certificate);
 	name = gnutls_sign_algorithm_get_name(result);
-	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Signature Algorithm"), -1);
-	gtk_tree_store_append(store, &j, &i);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Algorithm"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, name, -1);
-	gtk_tree_store_append(store, &j, &i);
-	gtk_tree_store_set(store, &j, CERTIFICATE_PROPERTIES_COL_NAME, _("Parameters"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, _("(unknown)"), -1);
+
+	GnomintPropNode *sigalg_node = gnomint_prop_node_new(_("Signature Algorithm"), NULL);
+	g_list_store_append(root_store, sigalg_node);
+
+	GnomintPropNode *alg_child = gnomint_prop_node_new(_("Algorithm"), name);
+	g_list_store_append(gnomint_prop_node_get_children(sigalg_node), alg_child);
+	g_object_unref(alg_child);
+
+	GnomintPropNode *params_child = gnomint_prop_node_new(_("Parameters"), _("(unknown)"));
+	g_list_store_append(gnomint_prop_node_get_children(sigalg_node), params_child);
+	g_object_unref(params_child);
+
+	g_object_unref(sigalg_node);
 }
 
-void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeIter *parent, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_signatureValue (GListStore *root_store, gnutls_x509_crt_t *certificate)
 {
-	GtkTreeIter i;
 	gint result;
 	gchar *buffer = NULL;
 	gsize buffer_size = 0;
 	gchar *hex_buffer = NULL;
-
-	gtk_tree_store_append(store, &i, parent);
 
 	result = gnutls_x509_crt_get_signature(*certificate, 0, &buffer_size);
 	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
 		return;
 	}
-	
+
 	buffer = g_new0 (gchar, buffer_size);
 
 	result = gnutls_x509_crt_get_signature(*certificate, buffer, &buffer_size);
@@ -1141,21 +1187,142 @@ void __certificate_properties_fill_signatureValue (GtkTreeStore *store, GtkTreeI
 		fprintf(stderr, "Error: (%s,%d): %s\n", __FILE__, __LINE__, gnutls_strerror(result));
 		return;
 	}
-	
+
 	hex_buffer = __certificate_properties_dump_raw_data((guchar *) buffer, buffer_size);
 
-	gtk_tree_store_set(store, &i, CERTIFICATE_PROPERTIES_COL_NAME, _("Signature"), 
-			   CERTIFICATE_PROPERTIES_COL_VALUE, hex_buffer, -1);
+	GnomintPropNode *sig_child = gnomint_prop_node_new(_("Signature"), hex_buffer);
+	g_list_store_append(root_store, sig_child);
+	g_object_unref(sig_child);
 
 	g_free(hex_buffer);
 }
 
-void __certificate_properties_fill_certificate(GtkTreeStore *store, gnutls_x509_crt_t *certificate)
+void __certificate_properties_fill_certificate(GListStore *root_store, gnutls_x509_crt_t *certificate)
 {
-	__certificate_properties_fill_cert(store, 0, certificate);
-	__certificate_properties_fill_signatureAlgorithm(store, 0, certificate);
-	__certificate_properties_fill_signatureValue(store, 0, certificate);
+	__certificate_properties_fill_cert(root_store, certificate);
+	__certificate_properties_fill_signatureAlgorithm(root_store, certificate);
+	__certificate_properties_fill_signatureValue(root_store, certificate);
 }
+
+
+/* ------------------------------------------------------------------ */
+/*  GtkColumnView factory callbacks for the certificate details tree  */
+/* ------------------------------------------------------------------ */
+
+/* Helper: extract the GnomintPropNode from a GtkListItem. The item in
+ * a GtkTreeListModel-backed column view is a GtkTreeListRow; the
+ * actual data object is obtained via gtk_tree_list_row_get_item(). */
+static GnomintPropNode *
+__cert_prop_node_from_list_item (GtkListItem *list_item)
+{
+	GtkTreeListRow *tree_row = GTK_TREE_LIST_ROW (
+	    gtk_list_item_get_item (list_item));
+	if (!tree_row)
+		return NULL;
+	return GNOMINT_PROP_NODE (gtk_tree_list_row_get_item (tree_row));
+}
+
+/* --- Name column (GtkTreeExpander + GtkLabel) --- */
+
+static void
+__cert_name_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                   GtkListItem *list_item,
+                   gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *expander = gtk_tree_expander_new ();
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_widget_set_halign (label, GTK_ALIGN_START);
+	gtk_tree_expander_set_child (GTK_TREE_EXPANDER (expander), label);
+	gtk_list_item_set_child (list_item, expander);
+}
+
+static void
+__cert_name_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                  GtkListItem *list_item,
+                  gpointer user_data G_GNUC_UNUSED)
+{
+	GtkTreeListRow *tree_row = GTK_TREE_LIST_ROW (
+	    gtk_list_item_get_item (list_item));
+	GtkWidget *expander = gtk_list_item_get_child (list_item);
+	gtk_tree_expander_set_list_row (GTK_TREE_EXPANDER (expander), tree_row);
+
+	GnomintPropNode *node = GNOMINT_PROP_NODE (
+	    gtk_tree_list_row_get_item (tree_row));
+	GtkWidget *label = gtk_tree_expander_get_child (
+	    GTK_TREE_EXPANDER (expander));
+
+	const gchar *name = gnomint_prop_node_get_name (node);
+	gtk_label_set_text (GTK_LABEL (label), name ? name : "");
+
+	g_object_unref (node);
+}
+
+/* --- Value column (GtkLabel, monospace) --- */
+
+static void
+__cert_value_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                    GtkListItem *list_item,
+                    gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_widget_set_halign (label, GTK_ALIGN_START);
+
+	/* Apply monospace font via CSS, matching the old cell renderer. */
+	GtkCssProvider *prov = gtk_css_provider_new ();
+	gtk_css_provider_load_from_data (prov, "label { font-family: Monospace; }", -1);
+	gtk_style_context_add_provider (
+	    gtk_widget_get_style_context (label),
+	    GTK_STYLE_PROVIDER (prov),
+	    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	g_object_unref (prov);
+
+	gtk_list_item_set_child (list_item, label);
+}
+
+static void
+__cert_value_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                   GtkListItem *list_item,
+                   gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintPropNode *node = __cert_prop_node_from_list_item (list_item);
+	GtkWidget *label = gtk_list_item_get_child (list_item);
+
+	const gchar *value = gnomint_prop_node_get_value (node);
+	gtk_label_set_text (GTK_LABEL (label), value ? value : "");
+
+	g_object_unref (node);
+}
+
+/* GtkTreeListModel child-model callback: given a GnomintPropNode,
+ * return its children GListStore (or NULL if empty/leaf). */
+static GListModel *
+__cert_tree_list_create_model (gpointer item, gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintPropNode *node = GNOMINT_PROP_NODE (item);
+	GListStore *children = gnomint_prop_node_get_children (node);
+	if (g_list_model_get_n_items (G_LIST_MODEL (children)) == 0)
+		return NULL;
+	return G_LIST_MODEL (g_object_ref (children));
+}
+
+/* Helper: recursively expand all rows in the tree list model. */
+static void
+__cert_expand_all (GtkTreeListModel *tree_model)
+{
+	guint n = g_list_model_get_n_items (G_LIST_MODEL (tree_model));
+	for (guint i = 0; i < n; i++) {
+		GtkTreeListRow *tlr = gtk_tree_list_model_get_row (tree_model, i);
+		if (tlr) {
+			gtk_tree_list_row_set_expanded (tlr, TRUE);
+			g_object_unref (tlr);
+		}
+		/* After expanding, new items may have been inserted. */
+		n = g_list_model_get_n_items (G_LIST_MODEL (tree_model));
+	}
+}
+
 
 void
 __certificate_details_populate(const char *certificate_pem)
@@ -1163,9 +1330,6 @@ __certificate_details_populate(const char *certificate_pem)
 	gint result;
 	gnutls_datum_t pem_datum;
 	gnutls_x509_crt_t certificate;
-	GtkTreeStore *store = NULL;
-	GObject *view = NULL;
-	GtkCellRenderer *renderer = NULL;
 
 	pem_datum.data = (guchar *) certificate_pem;
 	pem_datum.size = strlen(certificate_pem);
@@ -1184,22 +1348,62 @@ __certificate_details_populate(const char *certificate_pem)
 		return;
 	}
 
-	store = gtk_tree_store_new(CERTIFICATE_PROPERTIES_N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING);
-	__certificate_properties_fill_certificate(store, &certificate);
+	/* Build the prop-node tree. */
+	GListStore *root_store = g_list_store_new (GNOMINT_TYPE_PROP_NODE);
+	__certificate_properties_fill_certificate(root_store, &certificate);
 	gnutls_x509_crt_deinit(certificate);
 
-	view = gtk_builder_get_object(certificate_properties_window_gtkb, "certTreeView");
-	renderer = gtk_cell_renderer_text_new();
+	/* Create a GtkTreeListModel wrapping the root store. */
+	GtkTreeListModel *tree_model = gtk_tree_list_model_new (
+	    G_LIST_MODEL (g_object_ref (root_store)),
+	    FALSE,   /* passthrough = FALSE so items are GtkTreeListRow */
+	    TRUE,    /* autoexpand */
+	    __cert_tree_list_create_model,
+	    NULL, NULL);
 
-	g_object_set(renderer, "yalign", 0.0, NULL);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, _("Name"), renderer, "text", CERTIFICATE_PROPERTIES_COL_NAME, NULL);
-	renderer = gtk_cell_renderer_text_new();
+	/* Expand all rows. */
+	__cert_expand_all (tree_model);
 
-	g_object_set(renderer, "family", "Monospace", "family-set", 1, NULL);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, _("Value"), renderer, "text", CERTIFICATE_PROPERTIES_COL_VALUE, NULL);
-	gtk_tree_view_set_model(GTK_TREE_VIEW(view), GTK_TREE_MODEL(store));
+	/* Wrap in a GtkNoSelection (read-only display). */
+	GtkNoSelection *no_sel = gtk_no_selection_new (G_LIST_MODEL (tree_model));
 
-	g_object_unref(store);
+	/* Get the column view from the builder. */
+	GObject *view = gtk_builder_get_object (certificate_properties_window_gtkb, "certTreeView");
+	GtkColumnView *colview = GTK_COLUMN_VIEW (view);
+
+	/* Set headers invisible to match the old tree view appearance. */
+	gtk_column_view_set_show_column_separators (colview, FALSE);
+	gtk_column_view_set_show_row_separators (colview, FALSE);
+
+	/* Build and attach columns if not already present. */
+	{
+		/* Name column with tree expander. */
+		GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+		g_signal_connect (f, "setup", G_CALLBACK (__cert_name_setup), NULL);
+		g_signal_connect (f, "bind",  G_CALLBACK (__cert_name_bind),  NULL);
+		GtkColumnViewColumn *col = gtk_column_view_column_new (_("Name"), f);
+		gtk_column_view_column_set_expand (col, TRUE);
+		gtk_column_view_column_set_resizable (col, TRUE);
+		gtk_column_view_append_column (colview, col);
+		g_object_unref (col);
+	}
+	{
+		/* Value column with monospace font. */
+		GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+		g_signal_connect (f, "setup", G_CALLBACK (__cert_value_setup), NULL);
+		g_signal_connect (f, "bind",  G_CALLBACK (__cert_value_bind),  NULL);
+		GtkColumnViewColumn *col = gtk_column_view_column_new (_("Value"), f);
+		gtk_column_view_column_set_expand (col, TRUE);
+		gtk_column_view_column_set_resizable (col, TRUE);
+		gtk_column_view_append_column (colview, col);
+		g_object_unref (col);
+	}
+
+	/* Set the model on the column view. */
+	gtk_column_view_set_model (colview, GTK_SELECTION_MODEL (no_sel));
+
+	g_object_unref (no_sel);
+	g_object_unref (root_store);
 }
 
 #if 0
