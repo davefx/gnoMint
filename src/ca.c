@@ -2448,19 +2448,117 @@ cleanup:
 	if (row) g_object_unref (row);
 }
 
-G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpointer user_data) 
+/* ---- Async change-password dialog (Step 2.5b) ---- */
+
+/* Response callback for the change-password dialog.  Replaces the old
+ * do { ... } while (repeat) loop that used compat_dialog_run. */
+static void
+__ca_change_pwd_response (GtkDialog *dialog,
+                          gint       response_id,
+                          gpointer   user_data)
+{
+    GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
+    GObject *widget = NULL;
+    GtkDialog *info_dialog = NULL;
+
+    if (!response_id || response_id == GTK_RESPONSE_CANCEL ||
+        response_id == GTK_RESPONSE_DELETE_EVENT) {
+        gtk_window_destroy (GTK_WINDOW (dialog));
+        g_object_unref (G_OBJECT (dialog_gtkb));
+        return;
+    }
+
+    /* Read entries. */
+    widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
+    const gchar *newpwd = gtk_editable_get_text (GTK_EDITABLE (widget));
+
+    widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
+    const gchar *currpwd = gtk_editable_get_text (GTK_EDITABLE (widget));
+
+    /* Validate current password. */
+    if (ca_file_is_password_protected () && !ca_file_check_password (currpwd)) {
+        dialog_error (_("The current password you have entered  "
+                        "doesn't match with the actual current database password."));
+        widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
+        gtk_widget_grab_focus (GTK_WIDGET (widget));
+        /* Re-present the same dialog so the user can try again. */
+        gtk_window_present (GTK_WINDOW (dialog));
+        return;
+    }
+
+    /* Password validated — apply the change. */
+    widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
+    if (gtk_check_button_get_active (GTK_CHECK_BUTTON (widget))) {
+
+        if (ca_file_is_password_protected ()) {
+            /* It's a password change. */
+            if (!ca_file_password_change (currpwd, newpwd)) {
+                dialog_error (_("Error while changing database password. "
+                                "The operation was cancelled."));
+            } else {
+                info_dialog = GTK_DIALOG (gtk_message_dialog_new (
+                    GTK_WINDOW (dialog),
+                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    GTK_MESSAGE_INFO,
+                    GTK_BUTTONS_CLOSE,
+                    "%s",
+                    _("Password changed successfully")));
+                g_signal_connect (info_dialog, "response",
+                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                gtk_window_present (GTK_WINDOW (info_dialog));
+            }
+        } else {
+            /* It's a new password. */
+            if (!ca_file_password_protect (newpwd)) {
+                dialog_error (_("Error while establishing database password. "
+                                "The operation was cancelled."));
+            } else {
+                info_dialog = GTK_DIALOG (gtk_message_dialog_new (
+                    GTK_WINDOW (dialog),
+                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    GTK_MESSAGE_INFO,
+                    GTK_BUTTONS_CLOSE,
+                    "%s",
+                    _("Password established successfully")));
+                g_signal_connect (info_dialog, "response",
+                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                gtk_window_present (GTK_WINDOW (info_dialog));
+            }
+        }
+    } else {
+        if (ca_file_is_password_protected ()) {
+            /* Remove password protection. */
+            if (!ca_file_password_unprotect (currpwd)) {
+                dialog_error (_("Error while removing database password. "
+                                "The operation was cancelled."));
+            } else {
+                info_dialog = GTK_DIALOG (gtk_message_dialog_new (
+                    GTK_WINDOW (dialog),
+                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    GTK_MESSAGE_INFO,
+                    GTK_BUTTONS_CLOSE,
+                    "%s",
+                    _("Password removed successfully")));
+                g_signal_connect (info_dialog, "response",
+                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
+                gtk_window_present (GTK_WINDOW (info_dialog));
+            }
+        } else {
+            /* No password and not requesting one — nothing to do. */
+        }
+    }
+
+    gtk_window_destroy (GTK_WINDOW (dialog));
+    g_object_unref (G_OBJECT (dialog_gtkb));
+}
+
+G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
-	GtkDialog * dialog = NULL;
 	GtkBuilder * dialog_gtkb = NULL;
-	const gchar *newpwd;
-	const gchar *currpwd;
-
-	gint response = 0;
-	gboolean repeat;
 
 	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
+	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "change_password_dialog.ui", NULL),
 				   NULL);
 
@@ -2525,108 +2623,13 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
 	g_object_set_data (G_OBJECT(widget), "dialog_gtkb", dialog_gtkb);
 
-	
-	do {
-
-		widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
-		gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
-		response = compat_dialog_run(GTK_DIALOG(widget)); 
-		
-		if (!response || response == GTK_RESPONSE_CANCEL) {
-			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-			g_object_unref (G_OBJECT(dialog_gtkb));
-			return;
-		} 
-		
-		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_newpwd_entry1");
-		newpwd = gtk_editable_get_text(GTK_EDITABLE(widget));
-		
-		widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
-		currpwd = gtk_editable_get_text(GTK_EDITABLE(widget));
-
-		repeat = (ca_file_is_password_protected() && ! ca_file_check_password (currpwd));
-		
-		if (repeat) {
-			dialog_error (_("The current password you have entered  "
-					   "doesn't match with the actual current database password."));
-			widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_current_pwd_entry");
-			gtk_widget_grab_focus (GTK_WIDGET(widget));
-		} 
-
-	} while (repeat);
-	
-	widget = gtk_builder_get_object (dialog_gtkb, "ca_changepwd_pwd_protect_yes_radiobutton");
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (widget))) {
-
-		if (ca_file_is_password_protected()) {
-			// It's a password change
-
-			if (! ca_file_password_change (currpwd, newpwd)) {
-				dialog_error (_("Error while changing database password. "
-						   "The operation was cancelled."));
-			} else {
-				widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
-				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-									    GTK_DIALOG_DESTROY_WITH_PARENT,
-									    GTK_MESSAGE_INFO,
-									    GTK_BUTTONS_CLOSE,
-									    "%s",
-									    _("Password changed successfully")));
-				g_signal_connect (dialog, "response",
-				                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-				gtk_window_present (GTK_WINDOW (dialog));
-			}
-
-		} else {
-			// It's a new password
-
-			if (! ca_file_password_protect (newpwd)) {
-				dialog_error (_("Error while establishing database password. "
-						   "The operation was cancelled."));
-
-			} else {
-				widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
-				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-									    GTK_DIALOG_DESTROY_WITH_PARENT,
-									    GTK_MESSAGE_INFO,
-									    GTK_BUTTONS_CLOSE,
-									    "%s",
-									    _("Password established successfully")));
-				g_signal_connect (dialog, "response",
-				                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-				gtk_window_present (GTK_WINDOW (dialog));
-			}
-		}
-	} else {
-		if (ca_file_is_password_protected()) {
-			// Remove password protection
-			if (! ca_file_password_unprotect (currpwd)) {
-				dialog_error (_("Error while removing database password. "
-						   "The operation was cancelled."));
-			} else {
-				widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
-				dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-									    GTK_DIALOG_DESTROY_WITH_PARENT,
-									    GTK_MESSAGE_INFO,
-									    GTK_BUTTONS_CLOSE,
-									    "%s",
-									    _("Password removed successfully")));
-				g_signal_connect (dialog, "response",
-				                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-				gtk_window_present (GTK_WINDOW (dialog));
-
-			}
-
-		} else {
-			// Don't do anything
-			
-		}
-
-	}
-
+	/* Present the dialog asynchronously with a response callback. */
 	widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
-	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
+	gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
 
+	g_signal_connect (widget, "response",
+	                  G_CALLBACK (__ca_change_pwd_response), dialog_gtkb);
+	gtk_window_present (GTK_WINDOW (widget));
 }
 
 
