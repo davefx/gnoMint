@@ -1916,6 +1916,13 @@ int ca_cli_callback_renew (int argc, char **argv)
 		dialog_error (_("The given certificate id is not valid"));
 		return -1;
 	}
+	if (ca_file_check_if_is_ca_id (id)) {
+		dialog_error (_("CA certificates cannot be renewed. A renewed CA "
+		                "would have a different key, so certificates "
+		                "previously signed by the old CA would no longer "
+		                "chain to it."));
+		return -1;
+	}
 	if (! dialog_ask_for_confirmation (
 	        _("gnoMint will issue a new certificate with the same subject "
 	          "and SAN as this one, signed by the same CA, with a fresh "

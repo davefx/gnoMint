@@ -67,7 +67,7 @@ CaCommand ca_commands[] = {
 	{"showpreferences", 0, 0, "showpreferences", N_("Show program preferences"), ca_cli_callback_showpreferences}, // 22
 	{"setpreference", 2, 2, N_("setpreference <preference-id> <value>"), N_("Set the given program preference"), ca_cli_callback_setpreference}, // 23
 	{"addservercert", 3, 3, N_("addservercert <ca-id> <cert-type> <server-name>"), N_("Quick server certificate generation (cert-type: 'web' or 'email')"), ca_cli_callback_addservercert}, // 24
-	{"renewcert", 1, 1, N_("renewcert <cert-id>"), N_("Reissue a certificate with the same subject + SAN and a fresh keypair. The old certificate remains in the database."), ca_cli_callback_renew},
+	{"renewcert", 1, 1, N_("renewcert <cert-id>"), N_("Reissue a non-CA certificate with the same subject + SAN and a fresh keypair. The old certificate remains in the database. CA certificates cannot be renewed."), ca_cli_callback_renew},
 	{"exportchain", 2, 2, N_("exportchain <cert-id> <filename>"), N_("Export the full certificate chain (leaf → root) for the given certificate as a PEM bundle."), ca_cli_callback_exportchain},
 	{"revokemany", 1, 64, N_("revokemany <cert-id> [cert-id ...]"), N_("Revoke many certificates at once. Non-cert ids are silently skipped."), ca_cli_callback_revokemany},
 	{"deletemany", 1, 64, N_("deletemany <csr-id> [csr-id ...]"), N_("Delete many CSRs at once. Non-CSR ids are silently skipped."), ca_cli_callback_deletemany},

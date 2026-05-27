@@ -35,6 +35,9 @@
 #include "ca.h"
 #include "ca_bulk.h"
 #include "ca_file.h"
+#ifndef GNOMINTCLI
+#include "cert_row.h"
+#endif
 #include "certificate_properties.h"
 #include "crl.h"
 #include "csr_properties.h"
@@ -92,13 +95,18 @@ extern GtkBuilder * cert_popup_menu_gtkb;
 extern GtkBuilder * csr_popup_menu_gtkb;
 
 
-static GtkTreeStore * ca_model = NULL;
-static gboolean cert_title_inserted = FALSE;
-static GtkTreeIter * cert_parent_iter = NULL;
-static GtkTreeIter * last_parent_iter = NULL;
-static GtkTreeIter * last_cert_iter = NULL;
-static gboolean csr_title_inserted=FALSE;
-static GtkTreeIter * csr_parent_iter = NULL;
+/* --- New GtkColumnView-based model (GTK 4 modernization) --- */
+static GListStore        *ca_root_model      = NULL;  /* top-level GnomintCertRow items */
+static GtkTreeListModel  *ca_tree_list_model  = NULL;
+GtkMultiSelection *ca_selection_model  = NULL;
+static GtkColumnView     *ca_columnview       = NULL;
+
+/* Hash table used during model-rebuild: maps parent_route strings to
+ * the GnomintCertRow that owns those children.  Only valid during a
+ * single ca_refresh_model_callback invocation. */
+static GHashTable *ca_route_to_row = NULL;
+/* Parallel hash: "CSR" parent CA rows keyed by parent_id (string). */
+static GHashTable *ca_id_to_row = NULL;
 
 /* Pure helper exposed for unit tests: classify a row's foreground color
  * given its effective expiration timestamp, a "now" reference, and the
@@ -187,37 +195,29 @@ __ca_search_match (const gchar *haystack, const gchar *needle)
 
 int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char **columnNames);
 int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **columnNames);
-void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
-				   GtkCellRenderer *cell,
-				   GtkTreeModel *tree_model,
-				   GtkTreeIter *iter,
-				   gpointer data);
-void __ca_tree_view_is_ca_datafunc (GtkTreeViewColumn *tree_column,
-                                    GtkCellRenderer *cell,
-                                    GtkTreeModel *tree_model,
-                                    GtkTreeIter *iter,
-                                    gpointer data);
-void __ca_tree_view_private_key_in_db_datafunc (GtkTreeViewColumn *tree_column,
-						GtkCellRenderer *cell,
-						GtkTreeModel *tree_model,
-						GtkTreeIter *iter,
-						gpointer data);
-void __ca_certificate_activated (GtkTreeView *tree_view,
-                                 GtkTreePath *path,
-                                 GtkTreeViewColumn *column,
-                                 gpointer user_data);
-void __ca_csr_activated (GtkTreeView *tree_view,
-                         GtkTreePath *path,
-                         GtkTreeViewColumn *column,
-                         gpointer user_data);
-void __ca_activate_certificate_selection (GtkTreeIter *iter);
-void __ca_activate_csr_selection (GtkTreeIter *iter);
+
+/* Helper: get the currently selected GnomintCertRow from the selection
+ * model.  Returns NULL if nothing is selected or the selection is
+ * empty.  The caller does NOT own the returned pointer (it's borrowed
+ * from the model). */
+static GnomintCertRow *__ca_get_selected_row (void);
+
+/* Determine whether the selected row is a cert, CSR, or neither.
+ * Returns CA_FILE_ELEMENT_TYPE_CERT, CA_FILE_ELEMENT_TYPE_CSR, or -1.
+ * If row_out is non-NULL, stores the GnomintCertRow* there (borrowed). */
+static gint __ca_selection_type_cv (GnomintCertRow **row_out);
+
+void __ca_activate_certificate_selection_cv (GnomintCertRow *row);
+void __ca_activate_csr_selection_cv (GnomintCertRow *row);
 void __ca_deactivate_actions (void);
-gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter);
-void __ca_export_public_pem (GtkTreeIter *iter, gint type);
-gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type);
-void __ca_export_private_pem (GtkTreeIter *iter, gint type);
-void __ca_export_pkcs12 (GtkTreeIter *iter, gint type);
+void __ca_export_public_pem_cv (GnomintCertRow *row, gint type);
+gchar * __ca_export_private_pkcs8_cv (GnomintCertRow *row, gint type);
+void __ca_export_private_pem_cv (GnomintCertRow *row, gint type);
+void __ca_export_pkcs12_cv (GnomintCertRow *row, gint type);
+
+/* Date formatting helper: convert epoch string to locale date string.
+ * Returns a newly allocated string, or NULL if the epoch is 0/empty. */
+static gchar *__ca_format_epoch_to_date (const gchar *epoch_str);
 
 void __disable_widget (gchar *widget_name);
 void __enable_widget (gchar *widget_name);
@@ -240,13 +240,7 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 			return 0;
 	}
 
-	GtkTreeIter iter;
-	GtkTreeStore * new_model = GTK_TREE_STORE (pArg);
-	GValue *last_id_value = g_new0 (GValue, 1);
-	GValue *last_parent_route_value = g_new0 (GValue, 1);
-        guint64 uint64_value;
-	const gchar * string_value;
-	gchar * last_node_route = NULL;
+	GListStore *root_store = G_LIST_STORE (pArg);
 
 	/* Compute this cert's *effective* expiration: the earliest of its
 	 * own notAfter and every ancestor CA's notAfter, per RFC 5280.
@@ -305,92 +299,8 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 
 	/* Skip if hiding expired and this cert (or its CA chain) is past. */
 	if (! view_expired && effective_expiration > 0 &&
-	    effective_expiration < time (NULL)) {
-		g_free (last_id_value);
-		g_free (last_parent_route_value);
+	    effective_expiration < time (NULL))
 		return 0;
-	}
-
-	if (cert_title_inserted == FALSE) {
-		gtk_tree_store_append (new_model, &iter, NULL);
-		gtk_tree_store_set (new_model, &iter,
-				    3, _("<b>Certificates</b>"),
-				    -1);
-		cert_parent_iter = gtk_tree_iter_copy (&iter);
-		cert_title_inserted = TRUE;
-	}
-
-	if (! last_cert_iter || (! strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],":"))) {
-		if (last_parent_iter)
-			gtk_tree_iter_free (last_parent_iter);
-		last_parent_iter = NULL;
-	} else {
-		// If not, then we must find the parent of the current node
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_ID, last_id_value);
-		gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_cert_iter, CA_MODEL_COLUMN_PARENT_ROUTE, 
-					  last_parent_route_value);
-		
-		uint64_value = g_value_get_uint64 (last_id_value);
-		string_value = g_value_get_string (last_parent_route_value);
-                g_assert (string_value);
-
-		last_node_route = g_strdup_printf ("%s%"G_GUINT64_FORMAT":", string_value, uint64_value);
-
-		if (! strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE], last_node_route)) {
-			// Last node is parent of the current node
-			if (last_parent_iter)
-				gtk_tree_iter_free (last_parent_iter);
-			last_parent_iter = gtk_tree_iter_copy (last_cert_iter);
-			g_free (last_node_route);
-			last_node_route = NULL;
-		} else {
-			// We go back in the hierarchical tree, starting in the current parent, until we find the parent of the
-			// current certificate.
-			
-			if (last_parent_iter)
-                                gtk_tree_iter_free (last_parent_iter);
-                        last_parent_iter = gtk_tree_iter_copy (last_cert_iter);
-
-			while (last_node_route && 
-			       strcmp (argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE], last_node_route)) {
-				
-				g_free (last_node_route);
-				last_node_route = NULL;
-
-				if (! gtk_tree_model_iter_parent(GTK_TREE_MODEL(new_model), &iter, last_parent_iter)) {
-					// Last ca iter is a top_level
-					if (last_parent_iter)
-						gtk_tree_iter_free (last_parent_iter);
-					last_parent_iter = NULL;
-				} else {
-					if (last_parent_iter)
-						gtk_tree_iter_free (last_parent_iter);
-					last_parent_iter = gtk_tree_iter_copy (&iter);
-
-					g_value_unset (last_parent_route_value);
-					g_value_unset (last_id_value);
-					
-					gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_parent_iter, CA_MODEL_COLUMN_ID, last_id_value);
-					gtk_tree_model_get_value (GTK_TREE_MODEL(new_model), last_parent_iter, CA_MODEL_COLUMN_PARENT_ROUTE, 
-								  last_parent_route_value);
-					
-					uint64_value = g_value_get_uint64 (last_id_value);
-					string_value = g_value_get_string (last_parent_route_value);
-					if (string_value != NULL)
-						last_node_route = g_strdup_printf ("%s%"G_GUINT64_FORMAT":", string_value, uint64_value);
-					else 
-						last_node_route = NULL;
-				}
-
-			}
-
-			if (last_node_route)
-				g_free (last_node_route);
-		}
-	
-	}
-	
-	gtk_tree_store_append (new_model, &iter, (last_parent_iter ? last_parent_iter: cert_parent_iter));
 
 	const gchar *row_foreground = ca_compute_row_foreground (
 	    effective_expiration, time (NULL),
@@ -408,60 +318,71 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	if (ca_view_only_expiring &&
 	    argv[CA_FILE_CERT_COLUMN_IS_CA] &&
 	    atoi (argv[CA_FILE_CERT_COLUMN_IS_CA]) == 0 &&
-	    !is_amber) {
-		if (last_id_value) g_free (last_id_value);
-		if (last_parent_route_value) g_free (last_parent_route_value);
+	    !is_amber)
 		return 0;
+
+	/* Build the GnomintCertRow for this certificate. */
+	GnomintCertRow *row = gnomint_cert_row_new ();
+	gnomint_cert_row_set_id (row, (guint64) atoll (argv[CA_FILE_CERT_COLUMN_ID]));
+	gnomint_cert_row_set_is_ca (row, atoi (argv[CA_FILE_CERT_COLUMN_IS_CA]) != 0);
+	gnomint_cert_row_set_serial (row, argv[CA_FILE_CERT_COLUMN_SERIAL]);
+
+	if (argv[CA_FILE_CERT_COLUMN_REVOCATION]) {
+		gchar *revoked_subject = g_markup_printf_escaped (
+		    "<s>%s</s>", argv[CA_FILE_CERT_COLUMN_SUBJECT]);
+		gnomint_cert_row_set_subject (row, revoked_subject);
+		g_free (revoked_subject);
+		gnomint_cert_row_set_revocation (row, TRUE);
+	} else {
+		gnomint_cert_row_set_subject (row, argv[CA_FILE_CERT_COLUMN_SUBJECT]);
+		gnomint_cert_row_set_revocation (row, FALSE);
 	}
 
-        if (! argv[CA_FILE_CERT_COLUMN_REVOCATION])
-                gtk_tree_store_set (new_model, &iter,
-                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CERT_COLUMN_ID]),
-                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_FILE_CERT_COLUMN_IS_CA]),
-                                    CA_MODEL_COLUMN_SERIAL, argv[CA_FILE_CERT_COLUMN_SERIAL],
-                                    CA_MODEL_COLUMN_SUBJECT, argv[CA_FILE_CERT_COLUMN_SUBJECT],
-                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_FILE_CERT_COLUMN_ACTIVATION]),
-                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_FILE_CERT_COLUMN_EXPIRATION]),
-                                    CA_MODEL_COLUMN_REVOCATION, 0,
-                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_FILE_CERT_COLUMN_PRIVATE_KEY_IN_DB]),
-                                    CA_MODEL_COLUMN_PEM, argv[CA_FILE_CERT_COLUMN_PEM],
-				    CA_MODEL_COLUMN_DN, argv[CA_FILE_CERT_COLUMN_DN],
-				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_FILE_CERT_COLUMN_PARENT_DN],
-				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],
-                                    CA_MODEL_COLUMN_ITEM_TYPE, 0,
-                                    CA_MODEL_COLUMN_FOREGROUND, row_foreground,
-                                    -1);
-        else {
-                gchar * revoked_subject = g_markup_printf_escaped ("<s>%s</s>",
-                                                                   argv[CA_FILE_CERT_COLUMN_SUBJECT]);
+	gnomint_cert_row_set_activation (row, argv[CA_FILE_CERT_COLUMN_ACTIVATION]);
+	gnomint_cert_row_set_expiration (row, argv[CA_FILE_CERT_COLUMN_EXPIRATION]);
+	gnomint_cert_row_set_pkey_in_db (row, atoi (argv[CA_FILE_CERT_COLUMN_PRIVATE_KEY_IN_DB]) != 0);
+	gnomint_cert_row_set_pem (row, argv[CA_FILE_CERT_COLUMN_PEM]);
+	gnomint_cert_row_set_dn (row, argv[CA_FILE_CERT_COLUMN_DN]);
+	gnomint_cert_row_set_parent_dn (row, argv[CA_FILE_CERT_COLUMN_PARENT_DN]);
+	gnomint_cert_row_set_parent_route (row, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE]);
+	gnomint_cert_row_set_item_type (row,
+	    gnomint_cert_row_get_is_ca (row) ? GNOMINT_ROW_TYPE_CA : GNOMINT_ROW_TYPE_CERT);
+	gnomint_cert_row_set_foreground (row, row_foreground);
+	gnomint_cert_row_set_effective_expiration (row, effective_expiration);
 
-                gtk_tree_store_set (new_model, &iter,
-                                    CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CERT_COLUMN_ID]),
-                                    CA_MODEL_COLUMN_IS_CA, atoi(argv[CA_FILE_CERT_COLUMN_IS_CA]),
-                                    CA_MODEL_COLUMN_SERIAL, argv[CA_FILE_CERT_COLUMN_SERIAL],
-                                    CA_MODEL_COLUMN_SUBJECT, revoked_subject,
-                                    CA_MODEL_COLUMN_ACTIVATION, atoi(argv[CA_FILE_CERT_COLUMN_ACTIVATION]),
-                                    CA_MODEL_COLUMN_EXPIRATION, atoi(argv[CA_FILE_CERT_COLUMN_EXPIRATION]),
-                                    CA_MODEL_COLUMN_REVOCATION, atoi(argv[CA_FILE_CERT_COLUMN_REVOCATION]),
-                                    CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_FILE_CERT_COLUMN_PRIVATE_KEY_IN_DB]),
-                                    CA_MODEL_COLUMN_PEM, argv[CA_FILE_CERT_COLUMN_PEM],
-				    CA_MODEL_COLUMN_DN, argv[CA_FILE_CERT_COLUMN_DN],
-				    CA_MODEL_COLUMN_PARENT_DN, argv[CA_FILE_CERT_COLUMN_PARENT_DN],
-				    CA_MODEL_COLUMN_PARENT_ROUTE, argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE],
-                                    CA_MODEL_COLUMN_ITEM_TYPE, 0,
-                                    CA_MODEL_COLUMN_FOREGROUND, row_foreground,
-                                    -1);
+	/* Find the parent: look up parent_route in the hash table.
+	 * Top-level certs have parent_route ":" and go into root_store. */
+	const gchar *parent_route = argv[CA_FILE_CERT_COLUMN_PARENT_ROUTE];
+	GListStore *target_store = root_store;
 
-                g_free (revoked_subject);
-        }
+	if (parent_route && g_strcmp0 (parent_route, ":") != 0 && ca_route_to_row) {
+		GnomintCertRow *parent_row = g_hash_table_lookup (
+		    ca_route_to_row, parent_route);
+		if (parent_row)
+			target_store = gnomint_cert_row_get_children (parent_row);
+	}
 
+	g_list_store_append (target_store, row);
 
-	if (last_cert_iter)
-		gtk_tree_iter_free (last_cert_iter);
-	last_cert_iter = gtk_tree_iter_copy (&iter);
- 
-	g_free (last_id_value);
-	g_free (last_parent_route_value);      	
+	/* Register this row so children can find it.  The key is
+	 * parent_route + id + ":" — the route that a child of this
+	 * row would carry. */
+	if (ca_route_to_row) {
+		gchar *my_route = g_strdup_printf (
+		    "%s%" G_GUINT64_FORMAT ":",
+		    parent_route ? parent_route : ":",
+		    gnomint_cert_row_get_id (row));
+		/* The hash table owns the key string. */
+		g_hash_table_insert (ca_route_to_row, my_route, row);
+	}
+
+	/* Also register by ID so CSRs can find their parent CA. */
+	if (ca_id_to_row) {
+		gchar *id_str = g_strdup (argv[CA_FILE_CERT_COLUMN_ID]);
+		g_hash_table_insert (ca_id_to_row, id_str, row);
+	}
+
+	g_object_unref (row);
 
 	return 0;
 }
@@ -477,292 +398,507 @@ int __ca_refresh_model_add_csr (void *pArg, int argc, char **argv, char **column
 			return 0;
 	}
 
-	GtkTreeIter iter;
-	GtkTreeStore * new_model = GTK_TREE_STORE(pArg);
+	GListStore *root_store = G_LIST_STORE (pArg);
 
-	if (csr_title_inserted == 0) {
-		gtk_tree_store_append (new_model, &iter, NULL);
-		gtk_tree_store_set (new_model, &iter,
-				    3, _("<b>Certificate Signing Requests</b>"),
-				    -1);		
-		csr_parent_iter = gtk_tree_iter_copy (&iter);
-		csr_title_inserted = TRUE;
+	GnomintCertRow *row = gnomint_cert_row_new ();
+	gnomint_cert_row_set_id (row, (guint64) atoll (argv[CA_FILE_CSR_COLUMN_ID]));
+	gnomint_cert_row_set_subject (row, argv[CA_FILE_CSR_COLUMN_SUBJECT]);
+	gnomint_cert_row_set_pkey_in_db (row, atoi (argv[CA_FILE_CSR_COLUMN_PRIVATE_KEY_IN_DB]) != 0);
+	gnomint_cert_row_set_pem (row, argv[CA_FILE_CSR_COLUMN_PEM]);
+	gnomint_cert_row_set_item_type (row, GNOMINT_ROW_TYPE_CSR);
+	if (argv[CA_FILE_CSR_COLUMN_PARENT_ID]) {
+		gnomint_cert_row_set_parent_id (row,
+		    (guint64) atoll (argv[CA_FILE_CSR_COLUMN_PARENT_ID]));
 	}
 
-	
-	gtk_tree_store_append (new_model, &iter, csr_parent_iter);
+	/* CSRs are shown as children of their parent CA in the tree.
+	 * Look up the parent CA by its id string. If not found (or no
+	 * parent), append to root. */
+	GListStore *target_store = root_store;
+	if (argv[CA_FILE_CSR_COLUMN_PARENT_ID] && ca_id_to_row) {
+		GnomintCertRow *parent_row = g_hash_table_lookup (
+		    ca_id_to_row, argv[CA_FILE_CSR_COLUMN_PARENT_ID]);
+		if (parent_row)
+			target_store = gnomint_cert_row_get_children (parent_row);
+	}
 
-        gtk_tree_store_set (new_model, &iter,
-                            CA_MODEL_COLUMN_ID, atoll(argv[CA_FILE_CSR_COLUMN_ID]),
-                            CA_MODEL_COLUMN_SUBJECT, argv[CA_FILE_CSR_COLUMN_SUBJECT],
-                            CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, atoi(argv[CA_FILE_CSR_COLUMN_PRIVATE_KEY_IN_DB]),
-                            CA_MODEL_COLUMN_PEM, argv[CA_FILE_CSR_COLUMN_PEM],
-                            CA_MODEL_COLUMN_PARENT_ID, argv[CA_FILE_CSR_COLUMN_PARENT_ID],
-                            CA_MODEL_COLUMN_ITEM_TYPE, 1,
-                            -1);
+	g_list_store_append (target_store, row);
+	g_object_unref (row);
+
 	return 0;
 }
 
-void __ca_tree_view_date_datafunc (GtkTreeViewColumn *tree_column,
-				   GtkCellRenderer *cell,
-				   GtkTreeModel *tree_model,
-				   GtkTreeIter *iter,
-				   gpointer data)
+/* ------------------------------------------------------------------ */
+/*  Date formatting helper (extracted from old tree-view data func)    */
+/* ------------------------------------------------------------------ */
+
+static gchar *
+__ca_format_epoch_to_date (const gchar *epoch_str)
 {
-	time_t model_time = 0;
+	if (!epoch_str || !epoch_str[0])
+		return NULL;
+
+	time_t model_time = (time_t) g_ascii_strtoll (epoch_str, NULL, 10);
+	if (model_time == 0)
+		return NULL;
+
+	gchar buf[100];
 #ifndef WIN32
 	struct tm model_time_tm;
-#else
-	struct tm *model_time_tm = NULL;
-#endif
-	gchar model_time_str[100];
-	gchar *result = NULL;
-
-	gtk_tree_model_get(tree_model, iter, GPOINTER_TO_INT(data), &model_time, -1);
-
-	if (model_time == 0) {
-		g_object_set (G_OBJECT(cell), "text", "", NULL);
-		return;
-	}
-#ifndef WIN32	
 	gmtime_r (&model_time, &model_time_tm);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &model_time_tm);
+	strftime (buf, sizeof (buf), _("%m/%d/%Y %R GMT"), &model_time_tm);
 #else
-	model_time_tm = gmtime(&model_time);
-	strftime(model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), model_time_tm);
+	struct tm *model_time_tm = gmtime (&model_time);
+	strftime (buf, sizeof (buf), _("%m/%d/%Y %H:%M GMT"), model_time_tm);
 #endif
-
-	result = g_strdup (model_time_str);
-
-	g_object_set(G_OBJECT(cell), "text", result, NULL);
-	
-	g_free (result);
+	return g_strdup (buf);
 }
 
+/* ------------------------------------------------------------------ */
+/*  GtkColumnView factory callbacks                                    */
+/* ------------------------------------------------------------------ */
 
-void __ca_tree_view_is_ca_datafunc (GtkTreeViewColumn *tree_column,
-                                    GtkCellRenderer *cell,
-                                    GtkTreeModel *tree_model,
-                                    GtkTreeIter *iter,
-                                    gpointer data)
+/* Helper: extract the GnomintCertRow from a GtkListItem.  The item in
+ * a GtkTreeListModel-backed column view is a GtkTreeListRow; the
+ * actual data object is obtained via gtk_tree_list_row_get_item(). */
+static GnomintCertRow *
+__ca_row_from_list_item (GtkListItem *list_item)
 {
-	gboolean is_ca;
-	gchar *file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "ca-stamp-16.png", NULL);
+	GtkTreeListRow *tree_row = GTK_TREE_LIST_ROW (
+	    gtk_list_item_get_item (list_item));
+	if (!tree_row)
+		return NULL;
+	return GNOMINT_CERT_ROW (gtk_tree_list_row_get_item (tree_row));
+}
 
-	static GdkPixbuf * is_ca_pixbuf = NULL;
-	static GdkPixbuf * null_pixbuf = NULL;
-	GError *gerror = NULL;
+/* --- Subject column (GtkTreeExpander + GtkLabel with markup) --- */
 
-	if (is_ca_pixbuf == NULL) {
-		is_ca_pixbuf = gdk_pixbuf_new_from_file (file, &gerror);
+static void
+__ca_subject_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                    GtkListItem *list_item,
+                    gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *expander = gtk_tree_expander_new ();
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+	gtk_label_set_ellipsize (GTK_LABEL (label), PANGO_ELLIPSIZE_END);
+	gtk_tree_expander_set_child (GTK_TREE_EXPANDER (expander), label);
+	gtk_list_item_set_child (list_item, expander);
+}
 
-		if (gerror)
-			g_print ("%s\n", gerror->message);
+static void
+__ca_subject_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                   GtkListItem *list_item,
+                   gpointer user_data G_GNUC_UNUSED)
+{
+	GtkTreeListRow *tree_row = GTK_TREE_LIST_ROW (
+	    gtk_list_item_get_item (list_item));
+	GtkWidget *expander = gtk_list_item_get_child (list_item);
+	gtk_tree_expander_set_list_row (GTK_TREE_EXPANDER (expander), tree_row);
+
+	GnomintCertRow *row = GNOMINT_CERT_ROW (
+	    gtk_tree_list_row_get_item (tree_row));
+	GtkWidget *label = gtk_tree_expander_get_child (
+	    GTK_TREE_EXPANDER (expander));
+
+	const gchar *subject = gnomint_cert_row_get_subject (row);
+	gtk_label_set_markup (GTK_LABEL (label), subject ? subject : "");
+
+	const gchar *fg = gnomint_cert_row_get_foreground (row);
+	if (fg) {
+		/* Apply foreground colour via CSS. */
+		GtkStyleContext *ctx = gtk_widget_get_style_context (label);
+		GtkCssProvider *prov = gtk_css_provider_new ();
+		gchar *css = g_strdup_printf ("label { color: %s; }", fg);
+		gtk_css_provider_load_from_data (prov, css, -1);
+		gtk_style_context_add_provider (ctx, GTK_STYLE_PROVIDER (prov),
+		                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+		g_free (css);
+		g_object_unref (prov);
 	}
+	g_object_unref (row);
+}
 
-	g_free (file);
+/* --- Is-CA column (GtkImage) --- */
 
-	if (null_pixbuf == NULL) {
-		null_pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
-	}
+static void
+__ca_is_ca_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                  GtkListItem *list_item,
+                  gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *image = gtk_image_new ();
+	gtk_list_item_set_child (list_item, image);
+}
 
-	gtk_tree_model_get(tree_model, iter, CA_MODEL_COLUMN_IS_CA, &is_ca, -1);
+static void
+__ca_is_ca_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                 GtkListItem *list_item,
+                 gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintCertRow *row = __ca_row_from_list_item (list_item);
+	GtkWidget *image = gtk_list_item_get_child (list_item);
 
-	if (is_ca) {
-		g_object_set (G_OBJECT(cell), "pixbuf", is_ca_pixbuf, NULL);
+	if (row && gnomint_cert_row_get_is_ca (row)) {
+		gchar *path = g_build_filename (
+		    PACKAGE_DATA_DIR, "gnomint", "ca-stamp-16.png", NULL);
+		gtk_image_set_from_file (GTK_IMAGE (image), path);
+		g_free (path);
 	} else {
-		g_object_set (G_OBJECT(cell), "pixbuf", null_pixbuf, NULL);
+		gtk_image_clear (GTK_IMAGE (image));
 	}
+	if (row) g_object_unref (row);
 }
 
-void __ca_tree_view_private_key_in_db_datafunc (GtkTreeViewColumn *tree_column,
-						GtkCellRenderer *cell,
-						GtkTreeModel *tree_model,
-						GtkTreeIter *iter,
-						gpointer data)
+/* --- Private-key column (GtkImage) --- */
+
+static void
+__ca_pkey_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                 GtkListItem *list_item,
+                 gpointer user_data G_GNUC_UNUSED)
 {
-	gboolean pk_indb;
-	gchar *file = g_build_filename (PACKAGE_DATA_DIR, "gnomint", "key-16.png", NULL);
+	GtkWidget *image = gtk_image_new ();
+	gtk_list_item_set_child (list_item, image);
+}
 
-	static GdkPixbuf * pk_in_db_pixbuf = NULL;
-	static GdkPixbuf * null_pixbuf = NULL;
-	GError *gerror = NULL;
+static void
+__ca_pkey_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                GtkListItem *list_item,
+                gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintCertRow *row = __ca_row_from_list_item (list_item);
+	GtkWidget *image = gtk_list_item_get_child (list_item);
 
-	if (pk_in_db_pixbuf == NULL) {
-		pk_in_db_pixbuf = gdk_pixbuf_new_from_file (file, &gerror);
-
-		if (gerror)
-			g_print ("%s\n", gerror->message);
-	}
-
-	g_free (file);
-
-	if (null_pixbuf == NULL) {
-		null_pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
-	}
-
-	gtk_tree_model_get(tree_model, iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, -1);
-
-	if (pk_indb) {
-		g_object_set (G_OBJECT(cell), "pixbuf", pk_in_db_pixbuf, NULL);
+	if (row && gnomint_cert_row_get_pkey_in_db (row)) {
+		gchar *path = g_build_filename (
+		    PACKAGE_DATA_DIR, "gnomint", "key-16.png", NULL);
+		gtk_image_set_from_file (GTK_IMAGE (image), path);
+		g_free (path);
 	} else {
-		g_object_set (G_OBJECT(cell), "pixbuf", null_pixbuf, NULL);
+		gtk_image_clear (GTK_IMAGE (image));
 	}
+	if (row) g_object_unref (row);
+}
+
+/* --- Serial column (GtkLabel) --- */
+
+static void
+__ca_serial_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                   GtkListItem *list_item,
+                   gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_list_item_set_child (list_item, label);
+}
+
+static void
+__ca_serial_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                  GtkListItem *list_item,
+                  gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintCertRow *row = __ca_row_from_list_item (list_item);
+	GtkWidget *label = gtk_list_item_get_child (list_item);
+	const gchar *serial = row ? gnomint_cert_row_get_serial (row) : NULL;
+	gtk_label_set_text (GTK_LABEL (label), serial ? serial : "");
+
+	const gchar *fg = row ? gnomint_cert_row_get_foreground (row) : NULL;
+	if (fg) {
+		GtkStyleContext *ctx = gtk_widget_get_style_context (label);
+		GtkCssProvider *prov = gtk_css_provider_new ();
+		gchar *css = g_strdup_printf ("label { color: %s; }", fg);
+		gtk_css_provider_load_from_data (prov, css, -1);
+		gtk_style_context_add_provider (ctx, GTK_STYLE_PROVIDER (prov),
+		                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+		g_free (css);
+		g_object_unref (prov);
+	}
+	if (row) g_object_unref (row);
+}
+
+/* --- Generic date column (Activation / Expiration / Revocation) --- */
+
+/* The user_data for the date bind callback indicates which field:
+ * 0 = activation, 1 = expiration, 2 = revocation. */
+#define CA_DATE_ACTIVATION  0
+#define CA_DATE_EXPIRATION  1
+#define CA_DATE_REVOCATION  2
+
+static void
+__ca_date_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                 GtkListItem *list_item,
+                 gpointer user_data G_GNUC_UNUSED)
+{
+	GtkWidget *label = gtk_label_new (NULL);
+	gtk_label_set_xalign (GTK_LABEL (label), 0);
+	gtk_list_item_set_child (list_item, label);
+}
+
+static void
+__ca_date_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
+                GtkListItem *list_item,
+                gpointer user_data)
+{
+	gint which = GPOINTER_TO_INT (user_data);
+	GnomintCertRow *row = __ca_row_from_list_item (list_item);
+	GtkWidget *label = gtk_list_item_get_child (list_item);
+
+	const gchar *epoch_str = NULL;
+	if (row) {
+		switch (which) {
+		case CA_DATE_ACTIVATION:
+			epoch_str = gnomint_cert_row_get_activation (row);
+			break;
+		case CA_DATE_EXPIRATION:
+			epoch_str = gnomint_cert_row_get_expiration (row);
+			break;
+		case CA_DATE_REVOCATION:
+			/* Revocation is stored as a boolean; the epoch
+			 * string is not stored separately. Show empty
+			 * for non-revoked, or just "(revoked)" for revoked. */
+			if (gnomint_cert_row_get_revocation (row))
+				epoch_str = NULL; /* fall through to special handling */
+			else
+				epoch_str = NULL;
+			break;
+		default:
+			epoch_str = NULL;
+			break;
+		}
+	}
+
+	/* For the revocation column, we don't have epoch data in the new
+	 * model (revocation is a boolean). Show "Yes" / empty. */
+	if (which == CA_DATE_REVOCATION) {
+		if (row && gnomint_cert_row_get_revocation (row))
+			gtk_label_set_text (GTK_LABEL (label), _("Yes"));
+		else
+			gtk_label_set_text (GTK_LABEL (label), "");
+	} else {
+		gchar *formatted = __ca_format_epoch_to_date (epoch_str);
+		gtk_label_set_text (GTK_LABEL (label), formatted ? formatted : "");
+		g_free (formatted);
+	}
+
+	const gchar *fg = row ? gnomint_cert_row_get_foreground (row) : NULL;
+	if (fg) {
+		GtkStyleContext *ctx = gtk_widget_get_style_context (label);
+		GtkCssProvider *prov = gtk_css_provider_new ();
+		gchar *css = g_strdup_printf ("label { color: %s; }", fg);
+		gtk_css_provider_load_from_data (prov, css, -1);
+		gtk_style_context_add_provider (ctx, GTK_STYLE_PROVIDER (prov),
+		                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+		g_free (css);
+		g_object_unref (prov);
+	}
+	if (row) g_object_unref (row);
 }
 
 
 
-gboolean ca_refresh_model_callback () 
+/* GtkTreeListModel child-model callback: given a GnomintCertRow,
+ * return its children GListStore (or NULL if empty/leaf). */
+static GListModel *
+__ca_tree_list_create_model (gpointer item, gpointer user_data G_GNUC_UNUSED)
 {
-	GtkTreeStore * new_model = NULL;
-	GtkTreeView * treeview = NULL;
-	GtkCellRenderer * renderer = NULL;
-        GtkTreeViewColumn * column = NULL;
-                 
-        guint columns_number;
+	GnomintCertRow *row = GNOMINT_CERT_ROW (item);
+	GListStore *children = gnomint_cert_row_get_children (row);
+	if (g_list_model_get_n_items (G_LIST_MODEL (children)) == 0)
+		return NULL;
+	return G_LIST_MODEL (g_object_ref (children));
+}
 
-	/* Models have these columns: 
-           - Id
-           - Is CA
-           - Serial
-           - Subject
-           - Activation
-           - Expiration
-           - Revocation
-           - Private key is in DB
-           - PEM data
-           - DN
-           - Parent DN
-           - Parent route
-           - Item type
-           - Parent ID (only for CSR)
-	*/
+/* Helper: recursively expand all rows in the tree list model. */
+static void
+__ca_expand_all (GtkTreeListModel *tree_model)
+{
+	guint n = g_list_model_get_n_items (G_LIST_MODEL (tree_model));
+	for (guint i = 0; i < n; i++) {
+		GtkTreeListRow *tlr = gtk_tree_list_model_get_row (tree_model, i);
+		if (tlr) {
+			gtk_tree_list_row_set_expanded (tlr, TRUE);
+			g_object_unref (tlr);
+		}
+		/* After expanding, new items may have been inserted, so
+		 * update n to cover them. */
+		n = g_list_model_get_n_items (G_LIST_MODEL (tree_model));
+	}
+}
 
-	new_model = gtk_tree_store_new (CA_MODEL_COLUMN_NUMBER, G_TYPE_UINT64, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING,
-					G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN, G_TYPE_STRING,
-					G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING,
-					G_TYPE_STRING /* FOREGROUND */);
+/* Column view revocation column reference, used to toggle visibility. */
+static GtkColumnViewColumn *ca_revocation_column = NULL;
 
-	cert_title_inserted = FALSE;
-	cert_parent_iter = NULL;
-	last_parent_iter = NULL;
-	last_cert_iter = NULL;
+gboolean ca_refresh_model_callback ()
+{
+	/* Build a fresh root GListStore. */
+	GListStore *new_root = g_list_store_new (GNOMINT_TYPE_CERT_ROW);
 
 	if (ca_effective_expiration)
 		g_hash_table_destroy (ca_effective_expiration);
 	ca_effective_expiration = g_hash_table_new (g_direct_hash, g_direct_equal);
 	ca_expiring_soon_count = 0;
-	csr_title_inserted=FALSE;
-	csr_parent_iter = NULL;
 
-	ca_file_foreach_crt (__ca_refresh_model_add_certificate, view_rcrt, new_model);
-          
-        if (view_csr)
-		ca_file_foreach_csr (__ca_refresh_model_add_csr, new_model);
+	/* Build temporary hash tables for parent lookup during population. */
+	if (ca_route_to_row)
+		g_hash_table_destroy (ca_route_to_row);
+	ca_route_to_row = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
-	treeview = GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
+	if (ca_id_to_row)
+		g_hash_table_destroy (ca_id_to_row);
+	ca_id_to_row = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
-	if (ca_model) {
-                GList * column_list;
-		g_object_unref (ca_model);		
+	ca_file_foreach_crt (__ca_refresh_model_add_certificate, view_rcrt, new_root);
 
-                // Remove revocation column
-                column_list = gtk_tree_view_get_columns (treeview);
-                columns_number = g_list_length (column_list);
-                g_list_free (column_list);
-        
-                
-	} else {
-/*                 GtkTooltips * table_tooltips = gtk_tooltips_new(); */
-          
-		/* There's no model assigned to the treeview yet, so we add its columns */
-		
-		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
+	if (view_csr)
+		ca_file_foreach_csr (__ca_refresh_model_add_csr, new_root);
 
-		gtk_tree_view_insert_column_with_attributes (treeview,
-							     -1, _("Subject"), renderer,
-							     "markup", CA_MODEL_COLUMN_SUBJECT,
-							     "foreground", CA_MODEL_COLUMN_FOREGROUND,
-							     NULL);
+	/* Clean up the temporary hash tables. */
+	g_hash_table_destroy (ca_route_to_row);
+	ca_route_to_row = NULL;
+	g_hash_table_destroy (ca_id_to_row);
+	ca_id_to_row = NULL;
 
-/*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
-/*                                       _("Subject of the certificate or request"),  */
-/*                                       _("This is the distinguished name (DN) of the certificate or request")); */
+	/* Replace the root model. */
+	if (ca_root_model)
+		g_object_unref (ca_root_model);
+	ca_root_model = new_root;
 
-		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
-		
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, "", renderer,
-							    __ca_tree_view_is_ca_datafunc, 
-							    NULL, NULL);
+	/* Create a GtkTreeListModel wrapping the flat root store. */
+	GtkTreeListModel *tree_model = gtk_tree_list_model_new (
+	    G_LIST_MODEL (g_object_ref (ca_root_model)),
+	    FALSE,  /* passthrough = FALSE so items are GtkTreeListRow */
+	    TRUE,   /* autoexpand — we'll also expand manually */
+	    __ca_tree_list_create_model,
+	    NULL, NULL);
 
-/*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
-/*                                       _("It's a CA certificate"),  */
-/*                                       _("An icon in this column shows that the certificate is able to generate and sign " */
-/*                                         "new certificates.")); */
-
-		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_pixbuf_new ());
-
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, "", renderer,
-							    __ca_tree_view_private_key_in_db_datafunc, 
-							    NULL, NULL);
-
-/*                 gtk_tooltips_set_tip (table_tooltips, GTK_WIDGET(gtk_tree_view_get_column(treeview, column_number - 1)),  */
-/*                                       _("Private key kept in internal database"),  */
-/*                                       _("An icon in this column shows that the private key related to the certificate " */
-/*                                         "is kept in the gnoMint database.")); */
-
-		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
-
-		gtk_tree_view_insert_column_with_attributes (treeview,
-                                                             -1, _("Serial"), renderer,
-                                                             "markup", CA_MODEL_COLUMN_SERIAL,
-                                                             "foreground", CA_MODEL_COLUMN_FOREGROUND,
-                                                             NULL);
-		
-		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
-
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, _("Activation"), renderer,
-							    __ca_tree_view_date_datafunc,
-							    GINT_TO_POINTER(CA_MODEL_COLUMN_ACTIVATION), g_free);
-		gtk_tree_view_column_add_attribute (
-		    gtk_tree_view_get_column (treeview, -1 + (gint)gtk_tree_view_get_n_columns (treeview)),
-		    renderer, "foreground", CA_MODEL_COLUMN_FOREGROUND);
-
-		renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
-
-		gtk_tree_view_insert_column_with_data_func (treeview,
-							    -1, _("Expiration"), renderer,
-							    __ca_tree_view_date_datafunc,
-							    GINT_TO_POINTER(CA_MODEL_COLUMN_EXPIRATION), g_free);
-		gtk_tree_view_column_add_attribute (
-		    gtk_tree_view_get_column (treeview, -1 + (gint)gtk_tree_view_get_n_columns (treeview)),
-		    renderer, "foreground", CA_MODEL_COLUMN_FOREGROUND);
-
-                renderer = GTK_CELL_RENDERER(gtk_cell_renderer_text_new ());
-
-                columns_number = gtk_tree_view_insert_column_with_data_func (treeview,
-                                                                             -1, _("Revocation"), renderer,
-                                                                             __ca_tree_view_date_datafunc,
-                                                                             GINT_TO_POINTER(CA_MODEL_COLUMN_REVOCATION),
-                                                                             g_free);
-                gtk_tree_view_column_add_attribute (
-                    gtk_tree_view_get_column (treeview, columns_number - 1),
-                    renderer, "foreground", CA_MODEL_COLUMN_FOREGROUND);
-                
-
+	/* Get or create the column view. */
+	if (!ca_columnview) {
+		GObject *obj = gtk_builder_get_object (main_window_gtkb, "ca_treeview");
+		ca_columnview = GTK_COLUMN_VIEW (obj);
 	}
 
-        column = gtk_tree_view_get_column(treeview, columns_number - 1);
+	gboolean first_time = (ca_tree_list_model == NULL);
 
-        gtk_tree_view_column_set_visible (column, view_rcrt);        
+	/* Replace old tree list model. */
+	if (ca_tree_list_model)
+		g_object_unref (ca_tree_list_model);
+	ca_tree_list_model = tree_model;
 
-	gtk_tree_view_set_model (treeview, GTK_TREE_MODEL(new_model));
-	ca_model = new_model;
+	/* Create a selection model. */
+	GtkMultiSelection *sel = gtk_multi_selection_new (
+	    G_LIST_MODEL (g_object_ref (ca_tree_list_model)));
+	if (ca_selection_model)
+		g_object_unref (ca_selection_model);
+	ca_selection_model = sel;
 
-	gtk_tree_view_expand_all (treeview);
+	if (first_time) {
+		/* ---- Set up columns (done once) ---- */
+
+		/* Subject */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_subject_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_subject_bind),  NULL);
+			GtkColumnViewColumn *col = gtk_column_view_column_new (
+			    _("Subject"), f);
+			gtk_column_view_column_set_expand (col, TRUE);
+			gtk_column_view_column_set_resizable (col, TRUE);
+			gtk_column_view_append_column (ca_columnview, col);
+			g_object_unref (col);
+		}
+
+		/* Is CA */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_is_ca_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_is_ca_bind),  NULL);
+			GtkColumnViewColumn *col = gtk_column_view_column_new ("", f);
+			gtk_column_view_column_set_fixed_width (col, 32);
+			gtk_column_view_append_column (ca_columnview, col);
+			g_object_unref (col);
+		}
+
+		/* Private Key */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_pkey_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_pkey_bind),  NULL);
+			GtkColumnViewColumn *col = gtk_column_view_column_new ("", f);
+			gtk_column_view_column_set_fixed_width (col, 32);
+			gtk_column_view_append_column (ca_columnview, col);
+			g_object_unref (col);
+		}
+
+		/* Serial */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_serial_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_serial_bind),  NULL);
+			GtkColumnViewColumn *col = gtk_column_view_column_new (
+			    _("Serial"), f);
+			gtk_column_view_column_set_resizable (col, TRUE);
+			gtk_column_view_append_column (ca_columnview, col);
+			g_object_unref (col);
+		}
+
+		/* Activation */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_date_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_date_bind),
+			                  GINT_TO_POINTER (CA_DATE_ACTIVATION));
+			GtkColumnViewColumn *col = gtk_column_view_column_new (
+			    _("Activation"), f);
+			gtk_column_view_column_set_resizable (col, TRUE);
+			gtk_column_view_append_column (ca_columnview, col);
+			g_object_unref (col);
+		}
+
+		/* Expiration */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_date_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_date_bind),
+			                  GINT_TO_POINTER (CA_DATE_EXPIRATION));
+			GtkColumnViewColumn *col = gtk_column_view_column_new (
+			    _("Expiration"), f);
+			gtk_column_view_column_set_resizable (col, TRUE);
+			gtk_column_view_append_column (ca_columnview, col);
+			g_object_unref (col);
+		}
+
+		/* Revocation */
+		{
+			GtkListItemFactory *f = gtk_signal_list_item_factory_new ();
+			g_signal_connect (f, "setup", G_CALLBACK (__ca_date_setup), NULL);
+			g_signal_connect (f, "bind",  G_CALLBACK (__ca_date_bind),
+			                  GINT_TO_POINTER (CA_DATE_REVOCATION));
+			ca_revocation_column = gtk_column_view_column_new (
+			    _("Revocation"), f);
+			gtk_column_view_column_set_resizable (ca_revocation_column, TRUE);
+			gtk_column_view_append_column (ca_columnview, ca_revocation_column);
+			/* Don't unref — we keep the pointer to toggle visibility. */
+		}
+
+		/* Connect selection-changed. */
+		g_signal_connect (ca_selection_model, "selection-changed",
+		                  G_CALLBACK (ca_treeview_selection_change), NULL);
+
+		/* Connect row activation. */
+		g_signal_connect (ca_columnview, "activate",
+		                  G_CALLBACK (ca_treeview_row_activated), NULL);
+	}
+
+	/* Toggle revocation column visibility. */
+	if (ca_revocation_column)
+		gtk_column_view_column_set_visible (ca_revocation_column, view_rcrt);
+
+	/* Set the model on the column view. */
+	gtk_column_view_set_model (ca_columnview,
+	                           GTK_SELECTION_MODEL (ca_selection_model));
+
+	/* Expand all rows. */
+	__ca_expand_all (ca_tree_list_model);
 
 	/* Update the expiry banner (#56). Shown only when at least one
 	 * cert is in the amber window AND the user hasn't dismissed it
@@ -881,312 +1017,219 @@ ca_expiry_infobar_response (GtkInfoBar *bar,
 	}
 }
 
-void __ca_certificate_activated (GtkTreeView *tree_view,
-                                 GtkTreePath *path,
-                                 GtkTreeViewColumn *column,
-                                 gpointer user_data)
-{	
-        GValue * valueid = g_new0 (GValue, 1);
-	GValue * valuestr = g_new0 (GValue, 1);
-	GValue * value_pkey_in_db = g_new0 (GValue, 1);
-	GValue * value_is_ca = g_new0 (GValue, 1);
-	GtkTreeIter iter;
-	GtkTreeModel * tree_model = gtk_tree_view_get_model (tree_view);
-	
-	gtk_tree_model_get_iter (tree_model, &iter, path);
-        gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_ID, valueid);
-	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PEM, valuestr);	
-	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, value_pkey_in_db);	
-	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_IS_CA, value_is_ca);	
+/* ------------------------------------------------------------------ */
+/*  Selection helpers for GtkColumnView                                */
+/* ------------------------------------------------------------------ */
 
-	certificate_properties_display (g_value_get_uint64 (valueid),
-                                        g_value_get_string(valuestr), g_value_get_boolean(value_pkey_in_db),
-					g_value_get_boolean (value_is_ca));
-
-	g_free (valuestr);
-	g_free (value_pkey_in_db);
-	g_free (value_is_ca);
-}
-
-void __ca_csr_activated (GtkTreeView *tree_view,
-                         GtkTreePath *path,
-                         GtkTreeViewColumn *column,
-                         gpointer user_data)
-{	
-	GValue * value = g_new0 (GValue, 1);
-	GValue * valuebool = g_new0 (GValue, 1);
-	GtkTreeIter iter;
-	GtkTreeModel * tree_model = gtk_tree_view_get_model (tree_view);
-	
-	gtk_tree_model_get_iter (tree_model, &iter, path);
-	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PEM, value);	
-	gtk_tree_model_get_value (tree_model, &iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, valuebool);	
-
-	csr_properties_display (g_value_get_string(value), g_value_get_boolean (valuebool));
-
-	free (value);
-	free (valuebool);
-}
-
-
-
-G_MODULE_EXPORT gboolean ca_treeview_row_activated (GtkTreeView *tree_view,
-				    GtkTreePath *path,
-				    GtkTreeViewColumn *column,
-				    gpointer user_data)
+static GnomintCertRow *
+__ca_get_selected_row (void)
 {
+	if (!ca_selection_model)
+		return NULL;
 
-        GtkTreePath *parent = NULL;
-	
-        if (tree_view == NULL) {
-                GtkTreeSelection *selection;
-                GtkTreeIter selection_iter;
-		
-                tree_view = GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-                selection = gtk_tree_view_get_selection (tree_view);
-		
-                if (gtk_tree_selection_count_selected_rows (selection) != 1)
-                        return FALSE;
+	GtkBitset *sel = gtk_selection_model_get_selection (
+	    GTK_SELECTION_MODEL (ca_selection_model));
+	if (gtk_bitset_get_size (sel) != 1)
+		return NULL;
 
-                /* Tree-view selection mode is GTK_SELECTION_MULTIPLE since
-                 * #54; the single-row helpers must use _get_selected_rows
-                 * even when exactly one row is selected. */
-                GtkTreeModel *_m = NULL;
-                GList *_rows = gtk_tree_selection_get_selected_rows (selection, &_m);
-                if (! _rows) return FALSE;
-                gtk_tree_model_get_iter (_m, &selection_iter, _rows->data);
-                path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
-                g_list_free_full (_rows, (GDestroyNotify) gtk_tree_path_free);
+	guint pos = gtk_bitset_get_nth (sel, 0);
+	GtkTreeListRow *tlr = GTK_TREE_LIST_ROW (
+	    g_list_model_get_item (
+	        G_LIST_MODEL (ca_selection_model), pos));
+	if (!tlr)
+		return NULL;
 
-			
+	GnomintCertRow *row = GNOMINT_CERT_ROW (
+	    gtk_tree_list_row_get_item (tlr));
+	g_object_unref (tlr);
+	return row;   /* caller must g_object_unref */
+}
+
+static gint
+__ca_selection_type_cv (GnomintCertRow **row_out)
+{
+	GnomintCertRow *row = __ca_get_selected_row ();
+	if (!row) {
+		if (row_out) *row_out = NULL;
+		return -1;
 	}
-	
-	parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
-	if (gtk_tree_path_is_ancestor (parent, path) && gtk_tree_path_compare (parent, path)) {
-		__ca_certificate_activated (tree_view, path, column, user_data);
-	} else {
-		gtk_tree_path_free (parent);
-		
-		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
-		if (gtk_tree_path_is_ancestor (parent, path) && gtk_tree_path_compare (parent, path)) {
-			__ca_csr_activated (tree_view, path, column, user_data);
-		}
+	gint item_type = gnomint_cert_row_get_item_type (row);
+	if (row_out)
+		*row_out = row;  /* transfer ownership to caller */
+	else
+		g_object_unref (row);
+
+	switch (item_type) {
+	case GNOMINT_ROW_TYPE_CERT:
+	case GNOMINT_ROW_TYPE_CA:
+		return CA_FILE_ELEMENT_TYPE_CERT;
+	case GNOMINT_ROW_TYPE_CSR:
+		return CA_FILE_ELEMENT_TYPE_CSR;
+	default:
+		return -1;
 	}
-	gtk_tree_path_free (parent);
-	
+}
+
+/* ------------------------------------------------------------------ */
+/*  Activation handlers for GtkColumnView                              */
+/* ------------------------------------------------------------------ */
+
+static void
+__ca_certificate_activated_cv (GnomintCertRow *row)
+{
+	certificate_properties_display (
+	    gnomint_cert_row_get_id (row),
+	    gnomint_cert_row_get_pem (row),
+	    gnomint_cert_row_get_pkey_in_db (row),
+	    gnomint_cert_row_get_is_ca (row));
+}
+
+static void
+__ca_csr_activated_cv (GnomintCertRow *row)
+{
+	csr_properties_display (
+	    gnomint_cert_row_get_pem (row),
+	    gnomint_cert_row_get_pkey_in_db (row));
+}
+
+/* GtkColumnView "activate" signal or menu "Properties" action.
+ * The old signature took GtkTreeView args; the new one takes
+ * GtkColumnView + position.  We also support being called with
+ * NULL arguments (from the Properties menu item). */
+G_MODULE_EXPORT gboolean
+ca_treeview_row_activated (GtkColumnView *colview G_GNUC_UNUSED,
+                           guint position,
+                           gpointer user_data G_GNUC_UNUSED)
+{
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT && row) {
+		__ca_certificate_activated_cv (row);
+	} else if (type == CA_FILE_ELEMENT_TYPE_CSR && row) {
+		__ca_csr_activated_cv (row);
+	}
+
+	if (row) g_object_unref (row);
 	return FALSE;
-	
 }
 
 
-void __ca_activate_certificate_selection (GtkTreeIter *iter)
+static void
+__ca_set_action_enabled (const gchar *action_name, gboolean enabled)
 {
-	GObject *widget;
-	gboolean is_ca = FALSE;
-	gboolean pk_indb = FALSE;
-	gint is_revoked = FALSE;
-	
-	widget = gtk_builder_get_object (main_window_gtkb, "export1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "export_chain1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter,
-			   CA_MODEL_COLUMN_IS_CA, &is_ca,
-			   CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, 
-			   CA_MODEL_COLUMN_REVOCATION, &is_revoked, -1);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-	widget = gtk_builder_get_object (main_window_gtkb, "extractpkey_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-
-        widget = gtk_builder_get_object (main_window_gtkb, "revoke1");
-        gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
-        widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
-        gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
-
-        widget = gtk_builder_get_object (main_window_gtkb, "renew1");
-        if (widget) gtk_widget_set_sensitive (GTK_WIDGET(widget), (! is_revoked));
-
-	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "delete2");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "delete_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "properties1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-
-
+	GtkWidget *win = GTK_WIDGET (gtk_builder_get_object (main_window_gtkb, "main_window1"));
+	if (!win) return;
+	GAction *a = g_action_map_lookup_action (G_ACTION_MAP (win), action_name);
+	if (a) g_simple_action_set_enabled (G_SIMPLE_ACTION (a), enabled);
 }
 
-void __ca_activate_csr_selection (GtkTreeIter *iter)
+static void
+__ca_set_toolbutton_sensitive (const gchar *id, gboolean sensitive)
 {
-	GObject *widget;
-	gboolean pk_indb = FALSE;
-	
-	widget = gtk_builder_get_object (main_window_gtkb, "export1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
+	GObject *w = gtk_builder_get_object (main_window_gtkb, id);
+	if (w) gtk_widget_set_sensitive (GTK_WIDGET (w), sensitive);
+}
 
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &pk_indb, -1);
+void __ca_activate_certificate_selection_cv (GnomintCertRow *row)
+{
+	gboolean pk_indb = gnomint_cert_row_get_pkey_in_db (row);
+	gboolean is_revoked = gnomint_cert_row_get_revocation (row);
+	gboolean is_ca = gnomint_cert_row_get_is_ca (row);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
-	widget = gtk_builder_get_object (main_window_gtkb, "extractpkey_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), pk_indb);
+	__ca_set_action_enabled ("export", TRUE);
+	__ca_set_action_enabled ("export-chain", TRUE);
+	__ca_set_action_enabled ("extract-pkey", pk_indb);
+	__ca_set_toolbutton_sensitive ("extractpkey_toolbutton", pk_indb);
+	__ca_set_action_enabled ("revoke", !is_revoked);
+	__ca_set_toolbutton_sensitive ("revoke_toolbutton", !is_revoked);
+	/* Renewal is not offered for CA certificates: the new cert would
+	 * have a different key, so all certificates previously signed by
+	 * the old CA would no longer chain to it. */
+	__ca_set_action_enabled ("renew", !is_revoked && !is_ca);
+	__ca_set_action_enabled ("sign", FALSE);
+	__ca_set_toolbutton_sensitive ("sign_toolbutton", FALSE);
+	__ca_set_action_enabled ("delete", FALSE);
+	__ca_set_toolbutton_sensitive ("delete_toolbutton", FALSE);
+	__ca_set_action_enabled ("properties", TRUE);
+}
 
-	widget = gtk_builder_get_object (main_window_gtkb, "revoke1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+void __ca_activate_csr_selection_cv (GnomintCertRow *row)
+{
+	gboolean pk_indb = gnomint_cert_row_get_pkey_in_db (row);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "renew1");
-	if (widget) gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "delete2");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-	widget = gtk_builder_get_object (main_window_gtkb, "delete_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "properties1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), TRUE);
+	__ca_set_action_enabled ("export", TRUE);
+	__ca_set_action_enabled ("extract-pkey", pk_indb);
+	__ca_set_toolbutton_sensitive ("extractpkey_toolbutton", pk_indb);
+	__ca_set_action_enabled ("revoke", FALSE);
+	__ca_set_toolbutton_sensitive ("revoke_toolbutton", FALSE);
+	__ca_set_action_enabled ("renew", FALSE);
+	__ca_set_action_enabled ("sign", TRUE);
+	__ca_set_toolbutton_sensitive ("sign_toolbutton", TRUE);
+	__ca_set_action_enabled ("delete", TRUE);
+	__ca_set_toolbutton_sensitive ("delete_toolbutton", TRUE);
+	__ca_set_action_enabled ("properties", TRUE);
 }
 
 void __ca_deactivate_actions ()
 {
-	GObject *widget;
-
-	widget = gtk_builder_get_object (main_window_gtkb, "export1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "export_chain1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "extractprivatekey1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "extractpkey_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "revoke1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "revoke_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "renew1");
-	if (widget) gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "sign1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "sign_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "delete2");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-	widget = gtk_builder_get_object (main_window_gtkb, "delete_toolbutton");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
-
-	widget = gtk_builder_get_object (main_window_gtkb, "properties1");
-	gtk_widget_set_sensitive (GTK_WIDGET(widget), FALSE);
+	__ca_set_action_enabled ("export", FALSE);
+	__ca_set_action_enabled ("export-chain", FALSE);
+	__ca_set_action_enabled ("extract-pkey", FALSE);
+	__ca_set_toolbutton_sensitive ("extractpkey_toolbutton", FALSE);
+	__ca_set_action_enabled ("revoke", FALSE);
+	__ca_set_toolbutton_sensitive ("revoke_toolbutton", FALSE);
+	__ca_set_action_enabled ("renew", FALSE);
+	__ca_set_action_enabled ("sign", FALSE);
+	__ca_set_toolbutton_sensitive ("sign_toolbutton", FALSE);
+	__ca_set_action_enabled ("delete", FALSE);
+	__ca_set_toolbutton_sensitive ("delete_toolbutton", FALSE);
+	__ca_set_action_enabled ("properties", FALSE);
 }
 
-gint __ca_selection_type (GtkTreeView *tree_view, GtkTreeIter **iter) {
-
-	GtkTreeSelection *selection = gtk_tree_view_get_selection (tree_view);
-	GtkTreeIter selection_iter;
-	GtkTreePath *parent = NULL;
-	GtkTreePath *selection_path = NULL;
-
-	if (gtk_tree_selection_count_selected_rows (selection) != 1)
-		return -1;
-
-	/* GTK_SELECTION_MULTIPLE; _get_selected_rows works for any count. */
-	{
-		GtkTreeModel *_m = NULL;
-		GList *_rows = gtk_tree_selection_get_selected_rows (selection, &_m);
-		if (! _rows) return -1;
-		gtk_tree_model_get_iter (_m, &selection_iter, _rows->data);
-		g_list_free_full (_rows, (GDestroyNotify) gtk_tree_path_free);
-	}
-	if (iter)
-		(*iter) = gtk_tree_iter_copy (&selection_iter);
-
-	selection_path = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), &selection_iter);
-	
-	if (cert_parent_iter) {
-		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), cert_parent_iter);
-		if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
-			gtk_tree_path_free (parent);
-			gtk_tree_path_free (selection_path);
-			/* It's a certificate */
-			return CA_FILE_ELEMENT_TYPE_CERT;
-		}
-		gtk_tree_path_free (parent);
-	}
-
-	if (csr_parent_iter) {
-		parent = gtk_tree_model_get_path (gtk_tree_view_get_model(tree_view), csr_parent_iter);
-		if (gtk_tree_path_is_ancestor (parent, selection_path) && gtk_tree_path_compare (parent, selection_path)) {
-			gtk_tree_path_free (parent);
-			gtk_tree_path_free (selection_path);
-			/* It's a CSR */
-			return CA_FILE_ELEMENT_TYPE_CSR;
-		}
-		gtk_tree_path_free (parent);
-	}
-
-	gtk_tree_path_free (selection_path);
-	return -1;
-}
-
-G_MODULE_EXPORT gboolean ca_treeview_selection_change (GtkTreeView *tree_view,
-				       gpointer user_data)
+/* GtkMultiSelection "selection-changed" handler.  Signature differs
+ * from the old GtkTreeView "cursor-changed"; we ignore the position/
+ * n_items args and just re-query the selection. */
+G_MODULE_EXPORT void
+ca_treeview_selection_change (GtkSelectionModel *model G_GNUC_UNUSED,
+                              guint position G_GNUC_UNUSED,
+                              guint n_items G_GNUC_UNUSED,
+                              gpointer user_data G_GNUC_UNUSED)
 {
-	GtkTreeIter *selection_iter = NULL;
-	switch (__ca_selection_type (tree_view, &selection_iter)) {
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
+
+	switch (type) {
 	case CA_FILE_ELEMENT_TYPE_CERT:
-		__ca_activate_certificate_selection (selection_iter);
-		gtk_tree_iter_free (selection_iter);
+		__ca_activate_certificate_selection_cv (row);
+		g_object_unref (row);
 		break;
 	case CA_FILE_ELEMENT_TYPE_CSR:
-		__ca_activate_csr_selection (selection_iter);
-		gtk_tree_iter_free (selection_iter);
+		__ca_activate_csr_selection_cv (row);
+		g_object_unref (row);
 		break;
 	case -1:
 	default:
-		if (selection_iter)
-			gtk_tree_iter_free (selection_iter);
-		__ca_deactivate_actions();
+		if (row) g_object_unref (row);
+		__ca_deactivate_actions ();
 		break;
 	}
-
-	return FALSE;
 }
 
 
-void __ca_export_public_pem (GtkTreeIter *iter, gint type)
+void __ca_export_public_pem_cv (GnomintCertRow *row, gint type)
 {
 	GObject *widget = NULL;
 	GIOChannel * file = NULL;
 	gchar * filename = NULL;
-	gchar * pem = NULL;
-	gchar * parent_route = NULL;
+	const gchar * pem = NULL;
+	const gchar * parent_route = NULL;
 	GtkDialog * dialog = NULL;
 	GError * error = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	
-	if (type == 1)
+
+	if (type == CA_FILE_ELEMENT_TYPE_CERT)
 		dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export certificate"),
 								  GTK_WINDOW(widget),
 								  GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1200,33 +1243,29 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 								  _("_Cancel"), GTK_RESPONSE_CANCEL,
 								  _("_Save"), GTK_RESPONSE_ACCEPT,
 								  NULL));
-		
-	
+
+
 	if (compat_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
 		filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
 		file = g_io_channel_new_file (filename, "w", &error);
 		if (error) {
 			gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-			if (type == 1)
+			if (type == CA_FILE_ELEMENT_TYPE_CERT)
 				dialog_error (_("There was an error while exporting certificate."));
 			else
 				dialog_error (_("There was an error while exporting CSR."));
 			return;
-		} 
+		}
 
-                gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &pem, -1);
-                if (type == 1)
-			gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PARENT_ROUTE, &parent_route, -1);
-			
-                g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
+                pem = gnomint_cert_row_get_pem (row);
+                if (type == CA_FILE_ELEMENT_TYPE_CERT)
+			parent_route = gnomint_cert_row_get_parent_route (row);
+
+                if (pem)
+                        g_io_channel_write_chars (file, pem, strlen(pem), NULL, &error);
 
 		if (parent_route && strcmp (parent_route, ":")) {
-			// The parent of the certificate is in the data base.
-			// We then export all the certificates up to the root, after the given certificate
-			// so it can be validated
-
 			gchar ** tokens = g_strsplit (parent_route, ":", -1);
-			// First and last tokens are always empty, as all parent ids start and end by ':'
 			guint num_tokens = g_strv_length (tokens) - 2;
 			gint i;
 
@@ -1234,8 +1273,8 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
 				gchar * parent_pem = ca_file_get_public_pem_from_id (CA_FILE_ELEMENT_TYPE_CERT, atoll(tokens[i]));
 				if (parent_pem) {
 					g_io_channel_write_chars (file, parent_pem, strlen(parent_pem), NULL, &error);
-					g_free (parent_pem);		
-				}		
+					g_free (parent_pem);
+				}
 			}
 
 			g_strfreev (tokens);
@@ -1248,7 +1287,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                         else
                                 dialog_error (_("There was an error while exporting CSR."));
                         return;
-                } 
+                }
 
                 g_io_channel_shutdown (file, TRUE, &error);
                 if (error) {
@@ -1258,7 +1297,7 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                         else
                                 dialog_error (_("There was an error while exporting CSR."));
                         return;
-                } 
+                }
 
                 g_io_channel_unref (file);
 
@@ -1278,14 +1317,14 @@ void __ca_export_public_pem (GtkTreeIter *iter, gint type)
                                                                     "%s",
                                                                     _("Certificate signing request exported successfully")));
                 compat_dialog_run (GTK_DIALOG(dialog));
-			
+
                 gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
         }
 }
 
 
-gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
+gchar * __ca_export_private_pkcs8_cv (GnomintCertRow *row, gint type)
 {
 	GObject *widget = NULL;
 	gchar * filename = NULL;
@@ -1294,15 +1333,15 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 	gchar * strerror = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	
+
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export crypted private key"),
 							  GTK_WINDOW(widget),
 							  GTK_FILE_CHOOSER_ACTION_SAVE,
 							  _("_Cancel"), GTK_RESPONSE_CANCEL,
 							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
-		
-	
+
+
 	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return NULL;
@@ -1310,14 +1349,13 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 
 	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	
-	
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	
+
+	id = gnomint_cert_row_get_id (row);
+
 	strerror = export_private_pkcs8 (id, type, filename);
 
 	if (! strerror) {
-	
+
 		dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 							    GTK_DIALOG_DESTROY_WITH_PARENT,
 							    GTK_MESSAGE_INFO,
@@ -1325,7 +1363,7 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 							    "%s",
 							    _("Private key exported successfully")));
 		compat_dialog_run (GTK_DIALOG(dialog));
-		
+
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 	} else {
 		dialog_error (strerror);
@@ -1335,7 +1373,7 @@ gchar * __ca_export_private_pkcs8 (GtkTreeIter *iter, gint type)
 }
 
 
-void __ca_export_private_pem (GtkTreeIter *iter, gint type)
+void __ca_export_private_pem_cv (GnomintCertRow *row, gint type)
 {
 	GObject *widget = NULL;
 	gchar * filename = NULL;
@@ -1344,25 +1382,25 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
         gchar * error_msg = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	
+
 	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new (_("Export unencrypted private key"),
 							  GTK_WINDOW(widget),
 							  GTK_FILE_CHOOSER_ACTION_SAVE,
 							  _("_Cancel"), GTK_RESPONSE_CANCEL,
 							  _("_Save"), GTK_RESPONSE_ACCEPT,
 							  NULL));
-        
-	
+
+
 	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return;
 	}
-        
+
 	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-	
+	id = gnomint_cert_row_get_id (row);
+
         error_msg = export_private_pem (id, type, filename);
         g_free (filename);
 
@@ -1376,14 +1414,14 @@ void __ca_export_private_pem (GtkTreeIter *iter, gint type)
                                                             "%s",
                                                             _("Private key exported successfully")));
                 compat_dialog_run (GTK_DIALOG(dialog));
-                
+
                 gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
         }
-	
+
 }
 
 
-void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
+void __ca_export_pkcs12_cv (GnomintCertRow *row, gint type)
 {
 	GObject *widget = NULL;
 	gchar * filename = NULL;
@@ -1393,16 +1431,16 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
         gchar *error_msg = NULL;
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	
-	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new 
+
+	dialog = GTK_DIALOG (gtk_file_chooser_dialog_new
 			       (_("Export whole certificate in PKCS#12 package"),
 				GTK_WINDOW(widget),
 				GTK_FILE_CHOOSER_ACTION_SAVE,
 				_("_Cancel"), GTK_RESPONSE_CANCEL,
 				_("_Save"), GTK_RESPONSE_ACCEPT,
 				NULL));
-	
-	
+
+
 	if (compat_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT) {
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 		return;
@@ -1410,7 +1448,7 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 
 	filename = g_file_get_path(gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)));
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
+	id = gnomint_cert_row_get_id (row);
 
         error_msg = export_pkcs12 (id, type, filename);
 
@@ -1419,8 +1457,8 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
         if (error_msg && strlen(error_msg)) {
                 dialog_error (error_msg);
                 return;
-        } 
-        
+        }
+
         if (error_msg) {
                 // Export cancelled by user
                 return;
@@ -1434,29 +1472,33 @@ void __ca_export_pkcs12 (GtkTreeIter *iter, gint type)
 						    "%s",
 						    _("Certificate exported successfully")));
 	compat_dialog_run (GTK_DIALOG(dialog));
-	
+
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
-	
-	
+
+
 }
 
 
 G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data)
 {
 	GObject * widget = NULL;
-	//GtkDialog * dialog = NULL;
-	GtkTreeIter *iter = NULL;	
-	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
 	GtkBuilder * dialog_gtkb = NULL;
 	gboolean has_pk_in_db = FALSE;
 	gint response = 0;
 
+	if (type == -1) {
+		if (row) g_object_unref (row);
+		return;
+	}
+
 	dialog_gtkb = gtk_builder_new();
-	gtk_builder_add_from_file (dialog_gtkb, 
+	gtk_builder_add_from_file (dialog_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "export_certificate_dialog.ui", NULL ),
 				   NULL);
-	
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PRIVATE_KEY_IN_DB, &has_pk_in_db, -1);			
+
+	has_pk_in_db = gnomint_cert_row_get_pkey_in_db (row);
 	widget = gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2");
 	gtk_widget_set_sensitive (GTK_WIDGET(widget), has_pk_in_db);
 	widget = gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3");
@@ -1467,18 +1509,18 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 		gtk_window_set_title (GTK_WINDOW(widget), _("Export CSR - gnoMint"));
 
 		widget = gtk_builder_get_object (dialog_gtkb, "label2");
-		gtk_label_set_text 
-                        (GTK_LABEL(widget), 
+		gtk_label_set_text
+                        (GTK_LABEL(widget),
                          _("Please, choose which part of the saved Certificate Signing Request you want to export:"));
 
 		widget = gtk_builder_get_object (dialog_gtkb, "label5");
-		gtk_label_set_markup 
-                        (GTK_LABEL(widget), 
+		gtk_label_set_markup
+                        (GTK_LABEL(widget),
                          _("<i>Export the Certificate Signing Request to a public file, in PEM format.</i>"));
 
 		widget = gtk_builder_get_object (dialog_gtkb, "label15");
-		gtk_label_set_markup 
-                        (GTK_LABEL(widget), 
+		gtk_label_set_markup
+                        (GTK_LABEL(widget),
                          _("<i>Export the saved private key to a PKCS#8 password-protected file. This file should only be accessed by the subject of the Certificate Signing Request.</i>"));
 
 	        widget = gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3");
@@ -1487,62 +1529,54 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 		g_object_set (G_OBJECT (widget), "visible", FALSE, NULL);
 
 	}
-	
+
 
 	widget = gtk_builder_get_object (dialog_gtkb, "export_certificate_dialog");
 
-	response = compat_dialog_run(GTK_DIALOG(widget)); 
-	
+	response = compat_dialog_run(GTK_DIALOG(widget));
+
 	if (!response || response == GTK_RESPONSE_CANCEL) {
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
-		gtk_tree_iter_free (iter);
-		return;
-	} 
-	
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
-		/* Export public part */
-		__ca_export_public_pem (iter, type);
-		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
-		g_object_unref (G_OBJECT(dialog_gtkb));
-		gtk_tree_iter_free (iter);
-		
+		g_object_unref (row);
 		return;
 	}
-	
-	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
-		/* Export private part (crypted) */
-		g_free (__ca_export_private_pkcs8 (iter, type));
+
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "publicpart_radiobutton1")))) {
+		__ca_export_public_pem_cv (row, type);
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
-		gtk_tree_iter_free (iter);
-		
+		g_object_unref (row);
+		return;
+	}
+
+	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_radiobutton2")))) {
+		g_free (__ca_export_private_pkcs8_cv (row, type));
+		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
+		g_object_unref (G_OBJECT(dialog_gtkb));
+		g_object_unref (row);
 		return;
 	}
 
 	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "privatepart_uncrypted_radiobutton2")))) {
-		/* Export private part (uncrypted) */
-		__ca_export_private_pem (iter, type);
+		__ca_export_private_pem_cv (row, type);
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
-		gtk_tree_iter_free (iter);
-		
+		g_object_unref (row);
 		return;
 	}
-	
+
 	if (gtk_check_button_get_active (GTK_CHECK_BUTTON (gtk_builder_get_object (dialog_gtkb, "bothparts_radiobutton3")))) {
-		/* Export PKCS#12 structure */
-		__ca_export_pkcs12 (iter, type);
+		__ca_export_pkcs12_cv (row, type);
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 		g_object_unref (G_OBJECT(dialog_gtkb));
-		gtk_tree_iter_free (iter);
-		
+		g_object_unref (row);
 		return;
 	}
-	
+
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
 	g_object_unref (G_OBJECT(dialog_gtkb));
-	gtk_tree_iter_free (iter);
+	g_object_unref (row);
 	dialog_error (_("Unexpected error"));
 }
 
@@ -1552,20 +1586,17 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 G_MODULE_EXPORT void ca_on_export_chain_activate (gpointer sender G_GNUC_UNUSED,
                                                   gpointer user_data G_GNUC_UNUSED)
 {
-	GtkTreeIter *iter = NULL;
-	gint type = __ca_selection_type (GTK_TREE_VIEW (
-	    gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
 
 	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
-		if (iter) gtk_tree_iter_free (iter);
+		if (row) g_object_unref (row);
 		dialog_error (_("Please select a certificate to export its chain."));
 		return;
 	}
 
-	guint64 cert_id = 0;
-	gtk_tree_model_get (GTK_TREE_MODEL (ca_model), iter,
-	                    CA_MODEL_COLUMN_ID, &cert_id, -1);
-	gtk_tree_iter_free (iter);
+	guint64 cert_id = gnomint_cert_row_get_id (row);
+	g_object_unref (row);
 
 	gchar *cn = NULL;
 	{
@@ -1649,31 +1680,38 @@ __ca_collect_selected_ids (GSList **cert_ids_out, GSList **csr_ids_out)
 	*cert_ids_out = NULL;
 	*csr_ids_out = NULL;
 
-	GtkTreeView *tv = GTK_TREE_VIEW (
-	    gtk_builder_get_object (main_window_gtkb, "ca_treeview"));
-	GtkTreeSelection *sel = gtk_tree_view_get_selection (tv);
-	GtkTreeModel *model = NULL;
-	GList *rows = gtk_tree_selection_get_selected_rows (sel, &model);
+	if (!ca_selection_model)
+		return;
 
-	for (GList *l = rows; l; l = l->next) {
-		GtkTreePath *path = l->data;
-		GtkTreeIter iter;
-		if (! gtk_tree_model_get_iter (model, &iter, path))
+	GtkBitset *sel = gtk_selection_model_get_selection (
+	    GTK_SELECTION_MODEL (ca_selection_model));
+	guint64 n = gtk_bitset_get_size (sel);
+
+	for (guint64 i = 0; i < n; i++) {
+		guint pos = gtk_bitset_get_nth (sel, i);
+		GtkTreeListRow *tlr = GTK_TREE_LIST_ROW (
+		    g_list_model_get_item (
+		        G_LIST_MODEL (ca_selection_model), pos));
+		if (!tlr)
 			continue;
-		guint64 id = 0;
-		gint item_type = 0;
-		gtk_tree_model_get (model, &iter,
-		                    CA_MODEL_COLUMN_ID, &id,
-		                    CA_MODEL_COLUMN_ITEM_TYPE, &item_type, -1);
+		GnomintCertRow *row = GNOMINT_CERT_ROW (
+		    gtk_tree_list_row_get_item (tlr));
+		g_object_unref (tlr);
+		if (!row)
+			continue;
+
+		guint64 id = gnomint_cert_row_get_id (row);
+		gint item_type = gnomint_cert_row_get_item_type (row);
+		g_object_unref (row);
+
 		if (id == 0)
 			continue;
 		gpointer boxed = GUINT_TO_POINTER ((guint) id);
-		if (item_type == 1)
+		if (item_type == GNOMINT_ROW_TYPE_CSR)
 			*csr_ids_out = g_slist_prepend (*csr_ids_out, boxed);
 		else
 			*cert_ids_out = g_slist_prepend (*cert_ids_out, boxed);
 	}
-	g_list_free_full (rows, (GDestroyNotify) gtk_tree_path_free);
 }
 
 /* GUI handler: ask for confirmation, then bulk-revoke every selected
@@ -1784,29 +1822,33 @@ ca_on_bulk_delete_csrs_activate (gpointer sender G_GNUC_UNUSED,
 
 G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (gpointer sender, gpointer user_data)
 {
-	GtkTreeIter *iter = NULL;	
+	GnomintCertRow *row = NULL;
 	gint type;
 	gchar *filename = NULL;
 	guint64 id;
 
-	type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
-
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);		
-
-	filename = __ca_export_private_pkcs8 (iter, type);
-
-	if (! filename) {
-		gtk_tree_iter_free (iter);
+	type = __ca_selection_type_cv (&row);
+	if (type == -1 || !row) {
+		if (row) g_object_unref (row);
 		return;
 	}
-	
+
+	id = gnomint_cert_row_get_id (row);
+
+	filename = __ca_export_private_pkcs8_cv (row, type);
+
+	if (! filename) {
+		g_object_unref (row);
+		return;
+	}
+
 	if (type == CA_FILE_ELEMENT_TYPE_CERT)
 		ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CERT, filename, id);
 	else
 		ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CSR, filename, id);
 
 	g_free (filename);
-	gtk_tree_iter_free (iter);
+	g_object_unref (row);
 
 	dialog_refresh_list();
 }
@@ -1814,9 +1856,8 @@ G_MODULE_EXPORT void ca_on_extractprivatekey1_activate (gpointer sender, gpointe
 
 G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 {
-	GtkTreeIter *iter = NULL;
-	gint type = __ca_selection_type (GTK_TREE_VIEW (
-	    gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
 	guint64 cert_id = 0;
 	guint64 new_cert_id = 0;
 	gchar  *err = NULL;
@@ -1825,13 +1866,24 @@ G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 	gint response = 0;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
-		if (iter) gtk_tree_iter_free (iter);
+		if (row) g_object_unref (row);
 		return;
 	}
 
-	gtk_tree_model_get (GTK_TREE_MODEL (ca_model), iter,
-	                    CA_MODEL_COLUMN_ID, &cert_id, -1);
-	gtk_tree_iter_free (iter);
+	/* Refuse to renew CA certificates: the new cert would carry a
+	 * different key, so every certificate previously signed by the
+	 * old CA would no longer chain to the renewed one. */
+	if (gnomint_cert_row_get_is_ca (row)) {
+		g_object_unref (row);
+		dialog_error (_("CA certificates cannot be renewed. A renewed CA "
+		                "would have a different key, so certificates "
+		                "previously signed by the old CA would no longer "
+		                "chain to it."));
+		return;
+	}
+
+	cert_id = gnomint_cert_row_get_id (row);
+	g_object_unref (row);
 
 	parent_win = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	confirm = GTK_DIALOG (gtk_message_dialog_new_with_markup (
@@ -1969,21 +2021,15 @@ G_MODULE_EXPORT void
 ca_on_compare_with_activate (gpointer sender G_GNUC_UNUSED,
                              gpointer user_data G_GNUC_UNUSED)
 {
-	GtkTreeIter *iter = NULL;
-	gint type = __ca_selection_type (
-	    GTK_TREE_VIEW (gtk_builder_get_object (main_window_gtkb, "ca_treeview")),
-	    &iter);
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
 	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
-		if (iter) gtk_tree_iter_free (iter);
+		if (row) g_object_unref (row);
 		return;
 	}
-	gchar *left_pem = NULL;
-	gchar *left_subject = NULL;
-	gtk_tree_model_get (GTK_TREE_MODEL (ca_model), iter,
-	                    CA_MODEL_COLUMN_PEM, &left_pem,
-	                    CA_MODEL_COLUMN_SUBJECT, &left_subject,
-	                    -1);
-	gtk_tree_iter_free (iter);
+	gchar *left_pem = g_strdup (gnomint_cert_row_get_pem (row));
+	gchar *left_subject = g_strdup (gnomint_cert_row_get_subject (row));
+	g_object_unref (row);
 	if (!left_pem) {
 		dialog_error (_("Cannot read PEM of the selected certificate."));
 		g_free (left_subject);
@@ -2031,19 +2077,18 @@ G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
         gchar * errmsg = NULL;
-	GtkTreeIter *iter = NULL;	
-	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
 	gint response = 0;
 	guint64 id = 0;
 
-	if (type == CA_FILE_ELEMENT_TYPE_CSR) {
-		gtk_tree_iter_free (iter);
+	if (type == CA_FILE_ELEMENT_TYPE_CSR || type == -1) {
+		if (row) g_object_unref (row);
 		return;
 	}
-	
 
-
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
+	id = gnomint_cert_row_get_id (row);
+	g_object_unref (row);
 
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	if (! ca_file_check_if_is_ca_id (id)) {
@@ -2070,7 +2115,6 @@ G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
 	if (response == GTK_RESPONSE_NO) {
-		gtk_tree_iter_free (iter);
 		return;
 	}
 
@@ -2080,7 +2124,6 @@ G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 
         }
 
-	gtk_tree_iter_free (iter);
 	dialog_refresh_list();
   
 }
@@ -2090,16 +2133,16 @@ G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data
 {
 	GObject * widget = NULL;
 	GtkDialog * dialog = NULL;
-	GtkTreeIter *iter = NULL;	
-	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
+	GnomintCertRow *row = NULL;
+	gint type = __ca_selection_type_cv (&row);
 	gint response = 0;
 	guint64 id = 0;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
-		gtk_tree_iter_free (iter);
+		if (row) g_object_unref (row);
 		return;
 	}
-	
+
 	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
 						    GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -2112,38 +2155,41 @@ G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data
 	gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(dialog)));
 
 	if (response == GTK_RESPONSE_NO) {
-		gtk_tree_iter_free (iter);
+		g_object_unref (row);
 		return;
 	}
 
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &id, -1);			
+	id = gnomint_cert_row_get_id (row);
 	ca_file_remove_csr (id);
 
-	gtk_tree_iter_free (iter);
+	g_object_unref (row);
 	dialog_refresh_list();
 }
 
 G_MODULE_EXPORT void ca_on_sign1_activate (gpointer sender, gpointer user_data)
 {
-	GtkTreeIter *iter = NULL;
+	GnomintCertRow *row = NULL;
 
-	gint type = __ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter);
-	gchar * csr_pem;
-	gchar * csr_parent_id;
+	gint type = __ca_selection_type_cv (&row);
+	const gchar * csr_pem;
 	guint64 csr_id;
+	guint64 csr_parent_id_num;
+	gchar * csr_parent_id_str;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CSR) {
-		gtk_tree_iter_free (iter);
+		if (row) g_object_unref (row);
 		return;
 	}
-		
-	gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &csr_id, CA_MODEL_COLUMN_PEM, &csr_pem, CA_MODEL_COLUMN_PARENT_ID, &csr_parent_id, -1);
 
-	new_cert_window_display (csr_id, csr_pem, csr_parent_id);
-	
-	g_free (csr_pem);
-        g_free (csr_parent_id);
-	gtk_tree_iter_free (iter);
+	csr_id = gnomint_cert_row_get_id (row);
+	csr_pem = gnomint_cert_row_get_pem (row);
+	csr_parent_id_num = gnomint_cert_row_get_parent_id (row);
+	csr_parent_id_str = g_strdup_printf ("%" G_GUINT64_FORMAT, csr_parent_id_num);
+
+	new_cert_window_display (csr_id, csr_pem, csr_parent_id_str);
+
+	g_free (csr_parent_id_str);
+	g_object_unref (row);
 }
 
 
@@ -2175,12 +2221,12 @@ gboolean ca_open (gchar *filename, gboolean create)
 
 guint64 ca_get_selected_row_id ()
 {
-	GtkTreeIter *iter = NULL;
+	GnomintCertRow *row = NULL;
 	guint64 result = 0;
 
-	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
-		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_ID, &result, -1);
-		gtk_tree_iter_free (iter);
+	if (__ca_selection_type_cv (&row) != -1 && row) {
+		result = gnomint_cert_row_get_id (row);
+		g_object_unref (row);
 	}
 
 	return result;
@@ -2188,14 +2234,14 @@ guint64 ca_get_selected_row_id ()
 
 gchar * ca_get_selected_row_pem ()
 {
-	GtkTreeIter *iter = NULL;
+	GnomintCertRow *row = NULL;
 	gchar * result = NULL;
 
-	if (__ca_selection_type (GTK_TREE_VIEW(gtk_builder_get_object (main_window_gtkb, "ca_treeview")), &iter) != -1) {
-		gtk_tree_model_get(GTK_TREE_MODEL(ca_model), iter, CA_MODEL_COLUMN_PEM, &result, -1);
-		gtk_tree_iter_free (iter);
+	if (__ca_selection_type_cv (&row) != -1 && row) {
+		result = g_strdup (gnomint_cert_row_get_pem (row));
+		g_object_unref (row);
 	}
-	
+
 	return result;
 }
 
@@ -2265,22 +2311,14 @@ ca_treeview_popup_handler (GtkGestureClick *gesture,
                            int n_press, double x, double y,
                            gpointer user_data)
 {
-	GtkTreeView *tree_view = GTK_TREE_VIEW (user_data);
+	GtkWidget *colview_widget = GTK_WIDGET (user_data);
 	GMenuModel *menu_model = NULL;
-	GtkTreeIter *iter = NULL;
+	GnomintCertRow *row = NULL;
 	gint selection_type;
-	GtkTreePath *path = NULL;
-	GtkTreeSelection *selection;
 
-	/* Select the row under cursor before showing menu */
-	if (gtk_tree_view_get_path_at_pos(tree_view, (gint)x, (gint)y,
-	                                   &path, NULL, NULL, NULL)) {
-		selection = gtk_tree_view_get_selection(tree_view);
-		gtk_tree_selection_select_path(selection, path);
-		gtk_tree_path_free(path);
-	}
-
-	selection_type = __ca_selection_type (tree_view, &iter);
+	/* The row under the click is already selected by the default
+	 * GtkColumnView click handling, so just query the selection. */
+	selection_type = __ca_selection_type_cv (&row);
 
 	switch (selection_type) {
 	case CA_FILE_ELEMENT_TYPE_CERT:
@@ -2303,12 +2341,12 @@ ca_treeview_popup_handler (GtkGestureClick *gesture,
 		GtkWidget *popover = gtk_popover_menu_new_from_model (menu_model);
 		GdkRectangle rect = { (int)x, (int)y, 1, 1 };
 		gtk_popover_set_pointing_to (GTK_POPOVER (popover), &rect);
-		gtk_widget_set_parent (popover, GTK_WIDGET (tree_view));
+		gtk_widget_set_parent (popover, colview_widget);
 		gtk_popover_popup (GTK_POPOVER (popover));
 	}
 
 cleanup:
-	if (iter) gtk_tree_iter_free (iter);
+	if (row) g_object_unref (row);
 }
 
 G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpointer user_data) 
@@ -2798,7 +2836,7 @@ G_MODULE_EXPORT void on_preferences1_activate  (gpointer sender, gpointer     us
 
 G_MODULE_EXPORT void on_properties1_activate  (gpointer sender, gpointer     user_data)
 {
-	ca_treeview_row_activated (NULL, NULL, NULL, NULL);
+	ca_treeview_row_activated (NULL, 0, NULL);
 }
 
 
