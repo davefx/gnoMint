@@ -101,8 +101,7 @@ check_ui_consistency_CFLAGS = \
 	-DGNOMINT_UI_DIR=\""$(abs_top_srcdir)/gui"\" \
 	-DCOMPILATION_DATE=`date +%s` \
 	-DHAVE_CONFIG_H \
-	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_6 \
-	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_10 \
+	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_10 \
 	-DGNOMINT_UI_TEST
 
 check_ui_consistency_LDADD = \
@@ -171,8 +170,7 @@ check_workflows_CFLAGS = \
 	-DTEST_FIXTURE_PATH=\""$(abs_top_srcdir)/certs/example-ca.gnomint"\" \
 	-DCOMPILATION_DATE=`date +%s` \
 	-DHAVE_CONFIG_H \
-	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_6 \
-	-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_4_10 \
+	-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_4_10 \
 	-DGNOMINT_UI_TEST
 
 check_workflows_LDADD = \
