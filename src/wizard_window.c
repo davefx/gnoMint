@@ -478,5 +478,6 @@ void wizard_window_display (WizardCertType cert_type)
                       G_CALLBACK(on_wizard_cancel_button_clicked), dialog);
     
     // Show dialog
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), dialog_get_main_window ());
     gtk_widget_set_visible(dialog, TRUE);
 }

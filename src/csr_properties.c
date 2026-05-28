@@ -28,6 +28,7 @@
 #include "csr_properties.h"
 
 #include <glib/gi18n.h>
+#include "dialog.h"
 
 
 GtkBuilder * csr_properties_window_gtkb = NULL;
@@ -46,6 +47,7 @@ void csr_properties_display(const char *csr_pem, gboolean privkey_in_db)
 	__csr_properties_populate (csr_pem, privkey_in_db);
        
 	widget = gtk_builder_get_object (csr_properties_window_gtkb, "csr_properties_dialog");
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 }
 

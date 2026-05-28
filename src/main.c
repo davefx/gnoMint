@@ -542,29 +542,21 @@ __on_new1_save_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 
 	gchar *error = ca_file_create (filename);
 	if (error) {
-		GtkWidget *dlg = gtk_message_dialog_new (GTK_WINDOW(widget),
-						 GTK_DIALOG_DESTROY_WITH_PARENT,
-						 GTK_MESSAGE_ERROR,
-						 GTK_BUTTONS_CLOSE,
-						 _("Problem when creating '%s' CA database:\n%s"),
-						 filename, error);
-		g_signal_connect (dlg, "response",
-				  G_CALLBACK (gtk_window_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dlg));
+		GtkAlertDialog *alert = gtk_alert_dialog_new (
+		    _("Problem when creating '%s' CA database:\n%s"),
+		    filename, error);
+		gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+		g_object_unref (alert);
 		g_free (filename);
 		return;
 	}
 
 	if (! ca_open (filename, FALSE)) {
-		GtkWidget *dlg = gtk_message_dialog_new (GTK_WINDOW(widget),
-						 GTK_DIALOG_DESTROY_WITH_PARENT,
-						 GTK_MESSAGE_ERROR,
-						 GTK_BUTTONS_CLOSE,
-						 _("Problem when opening new '%s' CA database"),
-						 filename);
-		g_signal_connect (dlg, "response",
-				  G_CALLBACK (gtk_window_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dlg));
+		GtkAlertDialog *alert = gtk_alert_dialog_new (
+		    _("Problem when opening new '%s' CA database"),
+		    filename);
+		gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+		g_object_unref (alert);
 	} else {
 		__recent_add_utf8_filename (filename);
 	}
@@ -599,15 +591,11 @@ __on_open1_open_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 	GtkWidget *widget = GTK_WIDGET(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 
 	if (! ca_open (filename, FALSE)) {
-		GtkWidget *dlg = gtk_message_dialog_new (GTK_WINDOW(widget),
-						 GTK_DIALOG_DESTROY_WITH_PARENT,
-						 GTK_MESSAGE_ERROR,
-						 GTK_BUTTONS_CLOSE,
-						 _("Problem when opening '%s' CA database"),
-						 filename);
-		g_signal_connect (dlg, "response",
-				  G_CALLBACK (gtk_window_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dlg));
+		GtkAlertDialog *alert = gtk_alert_dialog_new (
+		    _("Problem when opening '%s' CA database"),
+		    filename);
+		gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+		g_object_unref (alert);
 	} else {
 		__recent_add_utf8_filename (filename);
 	}

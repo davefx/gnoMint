@@ -38,43 +38,17 @@ gint timer=0;
 GThread * creation_process_window_thread = NULL;
 
 
-static void
-__cpw_response_destroy (GtkDialog *dialog, gint response_id, gpointer user_data)
-{
-	gtk_window_destroy (GTK_WINDOW (dialog));
-}
-
-static void
-__cpw_response_destroy_both (GtkDialog *dialog, gint response_id, gpointer user_data)
-{
-	GtkWindow *parent = GTK_WINDOW (user_data);
-	gtk_window_destroy (GTK_WINDOW (dialog));
-	gtk_window_destroy (parent);
-}
-
 void creation_process_window_error_dialog (gchar *message)
 {
-	GtkWidget *dialog;
-	GObject *widget;
-
-	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
-
-	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_MESSAGE_ERROR,
-					 GTK_BUTTONS_CLOSE,
-					 "%s",
-					 message);
-
-	g_signal_connect (dialog, "response",
-			  G_CALLBACK (__cpw_response_destroy), NULL);
-	gtk_window_present (GTK_WINDOW (dialog));
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", message);
+	GObject *widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
+	gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+	g_object_unref (alert);
 }
 
-void creation_process_window_ca_finish (void) 
+void creation_process_window_ca_finish (void)
 {
 	GObject *widget = NULL;
-	GtkWidget *dialog = NULL;
 	
 	g_thread_join (creation_process_window_thread);
 	g_source_remove (timer);	       
@@ -84,16 +58,13 @@ void creation_process_window_ca_finish (void)
 	
         dialog_refresh_list();
 
-        dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         GTK_MESSAGE_INFO,
-                                         GTK_BUTTONS_CLOSE,
-                                         "%s",
-                                         _("CA creation process finished"));
-        g_signal_connect (dialog, "response",
-                          G_CALLBACK (__cpw_response_destroy_both),
-                          widget);
-        gtk_window_present (GTK_WINDOW (dialog));
+        {
+                GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+                    _("CA creation process finished"));
+                gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+                g_object_unref (alert);
+                gtk_window_destroy (GTK_WINDOW (widget));
+        }
 			
 
 }
@@ -205,7 +176,7 @@ G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 					 gpointer user_data) 
 {
 	
-	GtkWidget *dialog, *widget;
+	GtkWidget *widget;
 
 	if (timer) {
 		g_source_remove (timer);	       
@@ -216,18 +187,13 @@ G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 
 	/* Create the widgets */
 
-	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_MESSAGE_INFO,
-					 GTK_BUTTONS_CLOSE,
-					 "%s",
-					 _("Creation process cancelled"));
-
-	g_signal_connect (dialog, "response",
-			  G_CALLBACK (__cpw_response_destroy_both),
-			  widget);
-	gtk_window_present (GTK_WINDOW (dialog));
-	
+	{
+		GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+		    _("Creation process cancelled"));
+		gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+		g_object_unref (alert);
+		gtk_window_destroy (GTK_WINDOW (widget));
+	}
 }
 
 
@@ -235,7 +201,7 @@ G_MODULE_EXPORT void on_cancel_creation_process_clicked (GtkButton *button,
 // ********************** CSRs
 
 void creation_process_window_csr_finish (void) {
-	GtkWidget *widget = NULL, *dialog = NULL;
+	GtkWidget *widget = NULL;
 	
 	g_thread_join (creation_process_window_thread);
 	g_source_remove (timer);	       
@@ -243,16 +209,13 @@ void creation_process_window_csr_finish (void) {
 	
 	widget = GTK_WIDGET(gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window"));
 	
-	dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_MESSAGE_INFO,
-					 GTK_BUTTONS_CLOSE,
-					 "%s",
-					 _("CSR creation process finished"));
-	g_signal_connect (dialog, "response",
-			  G_CALLBACK (__cpw_response_destroy_both),
-			  widget);
-	gtk_window_present (GTK_WINDOW (dialog));
+	{
+		GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+		    _("CSR creation process finished"));
+		gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
+		g_object_unref (alert);
+		gtk_window_destroy (GTK_WINDOW (widget));
+	}
 
 	dialog_refresh_list ();
 }

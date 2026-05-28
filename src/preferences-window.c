@@ -28,6 +28,7 @@
 #include "preferences-window.h"
 
 #include <glib/gi18n.h>
+#include "dialog.h"
 
 GtkBuilder *preferences_window_gtkb = NULL;
 
@@ -44,6 +45,7 @@ void preferences_window_display()
                                       preferences_get_gnome_keyring_export());
 	widget = GTK_WIDGET(gtk_builder_get_object (preferences_window_gtkb, "preferences_dialog"));
 
+        	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
         gtk_widget_set_visible(widget, TRUE);
 
 }

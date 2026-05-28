@@ -33,6 +33,7 @@
 #include "san_manager.h"
 
 #include <glib/gi18n.h>
+#include "dialog.h"
 
 GtkBuilder * new_ca_window_gtkb = NULL;
 GtkWidget *san_manager_widget = NULL;

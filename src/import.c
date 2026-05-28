@@ -100,6 +100,7 @@ __import_ask_password_async (const gchar *crypted_part_description,
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__import_ask_password_response), ctx);
 	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (widget));
 }
 
@@ -148,6 +149,7 @@ gchar * __import_ask_password (const gchar *crypted_part_description)
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__import_pwd_sync_response), &ctx);
 	gtk_widget_set_visible (GTK_WIDGET(widget), TRUE);
+	gtk_window_set_transient_for (GTK_WINDOW(widget), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW(widget));
 	g_main_loop_run (ctx.loop);
 	g_main_loop_unref (ctx.loop);

@@ -136,6 +136,7 @@ void __pkey_manage_ask_external_file_password (const gchar *cert_dn,
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__pkey_manage_ask_external_file_password_response), ctx);
 	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (widget));
 }
 
@@ -405,6 +406,7 @@ __pkey_retrieve_show_filechooser (__RetrieveFromFileCtx *ctx)
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__pkey_retrieve_filechooser_response), ctx);
 	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (widget));
 }
 
@@ -1085,6 +1087,7 @@ void pkey_manage_ask_password (PkeyManagePasswordCallback cb, gpointer user_data
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__pkey_manage_ask_password_response), ctx);
 	gtk_widget_set_visible (GTK_WIDGET (widget), TRUE);
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (widget));
 }
 

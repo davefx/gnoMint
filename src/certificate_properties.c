@@ -31,6 +31,7 @@
 #include "prop_node.h"
 
 #include <glib/gi18n.h>
+#include "dialog.h"
 
 typedef struct
 {
@@ -144,6 +145,7 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT,
                                                                         cert_id));
 
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 }
 

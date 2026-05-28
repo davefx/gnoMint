@@ -67,6 +67,7 @@ void crl_window_display (void)
 				   NULL);
 
         widget = GTK_WIDGET(gtk_builder_get_object (crl_window_gtkb, "new_crl_dialog"));
+        gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
         gtk_widget_set_visible(widget, TRUE);
 
 	/* Populate and set up CA selector (GtkColumnView). */

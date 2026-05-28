@@ -282,41 +282,26 @@ gchar * dialog_ask_for_string (gchar *message, gchar *default_answer)
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
-static void
-__dialog_response_destroy (GtkDialog *dialog, gint response_id, gpointer user_data)
+extern GtkBuilder *main_window_gtkb;
+
+GtkWindow *
+dialog_get_main_window (void)
 {
-        gtk_window_destroy (GTK_WINDOW (dialog));
+        if (!main_window_gtkb) return NULL;
+        GObject *w = gtk_builder_get_object (main_window_gtkb, "main_window1");
+        return w ? GTK_WINDOW (w) : NULL;
 }
 
 void dialog_info (gchar *message) {
-        GtkWidget *dialog;
-
-        dialog = gtk_message_dialog_new (NULL,
-                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         GTK_MESSAGE_INFO,
-                                         GTK_BUTTONS_CLOSE,
-                                         "%s",
-                                         message);
-
-        g_signal_connect (dialog, "response",
-                          G_CALLBACK (__dialog_response_destroy), NULL);
-        gtk_window_present (GTK_WINDOW (dialog));
+        GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", message);
+        gtk_alert_dialog_show (alert, dialog_get_main_window ());
+        g_object_unref (alert);
 }
 
 void dialog_error (gchar *message) {
-        GtkWidget *dialog;
-
-        dialog = gtk_message_dialog_new (NULL,
-                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         GTK_MESSAGE_ERROR,
-                                         GTK_BUTTONS_CLOSE,
-                                         "%s",
-                                         message);
-
-        g_signal_connect (dialog, "response",
-                          G_CALLBACK (__dialog_response_destroy), NULL);
-        gtk_window_present (GTK_WINDOW (dialog));
-
+        GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", message);
+        gtk_alert_dialog_show (alert, dialog_get_main_window ());
+        g_object_unref (alert);
 }
 
 /* --- Async password dialog (GUI) --- */

@@ -35,6 +35,7 @@
 #include "ca_selector.h"
 
 #include <glib/gi18n.h>
+#include "dialog.h"
 
 GtkBuilder * new_req_window_gtkb = NULL;
 static GtkSingleSelection *new_req_ca_selection = NULL;
