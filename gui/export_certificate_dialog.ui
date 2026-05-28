@@ -6,9 +6,6 @@
     <property name="modal">1</property>
     <property name="destroy_with_parent">1</property>
     <child>
-      <placeholder/>
-    </child>
-    <child internal-child="content_area">
       <object class="GtkBox" id="dialog-vbox11">
         <property name="orientation">vertical</property>
         <child>
@@ -140,31 +137,20 @@ by other common programs, such as web or mail clients.&lt;/i&gt;</property>
             </child>
           </object>
         </child>
+              <child>
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="halign">end</property>
+            <property name="spacing">6</property>
+            <property name="margin-top">12</property>
+
+          </object>
+        </child>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="0">button1</action-widget>
+      <action-widget response="cancel">button1</action-widget>
       <action-widget response="1">button4</action-widget>
     </action-widgets>
-    <child internal-child="action_area">
-      <object class="GtkBox" id="dialog-action_area11">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <object class="GtkButton" id="button1">
-            <property name="label">gtk-cancel</property>
-            <property name="focusable">1</property>
-            <property name="receives_default">1</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkButton" id="button4">
-            <property name="label">gtk-ok</property>
-            <property name="focusable">1</property>
-            <property name="receives_default">1</property>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
+</object>
 </interface>

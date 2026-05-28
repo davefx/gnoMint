@@ -96,14 +96,16 @@ subject.&lt;/small&gt;</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkButton" id="button14">
-                        <property name="label">gtk-help</property>
+                        <property name="label" translatable="yes">_Help</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_cancel1">
-                        <property name="label">gtk-cancel</property>
+                        <property name="label" translatable="yes">_Cancel</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -344,14 +346,16 @@ subject.&lt;/small&gt;</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkButton" id="button5">
-                        <property name="label">gtk-help</property>
+                        <property name="label" translatable="yes">_Help</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_ca_cancel1">
-                        <property name="label">gtk-cancel</property>
+                        <property name="label" translatable="yes">_Cancel</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -533,14 +537,16 @@ subject.&lt;/small&gt;</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkButton" id="button6">
-                        <property name="label">gtk-help</property>
+                        <property name="label" translatable="yes">_Help</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_cancel2">
-                        <property name="label">gtk-cancel</property>
+                        <property name="label" translatable="yes">_Cancel</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -554,7 +560,8 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_ca_commit2">
-                        <property name="label">gtk-ok</property>
+                        <property name="label" translatable="yes">_OK</property>
+                <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>

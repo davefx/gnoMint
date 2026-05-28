@@ -48,7 +48,8 @@
             <child>
               <object class="GtkButton" id="button20">
                 <property name="valign">center</property>
-                <property name="label">gtk-cancel</property>
+                <property name="label" translatable="yes">_Cancel</property>
+                <property name="use-underline">1</property>
                 <property name="focusable">1</property>
                 <property name="receives_default">1</property>
               </object>

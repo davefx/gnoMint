@@ -9,9 +9,6 @@
     <property name="title" translatable="1">Subject Alternative Name</property>
     <property name="modal">1</property>
     <child>
-      <placeholder/>
-    </child>
-    <child internal-child="content_area">
       <object class="GtkBox" id="dialog_vbox">
         <property name="orientation">vertical</property>
         <property name="spacing">8</property>
@@ -83,29 +80,20 @@ URI: https://example.com</property>
             </attributes>
           </object>
         </child>
+              <child>
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="halign">end</property>
+            <property name="spacing">6</property>
+            <property name="margin-top">12</property>
+
+          </object>
+        </child>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
-      <action-widget response="-5">ok_button</action-widget>
+      <action-widget response="cancel">cancel_button</action-widget>
+      <action-widget response="ok">ok_button</action-widget>
     </action-widgets>
-    <child internal-child="action_area">
-      <object class="GtkBox" id="dialog_action_area">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <object class="GtkButton" id="cancel_button">
-            <property name="label" translatable="1">_Cancel</property>
-            <property name="focusable">1</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkButton" id="ok_button">
-            <property name="label" translatable="1">_OK</property>
-            <property name="focusable">1</property>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
+</object>
 </interface>

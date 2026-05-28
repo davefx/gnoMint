@@ -218,7 +218,8 @@
             <property name="can_focus">False</property>
             <child>
               <object class="GtkButton" id="button13">
-                <property name="label">gtk-close</property>
+                <property name="label" translatable="yes">_Close</property>
+                <property name="use-underline">1</property>
                 <property name="focusable">1</property>
                 <property name="receives_default">1</property>
               </object>
