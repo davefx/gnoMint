@@ -126,9 +126,15 @@ def send_key(name):
 
 
 def click(x, y, button=1):
-    """Move mouse and click at (x, y) via XTest."""
+    """Move mouse and click at (x, y).
+
+    Uses XWarpPointer for the move (real pointer warp) + XTest for the
+    button events.  GTK 4 accepts XTest button events only when the
+    pointer position was set via XWarpPointer, not XTestFakeMotionEvent.
+    """
     dpy = _display()
-    _xtst.XTestFakeMotionEvent(dpy, -1, x, y, 0)
+    root = _x11.XDefaultRootWindow(dpy)
+    _x11.XWarpPointer(dpy, 0, root, 0, 0, 0, 0, x, y)
     _x11.XFlush(dpy)
     time.sleep(0.05)
     _xtst.XTestFakeButtonEvent(dpy, button, True, 0)
@@ -137,3 +143,13 @@ def click(x, y, button=1):
     _xtst.XTestFakeButtonEvent(dpy, button, False, 0)
     _x11.XFlush(dpy)
     time.sleep(0.1)
+
+
+def focus_window(x, y):
+    """Give a GTK 4 window real X focus by warp+click at (x, y).
+
+    After this, XTest keyboard events (Tab, Enter, typing) will be
+    received by GTK 4. Without this initial real click, GTK 4 on X11
+    ignores XTest key events.
+    """
+    click(x, y)

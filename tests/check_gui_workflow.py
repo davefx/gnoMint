@@ -25,7 +25,7 @@ TIMEOUT = 20
 def _x11(script):
     subprocess.run([sys.executable, "-c",
                     "import sys, time; sys.path.insert(0, %r); "
-                    "from x11type import type_text, send_key, click\n%s"
+                    "from x11type import type_text, send_key, click, focus_window\n%s"
                     % (TESTS_DIR, script)],
                    check=False, timeout=30)
     time.sleep(0.05)
@@ -102,22 +102,43 @@ def run():
         ok()
 
         step("Create CA")
-        activate_action("win.add-ca")
+        # Click "Add CA" toolbar button at its screen position.
+        # Openbox centers the 800x600 main window on 1280x1024.
+        # The Add CA icon is at ~(328, 211).
+        _x11("focus_window(328, 211)")
+        time.sleep(1.0)
         ca_wid = xdo_find("New CA")
         xdo("windowactivate", "--sync", ca_wid)
-        xdo("windowfocus", "--sync", ca_wid)
-        xdo("windowraise", ca_wid)
-        time.sleep(1.0)
+        time.sleep(0.5)
 
-        # Click on widgets at absolute screen coordinates.
-        # openbox places window content at y=44 (title bar + border).
-        # Window is 700x600, so content spans y=44..644.
+        # Click on the CN entry to focus it, type, then Tab+Space to Next.
+        # CA window geometry retrieved dynamically.
         _x11("""
-click(240, 300); time.sleep(0.2)    # CN entry (~250px into content)
+import subprocess
+r = subprocess.run(['xdotool','search','--name','New CA'],
+                   capture_output=True, text=True)
+wid = r.stdout.strip().split(chr(10))[0]
+r2 = subprocess.run(['xdotool','getwindowgeometry','--shell',wid],
+                     capture_output=True, text=True)
+g = {}
+for ln in r2.stdout.strip().split(chr(10)):
+    if '=' in ln: k,v=ln.split('='); g[k]=int(v)
+wx, wy = g.get('X',16), g.get('Y',300)
+# CN entry: ~260px from top of window, ~220px from left
+click(wx + 220, wy + 260); time.sleep(0.2)
 type_text('Test Root CA'); time.sleep(0.3)
-click(196, 615); time.sleep(1.0)    # Next button (near bottom of content)
-click(196, 615); time.sleep(1.0)    # Next button (page 2, same position)
-click(196, 615)                     # OK button (page 3, same position)
+# Tab: email(1) + _Add(1) + _Edit(1) + _Remove(1) + Help(1) + Cancel(1) + Next(1) = 7
+for _ in range(7):
+    send_key('Tab'); time.sleep(0.05)
+send_key('space'); time.sleep(1.0)
+# Page 2: radio btns(4) + spin(1) + months_spin(1) + Help(1) + Cancel(1) + Prev(1) + Next(1) = 10
+for _ in range(10):
+    send_key('Tab'); time.sleep(0.05)
+send_key('space'); time.sleep(1.0)
+# Page 3: CRL entry(1) + Help(1) + Cancel(1) + Prev(1) + OK(1) = 5
+for _ in range(5):
+    send_key('Tab'); time.sleep(0.05)
+send_key('space')
 """)
 
         print(" keygen...", end="", flush=True)
@@ -155,22 +176,35 @@ click(196, 615)                     # OK button (page 3, same position)
         time.sleep(0.5)
 
         _x11("""
-# CSR page 1: Tab to Next, Space
+import subprocess
+r = subprocess.run(['xdotool','search','--pid','%d'],
+                   capture_output=True, text=True)
+wids = [w for w in r.stdout.strip().split(chr(10)) if w and w != '%s']
+if wids:
+    r2 = subprocess.run(['xdotool','getwindowgeometry','--shell',wids[-1]],
+                         capture_output=True, text=True)
+    g = {}
+    for ln in r2.stdout.strip().split(chr(10)):
+        if '=' in ln: k,v=ln.split('='); g[k]=int(v)
+    focus_window(g.get('X',100) + g.get('WIDTH',400)//2,
+                 g.get('Y',100) + g.get('HEIGHT',400)//2)
+    time.sleep(0.3)
+# CSR page 1: Tab to Next (8 stops)
 for _ in range(8):
     send_key('Tab'); time.sleep(0.03)
-send_key('space'); time.sleep(0.5)
-# Page 2: Tab 6x to CN (dropdown+ST+City+O+OU+CN), type
+send_key('Return'); time.sleep(0.5)
+# Page 2: Tab to CN (6 stops)
 for _ in range(6):
     send_key('Tab'); time.sleep(0.03)
 type_text('Web Server Test'); time.sleep(0.3)
 for _ in range(8):
     send_key('Tab'); time.sleep(0.03)
-send_key('space'); time.sleep(0.5)
-# Page 3: Tab 12x to OK, Space
+send_key('Return'); time.sleep(0.5)
+# Page 3: Tab to OK (12 stops)
 for _ in range(12):
     send_key('Tab'); time.sleep(0.03)
-send_key('space')
-""")
+send_key('Return')
+""" % (proc.pid, main_wid))
 
         print(" keygen...", end="", flush=True)
         time.sleep(15)

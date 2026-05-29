@@ -11,7 +11,7 @@ fi
 XDISPLAY=:$(( ($$ % 100) + 50 ))
 rm -f "/tmp/.X${XDISPLAY#:}-lock" 2>/dev/null || true
 
-Xvfb "$XDISPLAY" -screen 0 1280x1024x24 -ac >/dev/null 2>&1 &
+Xvfb "$XDISPLAY" -screen 0 1280x1200x24 -ac >/dev/null 2>&1 &
 XVFB_PID=$!
 
 cleanup() {
