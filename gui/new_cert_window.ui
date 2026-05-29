@@ -53,6 +53,9 @@ check the certificate properties.</property>
                 </child>
                 <child>
                   <object class="GtkGrid" id="table13">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">16</property>
             <property name="margin-end">16</property>
             <property name="margin-top">16</property>
@@ -421,6 +424,9 @@ going to use for signing it.</property>
                     <property name="focusable">1</property>
                     <child>
                       <object class="GtkGrid" id="table16">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">10</property>
             <property name="margin-end">10</property>
             <property name="margin-top">10</property>
@@ -536,6 +542,9 @@ going to use for signing it.</property>
                     <property name="focusable">1</property>
                     <child>
                       <object class="GtkGrid" id="table14">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">10</property>
             <property name="margin-end">10</property>
             <property name="margin-top">10</property>

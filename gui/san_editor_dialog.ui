@@ -14,6 +14,9 @@
         <property name="spacing">8</property>
         <child>
           <object class="GtkGrid" id="table_san">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="row_spacing">6</property>
             <property name="column_spacing">12</property>
             <child>

@@ -38,6 +38,44 @@
 GtkBuilder * new_ca_window_gtkb = NULL;
 GtkWidget *san_manager_widget = NULL;
 
+/* Explicit Tab-order chain for the page-1 form. When focus is on
+ * the Email entry and Tab is pressed, jump to the _Add button
+ * (first widget outside the grid). This works around GtkGrid's
+ * internal focus wrapping in GTK 4. Attached at the CAPTURE phase
+ * so it fires before the grid's own Tab handler. */
+static const char *page1_tab_order[] = {
+	"email_entry", "button3", NULL  /* email → Help button */
+};
+
+static gboolean
+__wizard_tab_handler (GtkEventControllerKey *ctrl,
+                      guint keyval, guint keycode,
+                      GdkModifierType state, gpointer user_data)
+{
+	GtkBuilder *gtkb = (GtkBuilder *) user_data;
+	if (keyval != GDK_KEY_Tab && keyval != GDK_KEY_ISO_Left_Tab)
+		return FALSE;
+
+	gboolean forward = !(state & GDK_SHIFT_MASK);
+	GtkWidget *focused = gtk_window_get_focus (
+	    GTK_WINDOW (gtk_builder_get_object (gtkb, "new_ca_window")));
+	if (!focused)
+		return FALSE;
+
+	for (const char **p = page1_tab_order; *p && *(p+1); p++) {
+		GtkWidget *from = GTK_WIDGET (gtk_builder_get_object (gtkb, *p));
+		GtkWidget *to   = GTK_WIDGET (gtk_builder_get_object (gtkb, *(p+1)));
+		if (forward && focused == from && to) {
+			gtk_widget_grab_focus (to);
+			return TRUE;
+		}
+		if (!forward && focused == to && from) {
+			gtk_widget_grab_focus (from);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 
 G_MODULE_EXPORT void on_new_ca_privkey_type_toggle (GtkCheckButton *button,
                                                     gpointer        user_data);
@@ -116,6 +154,20 @@ void new_ca_window_display()
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_cancel_clicked), NULL);
 
 	on_new_ca_privkey_type_toggle (NULL, NULL);
+
+	/* Fix Tab navigation: GtkGrid traps Tab within its entries.
+	 * Add a capture-phase key controller on the window to intercept
+	 * Tab at grid boundaries and jump to the next widget group. */
+	{
+		GtkWidget *win = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_window"));
+		if (win) {
+			GtkEventController *kc = gtk_event_controller_key_new ();
+			gtk_event_controller_set_propagation_phase (kc, GTK_PHASE_CAPTURE);
+			g_signal_connect (kc, "key-pressed",
+			    G_CALLBACK (__wizard_tab_handler), new_ca_window_gtkb);
+			gtk_widget_add_controller (win, kc);
+		}
+	}
 }
 
 

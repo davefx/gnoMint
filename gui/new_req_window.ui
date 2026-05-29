@@ -168,6 +168,9 @@ subject.&lt;/small&gt;</property>
             <property name="margin-top">6</property>
             <property name="margin-bottom">6</property>
                     <property name="row_spacing">6</property>
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
                     <child>
                       <object class="GtkDropDown" id="country_combobox1">
                         <property name="enable-search">1</property>
@@ -425,6 +428,9 @@ subject.&lt;/small&gt;</property>
             <property name="margin-top">6</property>
             <property name="margin-bottom">6</property>
                     <property name="vexpand">1</property>
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
                     <property name="column_homogeneous">1</property>
                     <child>
                       <object class="GtkBox" id="keylength_hbox1">

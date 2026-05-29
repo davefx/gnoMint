@@ -66,6 +66,9 @@
                     </child>
                     <child>
                       <object class="GtkGrid" id="table6">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">5</property>
             <property name="margin-end">5</property>
             <property name="margin-top">5</property>
@@ -739,6 +742,9 @@ expiration of the new generated certificates:</property>
                         <property name="focusable">1</property>
                         <child>
                           <object class="GtkGrid" id="table7">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">10</property>
             <property name="margin-end">10</property>
             <property name="margin-top">10</property>
@@ -940,6 +946,9 @@ expiration of the new generated certificates:</property>
                         <property name="focusable">1</property>
                         <child>
                           <object class="GtkGrid" id="table12">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">10</property>
             <property name="margin-end">10</property>
             <property name="margin-top">10</property>
@@ -1054,6 +1063,9 @@ expiration of the new generated certificates:</property>
                         <property name="focusable">1</property>
                         <child>
                           <object class="GtkGrid" id="table15">
+                    <property name="focusable">0</property>
+                    <property name="focus-on-click">0</property>
+                    <property name="can-target">0</property>
             <property name="margin-start">10</property>
             <property name="margin-end">10</property>
             <property name="margin-top">10</property>
