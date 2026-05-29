@@ -230,12 +230,24 @@ void gnomint_register_actions(GtkWindow *window, GtkApplication *app)
 
 
 /* ------------------------------------------------------------------ */
-/*  gnomint_activate — called by GtkApplication                        */
-/* ------------------------------------------------------------------ */
-
-static void gnomint_activate(GtkApplication *app, gpointer user_data);
+/* Shared UI setup, called by both activate and open handlers.
+ * If open_file is non-NULL, that file is opened instead of the default. */
+static void gnomint_setup_and_open(GtkApplication *app, const gchar *open_file);
 
 static void gnomint_activate(GtkApplication *app, gpointer user_data)
+{
+        gnomint_setup_and_open (app, NULL);
+}
+
+static void gnomint_open(GtkApplication *app, GFile **files, gint n_files,
+                         const gchar *hint, gpointer user_data)
+{
+        gchar *path = (n_files > 0) ? g_file_get_path (files[0]) : NULL;
+        gnomint_setup_and_open (app, path);
+        g_free (path);
+}
+
+static void gnomint_setup_and_open(GtkApplication *app, const gchar *open_file)
 {
         gchar *defaultfile = NULL;
         gchar     * size_str = NULL;
@@ -372,21 +384,24 @@ static void gnomint_activate(GtkApplication *app, gpointer user_data)
 	/* Register GActions */
 	gnomint_register_actions(main_win, app);
 
-	{
+	if (open_file) {
+		gboolean create;
+		defaultfile = g_strdup (open_file);
+		create = !g_file_test (defaultfile, G_FILE_TEST_EXISTS);
+		__recent_add_utf8_filename (defaultfile);
+		ca_open (defaultfile, create);
+	} else {
                 const gchar *data_dir = g_get_user_data_dir();
                 gchar *gnomint_data_dir = g_build_filename (data_dir, "gnomint", NULL);
 
-                /* Ensure the directory exists */
                 g_mkdir_with_parents (gnomint_data_dir, 0700);
 
                 defaultfile = g_build_filename (gnomint_data_dir, "default.gnomint", NULL);
                 g_free (gnomint_data_dir);
 
-                /* Check if we need to migrate from old location */
                 if (!g_file_test(defaultfile, G_FILE_TEST_EXISTS)) {
                         gchar *old_defaultfile = g_build_filename (g_get_home_dir(), ".gnomint", "default.gnomint", NULL);
                         if (g_file_test(old_defaultfile, G_FILE_TEST_EXISTS)) {
-                                /* Copy the old file to the new location */
                                 GFile *old_file = g_file_new_for_path(old_defaultfile);
                                 GFile *new_file = g_file_new_for_path(defaultfile);
                                 GError *error = NULL;
@@ -413,6 +428,7 @@ static void gnomint_activate(GtkApplication *app, gpointer user_data)
 }
 
 
+
 #ifndef GNOMINT_UI_TEST
 int main (int   argc,
 	  char *argv[])
@@ -432,8 +448,11 @@ int main (int   argc,
 
     tls_init ();
 
-    app = gtk_application_new ("org.gnome.gnomint", G_APPLICATION_DEFAULT_FLAGS);
+    app = gtk_application_new ("org.gnome.gnomint",
+                               G_APPLICATION_DEFAULT_FLAGS |
+                               G_APPLICATION_HANDLES_OPEN);
     g_signal_connect (app, "activate", G_CALLBACK (gnomint_activate), NULL);
+    g_signal_connect (app, "open", G_CALLBACK (gnomint_open), NULL);
     status = g_application_run (G_APPLICATION (app), argc, argv);
     g_object_unref (app);
     return status;

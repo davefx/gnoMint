@@ -1018,12 +1018,12 @@ gboolean ca_refresh_model_callback ()
 	/* Update the expiry banner (#56). Uses a GtkRevealer + GtkBox
 	 * instead of the deprecated GtkInfoBar. */
 	{
-		GtkRevealer *revealer = GTK_REVEALER (
-		    gtk_builder_get_object (main_window_gtkb, "expiry_infobar"));
-		GtkLabel *lbl = GTK_LABEL (
-		    gtk_builder_get_object (main_window_gtkb, "expiry_infobar_label"));
-		GtkWidget *show_btn = GTK_WIDGET (
-		    gtk_builder_get_object (main_window_gtkb, "expiry_show_them_button"));
+		GObject *rev_obj = gtk_builder_get_object (main_window_gtkb, "expiry_infobar");
+		GObject *lbl_obj = gtk_builder_get_object (main_window_gtkb, "expiry_infobar_label");
+		GObject *btn_obj = gtk_builder_get_object (main_window_gtkb, "expiry_show_them_button");
+		GtkRevealer *revealer = rev_obj ? GTK_REVEALER (rev_obj) : NULL;
+		GtkLabel *lbl = lbl_obj ? GTK_LABEL (lbl_obj) : NULL;
+		GtkWidget *show_btn = btn_obj ? GTK_WIDGET (btn_obj) : NULL;
 		gint days = preferences_get_expire_warning_days ();
 
 		if (revealer && lbl && ca_expiring_soon_count > 0 &&
