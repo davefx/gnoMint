@@ -98,6 +98,23 @@ void new_ca_window_display()
 	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "cn_entry"));
 	if (w) g_signal_connect(w, "changed", G_CALLBACK(on_cn_entry_changed), NULL);
 
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_next1"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_next1_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_previous2"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_previous2_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_next2"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_next2_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_previous3"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_previous3_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_commit"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_commit_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_cancel1"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_cancel_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_cancel2"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_cancel_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_ca_window_gtkb, "new_ca_cancel3"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_ca_cancel_clicked), NULL);
+
 	on_new_ca_privkey_type_toggle (NULL, NULL);
 }
 

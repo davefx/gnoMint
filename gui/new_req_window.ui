@@ -112,7 +112,8 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_next1">
-                        <property name="label">Next</property>
+                        <property name="label" translatable="yes">_Next</property>
+                        <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -362,14 +363,16 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_previous2">
-                        <property name="label">Previous</property>
+                        <property name="label" translatable="yes">_Previous</property>
+                        <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_next2">
-                        <property name="label">Next</property>
+                        <property name="label" translatable="yes">_Next</property>
+                        <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -552,7 +555,8 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_previous3">
-                        <property name="label">Previous</property>
+                        <property name="label" translatable="yes">_Previous</property>
+                        <property name="use-underline">1</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>

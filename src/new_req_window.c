@@ -126,6 +126,25 @@ void new_req_window_display()
 	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "manual_radiobutton"));
 	if (w) g_signal_connect(w, "toggled", G_CALLBACK(new_req_inherit_fields_toggled), NULL);
 
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_cn_entry"));
+	if (w) g_signal_connect(w, "changed", G_CALLBACK(on_new_req_cn_entry_changed), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_next1"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_next1_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_previous2"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_previous2_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_next2"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_next2_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_previous3"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_previous3_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_commit"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_commit_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_cancel1"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_cancel_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_cancel2"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_cancel_clicked), NULL);
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_cancel3"));
+	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_cancel_clicked), NULL);
+
 	on_new_req_privkey_type_toggle (NULL, NULL);
 }
 
