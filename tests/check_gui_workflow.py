@@ -97,18 +97,17 @@ def run():
     try:
         step("App startup")
         main_wid = xdo_find("gnoMint")
-        xdo("windowactivate", "--sync", main_wid)
+        # Give main window focus by clicking at screen center
+        _x11("focus_window(640, 600)")
         time.sleep(1.0)
         ok()
 
         step("Create CA")
-        # Click "Add CA" toolbar button at its screen position.
-        # Openbox centers the 800x600 main window on 1280x1024.
-        # The Add CA icon is at ~(328, 211).
-        _x11("focus_window(328, 211)")
-        time.sleep(1.0)
+        # Open CA window via AT-SPI GAction (no coordinates needed)
+        activate_action("win.add-ca")
         ca_wid = xdo_find("New CA")
-        xdo("windowactivate", "--sync", ca_wid)
+        # Give the new CA window focus by clicking at screen center
+        _x11("focus_window(640, 600)")
         time.sleep(0.5)
 
         # Click on the CN entry to focus it, type, then Tab+Space to Next.
@@ -123,19 +122,19 @@ r2 = subprocess.run(['xdotool','getwindowgeometry','--shell',wid],
 g = {}
 for ln in r2.stdout.strip().split(chr(10)):
     if '=' in ln: k,v=ln.split('='); g[k]=int(v)
-wx, wy = g.get('X',16), g.get('Y',300)
-# CN entry: ~260px from top of window, ~220px from left
-click(wx + 220, wy + 260); time.sleep(0.2)
+# Tab to CN: country(1) + ST(1) + City(1) + O(1) + OU(1) + CN(1) = 6
+for _ in range(6):
+    send_key('Tab'); time.sleep(0.05)
 type_text('Test Root CA'); time.sleep(0.3)
-# Tab: email(1) + _Add(1) + _Edit(1) + _Remove(1) + Help(1) + Cancel(1) + Next(1) = 7
+# Tab from CN to Next: email(1) + _Add(1) + _Edit(1) + _Remove(1) + Help(1) + Cancel(1) + Next(1) = 7
 for _ in range(7):
     send_key('Tab'); time.sleep(0.05)
 send_key('space'); time.sleep(1.0)
-# Page 2: radio btns(4) + spin(1) + months_spin(1) + Help(1) + Cancel(1) + Prev(1) + Next(1) = 10
+# Page 2: radio(4) + spin(1) + months(1) + Help(1) + Cancel(1) + Prev(1) + Next(1) = 10
 for _ in range(10):
     send_key('Tab'); time.sleep(0.05)
 send_key('space'); time.sleep(1.0)
-# Page 3: CRL entry(1) + Help(1) + Cancel(1) + Prev(1) + OK(1) = 5
+# Page 3: CRL(1) + Help(1) + Cancel(1) + Prev(1) + OK(1) = 5
 for _ in range(5):
     send_key('Tab'); time.sleep(0.05)
 send_key('space')
