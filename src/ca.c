@@ -135,50 +135,50 @@ ca_compute_row_foreground (time_t effective_expiration, time_t now,
     return NULL;
 }
 
-/* Simple "response" signal handler: destroy the dialog on any response.
- * Used for fire-and-forget informational dialogs presented with
- * gtk_window_present instead of the deprecated compat_dialog_run. */
+/* Register display-wide CSS classes for row foreground colours.
+ * Called once, the first time the column view is set up. */
 static void
-__ca_dialog_response_destroy (GtkDialog *dialog,
-                              gint       response_id G_GNUC_UNUSED,
-                              gpointer   user_data   G_GNUC_UNUSED)
+__ca_ensure_display_css (void)
 {
-    gtk_window_destroy (GTK_WINDOW (dialog));
+    static gboolean done = FALSE;
+    if (done) return;
+    done = TRUE;
+
+    GtkCssProvider *prov = gtk_css_provider_new ();
+    gtk_css_provider_load_from_string (prov,
+        ".ca-fg-gray { color: gray; } "
+        ".ca-fg-amber { color: #cc7700; } "
+        ".expiry-banner { background: #fff3cd; padding: 6px 12px; }");
+    gtk_style_context_add_provider_for_display (
+        gdk_display_get_default (),
+        GTK_STYLE_PROVIDER (prov),
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
-/* Variant that also frees user_data with g_free after destroying the
- * dialog.  Used for the cert-diff viewer where a CertDiff* must be
- * released when the user closes the dialog. */
+/* Helper: apply (or clear) the foreground CSS class on a label widget
+ * based on the row's foreground colour string. */
 static void
-__ca_dialog_response_destroy_and_free (GtkDialog *dialog,
-                                       gint       response_id G_GNUC_UNUSED,
-                                       gpointer   user_data)
+__ca_apply_fg_class (GtkWidget *widget, const gchar *fg)
 {
-    gtk_window_destroy (GTK_WINDOW (dialog));
-    cert_diff_free ((CertDiff *) user_data);
+    gtk_widget_remove_css_class (widget, "ca-fg-gray");
+    gtk_widget_remove_css_class (widget, "ca-fg-amber");
+    if (fg) {
+        if (g_strcmp0 (fg, "gray") == 0)
+            gtk_widget_add_css_class (widget, "ca-fg-gray");
+        else if (g_strcmp0 (fg, "#cc7700") == 0)
+            gtk_widget_add_css_class (widget, "ca-fg-amber");
+    }
 }
 
-/* ---- Async confirmation-dialog response callbacks (Step 2.1) ---- */
-
-/* Helper: free a GSList stored as "ids" data on the dialog. */
 static void
-__ca_gslist_free_notify (gpointer data)
+__ca_bulk_revoke_choose_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-    g_slist_free ((GSList *) data);
-}
-
-/* Response callback for the bulk-revoke confirmation dialog.
- * cert_ids GSList is attached to the dialog as "ids". */
-static void
-__ca_bulk_revoke_response (GtkDialog *dialog,
-                           gint       response_id,
-                           gpointer   user_data G_GNUC_UNUSED)
-{
-    GSList *cert_ids = (GSList *) g_object_get_data (G_OBJECT (dialog), "ids");
-    gtk_window_destroy (GTK_WINDOW (dialog));
-
-    if (response_id != GTK_RESPONSE_YES)
+    GSList *cert_ids = (GSList *) user_data;
+    int btn = gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), result, NULL);
+    if (btn != 0) {
+        g_slist_free (cert_ids);
         return;
+    }
 
     gchar *err = NULL;
     gint done = ca_bulk_revoke_ids (cert_ids, &err);
@@ -189,36 +189,32 @@ __ca_bulk_revoke_response (GtkDialog *dialog,
         g_free (err);
     }
 
-    GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
+    g_slist_free (cert_ids);
+
     gchar *summary = g_strdup_printf (
         ngettext ("%d certificate revoked.",
                   "%d certificates revoked.", done), done);
-    GtkWidget *info = gtk_message_dialog_new (
-        GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", summary);
+    GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", summary);
     g_free (summary);
-    g_signal_connect (info, "response",
-                      G_CALLBACK (__ca_dialog_response_destroy), NULL);
-    gtk_window_present (GTK_WINDOW (info));
+    gtk_alert_dialog_show (alert, dialog_get_main_window ());
+    g_object_unref (alert);
 
     dialog_refresh_list ();
 }
 
-/* Response callback for the bulk-delete-CSRs confirmation dialog.
- * csr_ids GSList is attached to the dialog as "ids". */
 static void
-__ca_bulk_delete_csrs_response (GtkDialog *dialog,
-                                gint       response_id,
-                                gpointer   user_data G_GNUC_UNUSED)
+__ca_bulk_delete_csrs_choose_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-    GSList *csr_ids = (GSList *) g_object_get_data (G_OBJECT (dialog), "ids");
-    gtk_window_destroy (GTK_WINDOW (dialog));
-
-    if (response_id != GTK_RESPONSE_YES)
+    GSList *csr_ids = (GSList *) user_data;
+    int btn = gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), result, NULL);
+    if (btn != 0) {
+        g_slist_free (csr_ids);
         return;
+    }
 
     gchar *err = NULL;
     ca_bulk_delete_csr_ids (csr_ids, &err);
+    g_slist_free (csr_ids);
 
     if (err) {
         dialog_error (g_strdup_printf (
@@ -243,36 +239,25 @@ __ca_renew_done_cb (gchar *error, gpointer user_data)
     ca_refresh_model_callback ();
 }
 
-/* Response callback for the certificate-renewal confirmation dialog.
- * cert_id is stored as a heap-allocated guint64 in user_data. */
 static void
-__ca_renew_response (GtkDialog *dialog,
-                     gint       response_id,
-                     gpointer   user_data)
+__ca_renew_choose_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
     guint64 cert_id = *(guint64 *) user_data;
-    gtk_window_destroy (GTK_WINDOW (dialog));
     g_free (user_data);
-
-    if (response_id != GTK_RESPONSE_YES)
+    int btn = gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), result, NULL);
+    if (btn != 0)
         return;
-
     cert_renewal_renew (cert_id, NULL,
                         __ca_renew_done_cb, NULL);
 }
 
-/* Response callback for the single-certificate-revoke confirmation dialog.
- * cert id is stored as a heap-allocated guint64 in user_data. */
 static void
-__ca_revoke_response (GtkDialog *dialog,
-                      gint       response_id,
-                      gpointer   user_data)
+__ca_revoke_choose_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
     guint64 id = *(guint64 *) user_data;
-    gtk_window_destroy (GTK_WINDOW (dialog));
     g_free (user_data);
-
-    if (response_id != GTK_RESPONSE_YES)
+    int btn = gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), result, NULL);
+    if (btn != 0)
         return;
 
     gchar *errmsg = ca_file_revoke_crt (id);
@@ -283,18 +268,13 @@ __ca_revoke_response (GtkDialog *dialog,
     dialog_refresh_list ();
 }
 
-/* Response callback for the single-CSR-delete confirmation dialog.
- * csr id is stored as a heap-allocated guint64 in user_data. */
 static void
-__ca_delete_csr_response (GtkDialog *dialog,
-                          gint       response_id,
-                          gpointer   user_data)
+__ca_delete_csr_choose_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
     guint64 id = *(guint64 *) user_data;
-    gtk_window_destroy (GTK_WINDOW (dialog));
     g_free (user_data);
-
-    if (response_id != GTK_RESPONSE_YES)
+    int btn = gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), result, NULL);
+    if (btn != 0)
         return;
 
     ca_file_remove_csr (id);
@@ -331,10 +311,6 @@ static gboolean ca_expiry_infobar_dismissed = FALSE;
  * action button; reset when the banner is dismissed or a new file is
  * opened. Non-static so the test scenario can flip it directly. */
 gboolean ca_view_only_expiring = FALSE;
-
-/* Custom GtkInfoBar response id for the banner's "Show them" button.
- * Chosen well outside the GtkResponseType range so it can't collide. */
-#define CA_BANNER_RESPONSE_SHOW_THEM 100
 
 /* Active search text for the filter box (#53). When non-empty, leaf
  * certificates whose subject/serial doesn't contain this substring
@@ -670,18 +646,7 @@ __ca_subject_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
 	const gchar *subject = gnomint_cert_row_get_subject (row);
 	gtk_label_set_markup (GTK_LABEL (label), subject ? subject : "");
 
-	const gchar *fg = gnomint_cert_row_get_foreground (row);
-	if (fg) {
-		/* Apply foreground colour via CSS. */
-		GtkStyleContext *ctx = gtk_widget_get_style_context (label);
-		GtkCssProvider *prov = gtk_css_provider_new ();
-		gchar *css = g_strdup_printf ("label { color: %s; }", fg);
-		gtk_css_provider_load_from_data (prov, css, -1);
-		gtk_style_context_add_provider (ctx, GTK_STYLE_PROVIDER (prov),
-		                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-		g_free (css);
-		g_object_unref (prov);
-	}
+	__ca_apply_fg_class (label, gnomint_cert_row_get_foreground (row));
 	g_object_unref (row);
 }
 
@@ -767,17 +732,7 @@ __ca_serial_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
 	const gchar *serial = row ? gnomint_cert_row_get_serial (row) : NULL;
 	gtk_label_set_text (GTK_LABEL (label), serial ? serial : "");
 
-	const gchar *fg = row ? gnomint_cert_row_get_foreground (row) : NULL;
-	if (fg) {
-		GtkStyleContext *ctx = gtk_widget_get_style_context (label);
-		GtkCssProvider *prov = gtk_css_provider_new ();
-		gchar *css = g_strdup_printf ("label { color: %s; }", fg);
-		gtk_css_provider_load_from_data (prov, css, -1);
-		gtk_style_context_add_provider (ctx, GTK_STYLE_PROVIDER (prov),
-		                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-		g_free (css);
-		g_object_unref (prov);
-	}
+	__ca_apply_fg_class (label, row ? gnomint_cert_row_get_foreground (row) : NULL);
 	if (row) g_object_unref (row);
 }
 
@@ -845,17 +800,7 @@ __ca_date_bind (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
 		g_free (formatted);
 	}
 
-	const gchar *fg = row ? gnomint_cert_row_get_foreground (row) : NULL;
-	if (fg) {
-		GtkStyleContext *ctx = gtk_widget_get_style_context (label);
-		GtkCssProvider *prov = gtk_css_provider_new ();
-		gchar *css = g_strdup_printf ("label { color: %s; }", fg);
-		gtk_css_provider_load_from_data (prov, css, -1);
-		gtk_style_context_add_provider (ctx, GTK_STYLE_PROVIDER (prov),
-		                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-		g_free (css);
-		g_object_unref (prov);
-	}
+	__ca_apply_fg_class (label, row ? gnomint_cert_row_get_foreground (row) : NULL);
 	if (row) g_object_unref (row);
 }
 
@@ -889,6 +834,10 @@ __ca_expand_all (GtkTreeListModel *tree_model)
 		n = g_list_model_get_n_items (G_LIST_MODEL (tree_model));
 	}
 }
+
+/* Forward declarations for expiry banner callbacks. */
+void ca_expiry_banner_show_them (GtkRevealer *revealer);
+void ca_expiry_banner_close (GtkRevealer *revealer);
 
 /* Column view revocation column reference, used to toggle visibility. */
 static GtkColumnViewColumn *ca_revocation_column = NULL;
@@ -958,6 +907,7 @@ gboolean ca_refresh_model_callback ()
 
 	if (first_time) {
 		/* ---- Set up columns (done once) ---- */
+		__ca_ensure_display_css ();
 
 		/* Subject */
 		{
@@ -1065,17 +1015,18 @@ gboolean ca_refresh_model_callback ()
 	/* Expand all rows. */
 	__ca_expand_all (ca_tree_list_model);
 
-	/* Update the expiry banner (#56). Shown only when at least one
-	 * cert is in the amber window AND the user hasn't dismissed it
-	 * for the currently-open file. */
+	/* Update the expiry banner (#56). Uses a GtkRevealer + GtkBox
+	 * instead of the deprecated GtkInfoBar. */
 	{
-		GtkWidget *bar  = GTK_WIDGET (
+		GtkRevealer *revealer = GTK_REVEALER (
 		    gtk_builder_get_object (main_window_gtkb, "expiry_infobar"));
-		GtkLabel  *lbl  = GTK_LABEL (
+		GtkLabel *lbl = GTK_LABEL (
 		    gtk_builder_get_object (main_window_gtkb, "expiry_infobar_label"));
+		GtkWidget *show_btn = GTK_WIDGET (
+		    gtk_builder_get_object (main_window_gtkb, "expiry_show_them_button"));
 		gint days = preferences_get_expire_warning_days ();
 
-		if (bar && lbl && ca_expiring_soon_count > 0 &&
+		if (revealer && lbl && ca_expiring_soon_count > 0 &&
 		    !ca_expiry_infobar_dismissed && days > 0) {
 			gchar *msg;
 			if (ca_view_only_expiring) {
@@ -1102,21 +1053,22 @@ gboolean ca_refresh_model_callback ()
 			gtk_label_set_markup (lbl, msg);
 			g_free (msg);
 
-			/* Add the "Show them" action button on first show. The
-			 * GtkInfoBar widget itself owns the button once added; we
-			 * don't want to add it again on every refresh, so we
-			 * stash a flag on the widget. */
-			if (!g_object_get_data (G_OBJECT (bar), "show-them-added")) {
-				gtk_info_bar_add_button (GTK_INFO_BAR (bar),
-				                         _("_Show them"),
-				                         CA_BANNER_RESPONSE_SHOW_THEM);
-				g_object_set_data (G_OBJECT (bar), "show-them-added",
+			if (show_btn && !g_object_get_data (G_OBJECT (revealer), "signals-connected")) {
+				g_signal_connect_swapped (show_btn, "clicked",
+				    G_CALLBACK (ca_expiry_banner_show_them), revealer);
+				GtkWidget *close_btn = GTK_WIDGET (
+				    gtk_builder_get_object (main_window_gtkb, "expiry_close_button"));
+				if (close_btn)
+					g_signal_connect_swapped (close_btn, "clicked",
+					    G_CALLBACK (ca_expiry_banner_close), revealer);
+				g_object_set_data (G_OBJECT (revealer), "signals-connected",
 				                   GINT_TO_POINTER (1));
 			}
-			/* Don't offer "Show them" if we're already in that mode. */
-			gtk_widget_set_visible (bar, TRUE);
-		} else if (bar) {
-			gtk_widget_set_visible(bar, FALSE);
+			if (show_btn)
+				gtk_widget_set_visible (show_btn, !ca_view_only_expiring);
+			gtk_revealer_set_reveal_child (revealer, TRUE);
+		} else if (revealer) {
+			gtk_revealer_set_reveal_child (revealer, FALSE);
 		}
 	}
 
@@ -1155,31 +1107,24 @@ ca_on_search_changed (GtkSearchEntry *entry, gpointer user_data G_GNUC_UNUSED)
 	ca_refresh_model_callback ();
 }
 
-/* GtkInfoBar response handler: dismiss / close => hide and remember
- * that we've dismissed for this open file. Re-opening the file resets
- * the dismissed flag. */
-G_MODULE_EXPORT void
-ca_expiry_infobar_response (GtkInfoBar *bar,
-                            gint        response,
-                            gpointer    user_data G_GNUC_UNUSED)
+/* Banner button handlers (replacing deprecated GtkInfoBar).
+ * Non-static so the test suite can exercise them directly. */
+void
+ca_expiry_banner_show_them (GtkRevealer *revealer G_GNUC_UNUSED)
 {
-	if (response == CA_BANNER_RESPONSE_SHOW_THEM) {
-		/* Enter "show only expiring" filter mode and refresh. The
-		 * banner stays visible (text changes to reflect the mode);
-		 * closing it both clears the filter and dismisses the banner. */
-		ca_view_only_expiring = TRUE;
+	ca_view_only_expiring = TRUE;
+	ca_refresh_model_callback ();
+}
+
+void
+ca_expiry_banner_close (GtkRevealer *revealer)
+{
+	ca_expiry_infobar_dismissed = TRUE;
+	if (ca_view_only_expiring) {
+		ca_view_only_expiring = FALSE;
 		ca_refresh_model_callback ();
-		return;
 	}
-	if (response == GTK_RESPONSE_CLOSE || response == -7 /* close button */) {
-		ca_expiry_infobar_dismissed = TRUE;
-		if (ca_view_only_expiring) {
-			/* Restore the full view too. */
-			ca_view_only_expiring = FALSE;
-			ca_refresh_model_callback ();
-		}
-		gtk_widget_set_visible(GTK_WIDGET(bar), FALSE);
-	}
+	gtk_revealer_set_reveal_child (revealer, FALSE);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1404,7 +1349,6 @@ __ca_export_public_pem_save_cb (GObject *source, GAsyncResult *result, gpointer 
 	gchar *filename = g_file_get_path (gfile);
 	g_object_unref (gfile);
 
-	GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	GIOChannel *file = g_io_channel_new_file (filename, "w", &error);
 	g_free (filename);
 	if (error) {
@@ -1466,24 +1410,12 @@ __ca_export_public_pem_save_cb (GObject *source, GAsyncResult *result, gpointer 
 
 	g_io_channel_unref (file);
 
-	GtkDialog *info;
-	if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
-		info = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-							  GTK_DIALOG_DESTROY_WITH_PARENT,
-							  GTK_MESSAGE_INFO,
-							  GTK_BUTTONS_CLOSE,
-							  "%s",
-							  _("Certificate exported successfully")));
-	else
-		info = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-							  GTK_DIALOG_DESTROY_WITH_PARENT,
-							  GTK_MESSAGE_INFO,
-							  GTK_BUTTONS_CLOSE,
-							  "%s",
-							  _("Certificate signing request exported successfully")));
-	g_signal_connect (info, "response",
-			  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-	gtk_window_present (GTK_WINDOW (info));
+	const gchar *ok_msg = (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
+	    ? _("Certificate exported successfully")
+	    : _("Certificate signing request exported successfully");
+	GtkAlertDialog *ok_alert = gtk_alert_dialog_new ("%s", ok_msg);
+	gtk_alert_dialog_show (ok_alert, dialog_get_main_window ());
+	g_object_unref (ok_alert);
 
 	g_free (ctx);
 }
@@ -1513,16 +1445,10 @@ __ca_export_pkcs8_done (const gchar *error_msg, gpointer user_data)
 	gchar *filename = (gchar *) user_data;
 
 	if (! error_msg) {
-		GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-		GtkDialog *dlg = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-								    GTK_DIALOG_DESTROY_WITH_PARENT,
-								    GTK_MESSAGE_INFO,
-								    GTK_BUTTONS_CLOSE,
-								    "%s",
-								    _("Private key exported successfully")));
-		g_signal_connect (dlg, "response",
-		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dlg));
+		GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+		    _("Private key exported successfully"));
+		gtk_alert_dialog_show (alert, dialog_get_main_window ());
+		g_object_unref (alert);
 	} else {
 		dialog_error ((gchar *) error_msg);
 	}
@@ -1581,16 +1507,10 @@ __ca_export_private_pem_done_cb (const gchar *error_msg, gpointer user_data)
 	if (error_msg) {
 		dialog_error ((gchar *) error_msg);
 	} else {
-		GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-		GtkDialog *info = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-		                                                      GTK_DIALOG_DESTROY_WITH_PARENT,
-		                                                      GTK_MESSAGE_INFO,
-		                                                      GTK_BUTTONS_CLOSE,
-		                                                      "%s",
-		                                                      _("Private key exported successfully")));
-		g_signal_connect (info, "response",
-		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (info));
+		GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+		    _("Private key exported successfully"));
+		gtk_alert_dialog_show (alert, dialog_get_main_window ());
+		g_object_unref (alert);
 	}
 }
 
@@ -1654,16 +1574,10 @@ __ca_export_pkcs12_done (const gchar *error_msg, gpointer user_data)
 		return;
 	}
 
-	GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	GtkDialog *dlg = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_INFO,
-						    GTK_BUTTONS_CLOSE,
-						    "%s",
-						    _("Certificate exported successfully")));
-	g_signal_connect (dlg, "response",
-	                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-	gtk_window_present (GTK_WINDOW (dlg));
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+	    _("Certificate exported successfully"));
+	gtk_alert_dialog_show (alert, dialog_get_main_window ());
+	g_object_unref (alert);
 }
 
 typedef struct {
@@ -1841,8 +1755,6 @@ __ca_export_chain_save_cb (GObject *source, GAsyncResult *result, gpointer user_
 	gchar *filename = g_file_get_path (gfile);
 	g_object_unref (gfile);
 
-	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
-
 	gchar *chain_pem = ca_file_get_chain_pem_from_id (ctx->cert_id);
 	if (! chain_pem) {
 		dialog_error (_("Could not build certificate chain."));
@@ -1856,14 +1768,10 @@ __ca_export_chain_save_cb (GObject *source, GAsyncResult *result, gpointer user_
 		                               err ? err->message : "?"));
 		g_clear_error (&err);
 	} else {
-		GtkWidget *info = gtk_message_dialog_new (
-		    GTK_WINDOW (parent),
-		    GTK_DIALOG_DESTROY_WITH_PARENT,
-		    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-		    "%s", _("Certificate chain exported successfully."));
-		g_signal_connect (info, "response",
-		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (info));
+		GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+		    _("Certificate chain exported successfully."));
+		gtk_alert_dialog_show (alert, dialog_get_main_window ());
+		g_object_unref (alert);
 	}
 
 	g_free (chain_pem);
@@ -1990,24 +1898,25 @@ ca_on_bulk_revoke_activate (gpointer sender G_GNUC_UNUSED,
 		return;
 	}
 
-	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	gchar *msg = g_strdup_printf (
 	    ngettext ("Are you sure you want to revoke %d certificate?",
 	              "Are you sure you want to revoke %d certificates?", n),
 	    n);
-	GtkWidget *dialog = gtk_message_dialog_new_with_markup (
-	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
-	    GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-	    "<b>%s</b>\n\n<span font_size='small'>%s</span>", msg,
+	gchar *detail = g_strdup_printf ("%s\n\n%s", msg,
 	    _("Revoking a certificate will include it in the next CRL, marking "
 	      "it as invalid. CSRs in the selection (if any) are not affected; "
 	      "use \"Delete selected CSRs\" for those."));
 	g_free (msg);
-	g_object_set_data_full (G_OBJECT (dialog), "ids", cert_ids,
-	                        __ca_gslist_free_notify);
-	g_signal_connect (dialog, "response",
-	                  G_CALLBACK (__ca_bulk_revoke_response), NULL);
-	gtk_window_present (GTK_WINDOW (dialog));
+
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", detail);
+	g_free (detail);
+	const char *buttons[] = { _("Yes"), _("No"), NULL };
+	gtk_alert_dialog_set_buttons (alert, buttons);
+	gtk_alert_dialog_set_cancel_button (alert, 1);
+	gtk_alert_dialog_set_default_button (alert, 1);
+	gtk_alert_dialog_choose (alert, dialog_get_main_window (), NULL,
+	    __ca_bulk_revoke_choose_cb, cert_ids);
+	g_object_unref (alert);
 }
 
 /* GUI handler: bulk-delete CSRs from the current selection. */
@@ -2026,20 +1935,19 @@ ca_on_bulk_delete_csrs_activate (gpointer sender G_GNUC_UNUSED,
 		return;
 	}
 
-	GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
 	gchar *msg = g_strdup_printf (
 	    ngettext ("Are you sure you want to delete %d Certificate Signing Request?",
 	              "Are you sure you want to delete %d Certificate Signing Requests?", n),
 	    n);
-	GtkWidget *dialog = gtk_message_dialog_new_with_markup (
-	    GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT,
-	    GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "<b>%s</b>", msg);
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", msg);
 	g_free (msg);
-	g_object_set_data_full (G_OBJECT (dialog), "ids", csr_ids,
-	                        __ca_gslist_free_notify);
-	g_signal_connect (dialog, "response",
-	                  G_CALLBACK (__ca_bulk_delete_csrs_response), NULL);
-	gtk_window_present (GTK_WINDOW (dialog));
+	const char *buttons[] = { _("Yes"), _("No"), NULL };
+	gtk_alert_dialog_set_buttons (alert, buttons);
+	gtk_alert_dialog_set_cancel_button (alert, 1);
+	gtk_alert_dialog_set_default_button (alert, 1);
+	gtk_alert_dialog_choose (alert, dialog_get_main_window (), NULL,
+	    __ca_bulk_delete_csrs_choose_cb, csr_ids);
+	g_object_unref (alert);
 }
 
 typedef struct {
@@ -2055,16 +1963,10 @@ __ca_extract_pkey_done (const gchar *error_msg, gpointer user_data)
 	_ExtractPkeyCtx *ctx = (_ExtractPkeyCtx *) user_data;
 
 	if (! error_msg) {
-		GObject *widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-		GtkDialog *dlg = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-								    GTK_DIALOG_DESTROY_WITH_PARENT,
-								    GTK_MESSAGE_INFO,
-								    GTK_BUTTONS_CLOSE,
-								    "%s",
-								    _("Private key exported successfully")));
-		g_signal_connect (dlg, "response",
-		                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-		gtk_window_present (GTK_WINDOW (dlg));
+		GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+		    _("Private key exported successfully"));
+		gtk_alert_dialog_show (alert, dialog_get_main_window ());
+		g_object_unref (alert);
 
 		if (ctx->type == CA_FILE_ELEMENT_TYPE_CERT)
 			ca_file_mark_pkey_as_extracted_for_id (CA_FILE_ELEMENT_TYPE_CERT, ctx->filename, ctx->id);
@@ -2149,8 +2051,6 @@ G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 	GnomintCertRow *row = NULL;
 	gint type = __ca_selection_type_cv (&row);
 	guint64 cert_id = 0;
-	GObject *parent_win = NULL;
-	GtkDialog *confirm = NULL;
 
 	if (type != CA_FILE_ELEMENT_TYPE_CERT) {
 		if (row) g_object_unref (row);
@@ -2169,23 +2069,22 @@ G_MODULE_EXPORT void ca_on_renew_activate (gpointer sender, gpointer user_data)
 	cert_id = gnomint_cert_row_get_id (row);
 	g_object_unref (row);
 
-	parent_win = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	confirm = GTK_DIALOG (gtk_message_dialog_new_with_markup (
-	    GTK_WINDOW (parent_win),
-	    GTK_DIALOG_DESTROY_WITH_PARENT,
-	    GTK_MESSAGE_QUESTION,
-	    GTK_BUTTONS_YES_NO,
-	    _("<b>Renew this certificate?</b>\n\n"
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+	    _("Renew this certificate?\n\n"
 	      "gnoMint will issue a new certificate with the same subject "
 	      "and SAN as the selected one, signed by the same CA, with a "
 	      "freshly-generated keypair. The old certificate will remain in "
 	      "the database — revoke it manually after you have deployed the "
-	      "new one.")));
+	      "new one."));
+	const char *buttons[] = { _("Yes"), _("No"), NULL };
+	gtk_alert_dialog_set_buttons (alert, buttons);
+	gtk_alert_dialog_set_cancel_button (alert, 1);
+	gtk_alert_dialog_set_default_button (alert, 1);
 	guint64 *cert_id_heap = g_new (guint64, 1);
 	*cert_id_heap = cert_id;
-	g_signal_connect (confirm, "response",
-	                  G_CALLBACK (__ca_renew_response), cert_id_heap);
-	gtk_window_present (GTK_WINDOW (GTK_WIDGET (confirm)));
+	gtk_alert_dialog_choose (alert, dialog_get_main_window (), NULL,
+	    __ca_renew_choose_cb, cert_id_heap);
+	g_object_unref (alert);
 }
 
 
@@ -2206,14 +2105,15 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 	              "Certificate diff — %d differences", n_diffs),
 	    n_diffs);
 
-	GtkWidget *dlg = gtk_dialog_new_with_buttons (
-	    title, parent ? GTK_WINDOW (parent) : NULL,
-	    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-	    _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+	GtkWidget *dlg = gtk_window_new ();
+	gtk_window_set_title (GTK_WINDOW (dlg), title);
+	if (parent) gtk_window_set_transient_for (GTK_WINDOW (dlg), GTK_WINDOW (parent));
+	gtk_window_set_modal (GTK_WINDOW (dlg), TRUE);
 	g_free (title);
 	gtk_window_set_default_size (GTK_WINDOW (dlg), 900, 600);
 
-	GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dlg));
+	GtkWidget *content = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+	gtk_window_set_child (GTK_WINDOW (dlg), content);
 
 	GtkWidget *scroll = gtk_scrolled_window_new ();
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
@@ -2282,9 +2182,17 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 		row++;
 	}
 
-	gtk_widget_set_visible(dlg, TRUE);
-	g_signal_connect (dlg, "response",
-	                  G_CALLBACK (__ca_dialog_response_destroy_and_free), diff);
+	GtkWidget *close_btn = gtk_button_new_with_mnemonic (_("_Close"));
+	gtk_widget_set_halign (close_btn, GTK_ALIGN_END);
+	gtk_widget_set_margin_top (close_btn, 6);
+	gtk_widget_set_margin_end (close_btn, 6);
+	gtk_widget_set_margin_bottom (close_btn, 6);
+	g_signal_connect_swapped (close_btn, "clicked",
+	    G_CALLBACK (gtk_window_destroy), dlg);
+	gtk_box_append (GTK_BOX (content), close_btn);
+
+	g_object_set_data_full (G_OBJECT (dlg), "diff", diff,
+	    (GDestroyNotify) cert_diff_free);
 	gtk_window_present (GTK_WINDOW (dlg));
 }
 
@@ -2371,8 +2279,6 @@ ca_on_compare_with_activate (gpointer sender G_GNUC_UNUSED,
 
 G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 {
-	GObject * widget = NULL;
-	GtkDialog * dialog = NULL;
 	GnomintCertRow *row = NULL;
 	gint type = __ca_selection_type_cv (&row);
 	guint64 id = 0;
@@ -2385,39 +2291,33 @@ G_MODULE_EXPORT void ca_on_revoke_activate (gpointer sender, gpointer user_data)
 	id = gnomint_cert_row_get_id (row);
 	g_object_unref (row);
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
+	gchar *msg;
 	if (! ca_file_check_if_is_ca_id (id)) {
-
-		dialog = GTK_DIALOG(gtk_message_dialog_new_with_markup (GTK_WINDOW(widget),
-							    GTK_DIALOG_DESTROY_WITH_PARENT,
-							    GTK_MESSAGE_QUESTION,
-							    GTK_BUTTONS_YES_NO,
-							    "<b>%s</b>\n\n<span font_size='small'>%s</span>",
-							    _("Are you sure you want to revoke this certificate?"),
-							    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked).")));
+		msg = g_strdup_printf ("%s\n\n%s",
+		    _("Are you sure you want to revoke this certificate?"),
+		    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked)."));
 	} else {
-
-		dialog = GTK_DIALOG(gtk_message_dialog_new_with_markup (GTK_WINDOW(widget),
-							    GTK_DIALOG_DESTROY_WITH_PARENT,
-							    GTK_MESSAGE_QUESTION,
-							    GTK_BUTTONS_YES_NO,
-							    "<b>%s</b>\n\n<span font_size='small'>%s</span>",		
-							    _("Are you sure you want to revoke this CA certificate?"),
-							    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked). \n\nMoreover, revoking a CA certificate can invalidate all the certificates generated with it, so all them should be regenerated with a new CA certificate.")));
+		msg = g_strdup_printf ("%s\n\n%s",
+		    _("Are you sure you want to revoke this CA certificate?"),
+		    _("Revoking a certificate will include it in the next CRL, marking it as invalid. This way, any future use of the certificate will be denied (as long as the CRL is checked). \n\nMoreover, revoking a CA certificate can invalidate all the certificates generated with it, so all them should be regenerated with a new CA certificate."));
 	}
 
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", msg);
+	g_free (msg);
+	const char *buttons[] = { _("Yes"), _("No"), NULL };
+	gtk_alert_dialog_set_buttons (alert, buttons);
+	gtk_alert_dialog_set_cancel_button (alert, 1);
+	gtk_alert_dialog_set_default_button (alert, 1);
 	guint64 *id_heap = g_new (guint64, 1);
 	*id_heap = id;
-	g_signal_connect (dialog, "response",
-	                  G_CALLBACK (__ca_revoke_response), id_heap);
-	gtk_window_present (GTK_WINDOW (GTK_WIDGET (dialog)));
+	gtk_alert_dialog_choose (alert, dialog_get_main_window (), NULL,
+	    __ca_revoke_choose_cb, id_heap);
+	g_object_unref (alert);
 }
 
 
 G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data)
 {
-	GObject * widget = NULL;
-	GtkDialog * dialog = NULL;
 	GnomintCertRow *row = NULL;
 	gint type = __ca_selection_type_cv (&row);
 	guint64 id = 0;
@@ -2427,22 +2327,20 @@ G_MODULE_EXPORT void ca_on_delete2_activate (gpointer sender, gpointer user_data
 		return;
 	}
 
-	widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-	dialog = GTK_DIALOG(gtk_message_dialog_new (GTK_WINDOW(widget),
-						    GTK_DIALOG_DESTROY_WITH_PARENT,
-						    GTK_MESSAGE_QUESTION,
-						    GTK_BUTTONS_YES_NO,
-						    "%s",
-						    _("Are you sure you want to delete this Certificate Signing Request?")));
-
 	id = gnomint_cert_row_get_id (row);
 	g_object_unref (row);
 
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+	    _("Are you sure you want to delete this Certificate Signing Request?"));
+	const char *buttons[] = { _("Yes"), _("No"), NULL };
+	gtk_alert_dialog_set_buttons (alert, buttons);
+	gtk_alert_dialog_set_cancel_button (alert, 1);
+	gtk_alert_dialog_set_default_button (alert, 1);
 	guint64 *id_heap = g_new (guint64, 1);
 	*id_heap = id;
-	g_signal_connect (dialog, "response",
-	                  G_CALLBACK (__ca_delete_csr_response), id_heap);
-	gtk_window_present (GTK_WINDOW (GTK_WIDGET (dialog)));
+	gtk_alert_dialog_choose (alert, dialog_get_main_window (), NULL,
+	    __ca_delete_csr_choose_cb, id_heap);
+	g_object_unref (alert);
 }
 
 G_MODULE_EXPORT void ca_on_sign1_activate (gpointer sender, gpointer user_data)
@@ -2639,7 +2537,6 @@ __ca_change_pwd_response (GtkDialog *dialog,
 {
     GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
     GObject *widget = NULL;
-    GtkDialog *info_dialog = NULL;
 
     if (!response_id || response_id == GTK_RESPONSE_CANCEL ||
         response_id == GTK_RESPONSE_DELETE_EVENT) {
@@ -2676,16 +2573,12 @@ __ca_change_pwd_response (GtkDialog *dialog,
                 dialog_error (_("Error while changing database password. "
                                 "The operation was cancelled."));
             } else {
-                info_dialog = GTK_DIALOG (gtk_message_dialog_new (
-                    GTK_WINDOW (dialog),
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                    GTK_MESSAGE_INFO,
-                    GTK_BUTTONS_CLOSE,
-                    "%s",
-                    _("Password changed successfully")));
-                g_signal_connect (info_dialog, "response",
-                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                gtk_window_present (GTK_WINDOW (info_dialog));
+                {
+                    GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+                        _("Password changed successfully"));
+                    gtk_alert_dialog_show (alert, GTK_WINDOW (dialog));
+                    g_object_unref (alert);
+                }
             }
         } else {
             /* It's a new password. */
@@ -2693,16 +2586,12 @@ __ca_change_pwd_response (GtkDialog *dialog,
                 dialog_error (_("Error while establishing database password. "
                                 "The operation was cancelled."));
             } else {
-                info_dialog = GTK_DIALOG (gtk_message_dialog_new (
-                    GTK_WINDOW (dialog),
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                    GTK_MESSAGE_INFO,
-                    GTK_BUTTONS_CLOSE,
-                    "%s",
-                    _("Password established successfully")));
-                g_signal_connect (info_dialog, "response",
-                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                gtk_window_present (GTK_WINDOW (info_dialog));
+                {
+                    GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+                        _("Password established successfully"));
+                    gtk_alert_dialog_show (alert, GTK_WINDOW (dialog));
+                    g_object_unref (alert);
+                }
             }
         }
     } else {
@@ -2712,16 +2601,12 @@ __ca_change_pwd_response (GtkDialog *dialog,
                 dialog_error (_("Error while removing database password. "
                                 "The operation was cancelled."));
             } else {
-                info_dialog = GTK_DIALOG (gtk_message_dialog_new (
-                    GTK_WINDOW (dialog),
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                    GTK_MESSAGE_INFO,
-                    GTK_BUTTONS_CLOSE,
-                    "%s",
-                    _("Password removed successfully")));
-                g_signal_connect (info_dialog, "response",
-                                  G_CALLBACK (__ca_dialog_response_destroy), NULL);
-                gtk_window_present (GTK_WINDOW (info_dialog));
+                {
+                    GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+                        _("Password removed successfully"));
+                    gtk_alert_dialog_show (alert, GTK_WINDOW (dialog));
+                    g_object_unref (alert);
+                }
             }
         } else {
             /* No password and not requesting one — nothing to do. */
@@ -2935,17 +2820,10 @@ __ca_dh_param_save_cb (GObject *source, GAsyncResult *result, gpointer user_data
     if (strerror) {
         dialog_error (strerror);
     } else {
-        GObject *parent = gtk_builder_get_object (main_window_gtkb, "main_window1");
-        GtkDialog *info = GTK_DIALOG (gtk_message_dialog_new (
-            GTK_WINDOW (parent),
-            GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_INFO,
-            GTK_BUTTONS_CLOSE,
-            "%s",
-            _("Diffie-Hellman parameters saved successfully")));
-        g_signal_connect (info, "response",
-                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
-        gtk_window_present (GTK_WINDOW (info));
+        GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+            _("Diffie-Hellman parameters saved successfully"));
+        gtk_alert_dialog_show (alert, dialog_get_main_window ());
+        g_object_unref (alert);
     }
 
     g_free (filename);
@@ -3051,19 +2929,11 @@ __ca_import_file_open_cb (GObject *source, GAsyncResult *result,
     gchar *filename = g_file_get_path (gfile);
     g_object_unref (gfile);
 
-    GObject *main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-
     if (!import_single_file (filename, NULL, NULL)) {
-        GtkWidget *errdlg = gtk_message_dialog_new (
-            GTK_WINDOW (main_window_widget),
-            GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_ERROR,
-            GTK_BUTTONS_CLOSE,
-            _("Problem when importing '%s' file"),
-            filename);
-        g_signal_connect (errdlg, "response",
-                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
-        gtk_window_present (GTK_WINDOW (errdlg));
+        GtkAlertDialog *alert = gtk_alert_dialog_new (
+            _("Problem when importing '%s' file"), filename);
+        gtk_alert_dialog_show (alert, dialog_get_main_window ());
+        g_object_unref (alert);
     }
     g_free (filename);
     g_object_unref (G_OBJECT (dialog_gtkb));
@@ -3088,20 +2958,12 @@ __ca_import_dir_select_cb (GObject *source, GAsyncResult *result,
     gchar *filename = g_file_get_path (gfile);
     g_object_unref (gfile);
 
-    GObject *main_window_widget = gtk_builder_get_object (main_window_gtkb, "main_window1");
-
     gchar *import_result = import_whole_dir (filename);
 
     if (import_result) {
-        GtkWidget *errdlg = gtk_message_dialog_new (
-            GTK_WINDOW (main_window_widget),
-            GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_ERROR,
-            GTK_BUTTONS_CLOSE,
-            "%s", import_result);
-        g_signal_connect (errdlg, "response",
-                          G_CALLBACK (__ca_dialog_response_destroy), NULL);
-        gtk_window_present (GTK_WINDOW (errdlg));
+        GtkAlertDialog *alert = gtk_alert_dialog_new ("%s", import_result);
+        gtk_alert_dialog_show (alert, dialog_get_main_window ());
+        g_object_unref (alert);
     }
     g_free (filename);
     g_object_unref (G_OBJECT (dialog_gtkb));

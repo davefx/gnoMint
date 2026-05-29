@@ -143,7 +143,18 @@ by other common programs, such as web or mail clients.&lt;/i&gt;</property>
             <property name="halign">end</property>
             <property name="spacing">6</property>
             <property name="margin-top">12</property>
-
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Cancel</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="button4">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Export</property>
+              </object>
+            </child>
           </object>
         </child>
       </object>

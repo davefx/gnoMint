@@ -65,7 +65,18 @@ applications for a secure interchange of their keys over insecure channels.&lt;/
             <property name="halign">end</property>
             <property name="spacing">6</property>
             <property name="margin-top">12</property>
-
+            <child>
+              <object class="GtkButton" id="button19">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Close</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="button18">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Generate</property>
+              </object>
+            </child>
           </object>
         </child>
       </object>

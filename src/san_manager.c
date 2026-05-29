@@ -191,15 +191,6 @@ typedef struct {
 /* Forward declaration. */
 static void san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data);
 
-/* Fire-and-forget handler for the validation error dialog. */
-static void
-san_editor_error_response (GtkDialog *dialog,
-                           gint       response_id G_GNUC_UNUSED,
-                           gpointer   user_data   G_GNUC_UNUSED)
-{
-	gtk_window_destroy (GTK_WINDOW (dialog));
-}
-
 /* Response callback for the SAN editor dialog.
  * On OK: validate; if invalid show error and re-present; if valid update model.
  * On CANCEL / DELETE_EVENT: destroy dialog, clean up. */
@@ -231,15 +222,9 @@ san_editor_response (GtkDialog *dialog, gint response_id, gpointer user_data)
 
 	if (!san_validate (type, value, &error_msg)) {
 		/* Show fire-and-forget error dialog, then re-present editor. */
-		GtkWidget *err_dlg = gtk_message_dialog_new (
-			GTK_WINDOW (dialog),
-			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_MESSAGE_ERROR,
-			GTK_BUTTONS_OK,
-			"%s", error_msg);
-		g_signal_connect (err_dlg, "response",
-		                  G_CALLBACK (san_editor_error_response), NULL);
-		gtk_window_present (GTK_WINDOW (err_dlg));
+		GtkAlertDialog *err_alert = gtk_alert_dialog_new ("%s", error_msg);
+		gtk_alert_dialog_show (err_alert, GTK_WINDOW (dialog));
+		g_object_unref (err_alert);
 		g_free (error_msg);
 		/* Re-present the same editor dialog so the user can correct. */
 		gtk_window_present (GTK_WINDOW (dialog));

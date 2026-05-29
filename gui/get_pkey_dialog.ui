@@ -72,7 +72,18 @@ certificate:</property>
             <property name="halign">end</property>
             <property name="spacing">6</property>
             <property name="margin-top">12</property>
-
+            <child>
+              <object class="GtkButton" id="button15">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Cancel</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="button7">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">OK</property>
+              </object>
+            </child>
           </object>
         </child>
       </object>

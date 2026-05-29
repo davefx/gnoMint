@@ -55,7 +55,6 @@ extern void on_wizard_email_activate (gpointer sender, gpointer user_data);
 extern void on_import1_activate (gpointer sender, gpointer user_data);
 extern void on_properties1_activate (gpointer sender, gpointer user_data);
 extern void on_preferences1_activate (gpointer sender, gpointer user_data);
-extern void ca_expiry_infobar_response (GtkInfoBar *bar, gint response, gpointer user_data);
 extern void ca_on_search_changed (GtkSearchEntry *entry, gpointer user_data);
 extern void ca_treeview_popup_handler (GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data);
 extern gboolean ca_on_key_pressed (GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
@@ -334,9 +333,7 @@ static void gnomint_activate(GtkApplication *app, gpointer user_data)
 	w = GTK_WIDGET(gtk_builder_get_object(main_window_gtkb, "wizard_email_toolbutton"));
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_wizard_email_activate), NULL);
 
-	/* InfoBar, search, tree view signals */
-	w = GTK_WIDGET(gtk_builder_get_object(main_window_gtkb, "expiry_infobar"));
-	if (w) g_signal_connect(w, "response", G_CALLBACK(ca_expiry_infobar_response), NULL);
+	/* Search and tree view signals */
 	w = GTK_WIDGET(gtk_builder_get_object(main_window_gtkb, "search_entry"));
 	if (w) g_signal_connect(w, "search-changed", G_CALLBACK(ca_on_search_changed), NULL);
 	/* Selection-changed and activate signals are connected by

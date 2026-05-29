@@ -120,11 +120,27 @@ GtkBuilder * certificate_properties_window_gtkb = NULL;
 void __certificate_properties_populate (const char *certificate_pem);
 void __certificate_details_populate (const char *certificate_pem);
 
+static void
+__cert_props_ensure_css (void)
+{
+	static gboolean done = FALSE;
+	if (done) return;
+	done = TRUE;
+	GtkCssProvider *prov = gtk_css_provider_new ();
+	gtk_css_provider_load_from_string (prov,
+	    ".cert-prop-value { font-family: Monospace; }");
+	gtk_style_context_add_provider_for_display (
+	    gdk_display_get_default (),
+	    GTK_STYLE_PROVIDER (prov),
+	    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 void certificate_properties_display(guint64 cert_id, const char *certificate_pem, gboolean privkey_in_db,
 				    gboolean is_ca)
 {
 	GObject * widget = NULL;
 
+	__cert_props_ensure_css ();
 	certificate_properties_window_gtkb = gtk_builder_new();
 	gtk_builder_add_from_file (certificate_properties_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_properties_dialog.ui", NULL),
@@ -1271,14 +1287,7 @@ __cert_value_setup (GtkSignalListItemFactory *factory G_GNUC_UNUSED,
 	gtk_label_set_xalign (GTK_LABEL (label), 0);
 	gtk_widget_set_halign (label, GTK_ALIGN_START);
 
-	/* Apply monospace font via CSS, matching the old cell renderer. */
-	GtkCssProvider *prov = gtk_css_provider_new ();
-	gtk_css_provider_load_from_data (prov, "label { font-family: Monospace; }", -1);
-	gtk_style_context_add_provider (
-	    gtk_widget_get_style_context (label),
-	    GTK_STYLE_PROVIDER (prov),
-	    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-	g_object_unref (prov);
+	gtk_widget_add_css_class (label, "cert-prop-value");
 
 	gtk_list_item_set_child (list_item, label);
 }

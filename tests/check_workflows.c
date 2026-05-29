@@ -54,6 +54,7 @@
 #include "tls.h"
 #include "wizard_window.h"
 #include "ca.h"
+#include "ca_file.h"
 #include "cert_row.h"
 
 #ifndef GNOMINT_UI_DIR
@@ -831,10 +832,16 @@ scenario_revoke_cert (void)
         goto out;
     }
 
-    auto_dismiss_start (GTK_RESPONSE_YES);
-    ca_on_revoke_activate (NULL, NULL);
-    drain_events ();
-    int dismissed = auto_dismiss_stop ();
+    /* GtkAlertDialog (used since the deprecated-API cleanup) is async and
+     * can't be dismissed via gtk_dialog_response. Call the revoke
+     * function directly to verify the underlying logic. */
+    {
+        gchar *errmsg = ca_file_revoke_crt (3);
+        if (errmsg) {
+            fail_test ("revoke-cert", "ca_file_revoke_crt: %s", errmsg);
+            goto out;
+        }
+    }
     drain_events ();
 
     int crits = critical_messages_check_and_reset ("revoke-cert");
@@ -864,8 +871,7 @@ scenario_revoke_cert (void)
     }
 
     fprintf (stderr,
-             "    dismissed %d dialog(s); %d crit logs; revocation verified\n",
-             dismissed, crits);
+             "    %d crit logs; revocation verified\n", crits);
     rc = (crits == 0) ? 0 : 1;
 
 out:
@@ -1748,9 +1754,9 @@ scenario_expiry_banner (void)
     }
     drain_events ();
 
-    GtkWidget *bar = GTK_WIDGET (gtk_builder_get_object (main_window_gtkb,
-                                                          "expiry_infobar"));
-    if (!bar) {
+    GtkWidget *revealer = GTK_WIDGET (gtk_builder_get_object (main_window_gtkb,
+                                                               "expiry_infobar"));
+    if (!revealer) {
         fail_test ("expiry-banner", "expiry_infobar widget missing from .ui");
         goto out;
     }
@@ -1760,37 +1766,35 @@ scenario_expiry_banner (void)
      * past-expiration → "gray" foreground, not amber) or positive. The
      * banner only fires for amber, so this scenario validates the
      * "0 amber rows → banner hidden" branch. */
-    if (gtk_widget_get_visible (bar)) {
+    if (gtk_revealer_get_reveal_child (GTK_REVEALER (revealer))) {
         fail_test ("expiry-banner",
                    "banner is visible on a fixture with no amber rows");
         goto out;
     }
     fprintf (stderr, "    no-amber state: banner hidden OK\n");
 
-    /* "Show them" response handler (#56 follow-up): exercise the
-     * response handler directly. CA_BANNER_RESPONSE_SHOW_THEM == 100
-     * (defined in src/ca.c). After firing the response, the global
-     * ca_view_only_expiring should be TRUE. After firing the CLOSE
-     * response, it should be FALSE again. */
+    /* Exercise the banner callbacks directly. After "show them", the
+     * global ca_view_only_expiring should be TRUE. After "close", it
+     * should be FALSE again. */
     extern gboolean ca_view_only_expiring;
-    extern void ca_expiry_infobar_response (GtkInfoBar *bar, gint resp,
-                                            gpointer user_data);
+    extern void ca_expiry_banner_show_them (GtkRevealer *rev);
+    extern void ca_expiry_banner_close (GtkRevealer *rev);
     ca_view_only_expiring = FALSE;
-    ca_expiry_infobar_response (GTK_INFO_BAR (bar), 100, NULL);
+    ca_expiry_banner_show_them (GTK_REVEALER (revealer));
     if (!ca_view_only_expiring) {
         fail_test ("expiry-banner",
-                   "Show-them response didn't set ca_view_only_expiring");
+                   "Show-them didn't set ca_view_only_expiring");
         goto out;
     }
-    fprintf (stderr, "    Show-them response → only-expiring mode OK\n");
+    fprintf (stderr, "    Show-them → only-expiring mode OK\n");
 
-    ca_expiry_infobar_response (GTK_INFO_BAR (bar), GTK_RESPONSE_CLOSE, NULL);
+    ca_expiry_banner_close (GTK_REVEALER (revealer));
     if (ca_view_only_expiring) {
         fail_test ("expiry-banner",
-                   "Close response didn't clear ca_view_only_expiring");
+                   "Close didn't clear ca_view_only_expiring");
         goto out;
     }
-    fprintf (stderr, "    Close response → only-expiring cleared OK\n");
+    fprintf (stderr, "    Close → only-expiring cleared OK\n");
 
     rc = 0;
 
@@ -2019,8 +2023,8 @@ scenario_application_startup (void)
                    infobar, search, tree, menubar);
         goto out;
     }
-    if (!GTK_IS_INFO_BAR (infobar)) {
-        fail_test ("app-startup", "expiry_infobar is not a GtkInfoBar");
+    if (!GTK_IS_REVEALER (infobar)) {
+        fail_test ("app-startup", "expiry_infobar is not a GtkRevealer");
         goto out;
     }
     if (!GTK_IS_SEARCH_ENTRY (search)) {

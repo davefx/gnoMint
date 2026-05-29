@@ -335,6 +335,43 @@ __pkey_retrieve_external_password_cb (gchar *password, gpointer data)
 }
 
 static void
+__pkey_browse_open_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	GtkButton *btn = GTK_BUTTON (user_data);
+	GtkFileDialog *fd = GTK_FILE_DIALOG (source);
+	GError *err = NULL;
+	GFile *gfile = gtk_file_dialog_open_finish (fd, result, &err);
+	if (!gfile) {
+		g_clear_error (&err);
+		return;
+	}
+	gchar *path = g_file_get_path (gfile);
+	g_object_unref (gfile);
+	gtk_button_set_label (btn, path);
+	g_object_set_data_full (G_OBJECT (btn), "selected-path", path, g_free);
+}
+
+static void
+__pkey_browse_clicked (GtkButton *btn, gpointer user_data G_GNUC_UNUSED)
+{
+	GtkFileDialog *fd = gtk_file_dialog_new ();
+	gtk_file_dialog_set_title (fd, _("Select private key file"));
+	const gchar *cur = (const gchar *) g_object_get_data (G_OBJECT (btn), "selected-path");
+	if (cur && cur[0]) {
+		GFile *f = g_file_new_for_path (cur);
+		GFile *folder = g_file_get_parent (f);
+		if (folder) {
+			gtk_file_dialog_set_initial_folder (fd, folder);
+			g_object_unref (folder);
+		}
+		g_object_unref (f);
+	}
+	gtk_file_dialog_open (fd, GTK_WINDOW (gtk_widget_get_root (GTK_WIDGET (btn))),
+	                      NULL, __pkey_browse_open_cb, btn);
+	g_object_unref (fd);
+}
+
+static void
 __pkey_retrieve_filechooser_response (GtkDialog *dialog, gint response_id, gpointer data)
 {
 	__RetrieveFromFileCtx *ctx = (__RetrieveFromFileCtx *) data;
@@ -356,9 +393,12 @@ __pkey_retrieve_filechooser_response (GtkDialog *dialog, gint response_id, gpoin
 		return;
 	}
 
-	g_free (ctx->file_name);
-	ctx->file_name = g_strdup ((gchar *) g_file_get_path (
-		gtk_file_chooser_get_file (GTK_FILE_CHOOSER (filepath_widget))));
+	const gchar *selected = (const gchar *) g_object_get_data (
+	    G_OBJECT (filepath_widget), "selected-path");
+	if (selected && selected[0]) {
+		g_free (ctx->file_name);
+		ctx->file_name = g_strdup (selected);
+	}
 	ctx->save_new_filename = gtk_check_button_get_active (
 		GTK_CHECK_BUTTON (remember_filepath_widget));
 
@@ -385,18 +425,14 @@ __pkey_retrieve_show_filechooser (__RetrieveFromFileCtx *ctx)
 				   NULL);
 
 	filepath_widget = gtk_builder_get_object (dialog_gtkb, "pkey_filechooser");
+	gtk_button_set_label (GTK_BUTTON (filepath_widget), ctx->file_name);
+	g_object_set_data_full (G_OBJECT (filepath_widget), "selected-path",
+	                        g_strdup (ctx->file_name), g_free);
+	g_signal_connect (filepath_widget, "clicked",
+	                  G_CALLBACK (__pkey_browse_clicked), NULL);
 
 	remember_filepath_widget = gtk_builder_get_object (dialog_gtkb, "save_filename_checkbutton");
 	g_object_set (G_OBJECT (remember_filepath_widget), "visible", FALSE, NULL);
-
-	gtk_widget_grab_focus (GTK_WIDGET (filepath_widget));
-	{
-		GFile *_f = g_file_new_for_path (ctx->file_name);
-		gtk_file_chooser_set_file (GTK_FILE_CHOOSER (filepath_widget), _f, NULL);
-		g_object_unref (_f);
-	}
-	g_object_set_data (G_OBJECT (filepath_widget), "save_filename_checkbutton",
-	                   remember_filepath_widget);
 
 	widget = gtk_builder_get_object (dialog_gtkb, "cert_dn_label");
 	gtk_label_set_text (GTK_LABEL (widget), ctx->cert->dn);

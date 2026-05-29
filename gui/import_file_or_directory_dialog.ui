@@ -88,7 +88,18 @@ a whole CA made with OpenSSL .&lt;/i&gt;</property>
             <property name="halign">end</property>
             <property name="spacing">6</property>
             <property name="margin-top">12</property>
-
+            <child>
+              <object class="GtkButton" id="button24">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Cancel</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="button23">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Import</property>
+              </object>
+            </child>
           </object>
         </child>
       </object>
