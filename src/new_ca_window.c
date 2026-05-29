@@ -177,8 +177,13 @@ G_MODULE_EXPORT void on_cn_entry_changed (GtkEditable *editable,
 }
 
 G_MODULE_EXPORT void on_new_ca_next1_clicked (GtkButton *widget,
-			      gpointer user_data) 
+			      gpointer user_data)
 {
+	GtkEditable *cn = GTK_EDITABLE(gtk_builder_get_object (new_ca_window_gtkb, "cn_entry"));
+	if (!strlen (gtk_editable_get_text (cn))) {
+		dialog_error (_("Please enter a Common Name (CN) for the CA."));
+		return;
+	}
 	new_ca_tab_activate (1);
 }
 

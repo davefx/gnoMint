@@ -305,8 +305,13 @@ G_MODULE_EXPORT void on_new_req_previous2_clicked (GtkButton *widget,
 }
 
 G_MODULE_EXPORT void on_new_req_next2_clicked (GtkButton *widget,
-			      gpointer user_data) 
+			      gpointer user_data)
 {
+	GtkEditable *cn = GTK_EDITABLE(gtk_builder_get_object (new_req_window_gtkb, "new_req_cn_entry"));
+	if (!strlen (gtk_editable_get_text (cn))) {
+		dialog_error (_("Please enter a Common Name (CN) for the certificate request."));
+		return;
+	}
 	new_req_tab_activate (2);
 }
 

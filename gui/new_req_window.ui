@@ -112,7 +112,7 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_next1">
-                        <property name="label">gtk-media-next</property>
+                        <property name="label">Next</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -362,15 +362,14 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_previous2">
-                        <property name="label">gtk-media-previous</property>
+                        <property name="label">Previous</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_next2">
-                        <property name="label">gtk-media-next</property>
-                        <property name="sensitive">0</property>
+                        <property name="label">Next</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
@@ -553,7 +552,7 @@ subject.&lt;/small&gt;</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="new_req_previous3">
-                        <property name="label">gtk-media-previous</property>
+                        <property name="label">Previous</property>
                         <property name="focusable">1</property>
                         <property name="receives_default">1</property>
                       </object>
