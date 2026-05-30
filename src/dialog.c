@@ -418,6 +418,145 @@ G_MODULE_EXPORT void dialog_password_entry_changed_cb (GtkEditable *password_ent
 
 
 
+/* GtkNotebook Tab-focus fix for wizard pages.
+ *
+ * GtkNotebook's focus() override cycles Tab within the current page
+ * content but never reaches sibling button boxes (Help/Cancel/Next)
+ * at the bottom of the page.  This capture-phase key handler
+ * intercepts Tab: when focus is NOT already in the button box, it
+ * redirects focus there instead of letting the notebook wrap.
+ */
+
+typedef struct {
+	GtkNotebook *notebook;
+	GtkWidget  **button_boxes;
+	int          n_pages;
+} NotebookFocusFixData;
+
+static GtkWidget *
+_find_ancestor_child_of (GtkWidget *widget, GtkWidget *ancestor)
+{
+	GtkWidget *child = widget;
+	GtkWidget *parent = gtk_widget_get_parent (child);
+	while (parent && parent != ancestor) {
+		child = parent;
+		parent = gtk_widget_get_parent (child);
+	}
+	return (parent == ancestor) ? child : NULL;
+}
+
+static gboolean
+_notebook_tab_capture_cb (GtkEventControllerKey *ctrl,
+                          guint                  keyval,
+                          guint                  keycode,
+                          GdkModifierType        state,
+                          gpointer               user_data)
+{
+	NotebookFocusFixData *data = user_data;
+	GtkWidget *focused, *bbox;
+	int page;
+
+	if (keyval != GDK_KEY_Tab && keyval != GDK_KEY_ISO_Left_Tab)
+		return FALSE;
+
+	gboolean forward = !(state & GDK_SHIFT_MASK);
+
+	page = gtk_notebook_get_current_page (data->notebook);
+	if (page < 0 || page >= data->n_pages)
+		return FALSE;
+
+	bbox = data->button_boxes[page];
+	if (!bbox)
+		return FALSE;
+
+	focused = gtk_window_get_focus (
+	    GTK_WINDOW (gtk_widget_get_root (GTK_WIDGET (data->notebook))));
+	if (!focused)
+		return FALSE;
+
+	GtkWidget *page_child = gtk_notebook_get_nth_page (data->notebook, page);
+	if (!page_child)
+		return FALSE;
+
+	if (forward) {
+		if (gtk_widget_is_ancestor (focused, bbox))
+			return FALSE;
+
+		/* Find which direct child of the page contains focus. */
+		GtkWidget *focus_section = _find_ancestor_child_of (focused, page_child);
+		if (!focus_section)
+			return FALSE;
+
+		/* Try to move within the current section first. */
+		gboolean moved = gtk_widget_child_focus (focus_section, GTK_DIR_TAB_FORWARD);
+		GtkWidget *after = gtk_window_get_focus (
+		    GTK_WINDOW (gtk_widget_get_root (GTK_WIDGET (data->notebook))));
+
+		if (moved && after != focused &&
+		    !gtk_widget_is_ancestor (focused, after) &&
+		    !gtk_widget_is_ancestor (after, focused))
+			return TRUE; /* Moved to a different widget. */
+
+		/* Section exhausted or focus moved within same widget tree
+		 * — try the next sibling section, then the button box. */
+		GtkWidget *next = gtk_widget_get_next_sibling (focus_section);
+		while (next) {
+			if (next == bbox) {
+				gtk_widget_child_focus (bbox, GTK_DIR_TAB_FORWARD);
+				return TRUE;
+			}
+			if (gtk_widget_child_focus (next, GTK_DIR_TAB_FORWARD)) {
+				GtkWidget *now = gtk_window_get_focus (
+				    GTK_WINDOW (gtk_widget_get_root (GTK_WIDGET (data->notebook))));
+				if (now != focused)
+					return TRUE;
+			}
+			next = gtk_widget_get_next_sibling (next);
+		}
+
+		/* No more siblings — go to button box. */
+		gtk_widget_child_focus (bbox, GTK_DIR_TAB_FORWARD);
+		return TRUE;
+	} else {
+		if (!gtk_widget_is_ancestor (focused, bbox))
+			return FALSE;
+
+		/* Shift+Tab from button box: go to last widget before it. */
+		GtkWidget *prev = gtk_widget_get_prev_sibling (bbox);
+		while (prev) {
+			if (gtk_widget_child_focus (prev, GTK_DIR_TAB_BACKWARD))
+				return TRUE;
+			prev = gtk_widget_get_prev_sibling (prev);
+		}
+		return FALSE;
+	}
+}
+
+void
+dialog_notebook_fix_tab_focus (GtkNotebook *notebook,
+                               const char **button_box_ids,
+                               GtkBuilder  *builder)
+{
+	int n = 0;
+	while (button_box_ids[n])
+		n++;
+
+	NotebookFocusFixData *data = g_new0 (NotebookFocusFixData, 1);
+	data->notebook = notebook;
+	data->n_pages = n;
+	data->button_boxes = g_new0 (GtkWidget *, n);
+
+	for (int i = 0; i < n; i++)
+		data->button_boxes[i] = GTK_WIDGET (
+		    gtk_builder_get_object (builder, button_box_ids[i]));
+
+	GtkEventController *kc = gtk_event_controller_key_new ();
+	gtk_event_controller_set_propagation_phase (kc, GTK_PHASE_CAPTURE);
+	g_signal_connect (kc, "key-pressed",
+	                  G_CALLBACK (_notebook_tab_capture_cb), data);
+	gtk_widget_add_controller (GTK_WIDGET (notebook), kc);
+}
+
 #endif
 
 

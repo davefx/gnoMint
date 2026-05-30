@@ -146,6 +146,15 @@ void new_req_window_display()
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_cancel_clicked), NULL);
 
 	on_new_req_privkey_type_toggle (NULL, NULL);
+
+	{
+		static const char *bbox_ids[] = {
+			"hbuttonbox13", "hbuttonbox10", "hbuttonbox11", NULL
+		};
+		dialog_notebook_fix_tab_focus (
+		    GTK_NOTEBOOK (gtk_builder_get_object (new_req_window_gtkb, "new_req_notebook")),
+		    bbox_ids, new_req_window_gtkb);
+	}
 }
 
 void new_req_tab_activate (int tab_number)

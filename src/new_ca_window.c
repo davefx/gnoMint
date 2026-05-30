@@ -116,6 +116,14 @@ void new_ca_window_display()
 
 	on_new_ca_privkey_type_toggle (NULL, NULL);
 
+	{
+		static const char *bbox_ids[] = {
+			"hbuttonbox1", "hbuttonbox12", "hbuttonbox4", NULL
+		};
+		dialog_notebook_fix_tab_focus (
+		    GTK_NOTEBOOK (gtk_builder_get_object (new_ca_window_gtkb, "new_ca_notebook")),
+		    bbox_ids, new_ca_window_gtkb);
+	}
 }
 
 

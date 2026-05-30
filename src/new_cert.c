@@ -143,6 +143,14 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
                 ca_selector_select_by_id (new_cert_ca_selection, atoll (csr_parent_id));
         }
 
+	{
+		static const char *bbox_ids[] = {
+			"hbuttonbox14", "hbuttonbox3", "hbuttonbox15", NULL
+		};
+		dialog_notebook_fix_tab_focus (
+		    GTK_NOTEBOOK (gtk_builder_get_object (new_cert_window_gtkb, "new_cert_notebook")),
+		    bbox_ids, new_cert_window_gtkb);
+	}
 }
 
 

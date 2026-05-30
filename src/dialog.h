@@ -53,6 +53,7 @@ gboolean dialog_refresh_list (void);
 
 GtkWindow * dialog_get_main_window (void);
 void dialog_password_entry_changed_cb (GtkEditable *password_entry, gpointer user_data);
+void dialog_notebook_fix_tab_focus (GtkNotebook *notebook, const char **button_box_ids, GtkBuilder *builder);
 
 #else
 
