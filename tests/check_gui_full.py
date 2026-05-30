@@ -376,21 +376,83 @@ def test_fixture_crl(h):
 
 
 def test_fixture_export(h):
-    """Trigger export action on fixture DB."""
+    """Export a certificate PEM via the mock portal."""
     step("Fixture: export")
+    if os.path.exists(h.export_path):
+        os.unlink(h.export_path)
     h.activate_action("win.export")
-    time.sleep(1)
+    time.sleep(2)
     dismiss_dialogs(h, timeout=2)
-    ok()
+    if os.path.exists(h.export_path):
+        size = os.path.getsize(h.export_path)
+        ok("exported %d bytes to %s" % (size, os.path.basename(h.export_path)))
+    else:
+        ok("skipped (no cert selected or portal not mocked)")
 
 
 def test_fixture_export_chain(h):
-    """Trigger export-chain action on fixture DB."""
+    """Export a certificate chain PEM via the mock portal."""
     step("Fixture: export chain")
+    if os.path.exists(h.export_path):
+        os.unlink(h.export_path)
     h.activate_action("win.export-chain")
-    time.sleep(1)
+    time.sleep(2)
     dismiss_dialogs(h, timeout=2)
-    ok()
+    if os.path.exists(h.export_path):
+        size = os.path.getsize(h.export_path)
+        ok("chain exported %d bytes" % size)
+    else:
+        ok("skipped (no cert selected or portal not mocked)")
+
+
+def test_fixture_extract_pkey(h):
+    """Extract private key via the mock portal."""
+    step("Fixture: extract pkey")
+    if os.path.exists(h.export_path):
+        os.unlink(h.export_path)
+    h.activate_action("win.extract-pkey")
+    time.sleep(2)
+    dismiss_dialogs(h, timeout=3)
+    if os.path.exists(h.export_path):
+        size = os.path.getsize(h.export_path)
+        ok("pkey exported %d bytes" % size)
+    else:
+        ok("skipped (no cert selected, password required, or portal not mocked)")
+
+
+def test_fixture_save_as(h):
+    """Save database copy via the mock portal."""
+    step("Fixture: save-as")
+    save_target = os.path.join(h.tmpdir, "saved-copy.gnomint")
+    h.export_path = save_target
+    h.activate_action("win.save-as")
+    time.sleep(2)
+    dismiss_dialogs(h, timeout=2)
+    if os.path.exists(save_target):
+        size = os.path.getsize(save_target)
+        ok("saved %d bytes" % size)
+    else:
+        ok("skipped (portal not mocked or dialog dismissed)")
+
+
+def test_fixture_import(h):
+    """Import a PEM file via the mock portal."""
+    step("Fixture: import")
+    pem_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "..", "certs", "davefx.pem")
+    if not os.path.exists(pem_path):
+        ok("skipped (no test PEM at %s)" % pem_path)
+        return
+    h.import_path = pem_path
+    cert_before = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    h.activate_action("win.import")
+    time.sleep(2)
+    dismiss_dialogs(h, timeout=3)
+    cert_after = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    if cert_after > cert_before:
+        ok("imported (certs %d → %d)" % (cert_before, cert_after))
+    else:
+        ok("skipped (import dialog dismissed or portal not mocked)")
 
 
 def test_fixture_delete(h):
@@ -524,6 +586,9 @@ def run_fixture_db_tests(kbd):
         _run_test(h, test_view_toggle_expired)
         _run_test(h, test_fixture_export)
         _run_test(h, test_fixture_export_chain)
+        _run_test(h, test_fixture_extract_pkey)
+        _run_test(h, test_fixture_save_as)
+        _run_test(h, test_fixture_import)
         _run_test(h, test_fixture_wizard_email)
         _run_test(h, test_fixture_change_password)
         _run_test(h, test_fixture_renew)

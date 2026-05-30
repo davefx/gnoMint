@@ -50,12 +50,30 @@ class GnoMintHarness:
         self._owns_kbd = kbd is None
         self.kbd = kbd or InputTestClient(os.environ["INPUTTEST_KBD_SOCK"])
         self.proc = None
+        self._portal_proc = None
         self._app = None
+        self.export_path = os.path.join(self.tmpdir, "export.pem")
+        self.import_path = None
 
-    def start(self):
+    def start(self, mock_portal=True):
         env = {**os.environ, "LC_ALL": "C"}
         if os.path.isfile(self.GTK_PRELOAD):
             env["LD_PRELOAD"] = self.GTK_PRELOAD
+        if mock_portal:
+            env["GTK_USE_PORTAL"] = "1"
+
+        if mock_portal:
+            portal_env = {**os.environ,
+                          "MOCK_PORTAL_SAVE": self.export_path}
+            if self.import_path:
+                portal_env["MOCK_PORTAL_OPEN"] = self.import_path
+            script = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "mock_portal.py")
+            self._portal_proc = subprocess.Popen(
+                [sys.executable, script], env=portal_env,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            time.sleep(1)
+
         self.proc = subprocess.Popen(
             [self.GNOMINT, self.db], env=env,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -75,6 +93,13 @@ class GnoMintHarness:
             except Exception:
                 self.proc.kill()
                 self.proc.wait()
+        if self._portal_proc:
+            self._portal_proc.terminate()
+            try:
+                self._portal_proc.wait(timeout=3)
+            except Exception:
+                self._portal_proc.kill()
+                self._portal_proc.wait()
         if self._owns_kbd:
             self.kbd.close()
         shutil.rmtree(self.tmpdir, ignore_errors=True)
