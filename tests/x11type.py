@@ -90,7 +90,6 @@ def type_text(text, delay=0.02):
     for ch in text:
         sym = _char_to_keysym(ch)
         if _needs_shift(ch):
-            # For uppercase: send Shift+lowercase keysym
             if ch.isupper():
                 sym = _char_to_keysym(ch.lower())
             press_key(shift_sym)

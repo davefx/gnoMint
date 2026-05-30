@@ -52,6 +52,11 @@ RUN apt-get update \
     # For debugging GTK apps
     libgtk-3-0 \
     dbus-x11 \
+    # Headless X11 for GUI tests (Xorg + dummy driver + libinput)
+    xserver-xorg-core \
+    xserver-xorg-video-dummy \
+    xserver-xorg-input-libinput \
+    x11-xserver-utils \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \

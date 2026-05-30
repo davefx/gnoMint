@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openbox_config xmlns="http://openbox.org/3.4/rc"
+                xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- Minimal openbox config for headless GUI tests.
+       Focus-follows-pointer with zero delay so that moving the
+       inputtest pointer over a window gives it keyboard focus
+       immediately via WM_TAKE_FOCUS. -->
+  <focus>
+    <focusNew>yes</focusNew>
+    <followMouse>yes</followMouse>
+    <focusLast>yes</focusLast>
+    <underMouse>yes</underMouse>
+    <focusDelay>0</focusDelay>
+    <raiseOnFocus>yes</raiseOnFocus>
+  </focus>
+  <placement>
+    <policy>Smart</policy>
+    <center>yes</center>
+  </placement>
+  <theme>
+    <name>Clearlooks</name>
+    <titleLayout>NLIMC</titleLayout>
+    <keepBorder>yes</keepBorder>
+  </theme>
+  <desktops>
+    <number>1</number>
+  </desktops>
+  <applications>
+    <application class="*">
+      <focus>yes</focus>
+      <decor>yes</decor>
+    </application>
+  </applications>
+</openbox_config>

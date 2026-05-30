@@ -36,7 +36,11 @@ jobs:
             gettext \
             intltool \
             iso-codes \
-            weston
+            weston \
+            xserver-xorg-core \
+            xserver-xorg-video-dummy \
+            xserver-xorg-input-libinput \
+            x11-xserver-utils
       
       - name: Verify dependencies
         run: |

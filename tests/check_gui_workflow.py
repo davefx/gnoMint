@@ -2,11 +2,17 @@
 """
 check_gui_workflow.py — Black-box GUI workflow test for gnomint.
 
-Uses Xvfb + openbox + XTest (via x11type.py) for input,
-xdotool for window management, AT-SPI (in subprocess) for
-GAction activation, and SQLite for result verification.
+Uses Xorg + xf86-video-dummy + openbox + XTest (via x11type.py)
+for input, xdotool for window management, AT-SPI (in subprocess)
+for GAction activation, and SQLite for result verification.
 
-Run:  tests/run-xvfb.sh python3 tests/check_gui_workflow.py
+NOTE: GTK 4's X11 backend has a focus-proxy architecture that makes
+programmatic keyboard focus unreliable from external tools (XTest,
+xdotool, inputtest).  The automated test suite uses check_workflows
+under headless Wayland instead.  This script is kept for manual
+X11 smoke testing where a human can click to establish focus.
+
+Run:  tests/run-xdummy.sh python3 tests/check_gui_workflow.py
 """
 
 import os
