@@ -24,7 +24,8 @@ check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
 
 EXTRA_DIST = run-headless.sh run-xdummy.sh xorg-dummy.conf \
-             inputtest_client.py \
+             inputtest_client.py gui_harness.py testwm.py \
+             openbox-rc.xml check_gui_full.py \
              check_cli_email.sh check_cli_wizard.sh \
              check_cli_parity.sh check_cli_info.sh check_cli_lifecycle.sh \
              check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
