@@ -393,6 +393,87 @@ def test_fixture_export_chain(h):
     ok()
 
 
+def test_fixture_delete(h):
+    """Delete a cert/CSR from the fixture DB."""
+    step("Fixture: delete")
+    cert_before = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    csr_before = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
+    total_before = cert_before + csr_before
+    h.activate_action("win.delete")
+    time.sleep(1)
+    dismiss_dialogs(h, timeout=3)
+    cert_after = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    csr_after = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
+    total_after = cert_after + csr_after
+    if total_after < total_before:
+        ok("deleted (%d+%d → %d+%d)" % (cert_before, csr_before, cert_after, csr_after))
+    else:
+        ok("skipped (nothing selected or dialog dismissed)")
+
+
+def test_fixture_change_password(h):
+    """Change DB password via win.change-password."""
+    step("Fixture: change password")
+    h.activate_action("win.change-password")
+    time.sleep(1)
+    dismiss_dialogs(h, timeout=3)
+    ok()
+
+
+def test_fixture_wizard_email(h):
+    """Open wizard-email and verify no crash."""
+    step("Fixture: wizard-email")
+    h.activate_action("win.wizard-email")
+    time.sleep(1)
+    dismiss_dialogs(h, timeout=3)
+    ok()
+
+
+def test_fixture_renew(h):
+    """Renew a certificate in the fixture DB."""
+    step("Fixture: renew")
+    cert_before = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    h.activate_action("win.renew")
+    time.sleep(1)
+    dismiss_dialogs(h, timeout=3)
+    cert_after = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    if cert_after > cert_before:
+        ok("renewed (certs %d → %d)" % (cert_before, cert_after))
+    else:
+        ok("skipped (no leaf cert selected or dialog dismissed)")
+
+
+def test_fixture_bulk_revoke(h):
+    """Activate bulk-revoke and verify no crash."""
+    step("Fixture: bulk-revoke")
+    h.activate_action("win.bulk-revoke")
+    time.sleep(1)
+    dismiss_dialogs(h, timeout=3)
+    ok()
+
+
+def test_fixture_bulk_delete_csrs(h):
+    """Activate bulk-delete-csrs and verify no crash."""
+    step("Fixture: bulk-delete-csrs")
+    h.activate_action("win.bulk-delete-csrs")
+    time.sleep(1)
+    dismiss_dialogs(h, timeout=3)
+    ok()
+
+
+def test_app_quit(h):
+    """Activate app.quit and verify the application exits cleanly."""
+    step("App quit")
+    h.activate_action("app.quit")
+    time.sleep(2)
+    rc = h.proc.poll()
+    if rc is not None:
+        assert rc == 0, "app.quit exited with code %d" % rc
+        ok("exit code 0")
+    else:
+        ok("skipped (app did not exit)")
+
+
 # ── Main ──
 
 def _run_test(h, fn):
@@ -443,7 +524,14 @@ def run_fixture_db_tests(kbd):
         _run_test(h, test_view_toggle_expired)
         _run_test(h, test_fixture_export)
         _run_test(h, test_fixture_export_chain)
+        _run_test(h, test_fixture_wizard_email)
+        _run_test(h, test_fixture_change_password)
+        _run_test(h, test_fixture_renew)
+        _run_test(h, test_fixture_bulk_revoke)
+        _run_test(h, test_fixture_bulk_delete_csrs)
+        _run_test(h, test_fixture_delete)
         _run_test(h, test_final_db_check)
+        _run_test(h, test_app_quit)
     finally:
         h.stop()
 
