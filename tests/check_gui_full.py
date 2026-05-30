@@ -58,16 +58,9 @@ def wizard_fill_cn_and_commit(h, cn_text, cn_field_index=4):
     h.set_entry_text(fields[cn_field_index], cn_text)
     time.sleep(0.3)
 
-    # Page 1 → 2
-    h.alt_key("n")
-    time.sleep(1)
-
-    # Page 2 → 3
-    h.alt_key("n")
-    time.sleep(1)
-
-    # Page 3 → OK
-    h.alt_key("o")
+    h.wizard_next(win)
+    h.wizard_next(win)
+    h.wizard_ok(win)
     return True
 
 
@@ -118,11 +111,9 @@ def test_create_ca(h):
     h.set_entry_text(fields[4], "Test Root CA")
     time.sleep(0.3)
 
-    h.alt_key("n")
-    time.sleep(1.5)
-    h.alt_key("n")
-    time.sleep(1.5)
-    h.alt_key("o")
+    h.wizard_next(win)
+    h.wizard_next(win)
+    h.wizard_ok(win)
     time.sleep(15)
 
     dismiss_dialogs(h)
@@ -210,11 +201,9 @@ def test_sign_csr(h):
     # If sign dialog opened, accept defaults and commit
     win = h.find_window("New Cert") or h.find_window("Sign")
     if win:
-        h.alt_key("n")
-        time.sleep(1)
-        h.alt_key("n")
-        time.sleep(1)
-        h.alt_key("o")
+        h.wizard_next(win)
+        h.wizard_next(win)
+        h.wizard_ok(win)
         time.sleep(10)
         dismiss_dialogs(h)
 

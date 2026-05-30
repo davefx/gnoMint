@@ -202,6 +202,21 @@ class GnoMintHarness:
         self.kbd.sync()
         time.sleep(0.5)
 
+    def wizard_next(self, win):
+        """Advance a wizard page: try Alt+N mnemonic, fall back to AT-SPI."""
+        self.alt_key("n")
+        time.sleep(1)
+        # If the mnemonic didn't work (unpatched GTK 4), click via AT-SPI
+        self.click_button(win, "Next") or self.click_button(win, "_Next")
+        time.sleep(0.5)
+
+    def wizard_ok(self, win):
+        """Commit a wizard: try Alt+O mnemonic, fall back to AT-SPI."""
+        self.alt_key("o")
+        time.sleep(1)
+        self.click_button(win, "OK") or self.click_button(win, "_OK")
+        time.sleep(0.5)
+
     # ── DB helpers ──
 
     def db_query(self, sql):
