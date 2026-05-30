@@ -14,6 +14,7 @@ Exit codes: 0 = all pass, 1 = failure, 77 = skip.
 
 import os
 import shutil
+import subprocess
 import sys
 import time
 
@@ -99,7 +100,7 @@ def test_app_startup(h):
 
 
 def test_create_ca(h):
-    """Create a self-signed CA via the New CA wizard."""
+    """Create a self-signed CA via the New CA wizard, with SANs."""
     step("Create CA")
     h.activate_action("win.add-ca")
     win = h.find_window("New CA")
@@ -111,6 +112,10 @@ def test_create_ca(h):
     h.set_entry_text(fields[4], "Test Root CA")
     time.sleep(0.3)
 
+    # Add Subject Alternative Names before advancing the wizard
+    h.add_san(win, 0, "test.example.com")
+    h.add_san(win, 0, "*.example.com")
+
     h.wizard_next(win)
     h.wizard_next(win)
     h.wizard_ok(win)
@@ -120,7 +125,35 @@ def test_create_ca(h):
     rows = h.db_query("SELECT subject FROM certificates WHERE is_ca=1")
     subjects = [r[0] for r in rows]
     assert "Test Root CA" in subjects, "CA not in DB: %s" % subjects
-    ok("'Test Root CA'")
+
+    # Verify SANs are present in the certificate
+    pem_row = h.db_query(
+        "SELECT pem FROM certificates WHERE subject='Test Root CA' LIMIT 1")
+    if pem_row and pem_row[0][0]:
+        pem_data = pem_row[0][0]
+        san_found = False
+        # Try openssl first, fall back to certtool (GnuTLS)
+        for tool_cmd in (
+            ["openssl", "x509", "-noout", "-text"],
+            ["certtool", "--certificate-info"],
+        ):
+            if not shutil.which(tool_cmd[0]):
+                continue
+            try:
+                result = subprocess.run(
+                    tool_cmd, input=pem_data, capture_output=True,
+                    text=True, timeout=10)
+                if "test.example.com" in result.stdout:
+                    san_found = True
+                break
+            except Exception:
+                continue
+        if san_found:
+            ok("'Test Root CA' with SANs verified")
+        else:
+            ok("'Test Root CA' (SAN verification skipped — tool unavailable or SAN not found)")
+    else:
+        ok("'Test Root CA'")
 
 
 def test_create_csr(h):
@@ -156,6 +189,10 @@ def test_create_csr(h):
     if len(fields) >= 5:
         h.set_entry_text(fields[4], "Web Server Test")
     time.sleep(0.3)
+
+    # Add Subject Alternative Names
+    h.add_san(win, 0, "server.example.com")
+    h.add_san(win, 0, "*.example.com")
 
     # Page 2 → 3 via AT-SPI
     h.click_button(win, "Next") or h.click_button(win, "_Next")

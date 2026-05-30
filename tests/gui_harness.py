@@ -202,6 +202,43 @@ class GnoMintHarness:
         self.kbd.sync()
         time.sleep(0.5)
 
+    def add_san(self, win, san_type_index, san_value):
+        """Add a Subject Alternative Name entry via the SAN editor dialog.
+
+        Clicks the _Add button in the wizard window, waits for the SAN editor
+        dialog, sets the value via AT-SPI EditableText, and clicks OK.
+
+        Args:
+            win: The wizard window containing the _Add button.
+            san_type_index: Index for the SAN type dropdown (0=DNS, 1=IP,
+                            2=Email, 3=URI). Currently only default (0) is
+                            used since GtkDropDown is hard to drive via AT-SPI.
+            san_value: The SAN value string to enter.
+        """
+        # Click the _Add button inside the wizard window
+        clicked = self.click_button(win, "_Add") or self.click_button(win, "Add")
+        if not clicked:
+            return False
+        time.sleep(1)
+
+        # Find the SAN editor dialog (separate window)
+        san_dlg = self.find_window("Subject Alternative Name")
+        if not san_dlg:
+            san_dlg = self.find_window("SAN")
+        if not san_dlg:
+            return False
+
+        # Find the editable text entry in the dialog and set the value
+        entries = self.find_editable_texts(san_dlg)
+        if entries:
+            self.set_entry_text(entries[0], san_value)
+            time.sleep(0.2)
+
+        # Click OK in the SAN editor dialog
+        self.click_button(san_dlg, "OK") or self.click_button(san_dlg, "_OK")
+        time.sleep(0.5)
+        return True
+
     def wizard_next(self, win):
         """Advance a wizard page: try Alt+N mnemonic, fall back to AT-SPI."""
         self.alt_key("n")
