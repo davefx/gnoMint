@@ -46,27 +46,30 @@ void creation_process_window_error_dialog (gchar *message)
 	g_object_unref (alert);
 }
 
+static void
+__ca_finish_alert_cb (GObject *source, GAsyncResult *result, gpointer user_data)
+{
+	GtkWindow *win = GTK_WINDOW (user_data);
+	gtk_window_destroy (win);
+}
+
 void creation_process_window_ca_finish (void)
 {
 	GObject *widget = NULL;
-	
+
 	g_thread_join (creation_process_window_thread);
-	g_source_remove (timer);	       
-	timer = 0;
-	
+
 	widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
-	
-        dialog_refresh_list();
 
-        {
-                GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
-                    _("CA creation process finished"));
-                gtk_alert_dialog_show (alert, GTK_WINDOW (widget));
-                g_object_unref (alert);
-                gtk_window_destroy (GTK_WINDOW (widget));
-        }
-			
+	dialog_refresh_list();
 
+	GtkAlertDialog *alert = gtk_alert_dialog_new ("%s",
+	    _("CA creation process finished"));
+	gtk_alert_dialog_choose (alert,
+	    GTK_WINDOW (widget), NULL,
+	    __ca_finish_alert_cb,
+	    GTK_WIDGET (widget));
+	g_object_unref (alert);
 }
 
 
@@ -77,7 +80,6 @@ gint creation_process_window_ca_pulse (gpointer data)
 	gchar *error_message = NULL;
 	gint status = 0;
 
-	/* Only pulse if we have a valid progress bar widget */
 	if (data && GTK_IS_PROGRESS_BAR(data)) {
 		gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR(data), 0.1);
 		gtk_progress_bar_pulse (GTK_PROGRESS_BAR(data));
@@ -90,30 +92,26 @@ gint creation_process_window_ca_pulse (gpointer data)
 	if (strcmp(ca_creation_get_thread_message(), gtk_label_get_text(GTK_LABEL(widget)))) {
 		gtk_label_set_text (GTK_LABEL(widget), ca_creation_get_thread_message());
 	}
-	
-	status = ca_creation_get_thread_status(); 
+
+	status = ca_creation_get_thread_status();
 
 	ca_creation_unlock_status_mutex();
 
-	g_main_context_iteration(NULL, TRUE);
-
 	if (status > 0) {
 		creation_process_window_ca_finish ();
+		return G_SOURCE_REMOVE;
 	} else if (status < 0) {
 		error_message = (gchar *) g_thread_join (creation_process_window_thread);
-		g_source_remove (timer);	       
-		timer = 0;
 		if (error_message) {
 			creation_process_window_error_dialog (error_message);
 			printf ("%s\n\n", error_message);
 		}
 		widget = gtk_builder_get_object (creation_process_window_gtkb, "creation_process_window");
 		gtk_window_destroy(GTK_WINDOW(GTK_WIDGET(widget)));
+		return G_SOURCE_REMOVE;
 	}
 
-
-
-	return 1;
+	return G_SOURCE_CONTINUE;
 }
 
 
