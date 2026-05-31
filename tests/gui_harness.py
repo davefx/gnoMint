@@ -279,6 +279,22 @@ class GnoMintHarness:
         self.click_button(win, "OK") or self.click_button(win, "_OK")
         time.sleep(0.5)
 
+    def wait_for_window(self, name_substr, timeout=20):
+        """Wait for a new window to appear, without dismissing it.
+
+        Returns the window accessible, or None on timeout.  This lets
+        the GTK event loop run naturally — if the app is hung (e.g. a
+        blocking g_main_context_iteration), the window never appears
+        and the test times out.
+        """
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            w = self.find_window(name_substr)
+            if w:
+                return w
+            time.sleep(0.5)
+        return None
+
     # ── DB helpers ──
 
     def db_query(self, sql):

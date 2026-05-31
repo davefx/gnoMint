@@ -119,9 +119,15 @@ def test_create_ca(h):
     h.wizard_next(win)
     h.wizard_next(win)
     h.wizard_ok(win)
-    time.sleep(15)
 
+    # Wait for the completion alert to appear organically.
+    # If the progress window's timer callback blocks the main loop
+    # (the bug fixed in 4811336), this times out instead of hanging.
+    alert = h.wait_for_window("finished", timeout=30)
+    if not alert:
+        alert = h.wait_for_window("process", timeout=5)
     dismiss_dialogs(h)
+
     rows = h.db_query("SELECT subject FROM certificates WHERE is_ca=1")
     subjects = [r[0] for r in rows]
     assert "Test Root CA" in subjects, "CA not in DB: %s" % subjects
