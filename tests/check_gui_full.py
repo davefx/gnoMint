@@ -215,71 +215,141 @@ def test_create_csr(h):
     ok("'Web Server Test'")
 
 
+def test_select_ca(h):
+    """Select the CA in the tree view."""
+    step("Select CA")
+    name = h.select_row_by_name("Test Root CA")
+    assert name and "Test Root CA" in name, "CA row not found"
+    ok(name.split()[0:3])
+
+
 def test_view_properties(h):
-    """View certificate properties via GAction."""
+    """View certificate properties — verify dialog opens with data."""
     step("View properties")
     n_before = h.window_count()
     h.activate_action("win.properties")
     time.sleep(1)
 
     n_after = h.window_count()
-    if n_after > n_before:
-        ok("dialog opened")
-        dismiss_dialogs(h, timeout=2)
-    else:
-        ok("skipped (no cert selected)")
+    assert n_after > n_before, "Properties dialog did not open"
+    dismiss_dialogs(h, timeout=2)
+    ok("dialog opened and dismissed")
 
 
-def test_sign_csr(h):
-    """Sign a CSR using the CA."""
-    step("Sign CSR")
-    csr_count_before = h.db_scalar(
-        "SELECT COUNT(*) FROM cert_requests")
-    cert_count_before = h.db_scalar(
-        "SELECT COUNT(*) FROM certificates WHERE is_ca=0")
+def test_create_and_sign_csr(h):
+    """Create a CSR, then sign it with the CA."""
+    step("Create+Sign CSR")
+
+    # Enable CSR view so we can see them
+    h.activate_action("win.view-csrs")
+    time.sleep(0.5)
+
+    h.activate_action("win.add-csr")
+    time.sleep(1.5)
+
+    win = None
+    for i in range(h.window_count()):
+        try:
+            w = h._app.get_child_at_index(i)
+            if not w:
+                continue
+            name = w.get_name() or ""
+            if name and name != "gnoMint" and "gnomint" not in name.lower():
+                win = w
+                break
+        except Exception:
+            pass
+
+    if not win:
+        ok("skipped (no CSR window)")
+        return
+
+    h.click_button(win, "Next") or h.click_button(win, "_Next")
+    time.sleep(1.5)
+
+    fields = h.find_editable_texts(win)
+    if len(fields) >= 5:
+        h.set_entry_text(fields[4], "Web Server Test")
+    time.sleep(0.3)
+
+    h.add_san(win, 0, "server.example.com")
+
+    h.click_button(win, "Next") or h.click_button(win, "_Next")
+    time.sleep(1.5)
+    h.click_button(win, "OK") or h.click_button(win, "_OK")
+
+    alert = h.wait_for_window("finished", timeout=30)
+    if not alert:
+        h.wait_for_window("process", timeout=5)
+    dismiss_dialogs(h)
+
+    csr_count = h.db_scalar("SELECT COUNT(*) FROM cert_requests")
+    assert csr_count >= 1, "No CSR in database"
+
+    # Select the CSR and sign it
+    h.select_row_by_name("Web Server Test")
+    time.sleep(0.5)
+
+    cert_before = h.db_scalar(
+        "SELECT COUNT(*) FROM certificates WHERE is_ca=0") or 0
 
     h.activate_action("win.sign")
-    time.sleep(1)
+    time.sleep(1.5)
 
-    # If sign dialog opened, accept defaults and commit
-    win = h.find_window("New Cert") or h.find_window("Sign")
-    if win:
-        h.wizard_next(win)
-        h.wizard_next(win)
-        h.wizard_ok(win)
-        time.sleep(10)
+    sign_win = h.find_window("New Cert") or h.find_window("Sign")
+    if sign_win:
+        h.click_button(sign_win, "Next") or h.click_button(sign_win, "_Next")
+        time.sleep(1)
+        h.click_button(sign_win, "Next") or h.click_button(sign_win, "_Next")
+        time.sleep(1)
+        h.click_button(sign_win, "OK") or h.click_button(sign_win, "_OK")
+
+        alert = h.wait_for_window("finished", timeout=30)
+        if not alert:
+            h.wait_for_window("process", timeout=5)
         dismiss_dialogs(h)
 
-    cert_count_after = h.db_scalar(
-        "SELECT COUNT(*) FROM certificates WHERE is_ca=0")
-    if cert_count_after > cert_count_before:
-        ok("cert count %d → %d" % (cert_count_before, cert_count_after))
-    else:
-        ok("skipped (no CSR selected or sign not available)")
+    cert_after = h.db_scalar(
+        "SELECT COUNT(*) FROM certificates WHERE is_ca=0") or 0
+    assert cert_after > cert_before, \
+        "Cert not created: %d → %d" % (cert_before, cert_after)
+    ok("CSR created + signed (certs %d → %d)" % (cert_before, cert_after))
 
 
 def test_revoke_cert(h):
-    """Revoke a certificate."""
+    """Select a non-CA cert and revoke it."""
     step("Revoke cert")
+    name = h.select_row_by_name("Web Server Test")
+    if not name:
+        ok("skipped (cert not found)")
+        return
+
+    rev_before = h.db_scalar(
+        "SELECT COUNT(*) FROM certificates "
+        "WHERE revocation IS NOT NULL AND revocation != ''") or 0
+
     h.activate_action("win.revoke")
     time.sleep(1)
     dismiss_dialogs(h, timeout=2)
 
-    revoked = h.db_query(
-        "SELECT COUNT(*) FROM certificates WHERE revocation IS NOT NULL "
-        "AND revocation != ''")
-    ok("revoked=%d" % (revoked[0][0] if revoked else 0))
+    rev_after = h.db_scalar(
+        "SELECT COUNT(*) FROM certificates "
+        "WHERE revocation IS NOT NULL AND revocation != ''") or 0
+    ok("revoked %d → %d" % (rev_before, rev_after))
 
 
 def test_generate_crl(h):
-    """Generate a CRL for the selected CA."""
+    """Select the CA and generate a CRL."""
     step("Generate CRL")
+    h.select_row_by_name("Test Root CA")
+    time.sleep(0.5)
+
     h.activate_action("win.generate-crl")
     time.sleep(2)
     dismiss_dialogs(h, timeout=2)
 
-    crls = h.db_query("SELECT COUNT(*) FROM ca_crl")
-    ok("CRLs=%d" % (crls[0][0] if crls else 0))
+    crls = h.db_scalar("SELECT COUNT(*) FROM ca_crl") or 0
+    ok("CRLs=%d" % crls)
 
 
 def test_view_toggle_csrs(h):
@@ -348,17 +418,24 @@ def test_final_db_check(h):
 # ── Fixture-based tests ──
 
 def test_fixture_properties(h):
-    """Open properties on a fixture CA cert."""
+    """Select a cert and verify properties dialog opens."""
     step("Fixture: properties")
+    h.select_row_by_name("DFX Root CA")
+    time.sleep(0.3)
+    n_before = h.window_count()
     h.activate_action("win.properties")
     time.sleep(1)
+    n_after = h.window_count()
+    assert n_after > n_before, "Properties dialog did not open"
     dismiss_dialogs(h, timeout=2)
-    ok()
+    ok("dialog opened for DFX Root CA")
 
 
 def test_fixture_revoke(h):
-    """Revoke a cert in the fixture DB."""
+    """Select a leaf cert and revoke it."""
     step("Fixture: revoke")
+    h.select_row_by_name("Portable Computer")
+    time.sleep(0.3)
     rev_before = h.db_scalar(
         "SELECT COUNT(*) FROM certificates "
         "WHERE revocation IS NOT NULL AND revocation != ''") or 0
@@ -372,8 +449,10 @@ def test_fixture_revoke(h):
 
 
 def test_fixture_crl(h):
-    """Generate CRL on fixture DB."""
+    """Select a CA and generate CRL."""
     step("Fixture: CRL gen")
+    h.select_row_by_name("DFX Root CA")
+    time.sleep(0.3)
     h.activate_action("win.generate-crl")
     time.sleep(2)
     dismiss_dialogs(h, timeout=2)
@@ -382,38 +461,44 @@ def test_fixture_crl(h):
 
 
 def test_fixture_export(h):
-    """Export a certificate PEM via the mock portal."""
+    """Select a cert and export its PEM via the mock portal."""
     step("Fixture: export")
+    h.select_row_by_name("DFX Root CA")
+    time.sleep(0.3)
     if os.path.exists(h.export_path):
         os.unlink(h.export_path)
     h.activate_action("win.export")
     time.sleep(2)
-    dismiss_dialogs(h, timeout=2)
+    dismiss_dialogs(h, timeout=3)
     if os.path.exists(h.export_path):
         size = os.path.getsize(h.export_path)
-        ok("exported %d bytes to %s" % (size, os.path.basename(h.export_path)))
+        ok("exported %d bytes" % size)
     else:
-        ok("skipped (no cert selected or portal not mocked)")
+        ok("skipped (portal not active)")
 
 
 def test_fixture_export_chain(h):
-    """Export a certificate chain PEM via the mock portal."""
+    """Select a leaf cert and export the chain PEM."""
     step("Fixture: export chain")
+    h.select_row_by_name("gnoMint program")
+    time.sleep(0.3)
     if os.path.exists(h.export_path):
         os.unlink(h.export_path)
     h.activate_action("win.export-chain")
     time.sleep(2)
-    dismiss_dialogs(h, timeout=2)
+    dismiss_dialogs(h, timeout=3)
     if os.path.exists(h.export_path):
         size = os.path.getsize(h.export_path)
         ok("chain exported %d bytes" % size)
     else:
-        ok("skipped (no cert selected or portal not mocked)")
+        ok("skipped (portal not active)")
 
 
 def test_fixture_extract_pkey(h):
-    """Extract private key via the mock portal."""
+    """Select a cert with private key and extract it."""
     step("Fixture: extract pkey")
+    h.select_row_by_name("DFX Root CA")
+    time.sleep(0.3)
     if os.path.exists(h.export_path):
         os.unlink(h.export_path)
     h.activate_action("win.extract-pkey")
@@ -423,7 +508,7 @@ def test_fixture_extract_pkey(h):
         size = os.path.getsize(h.export_path)
         ok("pkey exported %d bytes" % size)
     else:
-        ok("skipped (no cert selected, password required, or portal not mocked)")
+        ok("skipped (password dialog or portal not active)")
 
 
 def test_fixture_save_as(h):
@@ -462,21 +547,19 @@ def test_fixture_import(h):
 
 
 def test_fixture_delete(h):
-    """Delete a cert/CSR from the fixture DB."""
-    step("Fixture: delete")
-    cert_before = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
+    """Select the CSR and delete it."""
+    step("Fixture: delete CSR")
+    # Enable CSR view and select the CSR
+    h.activate_action("win.view-csrs")
+    time.sleep(0.5)
+    h.select_row_by_name("Guillermo Puertas")
+    time.sleep(0.3)
     csr_before = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
-    total_before = cert_before + csr_before
     h.activate_action("win.delete")
     time.sleep(1)
     dismiss_dialogs(h, timeout=3)
-    cert_after = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
     csr_after = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
-    total_after = cert_after + csr_after
-    if total_after < total_before:
-        ok("deleted (%d+%d → %d+%d)" % (cert_before, csr_before, cert_after, csr_after))
-    else:
-        ok("skipped (nothing selected or dialog dismissed)")
+    ok("CSRs %d → %d" % (csr_before, csr_after))
 
 
 def test_fixture_change_password(h):
@@ -498,17 +581,16 @@ def test_fixture_wizard_email(h):
 
 
 def test_fixture_renew(h):
-    """Renew a certificate in the fixture DB."""
+    """Select a leaf cert and renew it."""
     step("Fixture: renew")
+    h.select_row_by_name("David")
+    time.sleep(0.3)
     cert_before = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
     h.activate_action("win.renew")
     time.sleep(1)
     dismiss_dialogs(h, timeout=3)
     cert_after = h.db_scalar("SELECT COUNT(*) FROM certificates") or 0
-    if cert_after > cert_before:
-        ok("renewed (certs %d → %d)" % (cert_before, cert_after))
-    else:
-        ok("skipped (no leaf cert selected or dialog dismissed)")
+    ok("certs %d → %d" % (cert_before, cert_after))
 
 
 def test_fixture_bulk_revoke(h):
@@ -562,9 +644,9 @@ def run_fresh_db_tests(kbd):
     try:
         _run_test(h, test_app_startup)
         _run_test(h, test_create_ca)
-        _run_test(h, test_create_csr)
+        _run_test(h, test_select_ca)
         _run_test(h, test_view_properties)
-        _run_test(h, test_sign_csr)
+        _run_test(h, test_create_and_sign_csr)
         _run_test(h, test_revoke_cert)
         _run_test(h, test_generate_crl)
         _run_test(h, test_view_toggle_csrs)

@@ -279,6 +279,50 @@ class GnoMintHarness:
         self.click_button(win, "OK") or self.click_button(win, "_OK")
         time.sleep(0.5)
 
+    def select_row(self, index):
+        """Select a row in the main tree view by index.
+
+        Uses the AT-SPI Selection interface on the list widget.
+        Returns the row's display name, or None on failure.
+        """
+        frame = self.get_frame()
+        lst = self._find_by_role_name(frame, ("list",), None)
+        if not lst:
+            return None
+        si = lst.get_selection_iface()
+        if not si:
+            return None
+        n = lst.get_child_count()
+        if index < 0 or index >= n:
+            return None
+        si.select_child(index)
+        time.sleep(0.3)
+        row = lst.get_child_at_index(index)
+        return row.get_name() if row else None
+
+    def select_row_by_name(self, name_substr):
+        """Select the first tree view row whose name contains name_substr."""
+        frame = self.get_frame()
+        lst = self._find_by_role_name(frame, ("list",), None)
+        if not lst:
+            return None
+        si = lst.get_selection_iface()
+        if not si:
+            return None
+        for i in range(lst.get_child_count()):
+            row = lst.get_child_at_index(i)
+            if row and name_substr in (row.get_name() or ""):
+                si.select_child(i)
+                time.sleep(0.3)
+                return row.get_name()
+        return None
+
+    def row_count(self):
+        """Return the number of rows in the main tree view."""
+        frame = self.get_frame()
+        lst = self._find_by_role_name(frame, ("list",), None)
+        return lst.get_child_count() if lst else 0
+
     def wait_for_window(self, name_substr, timeout=20):
         """Wait for a new window to appear, without dismissing it.
 
@@ -314,7 +358,8 @@ class GnoMintHarness:
         if depth > 12:
             return None
         try:
-            if obj.get_role_name() in roles and obj.get_name() == name:
+            if obj.get_role_name() in roles and \
+               (name is None or obj.get_name() == name):
                 return obj
             for i in range(obj.get_child_count()):
                 c = obj.get_child_at_index(i)
