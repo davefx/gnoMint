@@ -557,6 +557,12 @@ void country_table_populate_dropdown(GtkDropDown *dropdown)
 
 	gtk_drop_down_set_model (dropdown, G_LIST_MODEL (string_list));
 	gtk_drop_down_set_selected (dropdown, GTK_INVALID_LIST_POSITION);
+
+	GtkExpression *expr = gtk_property_expression_new (
+	    GTK_TYPE_STRING_OBJECT, NULL, "string");
+	gtk_drop_down_set_expression (dropdown, expr);
+	gtk_expression_unref (expr);
+
 	g_object_unref (string_list);
 }
 
