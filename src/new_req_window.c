@@ -126,7 +126,7 @@ void new_req_window_display()
 	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "manual_radiobutton"));
 	if (w) g_signal_connect(w, "toggled", G_CALLBACK(new_req_inherit_fields_toggled), NULL);
 
-	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_cn_entry"));
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "cn_entry1"));
 	if (w) g_signal_connect(w, "changed", G_CALLBACK(on_new_req_cn_entry_changed), NULL);
 	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_next1"));
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_next1_clicked), NULL);
@@ -335,7 +335,7 @@ G_MODULE_EXPORT void on_new_req_previous2_clicked (GtkButton *widget,
 G_MODULE_EXPORT void on_new_req_next2_clicked (GtkButton *widget,
 			      gpointer user_data)
 {
-	GtkEditable *cn = GTK_EDITABLE(gtk_builder_get_object (new_req_window_gtkb, "new_req_cn_entry"));
+	GtkEditable *cn = GTK_EDITABLE(gtk_builder_get_object (new_req_window_gtkb, "cn_entry1"));
 	if (!strlen (gtk_editable_get_text (cn))) {
 		dialog_error (_("Please enter a Common Name (CN) for the certificate request."));
 		return;

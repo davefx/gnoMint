@@ -73,6 +73,8 @@ class GnoMintHarness:
                 [sys.executable, script], env=portal_env,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             time.sleep(1)
+            if self._portal_proc.poll() is not None:
+                self._portal_proc = None
 
         self.proc = subprocess.Popen(
             [self.GNOMINT, self.db], env=env,
@@ -144,7 +146,58 @@ class GnoMintHarness:
         return None
 
     def find_button(self, root, label):
-        return self._find_by_role_name(root, ("button", "push button"), label)
+        return self._find_visible_button(root, label, 0)
+
+    def _find_visible_button(self, obj, label, depth):
+        if depth > 12:
+            return None
+        try:
+            if obj.get_role_name() in ("button", "push button") and \
+               obj.get_name() == label:
+                ss = obj.get_state_set()
+                if ss and ss.contains(Atspi.StateType.SHOWING) and \
+                   ss.contains(Atspi.StateType.SENSITIVE):
+                    return obj
+            for i in range(obj.get_child_count()):
+                c = obj.get_child_at_index(i)
+                if c:
+                    r = self._find_visible_button(c, label, depth + 1)
+                    if r:
+                        return r
+        except Exception:
+            pass
+        return None
+
+    def find_widget_by_name(self, root, name_substr, depth=0):
+        """Find any showing widget whose name contains name_substr."""
+        if depth > 12:
+            return None
+        try:
+            n = root.get_name() or ""
+            ss = root.get_state_set()
+            showing = ss.contains(Atspi.StateType.SHOWING) if ss else False
+            if showing and name_substr in n:
+                return root
+            for i in range(root.get_child_count()):
+                c = root.get_child_at_index(i)
+                if c:
+                    r = self.find_widget_by_name(c, name_substr, depth + 1)
+                    if r:
+                        return r
+        except Exception:
+            pass
+        return None
+
+    def click_widget_by_name(self, root, name_substr):
+        """Find a widget by name substring and click via AT-SPI action."""
+        w = self.find_widget_by_name(root, name_substr)
+        if w:
+            ai = w.get_action_iface()
+            if ai and ai.get_n_actions() > 0:
+                ai.do_action(0)
+                time.sleep(0.5)
+                return True
+        return False
 
     def click_button(self, root, label):
         btn = self.find_button(root, label)
