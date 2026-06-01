@@ -1729,6 +1729,118 @@ out:
     return (rc == 0 && crits == 0) ? 0 : 1;
 }
 
+
+/* Verify the country GtkDropDown has a search expression set and that
+ * the expression correctly resolves item strings for filtering.
+ * Regression test for the missing gtk_drop_down_set_expression() fix. */
+static int
+scenario_country_search (void)
+{
+    int rc = 1;
+    fprintf (stderr, "==> scenario: country-search expression\n");
+
+    if (!test_init_main_window ())
+        return 1;
+
+    new_ca_window_display ();
+    drain_events ();
+
+    if (!new_ca_window_gtkb) {
+        fail_test ("country-search", "new_ca_window_gtkb is NULL");
+        goto out;
+    }
+
+    GtkDropDown *dd = GTK_DROP_DOWN (gtk_builder_get_object (
+        new_ca_window_gtkb, "country_combobox"));
+    if (!dd) {
+        fail_test ("country-search", "country_combobox not found");
+        goto out;
+    }
+
+    /* Check the model has items. */
+    GListModel *model = gtk_drop_down_get_model (dd);
+    if (!model || g_list_model_get_n_items (model) < 100) {
+        fail_test ("country-search",
+                   "model has %u items, expected 200+",
+                   model ? g_list_model_get_n_items (model) : 0);
+        goto out;
+    }
+    fprintf (stderr, "    model: %u countries\n",
+             g_list_model_get_n_items (model));
+
+    /* The fix: an expression must be set for enable-search to work. */
+    GtkExpression *expr = gtk_drop_down_get_expression (dd);
+    if (!expr) {
+        fail_test ("country-search",
+                   "expression is NULL — search will not filter");
+        goto out;
+    }
+
+    /* Actually filter the model with a search term and verify the
+     * result set shrinks and contains the expected country.  This
+     * exercises the same code path as typing in the search box. */
+    {
+        GtkStringFilter *sf = gtk_string_filter_new (
+            gtk_drop_down_get_expression (dd));
+        gtk_expression_ref (gtk_drop_down_get_expression (dd));
+        GtkFilterListModel *fm = gtk_filter_list_model_new (
+            g_object_ref (G_LIST_MODEL (model)),
+            GTK_FILTER (sf));
+
+        guint all = g_list_model_get_n_items (G_LIST_MODEL (fm));
+        fprintf (stderr, "    unfiltered: %u items\n", all);
+
+        /* Search by country code — locale-independent. */
+        gtk_string_filter_set_search (sf, "(ES)");
+        guint filtered = g_list_model_get_n_items (G_LIST_MODEL (fm));
+        fprintf (stderr, "    search '(ES)': %u items\n", filtered);
+
+        if (filtered == 0 || filtered >= all) {
+            fail_test ("country-search",
+                       "search '(ES)' returned %u items (all=%u) — "
+                       "filter did not work", filtered, all);
+            g_object_unref (fm);
+            goto out;
+        }
+
+        /* Verify one of the results is Spain (ES). */
+        gboolean found = FALSE;
+        for (guint i = 0; i < filtered; i++) {
+            GtkStringObject *obj = GTK_STRING_OBJECT (
+                g_list_model_get_item (G_LIST_MODEL (fm), i));
+            const char *s = gtk_string_object_get_string (obj);
+            if (s && strstr (s, "(ES)"))
+                found = TRUE;
+            g_object_unref (obj);
+            if (found) break;
+        }
+        if (!found) {
+            fail_test ("country-search",
+                       "no result contains '(ES)' after filtering");
+            g_object_unref (fm);
+            goto out;
+        }
+        fprintf (stderr, "    search filtered %u → %u, '(ES)' found OK\n",
+                 all, filtered);
+        g_object_unref (fm);
+    }
+
+    rc = 0;
+
+out:
+    if (new_ca_window_gtkb) {
+        GObject *win = gtk_builder_get_object (new_ca_window_gtkb,
+                                                "new_ca_window");
+        if (win && GTK_IS_WIDGET (win))
+            gtk_window_destroy (GTK_WINDOW (GTK_WIDGET (win)));
+        g_object_unref (new_ca_window_gtkb);
+        new_ca_window_gtkb = NULL;
+    }
+    drain_events ();
+    int crits = critical_messages_check_and_reset ("country-search");
+    return (rc == 0 && crits == 0) ? 0 : 1;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Scenario: expiry banner (issue #56)                               */
 /* ------------------------------------------------------------------ */
@@ -2098,6 +2210,7 @@ main (int argc, char **argv)
         scenario_revoke_cert ();
         scenario_wizard_window ();
         scenario_keylength_selector ();
+        scenario_country_search ();
         scenario_expiry_banner ();
         scenario_search_filter ();
     } else {
