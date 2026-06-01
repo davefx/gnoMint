@@ -155,6 +155,9 @@ void new_req_window_display()
 		    GTK_NOTEBOOK (gtk_builder_get_object (new_req_window_gtkb, "new_req_notebook")),
 		    bbox_ids, new_req_window_gtkb);
 	}
+
+	gtk_widget_set_visible (
+	    GTK_WIDGET (gtk_builder_get_object (new_req_window_gtkb, "new_req_window")), TRUE);
 }
 
 void new_req_tab_activate (int tab_number)
@@ -239,7 +242,18 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 
 	inherit_fields = gtk_check_button_get_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")));
 
+	{
+		guint sel = gtk_single_selection_get_selected (new_req_ca_selection);
+		guint n = g_list_model_get_n_items (
+		    gtk_single_selection_get_model (new_req_ca_selection));
+		fprintf (stderr, "CSR next1: inherit=%d selected=%u n_items=%u\n",
+		         inherit_fields, sel, n);
+		if (inherit_fields && sel == GTK_INVALID_LIST_POSITION && n > 0)
+			gtk_single_selection_set_selected (new_req_ca_selection, 0);
+	}
+
 	GnomintCertRow *sel_row = ca_selector_get_selected_row (new_req_ca_selection);
+	fprintf (stderr, "CSR next1: sel_row=%p\n", (void*)sel_row);
 
         if (inherit_fields && sel_row) {
 

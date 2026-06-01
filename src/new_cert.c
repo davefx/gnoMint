@@ -151,6 +151,9 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 		    GTK_NOTEBOOK (gtk_builder_get_object (new_cert_window_gtkb, "new_cert_notebook")),
 		    bbox_ids, new_cert_window_gtkb);
 	}
+
+	gtk_widget_set_visible (
+	    GTK_WIDGET (gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window")), TRUE);
 }
 
 

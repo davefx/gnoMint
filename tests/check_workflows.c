@@ -598,6 +598,15 @@ scenario_new_self_signed_ca (void)
                    "expected at least one new toplevel after callback");
         return 1;
     }
+
+    {
+        extern GtkBuilder *new_ca_window_gtkb;
+        if (new_ca_window_gtkb) {
+            g_object_unref (new_ca_window_gtkb);
+            new_ca_window_gtkb = NULL;
+        }
+    }
+
     return crits == 0 ? 0 : 1;
 }
 

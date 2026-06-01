@@ -124,6 +124,9 @@ void new_ca_window_display()
 		    GTK_NOTEBOOK (gtk_builder_get_object (new_ca_window_gtkb, "new_ca_notebook")),
 		    bbox_ids, new_ca_window_gtkb);
 	}
+
+	gtk_widget_set_visible (
+	    GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window")), TRUE);
 }
 
 

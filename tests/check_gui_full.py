@@ -75,12 +75,20 @@ def dismiss_dialogs(h, timeout=3):
                 if not w:
                     continue
                 name = w.get_name() or ""
-                if name == "gnoMint" or name == "":
+                role = w.get_role_name()
+                if name == "gnoMint":
                     continue
-                for label in ("OK", "Close", "Yes", "_OK", "_Close", "_Yes"):
-                    if h.click_button(w, label):
-                        time.sleep(0.3)
-                        break
+                # Prioritize dialogs (GtkAlertDialog shows as "dialog")
+                if role == "dialog" or name == "":
+                    for label in ("Close", "OK", "Yes"):
+                        if h.click_button(w, label):
+                            time.sleep(0.3)
+                            break
+                else:
+                    for label in ("OK", "Close", "Yes"):
+                        if h.click_button(w, label):
+                            time.sleep(0.3)
+                            break
             except Exception:
                 pass
         time.sleep(0.5)
@@ -126,7 +134,13 @@ def test_create_ca(h):
     alert = h.wait_for_window("finished", timeout=30)
     if not alert:
         alert = h.wait_for_window("process", timeout=5)
-    dismiss_dialogs(h)
+
+    # Dismiss all dialogs and wait until only the main window remains
+    for _ in range(10):
+        dismiss_dialogs(h, timeout=1)
+        if h.window_count() <= 1:
+            break
+        time.sleep(0.5)
 
     rows = h.db_query("SELECT subject FROM certificates WHERE is_ca=1")
     subjects = [r[0] for r in rows]
@@ -208,9 +222,10 @@ def test_create_and_sign_csr(h):
         ok("skipped (no CSR window)")
         return
 
-    # Navigate pages. The skip parameter tells click_button which
-    # 'Next' to click (page 0's, page 1's) since GtkNotebook
-    # marks all pages' buttons as SHOWING in AT-SPI.
+    # Wait for the WM to send WM_TAKE_FOCUS after the new MapRequest.
+    time.sleep(1)
+
+    # Navigate pages by button index (skip=N finds the Nth 'Next').
     h.wizard_next(win, page=0)   # page 1 → 2 (inherits fields from CA)
     h.wizard_next(win, page=1)   # page 2 → 3 (CN pre-filled, validation passes)
     h.wizard_ok(win)

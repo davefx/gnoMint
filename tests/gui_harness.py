@@ -119,6 +119,26 @@ class GnoMintHarness:
     def get_frame(self):
         return self._app.get_child_at_index(0) if self._app else None
 
+    def focus_window(self, win):
+        """Send WM_TAKE_FOCUS to a window to give it keyboard focus.
+
+        Uses xdotool windowactivate which sends _NET_ACTIVE_WINDOW
+        to the WM, triggering proper ICCCM focus acquisition.
+        """
+        try:
+            import subprocess
+            # Find the X window ID from the AT-SPI accessible
+            # Use xdotool search by name as approximation
+            name = win.get_name() or ""
+            if name:
+                subprocess.run(
+                    ["xdotool", "search", "--name", name,
+                     "windowactivate", "--sync"],
+                    capture_output=True, timeout=3)
+                time.sleep(0.5)
+        except Exception:
+            pass
+
     def activate_action(self, action_name):
         frame = self.get_frame()
         if not frame:
@@ -350,22 +370,20 @@ class GnoMintHarness:
         """Advance a wizard page.
 
         page: which 'Next' button to click (0=page 1's, 1=page 2's).
-        Tries Alt+N mnemonic first (only activates the current page's
-        button), then falls back to AT-SPI click_button with skip.
+        Tries AT-SPI click_button first (works on any GTK 4), then
+        Alt+N mnemonic as fallback (needs GDK surface focus).
         """
-        self.alt_key("n")
+        if not (self.click_button(win, "Next", skip=page) or
+                self.click_button(win, "_Next", skip=page)):
+            self.alt_key("n")
         time.sleep(1)
-        self.click_button(win, "Next", skip=page) or \
-            self.click_button(win, "_Next", skip=page)
-        time.sleep(0.5)
 
     def wizard_ok(self, win, page=0):
-        """Commit a wizard: try Alt+O mnemonic, fall back to AT-SPI."""
-        self.alt_key("o")
+        """Commit a wizard."""
+        if not (self.click_button(win, "OK", skip=page) or
+                self.click_button(win, "_OK", skip=page)):
+            self.alt_key("o")
         time.sleep(1)
-        self.click_button(win, "OK", skip=page) or \
-            self.click_button(win, "_OK", skip=page)
-        time.sleep(0.5)
 
     def select_row(self, index):
         """Select a row in the main tree view by index.
