@@ -65,3 +65,5 @@ tests/test-suite.log
 .claude/
 ABOUT-NLS
 *.tar.gz
+tests/__pycache__/
+tests/xi2key
