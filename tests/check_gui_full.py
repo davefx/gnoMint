@@ -190,7 +190,13 @@ def test_create_and_sign_csr(h):
 
     h.activate_action("win.view-csrs")
     time.sleep(0.5)
-    dismiss_dialogs(h, timeout=3)
+
+    # Ensure no stale dialogs remain from CA creation
+    for _ in range(5):
+        dismiss_dialogs(h, timeout=1)
+        if h.window_count() <= 1:
+            break
+        time.sleep(0.5)
 
     h.activate_action("win.add-csr")
     time.sleep(2)
@@ -202,10 +208,11 @@ def test_create_and_sign_csr(h):
         ok("skipped (no CSR window)")
         return
 
-    # Navigate using wizard_next/ok (Alt+key mnemonics).
-    # Page 1 inherits subject from the CA (default), pre-filling CN.
-    h.wizard_next(win)
-    h.wizard_next(win)
+    # Navigate pages. The skip parameter tells click_button which
+    # 'Next' to click (page 0's, page 1's) since GtkNotebook
+    # marks all pages' buttons as SHOWING in AT-SPI.
+    h.wizard_next(win, page=0)   # page 1 → 2 (inherits fields from CA)
+    h.wizard_next(win, page=1)   # page 2 → 3 (CN pre-filled, validation passes)
     h.wizard_ok(win)
 
     alert = h.wait_for_window("finished", timeout=30)

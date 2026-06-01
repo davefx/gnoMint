@@ -199,8 +199,14 @@ class GnoMintHarness:
                 return True
         return False
 
-    def click_button(self, root, label):
-        btn = self.find_button(root, label)
+    def click_button(self, root, label, skip=0):
+        """Click a visible+sensitive button by label.
+
+        skip: number of matches to skip (0=first, 1=second, etc.).
+        Useful for notebook wizards where each page has a 'Next' button.
+        """
+        count = [0]
+        btn = self._find_nth_visible_button(root, label, skip, count, 0)
         if btn:
             ai = btn.get_action_iface()
             if ai and ai.get_n_actions() > 0:
@@ -208,6 +214,29 @@ class GnoMintHarness:
                 time.sleep(0.5)
                 return True
         return False
+
+    def _find_nth_visible_button(self, obj, label, skip, count, depth):
+        if depth > 12:
+            return None
+        try:
+            if obj.get_role_name() in ("button", "push button") and \
+               obj.get_name() == label:
+                ss = obj.get_state_set()
+                if ss and ss.contains(Atspi.StateType.SHOWING) and \
+                   ss.contains(Atspi.StateType.SENSITIVE):
+                    if count[0] == skip:
+                        return obj
+                    count[0] += 1
+            for i in range(obj.get_child_count()):
+                c = obj.get_child_at_index(i)
+                if c:
+                    r = self._find_nth_visible_button(
+                        c, label, skip, count, depth + 1)
+                    if r:
+                        return r
+        except Exception:
+            pass
+        return None
 
     def find_editable_texts(self, root):
         results = []
@@ -317,19 +346,25 @@ class GnoMintHarness:
         time.sleep(0.5)
         return True
 
-    def wizard_next(self, win):
-        """Advance a wizard page: try Alt+N mnemonic, fall back to AT-SPI."""
+    def wizard_next(self, win, page=0):
+        """Advance a wizard page.
+
+        page: which 'Next' button to click (0=page 1's, 1=page 2's).
+        Tries Alt+N mnemonic first (only activates the current page's
+        button), then falls back to AT-SPI click_button with skip.
+        """
         self.alt_key("n")
         time.sleep(1)
-        # If the mnemonic didn't work (unpatched GTK 4), click via AT-SPI
-        self.click_button(win, "Next") or self.click_button(win, "_Next")
+        self.click_button(win, "Next", skip=page) or \
+            self.click_button(win, "_Next", skip=page)
         time.sleep(0.5)
 
-    def wizard_ok(self, win):
+    def wizard_ok(self, win, page=0):
         """Commit a wizard: try Alt+O mnemonic, fall back to AT-SPI."""
         self.alt_key("o")
         time.sleep(1)
-        self.click_button(win, "OK") or self.click_button(win, "_OK")
+        self.click_button(win, "OK", skip=page) or \
+            self.click_button(win, "_OK", skip=page)
         time.sleep(0.5)
 
     def select_row(self, index):
