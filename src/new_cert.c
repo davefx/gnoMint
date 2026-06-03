@@ -154,6 +154,8 @@ void new_cert_window_display(const guint64 csr_id, const gchar *csr_pem, const g
 
 	gtk_widget_set_visible (
 	    GTK_WIDGET (gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window")), TRUE);
+
+	gtk_window_present (GTK_WINDOW (gtk_builder_get_object (new_cert_window_gtkb, "new_cert_window")));
 }
 
 

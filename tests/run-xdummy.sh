@@ -95,9 +95,14 @@ export GDK_BACKEND=x11
 export GTK_A11Y=atspi
 
 eval $(dbus-launch --sh-syntax)
-python3 "$SCRIPT_DIR/testwm.py" &
-TESTWM_PID=$!
-sleep 0.5
+if command -v openbox >/dev/null 2>&1; then
+    openbox --config-file "$SCRIPT_DIR/openbox-rc.xml" >/dev/null 2>&1 &
+    TESTWM_PID=$!
+else
+    python3 "$SCRIPT_DIR/testwm.py" &
+    TESTWM_PID=$!
+fi
+sleep 1
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
 sleep 1
 
