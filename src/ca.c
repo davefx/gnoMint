@@ -1728,6 +1728,8 @@ G_MODULE_EXPORT void ca_on_export1_activate (gpointer sender, gpointer user_data
 
 	widget = gtk_builder_get_object (dialog_gtkb, "export_certificate_dialog");
 
+	gtk_window_set_transient_for (GTK_WINDOW (widget),
+	    dialog_get_main_window ());
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__ca_export_cert_response), ctx);
 	gtk_window_present (GTK_WINDOW (widget));
