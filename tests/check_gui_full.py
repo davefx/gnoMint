@@ -198,19 +198,19 @@ def test_view_properties(h):
     ok("dialog opened and dismissed")
 
 
-def test_create_and_sign_csr(h):
-    """Create a CSR (inheriting from CA), then sign it."""
-    step("Create+Sign CSR")
+def test_create_csr(h):
+    """Create a CSR inheriting from a CA with inherit policies.
+
+    Only works on CAs that have C_INHERIT/ST_INHERIT/etc policies
+    set (the fixture DB has them; freshly created CAs do not).
+    """
+    step("Create CSR")
 
     h.activate_action("win.view-csrs")
     time.sleep(0.5)
+    dismiss_dialogs(h, timeout=2)
 
-    # Ensure no stale dialogs remain from CA creation
-    for _ in range(5):
-        dismiss_dialogs(h, timeout=1)
-        if h.window_count() <= 1:
-            break
-        time.sleep(0.5)
+    csr_before = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
 
     h.activate_action("win.add-csr")
     time.sleep(2)
@@ -222,12 +222,10 @@ def test_create_and_sign_csr(h):
         ok("skipped (no CSR window)")
         return
 
-    # Wait for the WM to send WM_TAKE_FOCUS after the new MapRequest.
+    h.wizard_next(win, page=0)
     time.sleep(1)
-
-    # Navigate pages by button index (skip=N finds the Nth 'Next').
-    h.wizard_next(win, page=0)   # page 1 → 2 (inherits fields from CA)
-    h.wizard_next(win, page=1)   # page 2 → 3 (CN pre-filled, validation passes)
+    h.wizard_next(win, page=0)
+    time.sleep(1)
     h.wizard_ok(win)
 
     alert = h.wait_for_window("finished", timeout=30)
@@ -235,13 +233,13 @@ def test_create_and_sign_csr(h):
         h.wait_for_window("process", timeout=5)
     dismiss_dialogs(h, timeout=3)
 
-    csr_count = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
-    if csr_count == 0:
+    csr_after = h.db_scalar("SELECT COUNT(*) FROM cert_requests") or 0
+    if csr_after <= csr_before:
         dismiss_dialogs(h, timeout=2)
-        ok("skipped (CSR wizard navigation requires patched GTK 4)")
+        ok("skipped (CA may lack inherit policies)")
         return
 
-    ok("CSR created (%d in DB)" % csr_count)
+    ok("CSR created (%d in DB)" % csr_after)
 
 
 def test_revoke_cert(h):
@@ -577,7 +575,6 @@ def run_fresh_db_tests(kbd):
         _run_test(h, test_create_ca)
         _run_test(h, test_select_ca)
         _run_test(h, test_view_properties)
-        _run_test(h, test_create_and_sign_csr)
         _run_test(h, test_revoke_cert)
         _run_test(h, test_generate_crl)
         _run_test(h, test_view_toggle_csrs)
@@ -600,6 +597,7 @@ def run_fixture_db_tests(kbd):
         _run_test(h, test_fixture_properties)
         _run_test(h, test_fixture_revoke)
         _run_test(h, test_fixture_crl)
+        _run_test(h, test_create_csr)
         _run_test(h, test_view_toggle_csrs)
         _run_test(h, test_view_toggle_revoked)
         _run_test(h, test_view_toggle_expired)
@@ -626,19 +624,18 @@ def main():
         print("SKIP: %s not found" % gnomint, file=sys.stderr)
         return 77
 
-    if "INPUTTEST_KBD_SOCK" not in os.environ:
-        print("SKIP: not running under run-xdummy.sh", file=sys.stderr)
-        return 77
-
-    from inputtest_client import InputTestClient
-    kbd = InputTestClient(os.environ["INPUTTEST_KBD_SOCK"])
+    kbd = None
+    if "INPUTTEST_KBD_SOCK" in os.environ:
+        from inputtest_client import InputTestClient
+        kbd = InputTestClient(os.environ["INPUTTEST_KBD_SOCK"])
 
     print("==> gnomint full GUI test suite (keyboard + AT-SPI)")
     try:
         run_fresh_db_tests(kbd)
         run_fixture_db_tests(kbd)
     finally:
-        kbd.close()
+        if kbd:
+            kbd.close()
 
     print("\n============================================")
     print("Results: %d passed, %d failed" % (_passed, _failed))

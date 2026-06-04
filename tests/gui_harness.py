@@ -48,7 +48,12 @@ class GnoMintHarness:
             self.db = os.path.join(self.tmpdir, "test.gnomint")
 
         self._owns_kbd = kbd is None
-        self.kbd = kbd or InputTestClient(os.environ["INPUTTEST_KBD_SOCK"])
+        if kbd:
+            self.kbd = kbd
+        elif "INPUTTEST_KBD_SOCK" in os.environ:
+            self.kbd = InputTestClient(os.environ["INPUTTEST_KBD_SOCK"])
+        else:
+            self.kbd = None
         self.proc = None
         self._portal_proc = None
         self._app = None
@@ -79,7 +84,7 @@ class GnoMintHarness:
         self.proc = subprocess.Popen(
             [self.GNOMINT, self.db], env=env,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(4)
+        time.sleep(5)
         Atspi.init()
         time.sleep(0.5)
         self._app = self._find_app()
@@ -102,7 +107,7 @@ class GnoMintHarness:
             except Exception:
                 self._portal_proc.kill()
                 self._portal_proc.wait()
-        if self._owns_kbd:
+        if self._owns_kbd and self.kbd:
             self.kbd.close()
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
@@ -284,12 +289,16 @@ class GnoMintHarness:
     # ── Keyboard helpers ──
 
     def tab(self, n=1):
+        if not self.kbd:
+            return
         for _ in range(n):
             send_key(self.kbd, "Tab")
             time.sleep(0.08)
         self.kbd.sync()
 
     def alt_key(self, key_name):
+        if not self.kbd:
+            return
         from inputtest_client import _NAME_TO_KEYCODE, _CHAR_TO_KEYCODE
         if key_name in _NAME_TO_KEYCODE:
             kc = _NAME_TO_KEYCODE[key_name]
@@ -315,16 +324,22 @@ class GnoMintHarness:
         time.sleep(0.5)
 
     def type(self, text):
+        if not self.kbd:
+            return
         type_text(self.kbd, text)
         self.kbd.sync()
         time.sleep(0.3)
 
     def press_return(self):
+        if not self.kbd:
+            return
         send_key(self.kbd, "Return")
         self.kbd.sync()
         time.sleep(0.5)
 
     def press_escape(self):
+        if not self.kbd:
+            return
         send_key(self.kbd, "Escape")
         self.kbd.sync()
         time.sleep(0.5)

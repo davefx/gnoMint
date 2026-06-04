@@ -91,6 +91,11 @@ void new_req_window_display()
 	    GTK_COLUMN_VIEW (gtk_builder_get_object (new_req_window_gtkb, "new_req_ca_treeview")),
 	    new_req_ca_root_store, NULL);
 
+	/* Process pending events so the GtkTreeListModel expands before
+	 * we try to select row 0 in the inherit toggled handler. */
+	while (g_main_context_pending (NULL))
+		g_main_context_iteration (NULL, FALSE);
+
 	new_req_inherit_fields_toggled (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "inherit_radiobutton")), NULL);
 
 	gtk_check_button_set_active (GTK_CHECK_BUTTON(gtk_builder_get_object(new_req_window_gtkb, "rsa_radiobutton1")), TRUE);
@@ -136,7 +141,7 @@ void new_req_window_display()
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_next2_clicked), NULL);
 	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_previous3"));
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_previous3_clicked), NULL);
-	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_commit"));
+	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_ca_commit2"));
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_commit_clicked), NULL);
 	w = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb, "new_req_cancel1"));
 	if (w) g_signal_connect(w, "clicked", G_CALLBACK(on_new_req_cancel_clicked), NULL);
@@ -316,6 +321,14 @@ G_MODULE_EXPORT void on_new_req_next1_clicked (GtkButton *button,
 			gtk_editable_set_text(GTK_EDITABLE(widget), "");
 		}
                 
+		widget = GTK_WIDGET(gtk_builder_get_object(new_req_window_gtkb,"cn_entry1"));
+                if (ca_file_policy_get_int (new_req_ca_id, "CN_INHERIT")) {
+                        gtk_widget_set_sensitive (widget, ! ca_file_policy_get_int (new_req_ca_id, "CN_FORCE_SAME"));
+                        gtk_editable_set_text(GTK_EDITABLE(widget), tlscert->cn ? tlscert->cn : "");
+                } else {
+                        gtk_widget_set_sensitive (widget, TRUE);
+                }
+
                 tls_cert_free (tlscert);
         } else {
 		if (sel_row)
@@ -352,10 +365,19 @@ G_MODULE_EXPORT void on_new_req_next2_clicked (GtkButton *widget,
 			      gpointer user_data)
 {
 	GtkEditable *cn = GTK_EDITABLE(gtk_builder_get_object (new_req_window_gtkb, "cn_entry1"));
-	if (!strlen (gtk_editable_get_text (cn))) {
+	const gchar *cn_text = gtk_editable_get_text (cn);
+	if (!cn_text || !strlen (cn_text)) {
 		dialog_error (_("Please enter a Common Name (CN) for the certificate request."));
 		return;
 	}
+
+	/* Re-check the Next button sensitivity in case the CN was set
+	 * programmatically (e.g. via AT-SPI) without firing 'changed'. */
+	GtkWidget *next_btn = GTK_WIDGET(gtk_builder_get_object (
+	    new_req_window_gtkb, "new_req_next2"));
+	if (next_btn)
+		gtk_widget_set_sensitive (next_btn, TRUE);
+
 	new_req_tab_activate (2);
 }
 
