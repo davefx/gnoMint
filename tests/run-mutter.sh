@@ -1,9 +1,9 @@
 #!/bin/sh
 # run-mutter.sh — run a GUI test under mutter headless Wayland.
 #
-# Uses mutter as a headless Wayland compositor. AT-SPI button
-# activation works correctly on mutter (no X11 focus proxy issues),
-# making this the preferred runner for the full GUI test suite.
+# Fully isolated: private Wayland display, private D-Bus session,
+# no connection to the host's display or accessibility bus.
+# The test binary and AT-SPI see only the headless mutter compositor.
 #
 # Requires: mutter, dbus-x11, at-spi2-core.
 
@@ -18,6 +18,14 @@ if ! command -v mutter >/dev/null 2>&1; then
     echo "run-mutter.sh: mutter not found" >&2
     exit 77
 fi
+
+# ── Isolate from the host session ──
+# Clear any inherited display/bus variables so GTK, GDK, and AT-SPI
+# connect only to our private headless compositor and D-Bus.
+unset DISPLAY 2>/dev/null || true
+unset WAYLAND_DISPLAY 2>/dev/null || true
+unset DBUS_SESSION_BUS_ADDRESS 2>/dev/null || true
+unset AT_SPI_BUS_ADDRESS 2>/dev/null || true
 
 # Each run gets its own Wayland display name.
 WAYLAND_DISPLAY="gnomint-test-$$"
@@ -61,9 +69,9 @@ if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
     exit 1
 fi
 
-# Extra settle time for mutter to fully initialize.
 sleep 1
 
+# Private D-Bus session — AT-SPI and the test app use only this bus.
 eval $(dbus-launch --sh-syntax)
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
 sleep 1
