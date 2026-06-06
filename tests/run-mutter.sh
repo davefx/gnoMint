@@ -2,10 +2,12 @@
 # run-mutter.sh — run a GUI test under a fully isolated headless Wayland
 # compositor with its own D-Bus and AT-SPI bus.
 #
-# Wraps weston --backend=headless-backend.so (no GPU, no display output,
-# no input capture) with a private XDG_RUNTIME_DIR, private D-Bus session,
-# and private AT-SPI bus. The test cannot see or interact with the host
-# desktop in any way.
+# Fully isolated: private XDG_RUNTIME_DIR, private D-Bus, private AT-SPI.
+# Uses weston --backend=headless-backend.so — no GPU, no display output,
+# no input capture. Cannot interact with the host desktop.
+#
+# All child processes (weston, dbus-daemon, at-spi-bus-launcher,
+# at-spi2-registryd, gnomint) are killed on exit via process group.
 #
 # Requires: weston, dbus-x11, at-spi2-core.
 
@@ -22,14 +24,13 @@ if ! command -v weston >/dev/null 2>&1; then
 fi
 
 # ── Fully isolate from the host session ──
-# Prevent any connection to the host's display, compositor, or buses.
 unset DISPLAY 2>/dev/null || true
 unset WAYLAND_DISPLAY 2>/dev/null || true
 unset DBUS_SESSION_BUS_ADDRESS 2>/dev/null || true
 unset AT_SPI_BUS_ADDRESS 2>/dev/null || true
 unset GNOME_SETUP_DISPLAY 2>/dev/null || true
 
-# Private runtime dir — everything lives here, nothing touches the host.
+# Private runtime dir.
 TEST_RUNTIME="$(mktemp -d -t gnomint-test-runtime.XXXXXX)"
 chmod 700 "$TEST_RUNTIME"
 export XDG_RUNTIME_DIR="$TEST_RUNTIME"
@@ -40,19 +41,27 @@ export GDK_BACKEND=wayland
 export GTK_A11Y=atspi
 
 WESTON_LOG="$TEST_RUNTIME/weston.log"
+PIDS_FILE="$TEST_RUNTIME/pids"
+: > "$PIDS_FILE"
 
 weston \
     --backend=headless-backend.so \
     --socket="$WAYLAND_DISPLAY" \
     --idle-time=0 \
     > "$WESTON_LOG" 2>&1 &
-COMPOSITOR_PID=$!
+echo $! >> "$PIDS_FILE"
 
 cleanup() {
     rc=$?
-    kill "$COMPOSITOR_PID" 2>/dev/null || true
-    wait "$COMPOSITOR_PID" 2>/dev/null || true
-    kill "$DBUS_SESSION_BUS_PID" 2>/dev/null || true
+    # Kill every process we started.
+    while read pid; do
+        kill "$pid" 2>/dev/null || true
+    done < "$PIDS_FILE"
+    # Also kill any at-spi processes in our private runtime dir.
+    pgrep -f "$TEST_RUNTIME" 2>/dev/null | while read pid; do
+        kill "$pid" 2>/dev/null || true
+    done
+    wait 2>/dev/null || true
     if [ "$rc" != 0 ] && [ -f "$WESTON_LOG" ]; then
         echo "--- weston log ---" >&2
         tail -20 "$WESTON_LOG" >&2
@@ -74,10 +83,14 @@ if [ ! -S "$TEST_RUNTIME/$WAYLAND_DISPLAY" ]; then
     exit 1
 fi
 
-# Private D-Bus session + AT-SPI bus (needed for AT-SPI-driven tests).
+# Private D-Bus session.
 eval $(dbus-launch --sh-syntax)
 export DBUS_SESSION_BUS_ADDRESS
+echo "$DBUS_SESSION_BUS_PID" >> "$PIDS_FILE"
+
+# Private AT-SPI bus.
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
+echo $! >> "$PIDS_FILE"
 sleep 1
 
 "$@"
