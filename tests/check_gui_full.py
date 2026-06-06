@@ -391,8 +391,10 @@ def test_fixture_crl(h):
 
 def _cli(db, command, timeout=10):
     """Run a gnomint-cli command and return (stdout, stderr, rc)."""
+    _here = os.path.dirname(os.path.abspath(__file__))
+    cli_bin = os.path.join(_here, "..", "src", "gnomint-cli")
     result = subprocess.run(
-        ["src/gnomint-cli", db],
+        [cli_bin, db],
         input=command + "\n", capture_output=True, text=True,
         timeout=timeout)
     return result.stdout, result.stderr, result.returncode
@@ -581,7 +583,9 @@ def run_fixture_db_tests(kbd):
 
 
 def main():
-    gnomint = os.environ.get("GNOMINT_BIN", "src/gnomint")
+    _here = os.path.dirname(os.path.abspath(__file__))
+    gnomint = os.environ.get("GNOMINT_BIN",
+        os.path.join(_here, "..", "src", "gnomint"))
     if not os.path.isfile(gnomint) and not shutil.which(gnomint):
         print("SKIP: %s not found" % gnomint, file=sys.stderr)
         return 77

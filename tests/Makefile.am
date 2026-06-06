@@ -1,16 +1,19 @@
 ## tests/Makefile.am — make check harness
 ##
-## Stage 1 — static checks, no display needed (issue #42, landed):
-##   check_y2k38             Standalone Y2K38 verification (was src/test_y2k38.c)
+## Stage 1 — static checks, no display needed (issue #42):
+##   check_y2k38             Standalone Y2K38 verification
 ##   check_ui_consistency    Static .ui consistency checker
 ##
-## Stage 2A — runtime checks under headless Wayland (issue #43):
+## Stage 2A — C runtime checks under headless Wayland (issue #43):
 ##   check_workflows         GTK workflow regression tests, run via
-##                           run-headless.sh which spawns weston with
-##                           the headless backend. Gnomint's primary
-##                           user environment is Wayland.
+##                           run-headless.sh (weston headless backend).
+##
+## Stage 2B — end-to-end GUI tests under mutter headless Wayland:
+##   check_gui_full.py       AT-SPI-driven black-box tests, run via
+##                           run-mutter.sh (mutter --headless).
 
 TESTS = check_y2k38 check_ui_consistency check_workflows \
+        check_gui_full.py \
         check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
         check_cli_info.sh check_cli_lifecycle.sh \
         check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
@@ -18,14 +21,15 @@ TESTS = check_y2k38 check_ui_consistency check_workflows \
         check_cli_algorithms.sh
 check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 
-# Per-test wrapper: only check_workflows runs under a headless Wayland
-# compositor. The static tests stay display-free. The CLI shell tests
-# spawn gnomint-cli directly so they need no display either.
+# Per-test wrapper: check_workflows runs under weston headless Wayland,
+# check_gui_full.py runs under mutter headless Wayland. The static
+# tests stay display-free, CLI tests need no display.
 check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
+check_gui_full_py_LOG_COMPILER = $(srcdir)/run-mutter.sh
 
-EXTRA_DIST = run-headless.sh run-xdummy.sh xorg-dummy.conf \
+EXTRA_DIST = run-headless.sh run-mutter.sh run-xdummy.sh xorg-dummy.conf \
              inputtest_client.py gui_harness.py testwm.py \
-             openbox-rc.xml check_gui_full.py \
+             openbox-rc.xml check_gui_full.py mock_portal.py \
              check_cli_email.sh check_cli_wizard.sh \
              check_cli_parity.sh check_cli_info.sh check_cli_lifecycle.sh \
              check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \

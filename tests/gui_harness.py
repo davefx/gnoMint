@@ -29,7 +29,9 @@ from inputtest_client import (InputTestClient, send_key, type_text,
 class GnoMintHarness:
     """Launch gnomint and drive it via AT-SPI + inputtest keyboard."""
 
-    GNOMINT = os.environ.get("GNOMINT_BIN", "src/gnomint")
+    GNOMINT = os.environ.get("GNOMINT_BIN",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     "..", "src", "gnomint"))
     GTK_PRELOAD = os.environ.get(
         "GTK_PRELOAD", "/tmp/gtk4-build/gtk/libgtk-4.so.1.2200.2")
     FIXTURE_DB = os.environ.get(
