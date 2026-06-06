@@ -25,11 +25,10 @@ check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 # check_gui_full.py runs under mutter headless Wayland. The static
 # tests stay display-free, CLI tests need no display.
 check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
-check_gui_full_py_LOG_COMPILER = $(srcdir)/run-mutter.sh
+check_gui_full_py_LOG_COMPILER = $(srcdir)/run-gui-test.sh
 
-EXTRA_DIST = run-headless.sh run-mutter.sh run-xdummy.sh xorg-dummy.conf \
-             inputtest_client.py gui_harness.py testwm.py \
-             openbox-rc.xml check_gui_full.py mock_portal.py \
+EXTRA_DIST = run-headless.sh run-gui-test.sh \
+             gui_harness.py check_gui_full.py \
              check_cli_email.sh check_cli_wizard.sh \
              check_cli_parity.sh check_cli_info.sh check_cli_lifecycle.sh \
              check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
