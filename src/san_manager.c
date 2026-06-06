@@ -22,6 +22,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <regex.h>
+#include "dialog.h"
 
 #include "san_manager.h"
 #include "san_entry.h"
@@ -308,6 +309,7 @@ static void san_manager_show_editor_async(SanManagerData *data, const gchar *ini
 	ctx->response_handler_id = g_signal_connect (
 		dialog, "response", G_CALLBACK (san_editor_response), ctx);
 
+	gtk_window_set_transient_for (GTK_WINDOW (dialog), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (dialog));
 }
 

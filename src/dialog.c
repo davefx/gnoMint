@@ -399,6 +399,7 @@ void dialog_get_password (gchar *info_message,
 	                  G_CALLBACK (_dialog_get_password_response), ctx);
 
 	gtk_widget_grab_focus (GTK_WIDGET (password_widget));
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (widget));
 }
 

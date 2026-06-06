@@ -2195,6 +2195,7 @@ __ca_show_diff_dialog (const gchar *pem_left, const gchar *pem_right,
 
 	g_object_set_data_full (G_OBJECT (dlg), "diff", diff,
 	    (GDestroyNotify) cert_diff_free);
+	gtk_window_set_transient_for (GTK_WINDOW (dlg), dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (dlg));
 }
 
@@ -2693,6 +2694,7 @@ G_MODULE_EXPORT void ca_on_change_pwd_menuitem_activate (gpointer sender, gpoint
 	/* Present the dialog asynchronously with a response callback. */
 	widget = gtk_builder_get_object (dialog_gtkb, "change_password_dialog");
 	gtk_window_set_title (GTK_WINDOW(widget), _("Change CA password - gnoMint"));
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 
 	g_signal_connect (widget, "response",
 	                  G_CALLBACK (__ca_change_pwd_response), dialog_gtkb);
@@ -2873,6 +2875,7 @@ G_MODULE_EXPORT void ca_generate_dh_param_show (GtkWidget *menuitem, gpointer us
 
 
 	dialog = GTK_DIALOG(gtk_builder_get_object (dialog_gtkb, "dh_parameters_dialog"));
+	gtk_window_set_transient_for (GTK_WINDOW (dialog), dialog_get_main_window ());
 
 	g_signal_connect (dialog, "response",
 	                  G_CALLBACK (__ca_dh_param_response), dialog_gtkb);
@@ -3021,6 +3024,7 @@ G_MODULE_EXPORT void on_import1_activate  (gpointer sender, gpointer     user_da
 
         g_signal_connect (widget, "response",
                           G_CALLBACK (__ca_import_file_or_dir_response), dialog_gtkb);
+        gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
         gtk_window_present (GTK_WINDOW (widget));
 }
 

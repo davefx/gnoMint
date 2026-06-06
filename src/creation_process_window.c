@@ -141,6 +141,7 @@ void creation_process_window_ca_display (TlsCreationData * ca_creation_data)
 		return;
 	}
 	
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 	
 	/* Process pending events to ensure window is displayed */
@@ -291,6 +292,7 @@ void creation_process_window_csr_display (TlsCreationData * ca_creation_data)
 		return;
 	}
 	
+	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 	
 	/* Process pending events to ensure window is displayed */

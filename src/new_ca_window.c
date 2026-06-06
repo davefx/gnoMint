@@ -128,6 +128,8 @@ void new_ca_window_display()
 	gtk_widget_set_visible (
 	    GTK_WIDGET (gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window")), TRUE);
 
+	gtk_window_set_transient_for (GTK_WINDOW (gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window")),
+	    dialog_get_main_window ());
 	gtk_window_present (GTK_WINDOW (gtk_builder_get_object (new_ca_window_gtkb, "new_ca_window")));
 }
 
