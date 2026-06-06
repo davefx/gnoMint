@@ -1,100 +1,56 @@
-name: GitHub Copilot Setup Steps
+name: Build and Test
 
 on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
 
 jobs:
-  copilot-setup-steps:
+  build-and-test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Install all project dependencies
+
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            gcc \
-            g++ \
-            make \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            libgtk-4-dev \
-            libglib2.0-dev \
-            libgnutls28-dev \
-            gnutls-bin \
-            libsqlite3-dev \
-            libgcrypt20-dev \
-            libreadline-dev \
+            build-essential gcc g++ make \
+            autoconf automake libtool pkg-config \
+            libgtk-4-dev libglib2.0-dev \
+            libgnutls28-dev gnutls-bin \
+            libsqlite3-dev libgcrypt20-dev libreadline-dev \
             libgdk-pixbuf2.0-dev \
-            gettext \
-            intltool \
-            iso-codes \
-            weston \
-            mutter \
-            python3-gi \
-            gir1.2-atspi-2.0 \
-            at-spi2-core \
-            dbus-x11 \
-            xserver-xorg-core \
-            xserver-xorg-video-dummy \
-            xserver-xorg-input-libinput \
-            x11-xserver-utils
-      
-      - name: Verify dependencies
-        run: |
-          echo "==================================="
-          echo "Verifying installed dependencies..."
-          echo "==================================="
-          echo ""
-          echo "GCC version:"
-          gcc --version | head -n 1
-          echo ""
-          echo "GTK version:"
-          pkg-config --modversion gtk4
-          echo ""
-          echo "GLib version:"
-          pkg-config --modversion glib-2.0
-          echo ""
-          echo "GnuTLS version:"
-          GNUTLS_VERSION=$(pkg-config --modversion gnutls)
-          echo "$GNUTLS_VERSION"
-          echo "Minimum required: 2.0 (advanced features: 2.7.4)"
-          echo ""
-          echo "SQLite version:"
-          pkg-config --modversion sqlite3
-          echo ""
-          echo "libgcrypt version:"
-          libgcrypt-config --version
-          echo ""
-          echo "==================================="
-          echo "All dependencies installed!"
-          echo "==================================="
-      
+            gettext intltool iso-codes \
+            weston mutter \
+            python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11 \
+            xserver-xorg-core xserver-xorg-video-dummy \
+            xserver-xorg-input-libinput x11-xserver-utils
+
       - name: Generate build configuration
-        run: |
-          ./autogen.sh
-      
-      - name: Configure project
-        run: |
-          ./configure
-      
-      - name: Build project
-        run: |
-          make
+        run: ./autogen.sh
+
+      - name: Configure
+        run: ./configure
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Install (needed for UI file tests)
+        run: sudo make install
 
       - name: Run test suite
-        run: |
-          make check
+        run: make check
 
-      - name: Display build summary
-        run: |
-          echo "==================================="
-          echo "Build completed successfully!"
-          echo "==================================="
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: tests/*.log

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-gnoMint is a GTK+ 3 graphical (and readline-driven CLI) Certification Authority manager written in C. It uses GnuTLS for crypto, libgcrypt for low-level primitives, and SQLite 3 as the on-disk format for CA databases (`*.gnomint` files). Builds produce two binaries from a shared source tree: `gnomint` (GTK GUI) and `gnomint-cli` (readline CLI).
+gnoMint is a GTK 4 graphical (and readline-driven CLI) Certification Authority manager written in C. It uses GnuTLS for crypto, libgcrypt for low-level primitives, and SQLite 3 as the on-disk format for CA databases (`*.gnomint` files). Builds produce two binaries from a shared source tree: `gnomint` (GTK GUI) and `gnomint-cli` (readline CLI).
 
 Upstream repo: https://github.com/davefx/gnoMint. The legacy gnomint.sourceforge.net site is gone; its content has been archived into docs/ in the repo.
 
@@ -21,7 +21,7 @@ sudo make install
 
 After `./configure` exists you can usually re-run only `make` between edits — `make` will re-invoke `config.status` if needed. A devcontainer at `.devcontainer/` installs all build deps on Debian/Ubuntu; the same package list is used by `.github/workflows/copilot-setup-steps.yml` if you need to reproduce CI locally.
 
-There is no test target in the Makefile and no `make check`. `src/test_y2k38.c` is a standalone harness that is **not** wired into the build — compile it manually if you need to run it:
+The test suite runs via `make check` (16 tests: C compiled, Python GUI, CLI shell). `src/test_y2k38.c` is a standalone harness that is **not** wired into the build — compile it manually if you need to run it:
 
 ```bash
 gcc -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64 src/test_y2k38.c -o /tmp/test_y2k38 && /tmp/test_y2k38
