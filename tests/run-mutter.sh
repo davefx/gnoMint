@@ -1,9 +1,10 @@
 #!/bin/sh
 # run-mutter.sh — run a GUI test under mutter headless Wayland.
 #
-# Fully isolated: private Wayland display, private D-Bus session,
-# no connection to the host's display or accessibility bus.
-# The test binary and AT-SPI see only the headless mutter compositor.
+# Fully isolated: private XDG_RUNTIME_DIR, private Wayland display,
+# private D-Bus session. No connection to the host's compositor,
+# display server, or accessibility bus. The test cannot capture
+# the user's keyboard or mouse.
 #
 # Requires: mutter, dbus-x11, at-spi2-core.
 
@@ -19,21 +20,24 @@ if ! command -v mutter >/dev/null 2>&1; then
     exit 77
 fi
 
-# ── Isolate from the host session ──
-# Clear any inherited display/bus variables so GTK, GDK, and AT-SPI
-# connect only to our private headless compositor and D-Bus.
+# ── Fully isolate from the host session ──
 unset DISPLAY 2>/dev/null || true
 unset WAYLAND_DISPLAY 2>/dev/null || true
 unset DBUS_SESSION_BUS_ADDRESS 2>/dev/null || true
 unset AT_SPI_BUS_ADDRESS 2>/dev/null || true
 
-# Each run gets its own Wayland display name.
-WAYLAND_DISPLAY="gnomint-test-$$"
+# Private XDG_RUNTIME_DIR so mutter's socket, D-Bus, and AT-SPI
+# are completely separate from the host session.
+TEST_RUNTIME="$(mktemp -d -t gnomint-test-runtime.XXXXXX)"
+chmod 700 "$TEST_RUNTIME"
+export XDG_RUNTIME_DIR="$TEST_RUNTIME"
+
+WAYLAND_DISPLAY="wayland-0"
 export WAYLAND_DISPLAY
 export GDK_BACKEND=wayland
 export GTK_A11Y=atspi
 
-MUTTER_LOG="/tmp/mutter-gnomint-test-$$.log"
+MUTTER_LOG="$TEST_RUNTIME/mutter.log"
 
 mutter --headless \
     --virtual-monitor 1280x1024 \
@@ -52,26 +56,25 @@ cleanup() {
         tail -20 "$MUTTER_LOG" >&2
         echo "--- end mutter log ---" >&2
     fi
-    rm -f "$MUTTER_LOG"
+    rm -rf "$TEST_RUNTIME"
     exit "$rc"
 }
 trap cleanup EXIT INT TERM
 
 # Wait for mutter's Wayland socket.
-XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 i=0
-while [ $i -lt 50 ] && [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; do
+while [ $i -lt 50 ] && [ ! -S "$TEST_RUNTIME/$WAYLAND_DISPLAY" ]; do
     sleep 0.1
     i=$((i + 1))
 done
-if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+if [ ! -S "$TEST_RUNTIME/$WAYLAND_DISPLAY" ]; then
     echo "run-mutter.sh: mutter socket never appeared" >&2
     exit 1
 fi
 
 sleep 1
 
-# Private D-Bus session — AT-SPI and the test app use only this bus.
+# Private D-Bus session.
 eval $(dbus-launch --sh-syntax)
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
 sleep 1
