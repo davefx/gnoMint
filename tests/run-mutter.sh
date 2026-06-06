@@ -1,9 +1,11 @@
 #!/bin/sh
-# run-mutter.sh — run a GUI test under a headless Wayland compositor.
+# run-mutter.sh — run a GUI test under a fully isolated headless Wayland
+# compositor with its own D-Bus and AT-SPI bus.
 #
-# Uses weston with the headless backend (no GPU, no display output).
-# Fully isolated: private XDG_RUNTIME_DIR, private D-Bus session,
-# private AT-SPI bus. Cannot capture the user's keyboard or mouse.
+# Wraps weston --backend=headless-backend.so (no GPU, no display output,
+# no input capture) with a private XDG_RUNTIME_DIR, private D-Bus session,
+# and private AT-SPI bus. The test cannot see or interact with the host
+# desktop in any way.
 #
 # Requires: weston, dbus-x11, at-spi2-core.
 
@@ -20,12 +22,14 @@ if ! command -v weston >/dev/null 2>&1; then
 fi
 
 # ── Fully isolate from the host session ──
+# Prevent any connection to the host's display, compositor, or buses.
 unset DISPLAY 2>/dev/null || true
 unset WAYLAND_DISPLAY 2>/dev/null || true
 unset DBUS_SESSION_BUS_ADDRESS 2>/dev/null || true
 unset AT_SPI_BUS_ADDRESS 2>/dev/null || true
+unset GNOME_SETUP_DISPLAY 2>/dev/null || true
 
-# Private runtime dir — compositor socket, D-Bus, AT-SPI all live here.
+# Private runtime dir — everything lives here, nothing touches the host.
 TEST_RUNTIME="$(mktemp -d -t gnomint-test-runtime.XXXXXX)"
 chmod 700 "$TEST_RUNTIME"
 export XDG_RUNTIME_DIR="$TEST_RUNTIME"
@@ -48,6 +52,7 @@ cleanup() {
     rc=$?
     kill "$COMPOSITOR_PID" 2>/dev/null || true
     wait "$COMPOSITOR_PID" 2>/dev/null || true
+    kill "$DBUS_SESSION_BUS_PID" 2>/dev/null || true
     if [ "$rc" != 0 ] && [ -f "$WESTON_LOG" ]; then
         echo "--- weston log ---" >&2
         tail -20 "$WESTON_LOG" >&2
@@ -69,15 +74,12 @@ if [ ! -S "$TEST_RUNTIME/$WAYLAND_DISPLAY" ]; then
     exit 1
 fi
 
-sleep 1
-
-# Private D-Bus session + AT-SPI bus.
+# Private D-Bus session + AT-SPI bus (needed for AT-SPI-driven tests).
 eval $(dbus-launch --sh-syntax)
+export DBUS_SESSION_BUS_ADDRESS
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
 sleep 1
 
 "$@"
 rc=$?
-
-kill "$DBUS_SESSION_BUS_PID" 2>/dev/null || true
 exit "$rc"
