@@ -86,7 +86,7 @@ class GnoMintHarness:
         self.proc = subprocess.Popen(
             [self.GNOMINT, self.db], env=env,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(5)
+        time.sleep(6)
         Atspi.init()
         time.sleep(0.5)
         self._app = self._find_app()
@@ -159,7 +159,7 @@ class GnoMintHarness:
                     ai.do_action(j)
                 except Exception:
                     pass
-                time.sleep(1.5)
+                time.sleep(2)
                 return True
         return False
 

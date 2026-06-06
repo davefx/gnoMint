@@ -2,16 +2,16 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="san_editor_dialog">
-            <property name="margin-start">8</property>
-            <property name="margin-end">8</property>
-            <property name="margin-top">8</property>
-            <property name="margin-bottom">8</property>
     <property name="title" translatable="1">Subject Alternative Name</property>
     <property name="modal">1</property>
     <child>
       <object class="GtkBox" id="dialog_vbox">
         <property name="orientation">vertical</property>
         <property name="spacing">8</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-top">12</property>
+        <property name="margin-bottom">12</property>
         <child>
           <object class="GtkGrid" id="table_san">
                     <property name="focusable">0</property>

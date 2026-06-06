@@ -47,6 +47,12 @@ void csr_properties_display(const char *csr_pem, gboolean privkey_in_db)
 	__csr_properties_populate (csr_pem, privkey_in_db);
        
 	widget = gtk_builder_get_object (csr_properties_window_gtkb, "csr_properties_dialog");
+
+	GObject *close_btn = gtk_builder_get_object (csr_properties_window_gtkb, "button13");
+	if (close_btn)
+		g_signal_connect_swapped (close_btn, "clicked",
+		    G_CALLBACK (gtk_window_destroy), widget);
+
 	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 }

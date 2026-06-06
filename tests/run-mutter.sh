@@ -61,6 +61,9 @@ if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
     exit 1
 fi
 
+# Extra settle time for mutter to fully initialize.
+sleep 1
+
 eval $(dbus-launch --sh-syntax)
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
 sleep 1

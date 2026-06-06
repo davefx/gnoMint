@@ -2,15 +2,15 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="new_crl_dialog">
-            <property name="margin-start">5</property>
-            <property name="margin-end">5</property>
-            <property name="margin-top">5</property>
-            <property name="margin-bottom">5</property>
     <property name="title" translatable="1">New CRL - gnoMint</property>
     <child>
       <object class="GtkBox" id="dialog-vbox21">
         <property name="orientation">vertical</property>
         <property name="spacing">11</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-top">12</property>
+        <property name="margin-bottom">12</property>
         <child>
           <object class="GtkLabel" id="label50">
             <property name="valign">center</property>

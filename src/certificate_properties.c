@@ -161,6 +161,11 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	g_object_set_data (G_OBJECT(widget), "cert_id", g_strdup_printf("%" G_GUINT64_FORMAT,
                                                                         cert_id));
 
+	GObject *close_btn = gtk_builder_get_object (certificate_properties_window_gtkb, "button2");
+	if (close_btn)
+		g_signal_connect_swapped (close_btn, "clicked",
+		    G_CALLBACK (gtk_window_destroy), widget);
+
 	gtk_window_set_transient_for (GTK_WINDOW (widget), dialog_get_main_window ());
 	gtk_widget_set_visible(GTK_WIDGET(widget), TRUE);
 }
