@@ -6,6 +6,10 @@
 # output, no input capture. Private XDG_RUNTIME_DIR ensures nothing
 # touches the host desktop.
 #
+# On exit, kills the ENTIRE process group so no child (gnomint,
+# at-spi-bus-launcher, dbus-daemon, etc.) can survive and leak
+# onto the host session.
+#
 # Requires: weston, dbus-x11, at-spi2-core.
 
 set -eu
@@ -40,21 +44,16 @@ weston \
     --socket="$WAYLAND_DISPLAY" \
     --idle-time=0 \
     > "$TEST_RUNTIME/weston.log" 2>&1 &
-WESTON_PID=$!
 
 cleanup() {
     rc=$?
-    # Kill compositor and all D-Bus/AT-SPI children.
-    kill "$WESTON_PID" 2>/dev/null || true
-    kill "$DBUS_SESSION_BUS_PID" 2>/dev/null || true
-    # Kill anything still running in our private runtime dir.
-    fuser -k "$TEST_RUNTIME" 2>/dev/null || true
+    # Kill ALL processes in this process group — weston, dbus-daemon,
+    # at-spi-bus-launcher, at-spi2-registryd, gnomint, python, etc.
+    # This prevents any child from surviving and appearing on the
+    # host desktop.
+    trap '' TERM  # prevent recursive signal
+    kill 0 2>/dev/null || true
     wait 2>/dev/null || true
-    if [ "$rc" != 0 ] && [ -f "$TEST_RUNTIME/weston.log" ]; then
-        echo "--- weston log ---" >&2
-        tail -20 "$TEST_RUNTIME/weston.log" >&2
-        echo "--- end weston log ---" >&2
-    fi
     rm -rf "$TEST_RUNTIME"
     exit "$rc"
 }
