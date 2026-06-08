@@ -114,6 +114,7 @@ static void action_toggle_view_csrs(GSimpleAction *action, GVariant *param, gpoi
     gboolean val = !g_variant_get_boolean(state);
     g_simple_action_set_state(action, g_variant_new_boolean(val));
     ca_update_csr_view(val, TRUE);
+    preferences_set_crq_visible(val);
     g_variant_unref(state);
 }
 
@@ -123,6 +124,7 @@ static void action_toggle_view_revoked(GSimpleAction *action, GVariant *param, g
     gboolean val = !g_variant_get_boolean(state);
     g_simple_action_set_state(action, g_variant_new_boolean(val));
     ca_update_revoked_view(val, TRUE);
+    preferences_set_revoked_visible(val);
     g_variant_unref(state);
 }
 
@@ -132,6 +134,7 @@ static void action_toggle_view_expired(GSimpleAction *action, GVariant *param, g
     gboolean val = !g_variant_get_boolean(state);
     g_simple_action_set_state(action, g_variant_new_boolean(val));
     ca_update_expired_view(val, TRUE);
+    preferences_set_expired_visible(val);
     g_variant_unref(state);
 }
 
@@ -193,21 +196,21 @@ void gnomint_register_actions(GtkWindow *window, GtkApplication *app)
 
     act = g_simple_action_new_stateful("view-csrs",
                                        NULL,
-                                       g_variant_new_boolean(TRUE));
+                                       g_variant_new_boolean(preferences_get_crq_visible()));
     g_signal_connect(act, "activate", G_CALLBACK(action_toggle_view_csrs), NULL);
     g_action_map_add_action(G_ACTION_MAP(window), G_ACTION(act));
     g_object_unref(act);
 
     act = g_simple_action_new_stateful("view-revoked",
                                        NULL,
-                                       g_variant_new_boolean(TRUE));
+                                       g_variant_new_boolean(preferences_get_revoked_visible()));
     g_signal_connect(act, "activate", G_CALLBACK(action_toggle_view_revoked), NULL);
     g_action_map_add_action(G_ACTION_MAP(window), G_ACTION(act));
     g_object_unref(act);
 
     act = g_simple_action_new_stateful("view-expired",
                                        NULL,
-                                       g_variant_new_boolean(TRUE));
+                                       g_variant_new_boolean(preferences_get_expired_visible()));
     g_signal_connect(act, "activate", G_CALLBACK(action_toggle_view_expired), NULL);
     g_action_map_add_action(G_ACTION_MAP(window), G_ACTION(act));
     g_object_unref(act);

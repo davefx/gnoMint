@@ -104,21 +104,25 @@ void preferences_set_size (const gchar *new_value)
 
 gboolean preferences_get_revoked_visible ()
 {
+        if (!preferences_settings) return TRUE;
         return g_settings_get_boolean (preferences_settings, "revoked-visible");
 }
 
 void preferences_set_revoked_visible (gboolean new_value)
 {
+        if (!preferences_settings) return;
         g_settings_set_boolean (preferences_settings, "revoked-visible", new_value);
 }
 
 gboolean preferences_get_expired_visible ()
 {
+        if (!preferences_settings) return TRUE;
         return g_settings_get_boolean (preferences_settings, "expired-visible");
 }
 
 void preferences_set_expired_visible (gboolean new_value)
 {
+        if (!preferences_settings) return;
         g_settings_set_boolean (preferences_settings, "expired-visible", new_value);
 }
 
@@ -140,11 +144,13 @@ void preferences_set_expire_warning_days (gint new_value)
 
 gboolean preferences_get_crq_visible ()
 {
+        if (!preferences_settings) return TRUE;
         return g_settings_get_boolean (preferences_settings, "crq-visible");
 }
 
 void preferences_set_crq_visible (gboolean new_value)
 {
+        if (!preferences_settings) return;
         g_settings_set_boolean (preferences_settings, "crq-visible", new_value);
 }
 
