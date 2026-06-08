@@ -46,11 +46,13 @@ jobs:
         run: sudo make install
 
       - name: Run test suite
-        run: make check
+        run: make check || (cat tests/test-suite.log; exit 1)
 
-      - name: Upload test logs on failure
-        if: failure()
+      - name: Upload test logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-logs
-          path: tests/*.log
+          path: |
+            tests/*.log
+            tests/test-suite.log
