@@ -1,16 +1,20 @@
 AC_PREREQ([2.69])
 
-AC_INIT([gnoMint],[1.5.0],[<davefx@gmail.com>],[gnomint])
+AC_INIT([gnoMint],[1.6.0],[<davefx@gmail.com>],[gnomint])
+
+PACKAGE_CODENAME="Tempered Anvil"
+AC_DEFINE_UNQUOTED([PACKAGE_CODENAME], ["$PACKAGE_CODENAME"], [Release codename])
 
 PACKAGE_COPYRIGHT="(c) 2006-2026 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="https://github.com/davefx/gnoMint"
 PACKAGE_AUTHORS=$(cat AUTHORS | tr '\n' ',' | sed 's/,/\\n/g')
-AC_DEFINE_UNQUOTED(PACKAGE_COPYRIGHT, "$PACKAGE_COPYRIGHT")
-AC_DEFINE_UNQUOTED(PACKAGE_WEBSITE, "$PACKAGE_WEBSITE")
-AC_DEFINE_UNQUOTED(PACKAGE_AUTHORS, "$PACKAGE_AUTHORS")
+AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT], ["$PACKAGE_COPYRIGHT"], [Copyright notice])
+AC_DEFINE_UNQUOTED([PACKAGE_WEBSITE], ["$PACKAGE_WEBSITE"], [Project website URL])
+AC_DEFINE_UNQUOTED([PACKAGE_AUTHORS], ["$PACKAGE_AUTHORS"], [Author list])
 
 AM_INIT_AUTOMAKE([1.12 foreign])
 
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 dnl Put the ACLOCAL flags in the Makefile
 AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \${ACLOCAL_FLAGS}"])
@@ -62,7 +66,7 @@ AC_CHECK_FUNCS([memset strcasecmp strdup])
 # gettext stuff
 GETTEXT_PACKAGE=${PACKAGE}
 AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [Gettext package name])
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.8])
 dnl Define locale directory — replaces deprecated AM_GLIB_DEFINE_LOCALEDIR
@@ -145,7 +149,7 @@ AC_MSG_CHECKING([whether gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION (fo
 PKG_CHECK_EXISTS([gnutls >= $GNUTLS_ADVANCED_FEATURES_MINIMUM_VERSION],
 		 [have_advanced_gnutls=yes],[have_advanced_gnutls=no])
 if test "x$have_advanced_gnutls" = "xyes"; then
-   	AC_DEFINE_UNQUOTED(ADVANCED_GNUTLS, "yes")
+   	AC_DEFINE_UNQUOTED([ADVANCED_GNUTLS], ["yes"], [GnuTLS has advanced features])
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
@@ -181,7 +185,7 @@ dnl
 AC_ARG_ENABLE(debug, 
 	[  --enable-debug          debug [default=no]],
 	use_debug="Yes";
-	AC_DEFINE(debug), use_debug="No")
+	AC_DEFINE([debug], [1], [Enable debug mode]), use_debug="No")
 
 dnl
 dnl Check if src should be build with the debug_signals mode
@@ -189,7 +193,7 @@ dnl
 AC_ARG_ENABLE(debug-signal, 
 	[  --enable-debug-signal   debug signals sent [default=no]],
 	use_debug_sig="Yes";
-	AC_DEFINE(debug_signal), use_debug_sig="No")
+	AC_DEFINE([debug_signal], [1], [Enable debug signal tracing]), use_debug_sig="No")
 
 dnl
 

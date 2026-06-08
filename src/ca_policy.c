@@ -20,6 +20,8 @@
 #ifndef GNOMINTCLI
 
 
+#include <config.h>
+
 #include <glib-object.h>
 #include <gtk/gtk.h>
 

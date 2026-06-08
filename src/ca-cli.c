@@ -19,6 +19,8 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include <config.h>
+
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib-object.h>
@@ -182,7 +184,7 @@ void ca_command_line()
 
 	__ca_add_commands (ca_command_table);
 
-        printf (_("\n\n%s version %s\n%s\n\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_COPYRIGHT); 
+        printf (_("\n\n%s version %s \"%s\"\n%s\n\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME, PACKAGE_COPYRIGHT);
         printf (_("This program comes with ABSOLUTELY NO WARRANTY;\nfor details type 'warranty'.\n"));
         printf (_("This is free software, and you are welcome to redistribute it\nunder certain conditions; type 'distribution' for details.\n\n"));
 

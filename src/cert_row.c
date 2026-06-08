@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include "cert_row.h"
 
 struct _GnomintCertRow {

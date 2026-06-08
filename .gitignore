@@ -9,10 +9,12 @@ aclocal.m4
 autom4te.cache/
 compile
 config.guess
+config.h
 config.log
 config.rpath
 config.status
 config.sub
+stamp-h1
 configure
 depcomp
 gconf/gnomint.schemas

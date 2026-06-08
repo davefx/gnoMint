@@ -1,5 +1,7 @@
 /* Pairwise X.509 certificate diff. See cert_diff.h. */
 
+#include <config.h>
+
 #include "cert_diff.h"
 #include "tls.h"
 #include "uint160.h"

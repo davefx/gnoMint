@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <config.h>
+
 #include <libintl.h>
 #include <glib.h>
 #include <gio/gio.h>
@@ -714,7 +716,7 @@ G_MODULE_EXPORT void on_about1_activate  (gpointer sender, gpointer     user_dat
 	g_free (logo_path);
 
 	gtk_about_dialog_set_program_name (dlg, "gnoMint");
-	gtk_about_dialog_set_version (dlg, PACKAGE_VERSION);
+	gtk_about_dialog_set_version (dlg, PACKAGE_VERSION " \"" PACKAGE_CODENAME "\"");
 	gtk_about_dialog_set_copyright (dlg, PACKAGE_COPYRIGHT);
 	gtk_about_dialog_set_comments (dlg,
 		_("gnoMint is a program for creating and managing "

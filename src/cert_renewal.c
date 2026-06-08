@@ -2,6 +2,8 @@
  *  See cert_renewal.h for the contract.
  */
 
+#include <config.h>
+
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <string.h>

@@ -1,5 +1,7 @@
 /* Bulk certificate / CSR operations. See ca_bulk.h. */
 
+#include <config.h>
+
 #include "ca_bulk.h"
 #include "ca_file.h"
 

@@ -17,6 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <config.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -1660,7 +1662,7 @@ int ca_cli_callback_distribution  (int argc, char **argv)
 
 int ca_cli_callback_version  (int argc, char **argv)
 {
-        printf (_("%s version %s\n"), PACKAGE_NAME, PACKAGE_VERSION); 
+        printf (_("%s version %s \"%s\"\n"), PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME);
 	return 0;
 }
 
