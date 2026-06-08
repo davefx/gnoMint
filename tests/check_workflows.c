@@ -159,6 +159,13 @@ critical_log_writer (GLogLevelFlags         log_level,
             message = fields[i].value;
     }
 
+    /* Ignore GTK/Gdk internal warnings that come from older GTK versions
+     * or headless rendering backends — not gnomint bugs. */
+    if (strstr (message, "gtk_box_remove") ||
+        strstr (message, "VK_ERROR_SURFACE_LOST") ||
+        strstr (message, "vkGetPhysicalDevice"))
+        return G_LOG_WRITER_HANDLED;
+
     g_critical_count++;
     g_ptr_array_add (g_critical_messages,
                      g_strdup_printf ("%s: %s", domain, message));
