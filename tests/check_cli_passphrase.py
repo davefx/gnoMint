@@ -155,7 +155,7 @@ def bootstrap_ca(fd, cn):
     send(fd, "RSA")
     expect(fd, "1024")
     send(fd, "1024")
-    expect(fd, "number of months")
+    expect(fd, "240")
     send(fd, "12")
     expect(fd, "change anything")
     send(fd, "no")
