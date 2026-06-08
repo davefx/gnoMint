@@ -27,7 +27,7 @@ jobs:
             libgnutls28-dev gnutls-bin \
             libsqlite3-dev libgcrypt20-dev libreadline-dev \
             libgdk-pixbuf2.0-dev \
-            gettext intltool iso-codes \
+            gettext autopoint intltool iso-codes \
             weston mutter \
             python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11 \
             xserver-xorg-core xserver-xorg-video-dummy \
