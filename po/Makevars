@@ -1,0 +1,29 @@
+# Makevars -- variables for po/Makefile (GNU gettext)
+
+DOMAIN = $(PACKAGE)
+
+subdir = po
+
+top_builddir = ..
+
+XGETTEXT_OPTIONS = \
+  --from-code=UTF-8 \
+  --keyword=_ --keyword=N_ --keyword=C_:1c,2 --keyword=NC_:1c,2 \
+  --flag=g_strdup_printf:1:c-format \
+  --flag=g_string_printf:2:c-format
+
+COPYRIGHT_HOLDER = David Marín Carreño
+
+MSGID_BUGS_ADDRESS = davefx@gmail.com
+
+EXTRA_LOCALE_CATEGORIES =
+
+USE_MSGCTXT = no
+
+MSGMERGE_OPTIONS =
+
+MSGINIT_OPTIONS =
+
+PO_DEPENDS_ON_POT = yes
+
+DIST_DEPENDS_ON_UPDATE_PO = yes
