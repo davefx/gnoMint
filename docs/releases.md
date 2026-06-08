@@ -15,6 +15,37 @@ file.
 
 ---
 
+## 1.6.0 — "Tempered Anvil" (2026-06-08)
+
+The first fully stabilized release of the GTK 4 port. No new
+user-facing features — this release is entirely bug fixes, polish,
+and quality infrastructure.
+
+Highlights:
+
+- **EdDSA key generation hang fixed** — blocking main-loop call inside
+  a timer callback caused deadlock.
+- **CSR wizard crash and broken commit button** — wrong widget IDs in
+  the code vs. the `.ui` file.
+- **Country selector search now works** — `GtkDropDown` needed an
+  explicit expression for search matching.
+- **All dialogs modal on Wayland** — `transient_for` set everywhere.
+- **Tab reaches wizard buttons** — capture-phase key handler works
+  around `GtkNotebook` focus wrapping.
+- **View toggles persist** — Show CSR/Revoked/Expired saved via GSettings.
+- **Spanish translations complete** — 862/862 strings.
+- **16 automated tests** via `make check`, all under headless Wayland
+  with full process isolation. GitHub Actions CI on every push/PR.
+- **`AC_CONFIG_HEADERS([config.h])`** — `make` now detects define
+  changes (version bumps, etc.) automatically.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
 ## 1.5.0 — "Belt and Braces" (2026-05-24)
 
 Six weeks after Lazarus. Closes the running-a-CA-over-years loop

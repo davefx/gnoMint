@@ -1,3 +1,69 @@
+* Version 1.6.0 "Tempered Anvil" (2026.06.08)
+
+The first fully stabilized release of the GTK 4 port, with a
+comprehensive automated test suite (16 tests: C unit, Python AT-SPI
+end-to-end GUI, and CLI shell scripts). No new user-facing features;
+this release is entirely bug fixes, polish, and quality infrastructure.
+
+- BUGFIX: EdDSA (Ed25519) key generation hang. A blocking
+  g_main_context_iteration(NULL, TRUE) inside a timer callback caused
+  a deadlock after private key generation completed. The callback now
+  returns G_SOURCE_REMOVE and uses async gtk_alert_dialog_choose.
+
+- BUGFIX: CSR wizard crash. The CN entry widget ID in the code
+  ("new_req_cn_entry") did not match the .ui file ("cn_entry1"),
+  causing a NULL dereference on wizard open.
+
+- BUGFIX: CSR wizard commit button silently broken. The signal was
+  connected to widget "new_req_commit" but the .ui file defines
+  "new_req_ca_commit2".
+
+- BUGFIX: Country selector search not filtering. GtkDropDown with
+  enable-search=1 requires gtk_drop_down_set_expression() to know
+  which property to match against.
+
+- BUGFIX: Certificate and CSR properties Close button not working.
+  Missing g_signal_connect_swapped for the close action.
+
+- BUGFIX: All dialogs and wizards now set transient_for, fixing
+  modality on Wayland (dialogs could previously be sent behind the
+  parent window).
+
+- BUGFIX: Tab navigation could not reach wizard Next/Cancel/Help
+  buttons due to GtkNotebook wrapping focus within the current page.
+  Added a capture-phase key handler (dialog_notebook_fix_tab_focus).
+
+- BUGFIX: SAN button labels displayed literal underscores ("_Add",
+  "_Edit", "_Remove"). Added use-underline=1 in the .ui file.
+
+- BUGFIX: Missing padding/margins on SAN editor dialog, New CRL
+  dialog, and other secondary dialogs.
+
+- BUGFIX: View toggle state (Show CSR / Show Revoked / Show Expired)
+  lost on application restart. Now persisted via GSettings.
+
+- BUGFIX: Menus and buttons showing in English even with Spanish
+  locale. Regenerated .pot with proper GMenu/ITS attribute extraction;
+  updated es.po (862/862 strings translated).
+
+- BUGFIX: Opening a .gnomint file from the command line was broken.
+
+- BUILD: Added AC_CONFIG_HEADERS([config.h]) so make properly detects
+  changes to version, codename, and other autoconf-defined values.
+  All source files now #include <config.h>.
+
+- BUILD: Removed GTK 3 leftover attributes (can_focus=False,
+  focus-on-click=0, can-target=0) from all .ui files.
+
+- BUILD: Minimum GTK raised to 4.10; all deprecated API removed.
+
+- TESTS: 16 automated tests via make check, all running under
+  headless Wayland (weston) with full process isolation. Includes
+  26 AT-SPI-driven end-to-end GUI scenarios. GitHub Actions CI runs
+  all tests on every push and pull request.
+
+Database-compatible with 1.4.0 — no migration needed.
+
 * Version 1.5.0 "Belt and Braces" (2026.05.24)
 
 Six weeks after Lazarus, gnoMint 1.5.0 closes the running-a-CA-over-
