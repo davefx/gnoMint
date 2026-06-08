@@ -37,12 +37,12 @@ echo "  CA renewal rejection: OK"
 
 # --- Test 2: exportchain, revokemany, deletemany, search, diff ---
 LC_ALL=C "$CLI" "$DB" >"$TMPDIR/out.txt" 2>&1 <<EOF
-exportchain 3 $CHAIN
-revokemany 5 6
+exportchain 5 $CHAIN
+revokemany 6 7
 deletemany 1
-search gnoMint
+search gnomint
 search xx-no-such-cert-xx
-diff 1 3
+diff 1 5
 diff 1 1
 quit
 EOF
@@ -50,7 +50,7 @@ EOF
 grep -q "Full chain.*written to $CHAIN" "$TMPDIR/out.txt"
 grep -q "2 certificates revoked" "$TMPDIR/out.txt"
 grep -q "CSR deleted" "$TMPDIR/out.txt"
-grep -q "gnoMint program" "$TMPDIR/out.txt"
+grep -q "gnomint-program" "$TMPDIR/out.txt"
 grep -q "0 matches\." "$TMPDIR/out.txt"
 grep -qE "^[1-9][0-9]* fields? differ\." "$TMPDIR/out.txt"
 grep -qE "^0 fields? differ\." "$TMPDIR/out.txt"

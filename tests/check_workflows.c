@@ -670,10 +670,10 @@ scenario_extract_private_key (void)
         goto out;
     }
 
-    /* Cert id 3 is "gnoMint program" — a non-CA leaf cert. */
-    if (!select_row_by_id ("0", 3)) {
+    /* Cert id 5 is "gnomint-program" — a non-CA leaf cert. */
+    if (!select_row_by_id ("0", 5)) {
         fail_test ("extract-private-key",
-                   "could not find/select cert id=3 in ca_model");
+                   "could not find/select cert id=5 in ca_model");
         goto out;
     }
 
@@ -834,18 +834,15 @@ scenario_revoke_cert (void)
         goto out;
     }
 
-    /* Cert id 3 is "gnoMint program" — non-CA, easy revocation target. */
-    if (!select_row_by_id ("0", 3)) {
+    /* Cert id 5 is "gnomint-program" — non-CA, easy revocation target. */
+    if (!select_row_by_id ("0", 5)) {
         fail_test ("revoke-cert",
-                   "could not find/select cert id=3 in ca_model");
+                   "could not find/select cert id=5 in ca_model");
         goto out;
     }
 
-    /* GtkAlertDialog (used since the deprecated-API cleanup) is async and
-     * can't be dismissed via gtk_dialog_response. Call the revoke
-     * function directly to verify the underlying logic. */
     {
-        gchar *errmsg = ca_file_revoke_crt (3);
+        gchar *errmsg = ca_file_revoke_crt (5);
         if (errmsg) {
             fail_test ("revoke-cert", "ca_file_revoke_crt: %s", errmsg);
             goto out;
@@ -855,8 +852,8 @@ scenario_revoke_cert (void)
 
     int crits = critical_messages_check_and_reset ("revoke-cert");
 
-    /* Verify the cert is now in the parent CA's revoked list. Cert id 3 is
-     * signed by CA id 2 ("Signing software CA"). */
+    /* Verify the cert is now in the parent CA's revoked list. Cert id 5 is
+     * signed by CA id 2 ("Signing Software CA"). */
     gchar *err = NULL;
     GList *revoked = ca_file_get_revoked_certs (2, &err);
     int found_revoked = 0;
@@ -1163,10 +1160,10 @@ scenario_chain_export (void)
     fprintf (stderr, "    root chain: 1 BEGIN marker OK\n");
     g_free (root_chain);
 
-    /* Three-deep leaf: leaf + intermediate + root = 3 markers. */
-    gchar *leaf_chain = ca_file_get_chain_pem_from_id (3);
+    /* Three-deep leaf (id=5): leaf + intermediate CA + root = 3 markers. */
+    gchar *leaf_chain = ca_file_get_chain_pem_from_id (5);
     if (! leaf_chain) {
-        fail_test ("chain-export", "chain for id=3 is NULL");
+        fail_test ("chain-export", "chain for id=5 is NULL");
         goto out;
     }
     int leaf_count = 0;
@@ -1190,7 +1187,7 @@ scenario_chain_export (void)
         g_free (leaf_chain);
         goto out;
     }
-    fprintf (stderr, "    leaf chain (id=3): 3 BEGIN + 3 END markers OK\n");
+    fprintf (stderr, "    leaf chain (id=5): 3 BEGIN + 3 END markers OK\n");
     g_free (leaf_chain);
 
     rc = 0;
@@ -1225,12 +1222,12 @@ scenario_bulk_operations (void)
         goto out;
     }
 
-    /* Bulk revoke certs 3, 5, 6 (all leaf certs in the fixture) plus a
+    /* Bulk revoke certs 5, 6, 7 (leaf certs in the fixture) plus a
      * bogus id that must be silently skipped. */
     GSList *cert_ids = NULL;
-    cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (3u));
     cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (5u));
     cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (6u));
+    cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (7u));
     cert_ids = g_slist_prepend (cert_ids, GUINT_TO_POINTER (999999u));
 
     gchar *err = NULL;
@@ -1247,9 +1244,9 @@ scenario_bulk_operations (void)
         goto out;
     }
 
-    /* Verify each cert appears in its CA's revoked-list now. Certs 3/5/6
-     * have parent CAs 2, 4, 4 respectively. Counting across CAs 2 and 4
-     * should yield ≥ 3 revoked entries. */
+    /* Verify each cert appears in its CA's revoked-list now. Certs 5/6/7
+     * have parent CAs 2, 3, 3 respectively. Counting across all CAs
+     * should yield >= 3 revoked entries. */
     int total_revoked_rows = 0;
     for (guint64 ca_id = 1; ca_id <= 9; ca_id++) {
         gchar *gerr = NULL;

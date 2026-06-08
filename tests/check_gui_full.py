@@ -231,7 +231,7 @@ def test_fixture_properties(h):
 
 def test_fixture_revoke(h):
     step("Fixture: revoke")
-    h.select_row_by_name("Portable Computer")
+    h.select_row_by_name("portable-computer")
     rev_before = h.db_scalar(
         "SELECT COUNT(*) FROM certificates "
         "WHERE revocation IS NOT NULL AND revocation != ''") or 0
@@ -333,7 +333,7 @@ def test_fixture_change_password(h):
 
 def test_fixture_renew(h):
     step("Fixture: renew")
-    h.select_row_by_name("David")
+    h.select_row_by_name("david-marin")
     h.activate_action("win.renew")
     time.sleep(1)
     dismiss_dialogs(h, timeout=2)
@@ -355,7 +355,7 @@ def test_fixture_delete(h):
     step("Fixture: delete CSR")
     h.activate_action("win.view-csrs")
     time.sleep(0.5)
-    h.select_row_by_name("Guillermo")
+    h.select_row_by_name("Guillermo Puertas")
     h.activate_action("win.delete")
     time.sleep(1)
     dismiss_dialogs(h, timeout=2)
