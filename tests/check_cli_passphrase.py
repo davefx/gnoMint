@@ -153,7 +153,7 @@ def bootstrap_ca(fd, cn):
     send(fd, "")               # SAN
     expect(fd, "[RSA]")
     send(fd, "RSA")
-    expect(fd, "Enter bitlength")
+    expect(fd, "1024")
     send(fd, "1024")
     expect(fd, "number of months")
     send(fd, "12")
@@ -181,7 +181,7 @@ def bootstrap_csr(fd, cn):
     send(fd, "")               # SAN
     expect(fd, "[RSA]")
     send(fd, "RSA")
-    expect(fd, "Enter bitlength")
+    expect(fd, "1024")
     send(fd, "1024")
     expect(fd, "change anything")
     send(fd, "no")

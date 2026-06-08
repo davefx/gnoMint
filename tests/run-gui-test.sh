@@ -6,10 +6,6 @@
 # output, no input capture. Private XDG_RUNTIME_DIR ensures nothing
 # touches the host desktop.
 #
-# On exit, kills the ENTIRE process group so no child (gnomint,
-# at-spi-bus-launcher, dbus-daemon, etc.) can survive and leak
-# onto the host session.
-#
 # Requires: weston, dbus-x11, at-spi2-core.
 
 set -eu
@@ -36,7 +32,27 @@ chmod 700 "$TEST_RUNTIME"
 export XDG_RUNTIME_DIR="$TEST_RUNTIME"
 export WAYLAND_DISPLAY="wayland-test"
 export GDK_BACKEND=wayland
+export GSK_RENDERER=cairo
 export GTK_A11Y=atspi
+
+PIDS=""
+
+add_pid() { PIDS="$PIDS $1"; }
+
+cleanup() {
+    rc=$?
+    for pid in $PIDS; do
+        kill "$pid" 2>/dev/null || true
+    done
+    wait 2>/dev/null || true
+    # D-Bus services (gvfs, portal) may have FUSE-mounted inside the
+    # runtime dir. Unmount before removing.
+    fusermount -uz "$TEST_RUNTIME/gvfs" 2>/dev/null || true
+    fusermount -uz "$TEST_RUNTIME/doc" 2>/dev/null || true
+    rm -rf "$TEST_RUNTIME" 2>/dev/null || true
+    exit "$rc"
+}
+trap cleanup EXIT INT TERM
 
 # ── Start headless compositor ──
 weston \
@@ -44,20 +60,7 @@ weston \
     --socket="$WAYLAND_DISPLAY" \
     --idle-time=0 \
     > "$TEST_RUNTIME/weston.log" 2>&1 &
-
-cleanup() {
-    rc=$?
-    # Kill ALL processes in this process group — weston, dbus-daemon,
-    # at-spi-bus-launcher, at-spi2-registryd, gnomint, python, etc.
-    # This prevents any child from surviving and appearing on the
-    # host desktop.
-    trap '' TERM  # prevent recursive signal
-    kill 0 2>/dev/null || true
-    wait 2>/dev/null || true
-    rm -rf "$TEST_RUNTIME"
-    exit "$rc"
-}
-trap cleanup EXIT INT TERM
+add_pid $!
 
 # Wait for compositor socket.
 i=0
@@ -67,13 +70,17 @@ while [ $i -lt 50 ] && [ ! -S "$TEST_RUNTIME/$WAYLAND_DISPLAY" ]; do
 done
 if [ ! -S "$TEST_RUNTIME/$WAYLAND_DISPLAY" ]; then
     echo "run-gui-test.sh: weston socket never appeared" >&2
+    cat "$TEST_RUNTIME/weston.log" >&2
     exit 1
 fi
 
 # ── Private D-Bus + AT-SPI ──
 eval $(dbus-launch --sh-syntax)
 export DBUS_SESSION_BUS_ADDRESS
+add_pid "$DBUS_SESSION_BUS_PID"
+
 /usr/libexec/at-spi-bus-launcher --launch-immediately >/dev/null 2>&1 &
+add_pid $!
 sleep 1
 
 "$@"

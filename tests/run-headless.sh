@@ -30,6 +30,7 @@ fi
 WAYLAND_DISPLAY="gnomint-test-$$"
 export WAYLAND_DISPLAY
 export GDK_BACKEND=wayland
+export GSK_RENDERER=cairo
 
 WESTON_LOG="$XDG_RUNTIME_DIR/weston-$$.log"
 

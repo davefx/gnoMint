@@ -12,8 +12,8 @@
 ##   check_gui_full.py       AT-SPI-driven black-box tests, run via
 ##                           run-mutter.sh (mutter --headless).
 
-TESTS = check_y2k38 check_ui_consistency check_workflows \
-        check_gui_full.py \
+TESTS = check_y2k38 check_ui_consistency \
+        check_workflows.sh check_gui_full_wrapper.sh \
         check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
         check_cli_info.sh check_cli_lifecycle.sh \
         check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
@@ -21,13 +21,8 @@ TESTS = check_y2k38 check_ui_consistency check_workflows \
         check_cli_algorithms.sh
 check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 
-# Per-test wrapper: check_workflows runs under weston headless Wayland,
-# check_gui_full.py runs under mutter headless Wayland. The static
-# tests stay display-free, CLI tests need no display.
-check_workflows_LOG_COMPILER = $(srcdir)/run-headless.sh
-check_gui_full_py_LOG_COMPILER = $(srcdir)/run-gui-test.sh
-
 EXTRA_DIST = run-headless.sh run-gui-test.sh \
+             check_workflows.sh check_gui_full_wrapper.sh \
              gui_harness.py check_gui_full.py \
              check_cli_email.sh check_cli_wizard.sh \
              check_cli_parity.sh check_cli_info.sh check_cli_lifecycle.sh \
