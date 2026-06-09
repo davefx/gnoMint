@@ -188,7 +188,7 @@ gint dialog_ask_for_number (gchar *message, gint minimum, gint maximum, gint def
 {
 	gchar *line;
 	gchar *prompt = NULL;
-	gint result;
+	gint result = default_value;
 	gboolean keep_trying = TRUE;
 
 	if (! message)

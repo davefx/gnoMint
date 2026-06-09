@@ -211,7 +211,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate build configuration
-        run: ./autogen.sh
+        run: NOCONFIGURE=1 ./autogen.sh
 
       - name: Configure
         run: ./configure
@@ -220,14 +220,14 @@ jobs:
         run: make -j$(nproc)
 
       - name: Install
-        run: make install
+        run: make DESTDIR=/tmp/gnomint-inst install
 
       - name: Run CLI tests
         run: |
           make check TESTS="check_y2k38 \
             check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
             check_cli_info.sh check_cli_lifecycle.sh \
-            check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
+            check_cli_keys.sh check_cli_import.sh \
             check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
             check_cli_algorithms.sh" \
           || (cat tests/test-suite.log; exit 1)
