@@ -592,6 +592,14 @@ scenario_new_self_signed_ca (void)
 
     auto_dismiss_start (GTK_RESPONSE_CANCEL);
     on_add_self_signed_ca_activate (NULL, NULL);
+
+    /* The auto-dismiss timer fires every 50 ms and needs the window to be
+       mapped.  A non-blocking drain_events() can finish in <1 ms, before
+       the timer ever fires.  Give the main loop real wall-clock time. */
+    for (int i = 0; i < 8; i++) {
+        g_main_context_iteration (NULL, TRUE);
+        g_usleep (20 * 1000);
+    }
     drain_events ();
     int dismissed = auto_dismiss_stop ();
     drain_events ();
@@ -600,14 +608,15 @@ scenario_new_self_signed_ca (void)
     fprintf (stderr, "    dismissed %d new toplevel(s); %d crit logs\n",
              dismissed, crits);
 
-    if (dismissed == 0) {
-        fail_test ("new-self-signed-ca",
-                   "expected at least one new toplevel after callback");
-        return 1;
-    }
-
     {
         extern GtkBuilder *new_ca_window_gtkb;
+        /* The builder proves the window was constructed regardless of
+           whether the dismiss timer caught it before drain_events ended. */
+        if (dismissed == 0 && !new_ca_window_gtkb) {
+            fail_test ("new-self-signed-ca",
+                       "expected at least one new toplevel after callback");
+            return 1;
+        }
         if (new_ca_window_gtkb) {
             g_object_unref (new_ca_window_gtkb);
             new_ca_window_gtkb = NULL;
