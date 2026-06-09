@@ -7,7 +7,7 @@ AC_DEFINE_UNQUOTED([PACKAGE_CODENAME], ["$PACKAGE_CODENAME"], [Release codename]
 
 PACKAGE_COPYRIGHT="(c) 2006-2026 David Marín Carreño <davefx@gmail.com>"
 PACKAGE_WEBSITE="https://github.com/davefx/gnoMint"
-PACKAGE_AUTHORS=$(cat AUTHORS | tr '\n' ',' | sed 's/,/\\n/g')
+PACKAGE_AUTHORS=$(awk 'NR>1{printf "\\n"}{printf "%s",$0}' AUTHORS)
 AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT], ["$PACKAGE_COPYRIGHT"], [Copyright notice])
 AC_DEFINE_UNQUOTED([PACKAGE_WEBSITE], ["$PACKAGE_WEBSITE"], [Project website URL])
 AC_DEFINE_UNQUOTED([PACKAGE_AUTHORS], ["$PACKAGE_AUTHORS"], [Author list])
