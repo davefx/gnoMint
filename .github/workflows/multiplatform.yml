@@ -1,0 +1,172 @@
+name: Multi-platform Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+
+  # ── Fedora (latest) ───────────────────────────────────────────────
+  fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Install dependencies
+        run: |
+          dnf install -y \
+            gcc make autoconf automake libtool pkgconf-pkg-config \
+            gtk4-devel glib2-devel \
+            gnutls-devel gnutls-utils \
+            sqlite-devel libgcrypt-devel readline-devel \
+            gdk-pixbuf2-devel \
+            gettext-devel intltool iso-codes-devel \
+            weston git
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate build configuration
+        run: ./autogen.sh
+
+      - name: Configure
+        run: ./configure
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Install
+        run: make install
+
+      - name: Run CLI tests
+        run: |
+          make check TESTS="check_y2k38 \
+            check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
+            check_cli_info.sh check_cli_lifecycle.sh \
+            check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
+            check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
+            check_cli_algorithms.sh" \
+          || (cat tests/test-suite.log; exit 1)
+
+      - name: Run GUI workflow tests (headless Wayland)
+        run: |
+          make check TESTS="check_ui_consistency check_workflows.sh" \
+          || (cat tests/test-suite.log; exit 1)
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-fedora
+          path: |
+            tests/*.log
+            tests/test-suite.log
+
+  # ── Arch Linux (rolling) ──────────────────────────────────────────
+  arch:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm \
+            gcc make autoconf automake libtool pkgconf \
+            gtk4 glib2 \
+            gnutls \
+            sqlite libgcrypt readline \
+            gdk-pixbuf2 \
+            gettext intltool iso-codes \
+            weston python git
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate build configuration
+        run: ./autogen.sh
+
+      - name: Configure
+        run: ./configure
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Install
+        run: make install
+
+      - name: Run CLI tests
+        run: |
+          make check TESTS="check_y2k38 \
+            check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
+            check_cli_info.sh check_cli_lifecycle.sh \
+            check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
+            check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
+            check_cli_algorithms.sh" \
+          || (cat tests/test-suite.log; exit 1)
+
+      - name: Run GUI workflow tests (headless Wayland)
+        run: |
+          make check TESTS="check_ui_consistency check_workflows.sh" \
+          || (cat tests/test-suite.log; exit 1)
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-arch
+          path: |
+            tests/*.log
+            tests/test-suite.log
+
+  # ── macOS (Homebrew) ──────────────────────────────────────────────
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install \
+            autoconf automake libtool pkg-config \
+            gtk4 glib \
+            gnutls libgcrypt \
+            sqlite readline \
+            gdk-pixbuf \
+            gettext intltool iso-codes
+
+      - name: Generate build configuration
+        run: ./autogen.sh
+
+      - name: Configure
+        run: |
+          export PKG_CONFIG_PATH="$(brew --prefix readline)/lib/pkgconfig:$(brew --prefix libffi)/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+          export LDFLAGS="-L$(brew --prefix readline)/lib -L$(brew --prefix gettext)/lib ${LDFLAGS:-}"
+          export CPPFLAGS="-I$(brew --prefix readline)/include -I$(brew --prefix gettext)/include ${CPPFLAGS:-}"
+          ./configure
+
+      - name: Build
+        run: make -j$(sysctl -n hw.ncpu)
+
+      - name: Install
+        run: sudo make install
+
+      - name: Run CLI tests
+        run: |
+          make check TESTS="check_y2k38 \
+            check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
+            check_cli_info.sh check_cli_lifecycle.sh \
+            check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
+            check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
+            check_cli_algorithms.sh" \
+          || (cat tests/test-suite.log; exit 1)
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-macos
+          path: |
+            tests/*.log
+            tests/test-suite.log
