@@ -51,6 +51,19 @@ char *getpass(const char *prompt)
 }
 #endif
 
+#ifdef _WIN32
+const gchar *
+gnomint_get_data_dir (void)
+{
+	static gchar *data_dir = NULL;
+	if (!data_dir) {
+		gchar *install_dir = g_win32_get_package_installation_directory_of_module (NULL);
+		data_dir = g_build_filename (install_dir, "share", NULL);
+		g_free (install_dir);
+	}
+	return data_dir;
+}
+#endif
 
 DialogRefreshCallback dialog_refresh_callback = NULL;
 

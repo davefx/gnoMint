@@ -1,0 +1,111 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Package Name="gnoMint"
+           Manufacturer="David Marin Carreno"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="A42C4C89-4AAF-53F6-A128-571D85FDCFAB"
+           Compressed="yes"
+           InstallerVersion="500">
+
+    <SummaryInformation Description="gnoMint - Certification Authority Manager" />
+
+    <MajorUpgrade DowngradeErrorMessage=
+        "A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Directory layout -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="gnoMint">
+        <Directory Id="DIR_bin" Name="bin" />
+        <Directory Id="DIR_etc" Name="etc" />
+        <Directory Id="DIR_lib" Name="lib" />
+        <Directory Id="DIR_share" Name="share" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="DIR_StartMenu" Name="gnoMint" />
+    </StandardDirectory>
+
+    <!-- Harvest all files from the staging tree -->
+    <ComponentGroup Id="BinFiles" Directory="DIR_bin">
+      <Files Include="staging\bin\**" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="EtcFiles" Directory="DIR_etc">
+      <Files Include="staging\etc\**" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="LibFiles" Directory="DIR_lib">
+      <Files Include="staging\lib\**" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="ShareFiles" Directory="DIR_share">
+      <Files Include="staging\share\**" />
+    </ComponentGroup>
+
+    <!-- Start Menu shortcuts -->
+    <Component Id="StartMenuShortcuts" Directory="DIR_StartMenu"
+               Guid="AEF713B1-EB66-5DB1-B11D-61498DC051D0">
+      <Shortcut Id="GnoMintGUI"
+                Name="gnoMint"
+                Description="Certification Authority Manager"
+                Target="[DIR_bin]gnomint.exe"
+                WorkingDirectory="DIR_bin"
+                Icon="gnomint.ico" />
+      <Shortcut Id="GnoMintCLI"
+                Name="gnoMint CLI"
+                Description="gnoMint command-line interface"
+                Target="[DIR_bin]gnomint-cli.exe"
+                WorkingDirectory="DIR_bin" />
+      <RemoveFolder Id="RemoveStartMenu" On="uninstall" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\gnoMint"
+                     Name="installed" Type="integer" Value="1"
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- .gnomint file association -->
+    <Component Id="FileAssociation" Directory="DIR_bin"
+               Guid="19C2DFCD-F789-52C2-BC4B-9B914740FC9F">
+      <RegistryValue Root="HKCU"
+                     Key="Software\Classes\.gnomint"
+                     Value="gnoMint.Database" Type="string" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\Classes\gnoMint.Database"
+                     Value="gnoMint CA Database" Type="string" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\Classes\gnoMint.Database\shell\open\command"
+                     Value="&quot;[DIR_bin]gnomint.exe&quot; &quot;%1&quot;"
+                     Type="string" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\gnoMint"
+                     Name="fileassoc" Type="integer" Value="1"
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- PATH entry so gnomint-cli is usable from any terminal -->
+    <Component Id="PathEntry" Directory="DIR_bin"
+               Guid="*">
+      <Environment Id="PATH" Name="PATH" Value="[DIR_bin]"
+                   Permanent="no" Part="last" Action="set" System="no" />
+    </Component>
+
+    <!-- Application icon (used by shortcuts and ARP) -->
+    <Icon Id="gnomint.ico" SourceFile="packaging\windows\gnomint.ico" />
+    <Property Id="ARPPRODUCTICON" Value="gnomint.ico" />
+    <Property Id="ARPHELPLINK"
+              Value="https://github.com/davefx/gnoMint" />
+
+    <Feature Id="MainFeature" Title="gnoMint" Level="1">
+      <ComponentGroupRef Id="BinFiles" />
+      <ComponentGroupRef Id="EtcFiles" />
+      <ComponentGroupRef Id="LibFiles" />
+      <ComponentGroupRef Id="ShareFiles" />
+      <ComponentRef Id="StartMenuShortcuts" />
+      <ComponentRef Id="FileAssociation" />
+      <ComponentRef Id="PathEntry" />
+    </Feature>
+
+  </Package>
+</Wix>

@@ -205,6 +205,8 @@ jobs:
             mingw-w64-x86_64-gettext
             mingw-w64-x86_64-pkg-config
             mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-ntldd
+            mingw-w64-x86_64-adwaita-icon-theme
             make autoconf automake libtool
             intltool
             git
@@ -236,6 +238,30 @@ jobs:
             check_cli_importdir.sh check_cli_dhgen.sh \
             check_cli_algorithms.sh" \
           || (cat tests/test-suite.log; exit 1)
+
+      - name: Collect files for installer
+        run: |
+          bash packaging/windows/collect-files.sh staging
+
+      - name: Install WiX Toolset
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+
+      - name: Build MSI
+        shell: pwsh
+        run: |
+          $version = "1.6.0.0"
+          & wix build -arch x64 `
+            -d ProductVersion=$version `
+            -o gnomint-1.6.0.msi `
+            packaging/windows/Package.wxs
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnomint-windows-installer
+          path: gnomint-1.6.0.msi
 
       - name: Upload test logs
         if: always()

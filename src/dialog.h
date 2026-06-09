@@ -45,6 +45,12 @@ void dialog_get_password (gchar *info_message,
 
 void dialog_todo_callback (void);
 
+#ifdef _WIN32
+const gchar *gnomint_get_data_dir (void);
+#undef PACKAGE_DATA_DIR
+#define PACKAGE_DATA_DIR gnomint_get_data_dir()
+#endif
+
 typedef gboolean (* DialogRefreshCallback) (void);
 void dialog_establish_refresh_function (DialogRefreshCallback callback);
 gboolean dialog_refresh_list (void);
