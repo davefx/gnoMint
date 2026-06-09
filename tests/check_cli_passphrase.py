@@ -15,6 +15,12 @@ through, so we trigger on the intro text and then blind-write the
 password twice (entry + confirm).
 """
 
+import sys
+
+if sys.platform == "win32":
+    print("SKIP: pty/termios not available on Windows", file=sys.stderr)
+    sys.exit(77)
+
 import errno
 import os
 import pty
@@ -22,7 +28,6 @@ import re
 import select
 import shutil
 import subprocess
-import sys
 import tempfile
 import time
 
