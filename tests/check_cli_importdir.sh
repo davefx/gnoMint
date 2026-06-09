@@ -42,13 +42,13 @@ echo "01" > "$CA_DIR/serial"
 # CA self-signed cert + key (unencrypted).
 openssl req -x509 -newkey rsa:2048 -nodes \
     -days 365 \
-    -subj "/CN=OpenSSL Test CA/O=Importdir Test" \
+    -subj "//CN=OpenSSL Test CA/O=Importdir Test" \
     -keyout "$CA_DIR/private/cakey.pem" \
     -out "$CA_DIR/cacert.pem" 2>/dev/null
 
 # One issued leaf cert. Sign it with the CA so the chain matches.
 openssl req -newkey rsa:2048 -nodes \
-    -subj "/CN=imported-leaf.example.com" \
+    -subj "//CN=imported-leaf.example.com" \
     -keyout "$TMPDIR_HERE/leaf.key" \
     -out "$TMPDIR_HERE/leaf.csr" 2>/dev/null
 openssl x509 -req -in "$TMPDIR_HERE/leaf.csr" \

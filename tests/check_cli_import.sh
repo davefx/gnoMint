@@ -27,7 +27,7 @@ OUT="$TMPDIR_HERE/out.txt"
 # importfile won't need a passphrase.
 openssl req -x509 -newkey rsa:2048 -nodes \
     -days 30 \
-    -subj "/CN=Imported External Cert" \
+    -subj "//CN=Imported External Cert" \
     -keyout "$TMPDIR_HERE/key.pem" \
     -out "$PEM" 2>/dev/null
 
