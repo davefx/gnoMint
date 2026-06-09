@@ -133,9 +133,9 @@ def send_passphrase(fd, passphrase):
     """Blind-write a passphrase twice (entry + confirm). The
     surrounding getpass() prompts won't reach the master until
     after we type, but the underlying code is waiting for them."""
-    time.sleep(0.3)
+    time.sleep(0.5)
     os.write(fd, (passphrase + "\n").encode())
-    time.sleep(0.3)
+    time.sleep(0.5)
     os.write(fd, (passphrase + "\n").encode())
 
 

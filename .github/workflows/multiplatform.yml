@@ -211,11 +211,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Verify toolchain
+        run: |
+          echo "PATH=$PATH"
+          which gcc
+          gcc --version
+          echo 'int main(){return 0;}' > /tmp/test.c
+          gcc -o /tmp/test.exe /tmp/test.c && echo "direct compile OK" || echo "direct compile FAILED"
+          cat /etc/config.site 2>/dev/null || echo "no config.site"
+
       - name: Generate build configuration
         run: NOCONFIGURE=1 ./autogen.sh
 
       - name: Configure
-        run: CONFIG_SITE= ./configure
+        run: ./configure LDFLAGS="" CFLAGS="-O2"
 
       - name: Build
         run: make -j$(nproc)
