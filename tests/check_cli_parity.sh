@@ -18,6 +18,7 @@ if [ ! -r "$FIXTURE" ]; then
     exit 77
 fi
 TMPDIR=$(mktemp -d)
+if command -v cygpath >/dev/null 2>&1; then TMPDIR=$(cygpath -m "$TMPDIR"); fi
 trap 'rm -rf "$TMPDIR"' EXIT
 
 DB="$TMPDIR/cli-parity.gnomint"

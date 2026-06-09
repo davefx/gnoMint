@@ -22,6 +22,8 @@ if [ ! -x "$GNOMINT_CLI" ]; then
 fi
 
 TMPDIR_HERE=$(mktemp -d /tmp/gnomint-cli-life-XXXXXX)
+# On MSYS2, convert POSIX /tmp to Windows path for the native MinGW binary
+if command -v cygpath >/dev/null 2>&1; then TMPDIR_HERE=$(cygpath -m "$TMPDIR_HERE"); fi
 trap 'rm -rf "$TMPDIR_HERE"' EXIT
 
 DB="$TMPDIR_HERE/life.gnomint"

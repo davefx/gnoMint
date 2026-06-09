@@ -16,6 +16,7 @@ if ! command -v openssl >/dev/null 2>&1; then
 fi
 
 TMPDIR_HERE=$(mktemp -d /tmp/gnomint-cli-import-XXXXXX)
+if command -v cygpath >/dev/null 2>&1; then TMPDIR_HERE=$(cygpath -m "$TMPDIR_HERE"); fi
 trap 'rm -rf "$TMPDIR_HERE"' EXIT
 
 PEM="$TMPDIR_HERE/imported.pem"

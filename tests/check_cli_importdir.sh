@@ -26,6 +26,7 @@ if ! command -v openssl >/dev/null 2>&1; then
 fi
 
 TMPDIR_HERE=$(mktemp -d /tmp/gnomint-cli-importdir-XXXXXX)
+if command -v cygpath >/dev/null 2>&1; then TMPDIR_HERE=$(cygpath -m "$TMPDIR_HERE"); fi
 trap 'rm -rf "$TMPDIR_HERE"' EXIT
 
 CA_DIR="$TMPDIR_HERE/openssl-ca"
