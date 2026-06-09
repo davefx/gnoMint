@@ -28,7 +28,6 @@
 #else
 #include <arpa/inet.h>
 #endif
-#include <regex.h>
 #include "dialog.h"
 
 #include "san_manager.h"
@@ -75,17 +74,10 @@ gboolean san_validate(SanType type, const gchar *value, gchar **error_message) {
 
 	switch (type) {
 		case SAN_TYPE_DNS: {
-			// Basic DNS validation - must be alphanumeric with dots, dashes, and asterisk for wildcards
-			regex_t regex;
-			int ret = regcomp(&regex, "^(\\*\\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)*[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$", REG_EXTENDED);
-			if (ret == 0) {
-				ret = regexec(&regex, value, 0, NULL, 0);
-				regfree(&regex);
-				if (ret == 0)
-					return TRUE;
-			} else {
-				regfree(&regex);
-			}
+			if (g_regex_match_simple(
+				"^(\\*\\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)*[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$",
+				value, 0, 0))
+				return TRUE;
 			if (error_message)
 				*error_message = g_strdup(_("Invalid DNS name. Use format: example.com or *.example.com"));
 			return FALSE;
