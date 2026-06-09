@@ -162,6 +162,7 @@ jobs:
 
       - name: Run CLI tests
         run: |
+          export GSETTINGS_SCHEMA_DIR=/usr/local/share/glib-2.0/schemas
           make check TESTS="check_y2k38 \
             check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
             check_cli_info.sh check_cli_lifecycle.sh \
@@ -214,7 +215,7 @@ jobs:
         run: NOCONFIGURE=1 ./autogen.sh
 
       - name: Configure
-        run: ./configure
+        run: CONFIG_SITE= ./configure
 
       - name: Build
         run: make -j$(nproc)
@@ -224,6 +225,7 @@ jobs:
 
       - name: Run CLI tests
         run: |
+          export GSETTINGS_SCHEMA_DIR=/tmp/gnomint-inst/usr/local/share/glib-2.0/schemas
           make check TESTS="check_y2k38 \
             check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
             check_cli_info.sh check_cli_lifecycle.sh \

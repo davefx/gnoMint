@@ -159,11 +159,14 @@ critical_log_writer (GLogLevelFlags         log_level,
             message = fields[i].value;
     }
 
-    /* Ignore GTK/Gdk internal warnings that come from older GTK versions
-     * or headless rendering backends — not gnomint bugs. */
+    /* Ignore GTK/Gdk internal warnings that come from older GTK versions,
+     * headless rendering backends, or missing xdg-desktop-portal interfaces
+     * in CI containers — not gnomint bugs. */
     if (strstr (message, "gtk_box_remove") ||
         strstr (message, "VK_ERROR_SURFACE_LOST") ||
-        strstr (message, "vkGetPhysicalDevice"))
+        strstr (message, "vkGetPhysicalDevice") ||
+        strstr (message, "Cannot get portal") ||
+        strstr (message, "No such interface \"org.freedesktop.portal"))
         return G_LOG_WRITER_HANDLED;
 
     g_critical_count++;
