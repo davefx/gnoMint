@@ -224,7 +224,12 @@ jobs:
         run: NOCONFIGURE=1 ./autogen.sh
 
       - name: Configure
-        run: ./configure LDFLAGS="" CFLAGS="-O2"
+        run: |
+          CONFIG_SITE= ./configure || {
+            echo "=== config.log (last 60 lines) ==="
+            tail -60 config.log
+            exit 1
+          }
 
       - name: Build
         run: make -j$(nproc)
