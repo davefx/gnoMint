@@ -25,13 +25,8 @@ jobs:
             gettext-devel intltool iso-codes-devel \
             weston dbus-daemon dbus-tools git
 
-      - name: Set up D-Bus (needed by GSettings/dconf in CLI tests)
-        run: |
-          dbus-uuidgen > /etc/machine-id
-          mkdir -p /run/dbus
-          dbus-daemon --system --fork || true
-          eval $(dbus-launch --sh-syntax)
-          echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" >> "$GITHUB_ENV"
+      - name: Set up D-Bus machine-id
+        run: dbus-uuidgen --ensure=/etc/machine-id
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,7 +45,7 @@ jobs:
 
       - name: Run CLI tests
         run: |
-          make check TESTS="check_y2k38 \
+          dbus-run-session -- make check TESTS="check_y2k38 \
             check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
             check_cli_info.sh check_cli_lifecycle.sh \
             check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
@@ -88,13 +83,8 @@ jobs:
             gettext intltool iso-codes \
             weston dbus python git
 
-      - name: Set up D-Bus (needed by GSettings/dconf in CLI tests)
-        run: |
-          dbus-uuidgen > /etc/machine-id
-          mkdir -p /run/dbus
-          dbus-daemon --system --fork || true
-          eval $(dbus-launch --sh-syntax)
-          echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" >> "$GITHUB_ENV"
+      - name: Set up D-Bus machine-id
+        run: dbus-uuidgen --ensure=/etc/machine-id
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -113,7 +103,7 @@ jobs:
 
       - name: Run CLI tests
         run: |
-          make check TESTS="check_y2k38 \
+          dbus-run-session -- make check TESTS="check_y2k38 \
             check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
             check_cli_info.sh check_cli_lifecycle.sh \
             check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
@@ -123,6 +113,8 @@ jobs:
 
       - name: Run GUI workflow tests (headless Wayland)
         run: |
+          export XDG_RUNTIME_DIR=$(mktemp -d)
+          chmod 700 "$XDG_RUNTIME_DIR"
           make check TESTS="check_ui_consistency check_workflows.sh" \
           || (cat tests/test-suite.log; exit 1)
 
@@ -183,6 +175,68 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-logs-macos
+          path: |
+            tests/*.log
+            tests/test-suite.log
+
+  # ── Windows (MSYS2/MinGW) ────────────────────────────────────────
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gtk4
+            mingw-w64-x86_64-glib2
+            mingw-w64-x86_64-gnutls
+            mingw-w64-x86_64-libgcrypt
+            mingw-w64-x86_64-sqlite3
+            mingw-w64-x86_64-readline
+            mingw-w64-x86_64-gdk-pixbuf2
+            mingw-w64-x86_64-iso-codes
+            mingw-w64-x86_64-gettext
+            mingw-w64-x86_64-pkg-config
+            make autoconf automake libtool
+            intltool
+            git
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate build configuration
+        run: ./autogen.sh
+
+      - name: Configure
+        run: ./configure
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Install
+        run: make install
+
+      - name: Run CLI tests
+        run: |
+          make check TESTS="check_y2k38 \
+            check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
+            check_cli_info.sh check_cli_lifecycle.sh \
+            check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
+            check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
+            check_cli_algorithms.sh" \
+          || (cat tests/test-suite.log; exit 1)
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-windows
           path: |
             tests/*.log
             tests/test-suite.log

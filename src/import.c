@@ -228,7 +228,7 @@ gint __import_csr (gnutls_x509_crq_t *crq, gchar ** csr_dn, guint64 *id)
 gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
 {
 	guchar *serial_str = NULL;
-	UInt160 serial;
+	UInt160 serial = {0, 0, 0};
 	gchar * pem_cert=NULL;
 	size_t size;
 	gchar * error_msg;
