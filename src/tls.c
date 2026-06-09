@@ -22,7 +22,12 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <arpa/inet.h>
+#endif
 #include <glib/gi18n.h>
 #include "uint160.h"
 #include "time64_check.h"

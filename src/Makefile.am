@@ -59,6 +59,7 @@ gnomint_LDADD = \
         $(LIBGCRYPT_LIBS) \
 	$(LIBGNUTLS_LIBS) \
 	$(SQLITE_LIBS) \
+	$(WINSOCK_LIBS) \
 	$(LTLIBINTL)
 
 gnomint_LDFLAGS = \
@@ -106,6 +107,7 @@ gnomint_cli_LDADD = \
 	$(LIBGNUTLS_LIBS) \
 	$(SQLITE_LIBS) \
 	$(READLINE_LIBS) \
+	$(WINSOCK_LIBS) \
 	$(LTLIBINTL)
 
 

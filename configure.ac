@@ -13,6 +13,7 @@ AC_DEFINE_UNQUOTED([PACKAGE_WEBSITE], ["$PACKAGE_WEBSITE"], [Project website URL
 AC_DEFINE_UNQUOTED([PACKAGE_AUTHORS], ["$PACKAGE_AUTHORS"], [Author list])
 
 AM_INIT_AUTOMAKE([1.12 foreign])
+AC_CANONICAL_HOST
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -134,6 +135,17 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[	READLINE_LIBS="-lreadline" ],[
 LIBS=$old_LIBS
 
 AC_SUBST(READLINE_LIBS)
+
+# On Windows (MinGW), inet_pton/inet_ntop live in ws2_32
+case "$host_os" in
+  mingw*|msys*|cygwin*)
+    WINSOCK_LIBS="-lws2_32"
+    ;;
+  *)
+    WINSOCK_LIBS=""
+    ;;
+esac
+AC_SUBST(WINSOCK_LIBS)
 
 PKG_CHECK_MODULES(GNOMINTCLI, 
 	glib-2.0 >= $GLIB_REQUIRED \
