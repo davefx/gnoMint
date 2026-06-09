@@ -86,9 +86,13 @@
 
     <!-- PATH entry so gnomint-cli is usable from any terminal -->
     <Component Id="PathEntry" Directory="DIR_bin"
-               Guid="*">
+               Guid="218C632E-2FAF-561F-88E6-565AE921145B">
       <Environment Id="PATH" Name="PATH" Value="[DIR_bin]"
                    Permanent="no" Part="last" Action="set" System="no" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\gnoMint"
+                     Name="pathentry" Type="integer" Value="1"
+                     KeyPath="yes" />
     </Component>
 
     <!-- Application icon (used by shortcuts and ARP) -->
