@@ -225,9 +225,9 @@ jobs:
 
       - name: Configure
         run: |
-          CONFIG_SITE= ./configure || {
-            echo "=== config.log (last 60 lines) ==="
-            tail -60 config.log
+          CONFIG_SITE=/dev/null ./configure 2>&1 || {
+            echo "=== config.log (full) ==="
+            cat config.log
             exit 1
           }
 

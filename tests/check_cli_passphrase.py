@@ -325,6 +325,12 @@ def main():
         print(f"SKIP: {CLI} not found", file=sys.stderr)
         return 77
 
+    if sys.platform == "darwin":
+        print("SKIP: macOS getpass() bypasses the pty slave, "
+              "making pty-driven passphrase tests impossible",
+              file=sys.stderr)
+        return 77
+
     tmpdir = tempfile.mkdtemp(prefix="gnomint-pty-")
     try:
         scenario_extractcertpkey(tmpdir)
