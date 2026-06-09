@@ -55,7 +55,7 @@ jobs:
 
       - name: Run GUI workflow tests (headless Wayland)
         run: |
-          make check TESTS="check_ui_consistency check_workflows.sh" \
+          dbus-run-session -- make check TESTS="check_ui_consistency check_workflows.sh" \
           || (cat tests/test-suite.log; exit 1)
 
       - name: Upload test logs
@@ -81,7 +81,7 @@ jobs:
             sqlite libgcrypt readline \
             gdk-pixbuf2 \
             gettext intltool iso-codes \
-            weston dbus python git
+            weston libdisplay-info dbus python git
 
       - name: Set up D-Bus machine-id
         run: dbus-uuidgen --ensure=/etc/machine-id
@@ -115,7 +115,7 @@ jobs:
         run: |
           export XDG_RUNTIME_DIR=$(mktemp -d)
           chmod 700 "$XDG_RUNTIME_DIR"
-          make check TESTS="check_ui_consistency check_workflows.sh" \
+          dbus-run-session -- make check TESTS="check_ui_consistency check_workflows.sh" \
           || (cat tests/test-suite.log; exit 1)
 
       - name: Upload test logs

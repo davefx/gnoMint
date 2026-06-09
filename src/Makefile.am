@@ -70,7 +70,7 @@ gnomint_cli_CFLAGS = \
 	-I$(top_srcdir) \
 	-I$(top_builddir) \
 	$(GNOMINTCLI_CFLAGS) \
-        $(LIBGCRYPT_LIBS) \
+        $(LIBGCRYPT_CFLAGS) \
 	$(LIBGNUTLS_CFLAGS) \
 	$(SQLITE_CFLAGS) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
