@@ -381,8 +381,8 @@ void wizard_window_display (WizardCertType cert_type)
     
     // Load the UI file
     wizard_window_gtkb = gtk_builder_new ();
-    if (!gtk_builder_add_from_file (wizard_window_gtkb, 
-                                     PACKAGE_DATA_DIR "/gnomint/wizard_window.ui",
+    if (!gtk_builder_add_from_file (wizard_window_gtkb,
+                                     g_build_filename (PACKAGE_DATA_DIR, "gnomint", "wizard_window.ui", NULL),
                                      &error)) {
         g_warning ("Couldn't load builder file: %s", error ? error->message : "Unknown error");
         g_clear_error (&error);
