@@ -12,18 +12,44 @@ if [ ! -x "$GNOMINT_CLI" ]; then
 fi
 
 TMPDIR_HERE=$(mktemp -d /tmp/gnomint-cli-banner-XXXXXX)
-PREV_WARN=$(gsettings get org.gnome.gnomint expire-warning-days 2>/dev/null || echo 30)
-gsettings set org.gnome.gnomint expire-warning-days 90 || true
 cleanup() {
     rm -rf "$TMPDIR_HERE"
-    gsettings set org.gnome.gnomint expire-warning-days "$PREV_WARN" 2>/dev/null || true
 }
 trap cleanup EXIT
+
+# Use the keyfile backend so the test works everywhere (Linux containers,
+# macOS, Windows/MSYS2) without needing dconf or a D-Bus session.
+export GSETTINGS_BACKEND=keyfile
+export XDG_CONFIG_HOME="$TMPDIR_HERE/config"
+mkdir -p "$XDG_CONFIG_HOME/glib-2.0/settings"
+printf '[org/gnome/gnomint]\nexpire-warning-days=90\n' \
+    > "$XDG_CONFIG_HOME/glib-2.0/settings/keyfile"
+
+# Compile the GSettings schema into a local directory so g_settings_new()
+# can find it regardless of whether `make install` ran.
+SCHEMA_SRC="${abs_top_srcdir:-..}/gconf/org.gnome.gnomint.gschema.xml"
+if [ ! -f "$SCHEMA_SRC" ]; then
+    for d in /usr/local/share/glib-2.0/schemas /usr/share/glib-2.0/schemas; do
+        if [ -f "$d/gschemas.compiled" ]; then
+            export GSETTINGS_SCHEMA_DIR="$d"
+            break
+        fi
+    done
+else
+    SCHEMA_DIR="$TMPDIR_HERE/schemas"
+    mkdir -p "$SCHEMA_DIR"
+    cp "$SCHEMA_SRC" "$SCHEMA_DIR/"
+    glib-compile-schemas "$SCHEMA_DIR"
+    export GSETTINGS_SCHEMA_DIR="$SCHEMA_DIR"
+fi
 
 DB="$TMPDIR_HERE/banner.gnomint"
 CREATE_OUT="$TMPDIR_HERE/create.out"
 REOPEN_OUT="$TMPDIR_HERE/reopen.out"
 
+# addca prompts: C, ST, L, O, OU, CN, Email, SAN, Key type, Key size,
+# Months, Change?, Confirm.  We create a CA expiring in 1 month so the
+# 90-day warning fires.
 LC_ALL=C "$GNOMINT_CLI" "$DB" >"$CREATE_OUT" 2>&1 <<'INNER' || true
 addca
 
