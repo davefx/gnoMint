@@ -251,17 +251,17 @@ jobs:
       - name: Build MSI
         shell: pwsh
         run: |
-          $version = "1.6.0.0"
+          $version = "1.6.1.0"
           & wix build -arch x64 `
             -d ProductVersion=$version `
-            -o gnomint-1.6.0.msi `
+            -o gnomint-1.6.1.msi `
             packaging/windows/Package.wxs
 
       - name: Upload MSI
         uses: actions/upload-artifact@v4
         with:
           name: gnomint-windows-installer
-          path: gnomint-1.6.0.msi
+          path: gnomint-1.6.1.msi
 
       - name: Upload test logs
         if: always()
