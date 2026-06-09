@@ -204,6 +204,7 @@ jobs:
             mingw-w64-x86_64-iso-codes
             mingw-w64-x86_64-gettext
             mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-openssl
             make autoconf automake libtool
             intltool
             git

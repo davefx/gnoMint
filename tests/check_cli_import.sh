@@ -25,7 +25,7 @@ OUT="$TMPDIR_HERE/out.txt"
 
 # Generate a small self-signed cert. -nodes => key is unencrypted, so
 # importfile won't need a passphrase.
-openssl req -x509 -newkey rsa:1024 -nodes \
+openssl req -x509 -newkey rsa:2048 -nodes \
     -days 30 \
     -subj "/CN=Imported External Cert" \
     -keyout "$TMPDIR_HERE/key.pem" \
