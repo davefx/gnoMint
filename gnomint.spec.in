@@ -45,6 +45,7 @@ PEM, DER, and PKCS#12 formats.
 %{_datadir}/metainfo/gnomint.appdata.xml
 %{_datadir}/pixmaps/gnomint.png
 %{_datadir}/icons/hicolor/*/apps/gnomint.png
+%{_datadir}/icons/hicolor/scalable/apps/gnomint.svg
 %exclude %{_datadir}/icons/hicolor/icon-theme.cache
 %{_datadir}/mime/packages/gnomint.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.gnomint.gschema.xml
