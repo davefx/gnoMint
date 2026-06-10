@@ -3,6 +3,7 @@ name: Multi-platform Build
 on:
   push:
     branches: [master]
+    tags: ['v*']
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -23,13 +24,26 @@ jobs:
             sqlite-devel libgcrypt-devel readline-devel \
             gdk-pixbuf2-devel \
             gettext-devel intltool iso-codes-devel \
-            weston dbus-daemon dbus-tools git
+            weston dbus-daemon dbus-tools git \
+            rpm-build tar gzip
 
       - name: Set up D-Bus machine-id
         run: dbus-uuidgen --ensure=/etc/machine-id
 
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            version=$(grep AC_INIT configure.ac | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Generate build configuration
         run: ./autogen.sh
@@ -57,6 +71,26 @@ jobs:
         run: |
           dbus-run-session -- make check TESTS="check_ui_consistency check_workflows.sh" \
           || (cat tests/test-suite.log; exit 1)
+
+      - name: Build source tarball
+        if: steps.version.outputs.is_release == 'true'
+        run: make dist
+
+      - name: Build binary tarball
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          make DESTDIR="$(pwd)/destdir" install
+          tar czf "gnomint-${{ steps.version.outputs.version }}-linux-x86_64.tar.gz" \
+            -C destdir/usr/local .
+
+      - name: Upload release artifacts
+        if: steps.version.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-fedora
+          path: |
+            gnomint-${{ steps.version.outputs.version }}.tar.gz
+            gnomint-${{ steps.version.outputs.version }}-linux-x86_64.tar.gz
 
       - name: Upload test logs
         if: always()
@@ -89,6 +123,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            version=$(grep AC_INIT configure.ac | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Generate build configuration
         run: ./autogen.sh
 
@@ -118,6 +164,20 @@ jobs:
           dbus-run-session -- make check TESTS="check_ui_consistency check_workflows.sh" \
           || (cat tests/test-suite.log; exit 1)
 
+      - name: Build binary tarball
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          make DESTDIR="$(pwd)/destdir" install
+          tar czf "gnomint-${{ steps.version.outputs.version }}-arch-x86_64.tar.gz" \
+            -C destdir/usr/local .
+
+      - name: Upload release artifacts
+        if: steps.version.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-arch
+          path: gnomint-${{ steps.version.outputs.version }}-arch-x86_64.tar.gz
+
       - name: Upload test logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -133,6 +193,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            version=$(grep AC_INIT configure.ac | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install dependencies
         run: |
@@ -170,6 +242,20 @@ jobs:
             check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
             check_cli_algorithms.sh" \
           || (cat tests/test-suite.log; exit 1)
+
+      - name: Build binary tarball
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          sudo make DESTDIR="$(pwd)/destdir" install
+          tar czf "gnomint-${{ steps.version.outputs.version }}-macos-arm64.tar.gz" \
+            -C destdir/usr/local .
+
+      - name: Upload release artifacts
+        if: steps.version.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-macos
+          path: gnomint-${{ steps.version.outputs.version }}-macos-arm64.tar.gz
 
       - name: Upload test logs
         if: always()
@@ -214,6 +300,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            version=$(grep AC_INIT configure.ac | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Generate build configuration
         run: NOCONFIGURE=1 ./autogen.sh
 
@@ -251,17 +349,17 @@ jobs:
       - name: Build MSI
         shell: pwsh
         run: |
-          $version = "1.6.1.0"
+          $version = "${{ steps.version.outputs.version }}.0"
           & wix build -arch x64 `
             -d ProductVersion=$version `
-            -o gnomint-1.6.1.msi `
+            -o "gnomint-${{ steps.version.outputs.version }}.msi" `
             packaging/windows/Package.wxs
 
-      - name: Upload MSI
+      - name: Upload MSI artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gnomint-windows-installer
-          path: gnomint-1.6.1.msi
+          name: release-windows
+          path: gnomint-${{ steps.version.outputs.version }}.msi
 
       - name: Upload test logs
         if: always()
@@ -271,3 +369,28 @@ jobs:
           path: |
             tests/*.log
             tests/test-suite.log
+
+  # ── Upload binaries to GitHub Release ────────────────────────────
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [fedora, arch, macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh
+
+      - name: Upload assets to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          gh release upload "$tag" ./* --clobber
