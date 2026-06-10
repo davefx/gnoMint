@@ -25,6 +25,8 @@ gnomint-cli
 gnomint.spec
 gui/gnomint.desktop
 gui/gnomint.appdata.xml
+gui/org.gnome.gnomint.desktop
+gui/org.gnome.gnomint.appdata.xml
 help
 install-sh
 intltool-extract.in
