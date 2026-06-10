@@ -13,7 +13,7 @@ config.h
 config.log
 config.rpath
 config.status
-debian/
+/debian/
 config.sub
 stamp-h1
 configure
