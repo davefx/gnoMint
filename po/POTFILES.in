@@ -12,8 +12,8 @@ gui/export_certificate_dialog.ui
 gui/get_db_password_dialog.ui
 gui/get_password_dialog.ui
 gui/get_pkey_dialog.ui
-gui/gnomint.appdata.xml.in
-gui/gnomint.desktop.in
+gui/org.gnome.gnomint.appdata.xml.in
+gui/org.gnome.gnomint.desktop.in
 gui/import_file_or_directory_dialog.ui
 gui/import_password_dialog.ui
 gui/main_window.ui
