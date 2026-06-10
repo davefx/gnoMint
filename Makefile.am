@@ -19,7 +19,15 @@ EXTRA_DIST =  \
 	intltool-merge.in \
 	intltool-update.in \
 	certs/davefx.pem \
-	certs/example-ca.gnomint
+	certs/example-ca.gnomint \
+	packaging/arch/PKGBUILD.in \
+	packaging/debian/control \
+	packaging/debian/rules \
+	packaging/debian/changelog.in \
+	packaging/debian/source/format \
+	packaging/windows/Package.wxs \
+	packaging/windows/collect-files.sh \
+	packaging/windows/gnomint.ico
 
 pkgconfigdir=$(libdir)/pkgconfig
 pkgconfig_DATA = 

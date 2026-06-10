@@ -1,0 +1,20 @@
+pkgname=gnomint
+pkgver=@PACKAGE_VERSION@
+pkgrel=1
+pkgdesc='X.509 Certification Authority management tool'
+arch=('x86_64')
+url='https://github.com/davefx/gnoMint'
+license=('GPL-3.0-or-later')
+depends=('gtk4' 'glib2' 'gnutls' 'sqlite' 'libgcrypt' 'readline' 'iso-codes')
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf' 'intltool' 'gettext')
+source=()
+
+build() {
+  cd "$startdir"
+  make -j$(nproc)
+}
+
+package() {
+  cd "$startdir"
+  make DESTDIR="$pkgdir" install
+}

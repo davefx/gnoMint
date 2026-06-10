@@ -1,14 +1,48 @@
-Vendor: David Marín Carreño <davefx@gmail.com>
-Name: gnomint
-Version: @PACKAGE_VERSION@
-Release: 1
+Name:           gnomint
+Version:        @PACKAGE_VERSION@
+Release:        1%{?dist}
+Summary:        Graphical X.509 Certification Authority management tool
+License:        GPL-3.0-or-later
+URL:            @PACKAGE_WEBSITE@
+Vendor:         David Marín Carreño <davefx@gmail.com>
+
+Source0:        %{name}-%{version}.tar.gz
+
+BuildRequires:  gcc make autoconf automake libtool pkgconf-pkg-config
+BuildRequires:  gtk4-devel glib2-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  sqlite-devel libgcrypt-devel readline-devel
+BuildRequires:  gdk-pixbuf2-devel
+BuildRequires:  gettext-devel intltool iso-codes-devel
+
+Requires:       gtk4 glib2 gnutls sqlite-libs libgcrypt readline iso-codes
 
 %description
- Certification Authority management made easy.
+gnoMint is an X.509 Certification Authority management tool for
+GTK/GNOME environments. It allows creating and managing your own CAs,
+signing certificates, generating CRLs, and importing/exporting in
+PEM, DER, and PKCS#12 formats.
 
-gnoMint is a x509 Certification Authority management tool for
-GTK/Gnome environments.
+%prep
+%autosetup
 
-Summary: Graphical x509 Certification Authority management tool
-Copyright: GPL
-URL: @PACKAGE_WEBSITE@
+%build
+%configure
+%make_build
+
+%install
+%make_install
+%find_lang %{name}
+
+%files -f %{name}.lang
+%license COPYING
+%doc README NEWS AUTHORS
+%{_bindir}/gnomint
+%{_bindir}/gnomint-cli
+%{_datadir}/gnomint/
+%{_datadir}/applications/gnomint.desktop
+%{_datadir}/metainfo/gnomint.appdata.xml
+%{_datadir}/pixmaps/gnomint.png
+%{_datadir}/icons/hicolor/*/apps/gnomint.png
+%{_datadir}/mime/packages/gnomint.xml
+%{_datadir}/glib-2.0/schemas/org.gnome.gnomint.gschema.xml

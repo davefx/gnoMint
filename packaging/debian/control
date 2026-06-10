@@ -1,0 +1,22 @@
+Source: gnomint
+Section: utils
+Priority: optional
+Maintainer: David Marín Carreño <davefx@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+               autoconf, automake, libtool, pkg-config, intltool,
+               libgtk-4-dev, libglib2.0-dev,
+               libgnutls28-dev,
+               libsqlite3-dev, libgcrypt20-dev, libreadline-dev,
+               libgdk-pixbuf-2.0-dev,
+               iso-codes
+Standards-Version: 4.6.2
+Homepage: https://github.com/davefx/gnoMint
+
+Package: gnomint
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, iso-codes
+Description: X.509 Certification Authority management tool
+ gnoMint is an X.509 Certification Authority management tool for
+ GTK/GNOME environments. It allows creating and managing your own CAs,
+ signing certificates, generating CRLs, and importing/exporting in
+ PEM, DER, and PKCS#12 formats.

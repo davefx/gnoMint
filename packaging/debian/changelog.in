@@ -1,0 +1,6 @@
+gnomint (@PACKAGE_VERSION@-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- David Marín Carreño <davefx@gmail.com>  @BUILD_DATE@
+
