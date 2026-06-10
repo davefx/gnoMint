@@ -1,3 +1,39 @@
+* Version 1.6.1 "Tempered Anvil" (2026.06.10)
+
+Multi-platform CI and Windows installer release.
+
+- FEATURE: Multi-platform CI via GitHub Actions. Automated builds
+  and tests on Fedora (latest), Arch Linux (rolling), macOS
+  (Homebrew), and Windows (MSYS2/MinGW64) on every push and pull
+  request.
+
+- FEATURE: Windows MSI installer built with WiX v5. The installer
+  bundles both gnomint and gnomint-cli with all required MinGW
+  runtime DLLs, GTK 4 theme and icons, GLib schemas, translations,
+  and UI files. Includes Start Menu shortcuts, .gnomint file
+  association, and PATH entry for gnomint-cli. Uploaded as a CI
+  artifact on every build.
+
+- FIX: Windows portability — replaced POSIX arpa/inet.h with
+  winsock2.h and POSIX regex.h with GLib GRegex for MinGW
+  compatibility.
+
+- FIX: Windows relocatable install — PACKAGE_DATA_DIR is now
+  resolved at runtime relative to the executable location via
+  g_win32_get_package_installation_directory_of_module(), so the
+  MSI-installed binary finds its data files regardless of install
+  path.
+
+- FIX: GSettings on Windows — uses the keyfile backend so
+  preferences persist without a D-Bus session or system registry.
+
+- TESTS: All CLI shell tests now pass on MSYS2/MinGW64 with proper
+  POSIX-to-Windows path conversion (cygpath) and MSYS2 argument
+  mangling suppression (MSYS2_ARG_CONV_EXCL) for openssl commands.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+
 * Version 1.6.0 "Tempered Anvil" (2026.06.08)
 
 The first fully stabilized release of the GTK 4 port, with a
