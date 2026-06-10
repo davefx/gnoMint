@@ -39,10 +39,12 @@ PEM, DER, and PKCS#12 formats.
 %doc README NEWS AUTHORS
 %{_bindir}/gnomint
 %{_bindir}/gnomint-cli
+%{_bindir}/gnomint-upgrade-db
 %{_datadir}/gnomint/
 %{_datadir}/applications/gnomint.desktop
 %{_datadir}/metainfo/gnomint.appdata.xml
 %{_datadir}/pixmaps/gnomint.png
 %{_datadir}/icons/hicolor/*/apps/gnomint.png
+%exclude %{_datadir}/icons/hicolor/icon-theme.cache
 %{_datadir}/mime/packages/gnomint.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.gnomint.gschema.xml

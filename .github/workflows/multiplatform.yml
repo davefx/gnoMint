@@ -107,7 +107,7 @@ jobs:
   # ── Debian / Ubuntu ──────────────────────────────────────────────
   debian:
     runs-on: ubuntu-latest
-    container: debian:bookworm
+    container: debian:trixie
     steps:
       - name: Install dependencies
         run: |
