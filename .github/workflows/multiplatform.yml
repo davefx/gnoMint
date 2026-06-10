@@ -113,6 +113,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends \
+            build-essential \
             gcc make autoconf automake libtool pkg-config intltool \
             libgtk-4-dev libglib2.0-dev \
             libgnutls28-dev gnutls-bin openssl \
