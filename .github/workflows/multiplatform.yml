@@ -175,7 +175,6 @@ jobs:
           sed -e "s/@PACKAGE_VERSION@/${version}/g" \
               -e "s/@BUILD_DATE@/$(date -R)/g" \
               packaging/debian/changelog.in > debian/changelog
-          echo "13" > debian/compat
           dpkg-buildpackage -us -uc -b
           cp ../*.deb .
 
