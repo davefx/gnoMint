@@ -1227,11 +1227,11 @@ gchar * ca_file_insert_self_signed_ca (gchar *pem_ca_private_key,
 
 	sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, pem, private_key_in_db, "
                                "private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, issuer_key_id) "
-                               "VALUES (NULL, 1, '%q', '%q', '%ld', '%ld', NULL, '%q', 1, '%q','%q','%q', 0, ':', %s, %s);", 
+                               "VALUES (NULL, 1, '%q', '%q', '%lld', '%lld', NULL, '%q', 1, '%q','%q','%q', 0, ':', %s, %s);", 
                                serialstr,
 			       tls_cert->cn,
-			       tls_cert->activation_time,
-			       tls_cert->expiration_time,
+			       (long long)tls_cert->activation_time,
+			       (long long)tls_cert->expiration_time,
 			       pem_ca_certificate,
 			       pem_ca_private_key,
 			       tls_cert->dn,
@@ -1344,13 +1344,13 @@ gchar * ca_file_insert_cert (gboolean is_ca,
 		sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
                                        "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, "
                                        "issuer_key_id) "
-                                       "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', "
+                                       "VALUES (NULL, %d, '%q', '%q', '%lld', '%lld', "
 				       "NULL, '%q', %d, '%q', '%q', '%q', %"GNOMINT_GUINT64_FORMAT", '%q', %s, %s);", 
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
-				       tlscert->activation_time,
-				       tlscert->expiration_time,
+				       (long long)tlscert->activation_time,
+				       (long long)tlscert->expiration_time,
 				       pem_certificate,
                                        private_key_in_db,
 				       private_key_info,
@@ -1364,13 +1364,13 @@ gchar * ca_file_insert_cert (gboolean is_ca,
 		sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
                                        "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, "
                                        "issuer_key_id) "
-                                       "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
+                                       "VALUES (NULL, %d, '%q', '%q', '%lld', '%lld', NULL, '%q', 0, NULL, '%q', '%q',"
 				       "%"GNOMINT_GUINT64_FORMAT", '%q', %s, %s);", 
                                        is_ca,
 				       serialstr,
 				       tlscert->cn,
-				       tlscert->activation_time,
-				       tlscert->expiration_time,
+				       (long long)tlscert->activation_time,
+				       (long long)tlscert->expiration_time,
 				       pem_certificate,
 				       tlscert->dn,
 				       tlscert->i_dn,
@@ -1571,13 +1571,13 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
         sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, "
                                "issuer_key_id) "
-                               "VALUES (NULL, %d, '%q', '%q', '%ld', '%ld', NULL, '%q', 0, NULL, '%q', '%q',"
+                               "VALUES (NULL, %d, '%q', '%q', '%lld', '%lld', NULL, '%q', 0, NULL, '%q', '%q',"
                                "%"GNOMINT_GUINT64_FORMAT", '%q', %s, %s);",
                                is_ca,
                                serialstr,
                                tlscert->cn,
-                               tlscert->activation_time,
-                               tlscert->expiration_time,
+                               (long long)tlscert->activation_time,
+                               (long long)tlscert->expiration_time,
                                pem_certificate,
                                tlscert->dn,
                                tlscert->i_dn,
