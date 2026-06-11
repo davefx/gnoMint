@@ -1,3 +1,23 @@
+* Version 1.6.2 "Tempered Anvil" (2026.06.11)
+
+New application icon and desktop integration fix.
+
+- FEATURE: New application icon — a wax-seal "CA" badge with colored
+  ribbons, rendered from SVG at all sizes. The scalable SVG is now
+  installed in hicolor/scalable/apps/ for sharp rendering at any DPI.
+
+- FIX: Taskbar icon not showing in GNOME Shell. The desktop file,
+  appdata, and icon filenames now use the org.gnome.gnomint reverse-DNS
+  name matching the GtkApplication ID, so the compositor correctly
+  associates the running window with its desktop entry and icon.
+
+- FIX: Flatpak manifest updated from net.sourceforge.gnomint to
+  org.gnome.gnomint; removed post-install rename hacks that are no
+  longer needed.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+
 * Version 1.6.1 "Tempered Anvil" (2026.06.10)
 
 Multi-platform CI and Windows installer release.

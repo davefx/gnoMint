@@ -53,6 +53,7 @@
 
   <!-- Update this section with each new release -->
   <releases>
+    <release version="1.6.2" date="2026-06-11"/>
     <release version="1.6.1" date="2026-06-09"/>
     <release version="1.6.0" date="2026-06-08"/>
     <release version="1.5.0" date="2026-05-24"/>
