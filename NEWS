@@ -1,3 +1,18 @@
+* Version 1.6.3 "Tempered Anvil" (2026.06.11)
+
+i386 crash fix (community contribution).
+
+- FIX: Segfault on 32-bit (i386) systems. Four sqlite3_mprintf calls
+  in ca_file.c used %ld for time_t values, but _TIME_BITS=64 makes
+  time_t 8 bytes (long long) on 32-bit targets. va_arg read only 4
+  bytes per value, corrupting the stack and crashing when the shifted
+  expiration_time was dereferenced as a char*. Now uses %lld with
+  explicit (long long) casts. (PR #85 by tzbkk, reported via Debian
+  CI: ci.debian.net)
+
+Database-compatible with 1.4.0 — no migration needed.
+
+
 * Version 1.6.2 "Tempered Anvil" (2026.06.11)
 
 New application icon and desktop integration fix.
