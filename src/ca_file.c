@@ -1808,8 +1808,8 @@ gchar * ca_file_revoke_crt (guint64 id)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %"GNOMINT_GUINT64_FORMAT" ;", 
-			       time(NULL),
+	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%lld WHERE id = %"GNOMINT_GUINT64_FORMAT" ;",
+			       (long long) time(NULL),
                                id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
@@ -1830,8 +1830,8 @@ gchar * ca_file_revoke_crt_with_date (guint64 id, time_t date)
 	if (sqlite3_exec (ca_db, "BEGIN TRANSACTION;", NULL, NULL, &error))
 		return error;
 
-	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%ld WHERE id = %"GNOMINT_GUINT64_FORMAT" ;", 
-			       date, id);
+	sql = sqlite3_mprintf ("UPDATE certificates SET revocation=%lld WHERE id = %"GNOMINT_GUINT64_FORMAT" ;",
+			       (long long) date, id);
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error))
 		return error;
 	sqlite3_free (sql);
@@ -2008,21 +2008,21 @@ void __ca_file_mark_expired_and_revoked_certificates_as_already_shown_in_crl (gu
         GList *cursor = NULL;
         gchar * error_str = NULL;
         guchar *certificate_pem;
-        time_t revocation;
-       
+        gint64 revocation; /* 64-bit: never atol()/%ld (long is 32-bit on ILP32) */
+
         cursor = g_list_first ((GList *) revoked_certs);
 
         while (cursor) {
                 certificate_pem = cursor->data;
                 cursor = g_list_next (cursor);
                 
-                revocation = atol (cursor->data);
+                revocation = g_ascii_strtoll ((const gchar *) cursor->data, NULL, 10);
                 cursor = g_list_next (cursor);
-                
-                sql = sqlite3_mprintf ("UPDATE certificates SET expired_already_in_crl=1, revocation=%ld "
+
+                sql = sqlite3_mprintf ("UPDATE certificates SET expired_already_in_crl=1, revocation=%lld "
                                        "WHERE parent_id=%"GNOMINT_GUINT64_FORMAT" AND revocation IS NOT NULL AND pem='%q' AND "
                                        "expired_already_in_crl=0 AND expiration < strftime('%%s','now'));",
-                                       revocation, ca_id, certificate_pem);
+                                       (long long) revocation, ca_id, certificate_pem);
 
 
                 sqlite3_exec (ca_db, sql,
@@ -2892,4 +2892,28 @@ gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gcha
 	// Format as full date: "YYYY-MM-DD"
 	strftime(date_str, sizeof(date_str), "%Y-%m-%d", &expiration_tm);
 	return g_strdup_printf("%s (expires %s)", subject, date_str);
+}
+
+gboolean ca_file_get_stored_cert_dates (guint64 cert_id, gint64 *activation, gint64 *expiration)
+{
+	gchar *s;
+	gboolean found = FALSE;
+
+	s = __ca_file_get_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id, "activation");
+	if (s) {
+		if (activation)
+			*activation = g_ascii_strtoll (s, NULL, 10);
+		g_free (s);
+		found = TRUE;
+	}
+
+	s = __ca_file_get_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id, "expiration");
+	if (s) {
+		if (expiration)
+			*expiration = g_ascii_strtoll (s, NULL, 10);
+		g_free (s);
+		found = TRUE;
+	}
+
+	return found;
 }

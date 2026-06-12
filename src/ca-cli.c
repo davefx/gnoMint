@@ -118,7 +118,7 @@ __ca_cli_count_expiring (void *pArg, int argc, char **argv, char **columnNames)
 	    argv[CA_FILE_CERT_COLUMN_REVOCATION][0])
 		return 0;  /* revoked — skip */
 	if (!argv[CA_FILE_CERT_COLUMN_EXPIRATION]) return 0;
-	time_t exp = (time_t) atoll (argv[CA_FILE_CERT_COLUMN_EXPIRATION]);
+	gint64 exp = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_EXPIRATION], NULL, 10);
 	if (exp <= 0) return 0;
 	if (exp >= ctx->now && exp < ctx->threshold)
 		ctx->count++;

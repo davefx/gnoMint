@@ -1295,7 +1295,14 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	certificate_pem = ca_file_get_public_pem_from_id(CA_FILE_ELEMENT_TYPE_CERT, cert_id);
 
 	cert = tls_parse_cert_pem (certificate_pem);
-	
+
+	/* The dates parsed above come from GnuTLS's time_t getter, which caps at
+	 * 2038 on a 32-bit-time_t build. This certificate is in the database, so
+	 * prefer the authoritative 64-bit values stored there — keeping showcert
+	 * consistent with listcert. */
+	gboolean dates_from_db =
+		ca_file_get_stored_cert_dates (cert_id, &cert->activation_time, &cert->expiration_time);
+
 	printf (_("Certificate:\n"));
 
 	serial_number = &cert->serial_number;
@@ -1317,10 +1324,16 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	gnomint_gmtime (cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	printf (_("\tActivated on: %s\n"), model_time_str);
+	if (! dates_from_db && gnomint_time_display_is_uncertain (cert->activation_time))
+		printf (_("\t  (warning: this 32-bit build cannot tell a real post-2038 date "
+			  "from an overflow; this value may be inaccurate)\n"));
 
 	gnomint_gmtime (cert->expiration_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	printf (_("\tExpires on: %s\n"), model_time_str);
+	if (! dates_from_db && gnomint_time_display_is_uncertain (cert->expiration_time))
+		printf (_("\t  (warning: this 32-bit build cannot tell a real post-2038 date "
+			  "from an overflow; this value may be inaccurate)\n"));
 
 	printf (_("Fingerprints:\n"));
 	printf (_("\tSHA1 fingerprint: %s\n"), cert->sha1);

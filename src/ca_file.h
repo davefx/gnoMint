@@ -114,6 +114,12 @@ gboolean ca_file_get_id_from_dn (CaFileElementType type, const gchar *dn, guint6
 gchar * ca_file_get_dn_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_public_pem_from_id (CaFileElementType type, guint64 db_id);
 gchar * ca_file_get_chain_pem_from_id (guint64 cert_id);
+
+/* Reads a certificate's stored notBefore/notAfter from the database as 64-bit
+ * Unix timestamps. The DB columns are plain integers, so they hold dates past
+ * 2038 even where time_t is 32-bit — unlike GnuTLS's time_t getters. Returns
+ * TRUE and fills the (optionally NULL) outputs when cert_id is found. */
+gboolean ca_file_get_stored_cert_dates (guint64 cert_id, gint64 *activation, gint64 *expiration);
 gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id);
 gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id);
 

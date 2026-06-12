@@ -108,3 +108,17 @@ struct tm *gnomint_gmtime (gint64 unixtime, struct tm *result)
 
 	return result;
 }
+
+gboolean gnomint_time_display_is_uncertain (gint64 unixtime)
+{
+	// 64-bit time_t represents every realistic certificate date exactly.
+	if (sizeof (time_t) >= 8)
+		return FALSE;
+
+	// 32-bit time_t: the representable range ends 2038-01-19 03:14:07 UTC.
+	// A value within the final stretch before that ceiling, or wrapped to a
+	// negative value, is the fingerprint of a later date that GnuTLS's
+	// time_t getter could not represent. 2114380800 == 2037-01-01 UTC; any
+	// date from then on is too close to the ceiling to be trusted here.
+	return (unixtime < 0) || (unixtime >= 2114380800LL);
+}

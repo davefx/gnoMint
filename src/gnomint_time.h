@@ -57,4 +57,17 @@ time_t gnomint_mktime_checked (struct tm *tm, gboolean *overflowed);
 // succeeds (no errno). tm_isdst is set to 0 (UTC has no DST).
 struct tm *gnomint_gmtime (gint64 unixtime, struct tm *result);
 
+// Returns TRUE when a date obtained from a time_t source (e.g. GnuTLS's
+// gnutls_x509_crt_get_expiration_time()) cannot be trusted on this build.
+//
+// This is gated on the C library's time_t size, NOT on long/atol() — those are
+// hardened unconditionally elsewhere. Where time_t is 64-bit the answer is
+// always FALSE. Where time_t is 32-bit, any value near or beyond the 2038
+// ceiling (or wrapped negative) might be a genuine date OR a later date that
+// the time_t API silently capped/overflowed, and the two are indistinguishable
+// on this hardware — so callers should flag such a value to the user. Dates
+// read straight from gnoMint's own 64-bit database are authoritative and should
+// NOT be passed here. When time_t grows to 64-bit, this stops firing on its own.
+gboolean gnomint_time_display_is_uncertain (gint64 unixtime);
+
 #endif // _GNOMINT_TIME_H_

@@ -124,8 +124,13 @@ typedef struct __TlsCert {
 
 	GList * uses;
 
-	time_t expiration_time;
-	time_t activation_time;
+	/* 64-bit so a notBefore/notAfter past 2038 survives on 32-bit-time_t
+	 * platforms (i386). Populated from GnuTLS's time_t getter when parsing
+	 * a PEM (capped there on i386), but overridden from the database's
+	 * 64-bit columns when the certificate is DB-resident — see
+	 * ca_file_get_stored_cert_dates(). */
+	gint64 expiration_time;
+	gint64 activation_time;
 } TlsCert;
 
 typedef struct __TlsCsr {

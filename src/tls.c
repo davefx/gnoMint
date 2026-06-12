@@ -1918,7 +1918,7 @@ gchar * tls_generate_crl (GList * revoked_certs,
         gnutls_x509_crl_t crl;
         gnutls_x509_crt_t rcrt;
         guchar *certificate_pem;
-        time_t revocation;
+        gint64 revocation; /* 64-bit: g_ascii_strtoll, not atol() (long is 32-bit on ILP32) */
 
         gnutls_x509_crt_t ca_crt;
         gnutls_x509_privkey_t ca_pkey;
@@ -1939,7 +1939,7 @@ gchar * tls_generate_crl (GList * revoked_certs,
                 certificate_pem = cursor->data;
                 cursor = g_list_next (cursor);
                 
-                revocation = atol (cursor->data);
+                revocation = g_ascii_strtoll ((const gchar *) cursor->data, NULL, 10);
                 cursor = g_list_next (cursor);
 
                 gnutls_x509_crt_init (&rcrt);

@@ -40,6 +40,7 @@
 #include <glib/gi18n.h>
 #include "dialog.h"
 #include "gnomint_time.h"
+#include "ca_file.h"
 
 typedef struct
 {
@@ -125,6 +126,36 @@ const certificate_properties_oid_function_couple_t certificate_properties_oid_fu
 
 GtkBuilder * certificate_properties_window_gtkb = NULL;
 
+/* Authoritative 64-bit validity dates for the certificate currently shown,
+ * read from the database by certificate_properties_display(). Used to override
+ * the (possibly 2038-capped) values GnuTLS parses from the PEM on a 32-bit
+ * build. cp_dates_from_db is FALSE for certificates not in the database (e.g.
+ * an externally-supplied PEM), in which case a displayed date that might have
+ * overflowed is flagged to the user instead. */
+static gboolean cp_dates_from_db = FALSE;
+static gint64   cp_db_activation = 0;
+static gint64   cp_db_expiration = 0;
+
+/* Sets a validity-date label, appending a warning marker and explanatory
+ * tooltip when the value may have overflowed the 32-bit time_t ceiling. */
+static void
+__certificate_properties_set_date_label (GtkLabel *label, const gchar *date_str,
+                                         gboolean uncertain)
+{
+	if (uncertain) {
+		gchar *m = g_strdup_printf ("%s \xE2\x9A\xA0", date_str); /* U+26A0 WARNING SIGN */
+		gtk_label_set_text (label, m);
+		g_free (m);
+		gtk_widget_set_tooltip_text (GTK_WIDGET (label),
+		    _("This 32-bit build cannot represent dates after 2038-01-19, so it "
+		      "cannot distinguish a genuine date from a later one that overflowed. "
+		      "This value may be inaccurate."));
+	} else {
+		gtk_label_set_text (label, date_str);
+		gtk_widget_set_tooltip_text (GTK_WIDGET (label), NULL);
+	}
+}
+
 void __certificate_properties_populate (const char *certificate_pem);
 void __certificate_details_populate (const char *certificate_pem);
 
@@ -153,6 +184,13 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	gtk_builder_add_from_file (certificate_properties_window_gtkb,
 				   g_build_filename (PACKAGE_DATA_DIR, "gnomint", "certificate_properties_dialog.ui", NULL),
 				   NULL);
+
+	/* The validity dates parsed from the PEM via GnuTLS's time_t getter cap
+	 * at 2038 on a 32-bit-time_t build. Fetch the authoritative 64-bit values
+	 * stored in the database so both the summary labels and the details tree
+	 * show the true date, consistent with the certificate list. The dialog is
+	 * single-instance, so file-scope is sufficient to carry these. */
+	cp_dates_from_db = ca_file_get_stored_cert_dates (cert_id, &cp_db_activation, &cp_db_expiration);
 
 	__certificate_properties_populate (certificate_pem);
 	__certificate_details_populate (certificate_pem);
@@ -194,17 +232,26 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 	cert = tls_parse_cert_pem (certificate_pem);
 
+	/* Prefer the database's authoritative 64-bit dates over GnuTLS's
+	 * (2038-capped on a 32-bit build) parse — see certificate_properties_display(). */
+	if (cp_dates_from_db) {
+		cert->activation_time = cp_db_activation;
+		cert->expiration_time = cp_db_expiration;
+	}
+
 	serial_number = &cert->serial_number;
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certActivationDateLabel");
 	gnomint_gmtime (cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
-	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
+	__certificate_properties_set_date_label (GTK_LABEL (widget), model_time_str,
+	    ! cp_dates_from_db && gnomint_time_display_is_uncertain (cert->activation_time));
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certExpirationDateLabel");
 	gnomint_gmtime (cert->expiration_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
-	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
+	__certificate_properties_set_date_label (GTK_LABEL (widget), model_time_str,
+	    ! cp_dates_from_db && gnomint_time_display_is_uncertain (cert->expiration_time));
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");
         aux = uint160_strdup_printf (serial_number);
@@ -522,55 +569,55 @@ void __certificate_properties_fill_cert_issuer(GnomintPropNode *parent, gnutls_x
 
 void __certificate_properties_fill_cert_validity (GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
-	time_t not_before;
-#ifndef WIN32
-	struct tm not_before_broken_down_time;
-#else
-	struct tm *not_before_broken_down_time = NULL;
-#endif
-	gchar not_before_asctime[32];
-	time_t not_after;
-#ifndef WIN32
-	struct tm not_after_broken_down_time;
-#else
-	struct tm *not_after_broken_down_time = NULL;
-#endif
-	gchar not_after_asctime[32];
+	gint64 not_before, not_after;
+	struct tm tm;
+	gchar not_before_str[64];
+	gchar not_after_str[64];
+	gboolean nb_uncertain, na_uncertain;
+	gchar *nb_val, *na_val;
 
-#ifndef WIN32
-	not_before = gnutls_x509_crt_get_activation_time(*certificate);
-	gmtime_r (&not_before, &not_before_broken_down_time);
-	asctime_r(&not_before_broken_down_time, not_before_asctime);
-	not_before_asctime[strlen(not_before_asctime) - 1] = 0;
-#else
-	not_before = gnutls_x509_crt_get_activation_time(*certificate);
-	not_before_broken_down_time = gmtime(&not_before);
-	snprintf(not_before_asctime, sizeof(not_before_asctime), "%s", asctime(not_before_broken_down_time));
-	// not_before_asctime[strlen(not_before_asctime) - 1] = 0; // ???
-#endif
+	/* Prefer the database's 64-bit values; fall back to GnuTLS's time_t parse
+	 * (2038-capped on a 32-bit build) only for certificates not in the DB. */
+	if (cp_dates_from_db) {
+		not_before = cp_db_activation;
+		not_after = cp_db_expiration;
+	} else {
+		not_before = gnutls_x509_crt_get_activation_time(*certificate);
+		not_after = gnutls_x509_crt_get_expiration_time(*certificate);
+	}
 
-#ifndef WIN32
-	not_after = gnutls_x509_crt_get_expiration_time(*certificate);
-	gmtime_r(&not_after, &not_after_broken_down_time);
-	asctime_r(&not_after_broken_down_time, not_after_asctime);
-	not_after_asctime[strlen(not_after_asctime) - 1] = 0;
-#else
-	not_after = gnutls_x509_crt_get_expiration_time(*certificate);
-	not_after_broken_down_time = gmtime(&not_after);
-	snprintf(not_after_asctime, sizeof(not_after_asctime), "%s", asctime(not_after_broken_down_time));
-	// not_after_asctime[strlen(not_after_asctime) - 1] = 0; // ???
-#endif
+	gnomint_gmtime (not_before, &tm);
+	strftime (not_before_str, sizeof(not_before_str), "%a %b %e %H:%M:%S %Y GMT", &tm);
+	gnomint_gmtime (not_after, &tm);
+	strftime (not_after_str, sizeof(not_after_str), "%a %b %e %H:%M:%S %Y GMT", &tm);
+
+	nb_uncertain = ! cp_dates_from_db && gnomint_time_display_is_uncertain (not_before);
+	na_uncertain = ! cp_dates_from_db && gnomint_time_display_is_uncertain (not_after);
 
 	GnomintPropNode *validity_node = gnomint_prop_node_new(_("Validity"), NULL);
 	g_list_store_append(gnomint_prop_node_get_children(parent), validity_node);
 
-	GnomintPropNode *nb_child = gnomint_prop_node_new(_("Not Before"), not_before_asctime);
+	nb_val = nb_uncertain ? g_strdup_printf ("%s \xE2\x9A\xA0", not_before_str)
+	                      : g_strdup (not_before_str);
+	GnomintPropNode *nb_child = gnomint_prop_node_new(_("Not Before"), nb_val);
+	g_free (nb_val);
 	g_list_store_append(gnomint_prop_node_get_children(validity_node), nb_child);
 	g_object_unref(nb_child);
 
-	GnomintPropNode *na_child = gnomint_prop_node_new(_("Not After"), not_after_asctime);
+	na_val = na_uncertain ? g_strdup_printf ("%s \xE2\x9A\xA0", not_after_str)
+	                      : g_strdup (not_after_str);
+	GnomintPropNode *na_child = gnomint_prop_node_new(_("Not After"), na_val);
+	g_free (na_val);
 	g_list_store_append(gnomint_prop_node_get_children(validity_node), na_child);
 	g_object_unref(na_child);
+
+	if (nb_uncertain || na_uncertain) {
+		GnomintPropNode *warn = gnomint_prop_node_new(_("Note"),
+		    _("This 32-bit build cannot represent dates after 2038-01-19, so a value "
+		      "marked \xE2\x9A\xA0 may be a later date that overflowed and is inaccurate."));
+		g_list_store_append(gnomint_prop_node_get_children(validity_node), warn);
+		g_object_unref(warn);
+	}
 
 	g_object_unref(validity_node);
 }
