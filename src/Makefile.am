@@ -32,6 +32,8 @@ gnomint_SOURCES = \
 	ca_bulk.c \
 	creation_process_window.c \
 	dialog.c \
+	gnomint_time.c \
+	gnomint_time.h \
 	ca.c \
 	ca_creation.c \
 	tls.c \
@@ -81,6 +83,8 @@ gnomint_cli_CFLAGS = \
 
 gnomint_cli_SOURCES = \
 	dialog.c \
+	gnomint_time.c \
+	gnomint_time.h \
 	gnomint-cli.c \
 	export.c \
 	ca-cli.c \

@@ -72,3 +72,5 @@ ABOUT-NLS
 *.tar.gz
 tests/__pycache__/
 tests/xi2key
+/build-i386/
+/build-amd64/

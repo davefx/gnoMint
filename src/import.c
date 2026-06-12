@@ -32,6 +32,7 @@
 #include "tls.h"
 #include "dialog.h"
 #include "ca_file.h"
+#include "gnomint_time.h"
 
 
 #ifndef GNOMINTCLI
@@ -285,7 +286,22 @@ gint __import_cert (gnutls_x509_crt_t *cert, gchar **cert_dn, guint64 *id)
 	}
 	
 	error_msg = ca_file_insert_imported_cert (is_ca, serial, pem_cert, id);
-        
+
+	/* On a 32-bit-time_t build, GnuTLS's getter caps an imported certificate's
+	 * notAfter at 2038, and that capped value is what gets stored — we cannot
+	 * recover the true date here. Warn the user that the stored expiration may
+	 * be inaccurate. gnomint_time_display_is_uncertain() is a no-op where
+	 * time_t is 64-bit, so this never fires on those builds (dates are exact). */
+	if (! error_msg) {
+		time_t imported_expiration = gnutls_x509_crt_get_expiration_time (*cert);
+		if (gnomint_time_display_is_uncertain ((gint64) imported_expiration))
+			dialog_info (_("The imported certificate expires after 2038-01-19, a date "
+				       "this 32-bit build cannot represent. Its stored expiration "
+				       "has been capped and may be inaccurate. The certificate "
+				       "itself is unchanged; open it on a 64-bit system to see the "
+				       "exact date."));
+	}
+
 	if (pem_cert)
 		g_free (pem_cert);
 	

@@ -36,6 +36,7 @@
 
 #include <glib/gi18n.h>
 #include "dialog.h"
+#include "gnomint_time.h"
 
 GtkBuilder * new_ca_window_gtkb = NULL;
 GtkWidget *san_manager_widget = NULL;
@@ -448,8 +449,16 @@ G_MODULE_EXPORT void on_new_ca_commit_clicked (GtkButton *widg,
 #endif
 	expiration_time->tm_mon = expiration_time->tm_mon + ca_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
-	expiration_time->tm_mon = expiration_time->tm_mon % 12;	
-	ca_creation_data->expiration = mktime(expiration_time);
+	expiration_time->tm_mon = expiration_time->tm_mon % 12;
+	{
+		gboolean exp_overflow = FALSE;
+		ca_creation_data->expiration = gnomint_mktime_checked (expiration_time, &exp_overflow);
+		if (exp_overflow)
+			dialog_info (_("This system uses a 32-bit time_t and cannot represent "
+				       "dates after 2038-01-19. The new CA's expiration date has "
+				       "been clamped to that limit. To issue longer-lived CAs, "
+				       "run gnoMint on a 64-bit platform."));
+	}
 #ifndef WIN32
 	g_free (expiration_time);
 #endif

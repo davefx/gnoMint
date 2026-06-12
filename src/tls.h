@@ -124,8 +124,13 @@ typedef struct __TlsCert {
 
 	GList * uses;
 
-	time_t expiration_time;
-	time_t activation_time;
+	/* 64-bit so a notBefore/notAfter past 2038 survives on 32-bit-time_t
+	 * platforms (i386). Populated from GnuTLS's time_t getter when parsing
+	 * a PEM (capped there on i386), but overridden from the database's
+	 * 64-bit columns when the certificate is DB-resident — see
+	 * ca_file_get_stored_cert_dates(). */
+	gint64 expiration_time;
+	gint64 activation_time;
 } TlsCert;
 
 typedef struct __TlsCsr {
@@ -190,6 +195,17 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 				  gchar **certificate);
 
 TlsCert * tls_parse_cert_pem (const char * pem_certificate);
+
+/* Reads only the validity period (notBefore/notAfter) from a certificate PEM,
+ * as 64-bit Unix timestamps, without the cost of a full tls_parse_cert_pem().
+ * Used to re-derive a date from the certificate when its database column is
+ * NULL (i.e. the date could not be represented when the cert was stored). The
+ * values come from GnuTLS's time_t getter, so on a 32-bit-time_t build they are
+ * still capped at 2038 — callers should pass them through
+ * gnomint_time_display_is_uncertain(). Returns TRUE on success. */
+gboolean tls_cert_pem_get_validity (const gchar *pem_certificate,
+                                    gint64 *activation, gint64 *expiration);
+
 gboolean tls_is_ca_pem (const char * pem_certificate);
 void tls_cert_free (TlsCert *);
 

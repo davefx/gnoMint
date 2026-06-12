@@ -18,7 +18,8 @@ TESTS = check_y2k38 check_ui_consistency \
         check_cli_info.sh check_cli_lifecycle.sh \
         check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
         check_cli_importdir.sh check_cli_dhgen.sh check_cli_passphrase.py \
-        check_cli_algorithms.sh
+        check_cli_algorithms.sh check_cli_y2038.sh \
+        check_cli_y2038_import.sh check_cli_y2038_backfill.sh
 check_PROGRAMS = check_y2k38 check_ui_consistency check_workflows
 
 EXTRA_DIST = run-headless.sh run-gui-test.sh \
@@ -28,17 +29,23 @@ EXTRA_DIST = run-headless.sh run-gui-test.sh \
              check_cli_parity.sh check_cli_info.sh check_cli_lifecycle.sh \
              check_cli_keys.sh check_cli_banner.sh check_cli_import.sh \
              check_cli_importdir.sh check_cli_dhgen.sh \
-             check_cli_passphrase.py check_cli_algorithms.sh
+             check_cli_passphrase.py check_cli_algorithms.sh \
+             check_cli_y2038.sh check_cli_y2038_import.sh \
+             check_cli_y2038_backfill.sh
 
 # ---------------------------------------------------------------
 # Y2K38 verification — no GUI dependencies, just stdio + time.h.
 # ---------------------------------------------------------------
 
 check_y2k38_SOURCES = check_y2k38.c
+# NOTE: deliberately does NOT force -D_TIME_BITS=64. This test must observe the
+# platform's real time_t ABI (the same one the shipped gnomint binaries use), so
+# that on legacy 32-bit-time_t platforms such as i386 it reports the Y2038 limit
+# honestly (SKIP) instead of testing a 64-bit configuration the binaries don't
+# actually use. See issue #86.
 check_y2k38_CFLAGS = \
 	-I$(top_srcdir) \
 	-I$(top_builddir) \
-	-D_TIME_BITS=64 \
 	-D_FILE_OFFSET_BITS=64 \
 	-DHAVE_CONFIG_H
 
@@ -71,6 +78,7 @@ check_ui_consistency_SOURCES = \
 	$(top_srcdir)/src/ca_bulk.c \
 	$(top_srcdir)/src/creation_process_window.c \
 	$(top_srcdir)/src/dialog.c \
+	$(top_srcdir)/src/gnomint_time.c \
 	$(top_srcdir)/src/ca.c \
 	$(top_srcdir)/src/ca_creation.c \
 	$(top_srcdir)/src/tls.c \
@@ -138,6 +146,7 @@ check_workflows_SOURCES = \
 	$(top_srcdir)/src/ca_bulk.c \
 	$(top_srcdir)/src/creation_process_window.c \
 	$(top_srcdir)/src/dialog.c \
+	$(top_srcdir)/src/gnomint_time.c \
 	$(top_srcdir)/src/ca.c \
 	$(top_srcdir)/src/ca_creation.c \
 	$(top_srcdir)/src/tls.c \

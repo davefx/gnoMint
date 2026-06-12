@@ -32,6 +32,7 @@
 #include "tls.h"
 #include "pkey_manage.h"
 #include "dialog.h"
+#include "gnomint_time.h"
 #include "new_cert.h"
 
 #include <glib/gi18n.h>
@@ -43,7 +44,7 @@ static GArray *ca_ids = NULL;  /* parallel array of guint64 CA IDs for signing_c
 typedef struct {
     guint64 ca_id;
     gchar *subject;
-    time_t expiration;
+    gint64 expiration;
 } CAInfo;
 
 /* sqlite3 callback used by ca_file_foreach_ca (signature dictated by
@@ -61,7 +62,7 @@ __wizard_collect_ca_cb (void *pArg, int argc, char **argv,
         ca->ca_id = g_ascii_strtoull (argv[CA_FILE_CA_COLUMN_ID], NULL, 10);
         ca->subject = g_strdup (argv[CA_FILE_CA_COLUMN_SUBJECT]);
         ca->expiration = argv[CA_FILE_CA_COLUMN_EXPIRATION]
-            ? (time_t) g_ascii_strtoull (argv[CA_FILE_CA_COLUMN_EXPIRATION], NULL, 10)
+            ? g_ascii_strtoll (argv[CA_FILE_CA_COLUMN_EXPIRATION], NULL, 10)
             : 0;
         *list = g_list_append (*list, ca);
     }
@@ -433,9 +434,10 @@ void wizard_window_display (WizardCertType cert_type)
 
         // Format display text with expiration date to distinguish CAs with same name
         if (ca->expiration > 0) {
-            struct tm *exp_tm = localtime(&ca->expiration);
+            struct tm exp_tm;
+            gnomint_gmtime(ca->expiration, &exp_tm);
             gchar exp_date[20];
-            strftime(exp_date, sizeof(exp_date), "%Y-%m-%d", exp_tm);
+            strftime(exp_date, sizeof(exp_date), "%Y-%m-%d", &exp_tm);
 
             if (ca->expiration < now) {
                 display_text = g_strdup_printf("%s (exp: %s, expired)", ca->subject, exp_date);
