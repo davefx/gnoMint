@@ -586,3 +586,52 @@ jobs:
         run: |
           tag="${GITHUB_REF#refs/tags/}"
           gh release upload "$tag" ./* --clobber
+
+  # ── Notify when a PR run recovers (red → green) ───────────────────
+  # GitHub Actions has no native "back to green" notification — the account
+  # setting only notifies on failures. This job posts a PR comment when a
+  # pull-request run succeeds after the previous run on the same branch failed.
+  # It depends on every build job, so GitHub skips it automatically if any of
+  # them fail (i.e. it only runs when THIS run is green); it then comments only
+  # when the PREVIOUS run failed, so it fires exactly on the failure→success
+  # transition and never on routine green runs. Uses the built-in token — no
+  # secrets, no account settings.
+  notify-recovery:
+    name: Notify on PR run recovery
+    needs: [fedora, debian, arch, i386, macos, windows]
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      actions: read
+    steps:
+      - name: Comment if this run recovered a previous failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_REF: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_ID: ${{ github.run_id }}
+          SERVER_URL: ${{ github.server_url }}
+          WF: ${{ github.workflow }}
+        run: |
+          # Conclusion of the most recent COMPLETED pull_request run for this
+          # branch, excluding the current run.
+          prev=$(gh run list --repo "$GH_REPO" \
+                   --workflow "$WF" \
+                   --branch "$HEAD_REF" \
+                   --event pull_request \
+                   --limit 20 \
+                   --json databaseId,status,conclusion \
+                   -q "[.[] | select((.databaseId|tostring) != \"$RUN_ID\" and .status == \"completed\")][0].conclusion")
+          echo "Previous completed run conclusion: ${prev:-none}"
+          case "$prev" in
+            failure|timed_out|startup_failure)
+              gh pr comment "$PR_NUMBER" --repo "$GH_REPO" \
+                --body "✅ CI recovered — **$WF** is back to green on \`$HEAD_REF\` ([run #$RUN_ID]($SERVER_URL/$GH_REPO/actions/runs/$RUN_ID))."
+              echo "Posted recovery comment on PR #$PR_NUMBER"
+              ;;
+            *)
+              echo "No prior failure to recover from — not commenting."
+              ;;
+          esac
