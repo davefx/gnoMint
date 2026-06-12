@@ -33,6 +33,7 @@
 #include "ca_file.h"
 #include "tls.h"
 #include "dialog.h"
+#include "gnomint_time.h"
 #include "pkey_manage.h"
 #include "preferences-gui.h"
 #include "new_cert.h"
@@ -726,7 +727,15 @@ __new_cert_prepare_expiration (TlsCertCreationData *cert_creation_data)
 	expiration_time->tm_mon = expiration_time->tm_mon + cert_creation_data->key_months_before_expiration;
 	expiration_time->tm_year = expiration_time->tm_year + (expiration_time->tm_mon / 12);
 	expiration_time->tm_mon = expiration_time->tm_mon % 12;
-	cert_creation_data->expiration = mktime(expiration_time);
+	{
+		gboolean exp_overflow = FALSE;
+		cert_creation_data->expiration = gnomint_mktime_checked (expiration_time, &exp_overflow);
+		if (exp_overflow)
+			dialog_info (_("This system uses a 32-bit time_t and cannot represent "
+				       "dates after 2038-01-19. The new certificate's expiration "
+				       "date has been clamped to that limit. To issue longer-lived "
+				       "certificates, run gnoMint on a 64-bit platform."));
+	}
 #ifndef WIN32
 	g_free (expiration_time);
 #endif
