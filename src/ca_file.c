@@ -1000,6 +1000,81 @@ gchar * __ca_file_check_and_update_version (sqlite3 * ca_checking_db)
 	return NULL;
 }
 
+typedef struct {
+	guint64  id;
+	gchar   *pem;
+	gboolean act_null;
+	gboolean exp_null;
+} BackfillRow;
+
+static int __ca_file_backfill_collect (void *pArg, int argc, char **argv, char **col)
+{
+	GList **rows = (GList **) pArg;
+	BackfillRow *r;
+
+	(void) col;
+	if (argc < 4 || ! argv[0] || ! argv[1])
+		return 0;
+
+	r = g_new0 (BackfillRow, 1);
+	r->id = g_ascii_strtoull (argv[0], NULL, 10);
+	r->pem = g_strdup (argv[1]);
+	r->act_null = (argv[2] && argv[2][0] == '1');
+	r->exp_null = (argv[3] && argv[3][0] == '1');
+	*rows = g_list_prepend (*rows, r);
+	return 0;
+}
+
+void ca_file_backfill_null_dates (void)
+{
+	GList *rows = NULL, *l;
+
+	if (! ca_db)
+		return;
+
+	/* A 32-bit-time_t host cannot represent any date that is stored NULL (those
+	 * are exactly the post-2038 dates it could not represent), so it would only
+	 * re-derive the same capped value — never write it back. Skip entirely. */
+	if (sizeof (time_t) < 8)
+		return;
+
+	sqlite3_exec (ca_db,
+	    "SELECT id, pem, activation IS NULL, expiration IS NULL FROM certificates "
+	    "WHERE activation IS NULL OR expiration IS NULL;",
+	    __ca_file_backfill_collect, &rows, NULL);
+
+	for (l = rows; l; l = l->next) {
+		BackfillRow *r = l->data;
+		gint64 act = 0, exp = 0;
+
+		if (tls_cert_pem_get_validity (r->pem, &act, &exp)) {
+			/* Only write values this host can actually represent. */
+			gboolean set_act = r->act_null && ! gnomint_time_display_is_uncertain (act);
+			gboolean set_exp = r->exp_null && ! gnomint_time_display_is_uncertain (exp);
+			gchar *sql = NULL;
+
+			if (set_act && set_exp)
+				sql = sqlite3_mprintf ("UPDATE certificates SET activation=%lld, "
+				    "expiration=%lld WHERE id=%" GNOMINT_GUINT64_FORMAT ";",
+				    (long long) act, (long long) exp, r->id);
+			else if (set_act)
+				sql = sqlite3_mprintf ("UPDATE certificates SET activation=%lld "
+				    "WHERE id=%" GNOMINT_GUINT64_FORMAT ";", (long long) act, r->id);
+			else if (set_exp)
+				sql = sqlite3_mprintf ("UPDATE certificates SET expiration=%lld "
+				    "WHERE id=%" GNOMINT_GUINT64_FORMAT ";", (long long) exp, r->id);
+
+			if (sql) {
+				sqlite3_exec (ca_db, sql, NULL, NULL, NULL);
+				sqlite3_free (sql);
+			}
+		}
+		g_free (r->pem);
+		g_free (r);
+	}
+	g_list_free (rows);
+}
+
 gboolean ca_file_open (gchar *file_name, gboolean create)
 {
         gchar *dirname = NULL;
@@ -1055,6 +1130,10 @@ gboolean ca_file_open (gchar *file_name, gboolean create)
         sqlite3_create_function (ca_db, "concat", -1, SQLITE_ANY, NULL, __ca_file_concat_string, NULL, NULL);
         sqlite3_create_function (ca_db, "zeropad", 2, SQLITE_ANY, NULL, __ca_file_zeropad, NULL, NULL);
         sqlite3_create_function (ca_db, "zeropad_route", 2, SQLITE_ANY, NULL, __ca_file_zeropad_route, NULL, NULL);
+
+        /* Fill in any date columns that were stored NULL on a host that could
+         * not represent them, now that this host may be able to. */
+        ca_file_backfill_null_dates ();
 
         return TRUE;
 }
@@ -1568,17 +1647,30 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
 
         // We insert the certificate, with the correct issuer, if this has been found
 
+        /* The dates come from GnuTLS's time_t getter, which caps at 2038 on a
+         * 32-bit-time_t build. Rather than cache a WRONG value, store NULL for a
+         * date we cannot represent: the column then means "not cached — derive
+         * from the PEM", and a 64-bit host reading the same database recovers
+         * the true date. The certificate's PEM (with the real notAfter) is
+         * stored intact regardless. */
+        gchar *activation_val = gnomint_time_display_is_uncertain (tlscert->activation_time)
+                ? g_strdup ("NULL")
+                : g_strdup_printf ("'%lld'", (long long) tlscert->activation_time);
+        gchar *expiration_val = gnomint_time_display_is_uncertain (tlscert->expiration_time)
+                ? g_strdup ("NULL")
+                : g_strdup_printf ("'%lld'", (long long) tlscert->expiration_time);
+
         serialstr = uint160_strdup_printf(&serial);
         sql = sqlite3_mprintf ("INSERT INTO certificates (id, is_ca, serial, subject, activation, expiration, revocation, "
                                "pem, private_key_in_db, private_key, dn, parent_dn, parent_id, parent_route, subject_key_id, "
                                "issuer_key_id) "
-                               "VALUES (NULL, %d, '%q', '%q', '%lld', '%lld', NULL, '%q', 0, NULL, '%q', '%q',"
+                               "VALUES (NULL, %d, '%q', '%q', %s, %s, NULL, '%q', 0, NULL, '%q', '%q',"
                                "%"GNOMINT_GUINT64_FORMAT", '%q', %s, %s);",
                                is_ca,
                                serialstr,
                                tlscert->cn,
-                               (long long)tlscert->activation_time,
-                               (long long)tlscert->expiration_time,
+                               activation_val,
+                               expiration_val,
                                pem_certificate,
                                tlscert->dn,
                                tlscert->i_dn,
@@ -1587,6 +1679,8 @@ gchar * ca_file_insert_imported_cert (gboolean is_ca,
                                sql_subject_key_id,
                                sql_issuer_key_id);
         g_free (serialstr);
+        g_free (activation_val);
+        g_free (expiration_val);
 
 	if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 		sqlite3_exec (ca_db, "ROLLBACK;", NULL, NULL, NULL);
@@ -2894,26 +2988,44 @@ gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gcha
 	return g_strdup_printf("%s (expires %s)", subject, date_str);
 }
 
-gboolean ca_file_get_stored_cert_dates (guint64 cert_id, gint64 *activation, gint64 *expiration)
+gboolean ca_file_get_stored_cert_dates (guint64 cert_id,
+                                        gint64 *activation, gboolean *have_activation,
+                                        gint64 *expiration, gboolean *have_expiration)
 {
 	gchar *s;
-	gboolean found = FALSE;
+	gboolean exists;
 
+	if (have_activation)
+		*have_activation = FALSE;
+	if (have_expiration)
+		*have_expiration = FALSE;
+
+	/* Confirm the certificate exists at all (its PEM column is never NULL). */
+	s = __ca_file_get_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id, "id");
+	exists = (s != NULL);
+	g_free (s);
+	if (! exists)
+		return FALSE;
+
+	/* __ca_file_get_field_from_id() returns NULL for a NULL column, i.e. a
+	 * date that could not be represented when the cert was stored. */
 	s = __ca_file_get_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id, "activation");
 	if (s) {
 		if (activation)
 			*activation = g_ascii_strtoll (s, NULL, 10);
+		if (have_activation)
+			*have_activation = TRUE;
 		g_free (s);
-		found = TRUE;
 	}
 
 	s = __ca_file_get_field_from_id (CA_FILE_ELEMENT_TYPE_CERT, cert_id, "expiration");
 	if (s) {
 		if (expiration)
 			*expiration = g_ascii_strtoll (s, NULL, 10);
+		if (have_expiration)
+			*have_expiration = TRUE;
 		g_free (s);
-		found = TRUE;
 	}
 
-	return found;
+	return TRUE;
 }

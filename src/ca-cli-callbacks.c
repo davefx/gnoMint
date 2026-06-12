@@ -136,11 +136,45 @@ int ca_cli_callback_status (int argc, char **argv)
 	return 0;
 }
 
+/* Formats a certificate validity date for the list. When the column is NULL
+ * (the date could not be represented on the host that stored it), the value is
+ * re-derived from the certificate PEM: correct on a 64-bit host, capped and
+ * suffixed with a marker on a 32-bit one. Writes "" when there is no date. */
+static void __ca_cli_format_list_date (const gchar *date_col, const gchar *pem,
+                                       gboolean want_expiration,
+                                       gchar *out, gsize outsz)
+{
+	gint64 t = 0;
+	gboolean authoritative = FALSE;
+	struct tm tm;
+	gsize n;
+
+	if (date_col && date_col[0]) {
+		t = g_ascii_strtoll (date_col, NULL, 10);
+		authoritative = TRUE;
+	} else if (pem && pem[0]) {
+		gint64 act = 0, exp = 0;
+		if (tls_cert_pem_get_validity (pem, &act, &exp))
+			t = want_expiration ? exp : act;
+	}
+
+	if (t == 0) {
+		out[0] = '\0';
+		return;
+	}
+
+	gnomint_gmtime (t, &tm);
+	n = strftime (out, outsz, _("%m/%d/%Y %R GMT"), &tm);
+	if (! authoritative && gnomint_time_display_is_uncertain (t) && n < outsz)
+		g_strlcpy (out + n, _(" (after 2038?)"), outsz - n);
+}
+
 int __ca_cli_callback_listcert_aux (void *pArg, int argc, char **argv, char **columnNames)
 {
 	struct tm tmp;
 	gint64 aux_date;
 	gchar model_time_str[100];
+	const gchar *cert_pem = (argc > CA_FILE_CERT_COLUMN_PEM) ? argv[CA_FILE_CERT_COLUMN_PEM] : NULL;
 
 	printf (Q_("CertList ID|%s\t"), argv[CA_FILE_CERT_COLUMN_ID]);
 	
@@ -164,23 +198,19 @@ int __ca_cli_callback_listcert_aux (void *pArg, int argc, char **argv, char **co
 	else
 		printf (Q_("CertList PKeyInDB|N\t\t"));
 
-	aux_date = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_ACTIVATION], NULL, 10);
-	if (aux_date == 0) {
-		printf (Q_("CertList Activation|\t"));
-	} else {
-		gnomint_gmtime (aux_date, &tmp);
-		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tmp);
+	__ca_cli_format_list_date (argv[CA_FILE_CERT_COLUMN_ACTIVATION], cert_pem, FALSE,
+	                           model_time_str, sizeof model_time_str);
+	if (model_time_str[0])
 		printf (Q_("CertList Activation|%s\t"), model_time_str);
-	}
+	else
+		printf (Q_("CertList Activation|\t"));
 
-	aux_date = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_EXPIRATION], NULL, 10);
-	if (aux_date == 0) {
-		printf (Q_("CertList Expiration|\t"));
-	} else {
-		gnomint_gmtime (aux_date, &tmp);
-		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tmp);
+	__ca_cli_format_list_date (argv[CA_FILE_CERT_COLUMN_EXPIRATION], cert_pem, TRUE,
+	                           model_time_str, sizeof model_time_str);
+	if (model_time_str[0])
 		printf (Q_("CertList Expiration|%s\t"), model_time_str);
-	}
+	else
+		printf (Q_("CertList Expiration|\t"));
 
 	if (argc > CA_FILE_CERT_COLUMN_REVOCATION && argv[CA_FILE_CERT_COLUMN_REVOCATION]) {
 		aux_date = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_REVOCATION], NULL, 10);
@@ -1297,11 +1327,18 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	cert = tls_parse_cert_pem (certificate_pem);
 
 	/* The dates parsed above come from GnuTLS's time_t getter, which caps at
-	 * 2038 on a 32-bit-time_t build. This certificate is in the database, so
-	 * prefer the authoritative 64-bit values stored there — keeping showcert
-	 * consistent with listcert. */
-	gboolean dates_from_db =
-		ca_file_get_stored_cert_dates (cert_id, &cert->activation_time, &cert->expiration_time);
+	 * 2038 on a 32-bit-time_t build. Prefer the authoritative 64-bit value
+	 * cached in the database (keeping showcert consistent with listcert). A
+	 * column may be NULL — meaning the date was not representable when stored;
+	 * in that case we keep the freshly re-parsed value (correct on a 64-bit
+	 * host) and flag it as uncertain on a 32-bit one. */
+	gboolean have_act = FALSE, have_exp = FALSE;
+	gint64 db_act = 0, db_exp = 0;
+	ca_file_get_stored_cert_dates (cert_id, &db_act, &have_act, &db_exp, &have_exp);
+	if (have_act)
+		cert->activation_time = db_act;
+	if (have_exp)
+		cert->expiration_time = db_exp;
 
 	printf (_("Certificate:\n"));
 
@@ -1324,14 +1361,14 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	gnomint_gmtime (cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	printf (_("\tActivated on: %s\n"), model_time_str);
-	if (! dates_from_db && gnomint_time_display_is_uncertain (cert->activation_time))
+	if (! have_act && gnomint_time_display_is_uncertain (cert->activation_time))
 		printf (_("\t  (warning: this 32-bit build cannot tell a real post-2038 date "
 			  "from an overflow; this value may be inaccurate)\n"));
 
 	gnomint_gmtime (cert->expiration_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	printf (_("\tExpires on: %s\n"), model_time_str);
-	if (! dates_from_db && gnomint_time_display_is_uncertain (cert->expiration_time))
+	if (! have_exp && gnomint_time_display_is_uncertain (cert->expiration_time))
 		printf (_("\t  (warning: this 32-bit build cannot tell a real post-2038 date "
 			  "from an overflow; this value may be inaccurate)\n"));
 

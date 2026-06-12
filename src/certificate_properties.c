@@ -132,7 +132,8 @@ GtkBuilder * certificate_properties_window_gtkb = NULL;
  * build. cp_dates_from_db is FALSE for certificates not in the database (e.g.
  * an externally-supplied PEM), in which case a displayed date that might have
  * overflowed is flagged to the user instead. */
-static gboolean cp_dates_from_db = FALSE;
+static gboolean cp_have_activation = FALSE; /* DB column non-NULL (authoritative) */
+static gboolean cp_have_expiration = FALSE;
 static gint64   cp_db_activation = 0;
 static gint64   cp_db_expiration = 0;
 
@@ -190,7 +191,8 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 	 * stored in the database so both the summary labels and the details tree
 	 * show the true date, consistent with the certificate list. The dialog is
 	 * single-instance, so file-scope is sufficient to carry these. */
-	cp_dates_from_db = ca_file_get_stored_cert_dates (cert_id, &cp_db_activation, &cp_db_expiration);
+	ca_file_get_stored_cert_dates (cert_id,
+	    &cp_db_activation, &cp_have_activation, &cp_db_expiration, &cp_have_expiration);
 
 	__certificate_properties_populate (certificate_pem);
 	__certificate_details_populate (certificate_pem);
@@ -232,12 +234,14 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 	cert = tls_parse_cert_pem (certificate_pem);
 
-	/* Prefer the database's authoritative 64-bit dates over GnuTLS's
-	 * (2038-capped on a 32-bit build) parse — see certificate_properties_display(). */
-	if (cp_dates_from_db) {
+	/* Prefer the database's authoritative 64-bit date over GnuTLS's
+	 * (2038-capped on a 32-bit build) parse. A NULL column (date not
+	 * representable when stored) leaves the re-parsed value in place — correct
+	 * on a 64-bit host, flagged uncertain on a 32-bit one. */
+	if (cp_have_activation)
 		cert->activation_time = cp_db_activation;
+	if (cp_have_expiration)
 		cert->expiration_time = cp_db_expiration;
-	}
 
 	serial_number = &cert->serial_number;
 
@@ -245,13 +249,13 @@ void __certificate_properties_populate (const char *certificate_pem)
 	gnomint_gmtime (cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	__certificate_properties_set_date_label (GTK_LABEL (widget), model_time_str,
-	    ! cp_dates_from_db && gnomint_time_display_is_uncertain (cert->activation_time));
+	    ! cp_have_activation && gnomint_time_display_is_uncertain (cert->activation_time));
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certExpirationDateLabel");
 	gnomint_gmtime (cert->expiration_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	__certificate_properties_set_date_label (GTK_LABEL (widget), model_time_str,
-	    ! cp_dates_from_db && gnomint_time_display_is_uncertain (cert->expiration_time));
+	    ! cp_have_expiration && gnomint_time_display_is_uncertain (cert->expiration_time));
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");
         aux = uint160_strdup_printf (serial_number);
@@ -576,23 +580,24 @@ void __certificate_properties_fill_cert_validity (GnomintPropNode *parent, gnutl
 	gboolean nb_uncertain, na_uncertain;
 	gchar *nb_val, *na_val;
 
-	/* Prefer the database's 64-bit values; fall back to GnuTLS's time_t parse
-	 * (2038-capped on a 32-bit build) only for certificates not in the DB. */
-	if (cp_dates_from_db) {
+	/* Prefer the database's 64-bit value per field; fall back to GnuTLS's
+	 * time_t parse (2038-capped on a 32-bit build) where the column is NULL. */
+	if (cp_have_activation)
 		not_before = cp_db_activation;
-		not_after = cp_db_expiration;
-	} else {
+	else
 		not_before = gnutls_x509_crt_get_activation_time(*certificate);
+	if (cp_have_expiration)
+		not_after = cp_db_expiration;
+	else
 		not_after = gnutls_x509_crt_get_expiration_time(*certificate);
-	}
 
 	gnomint_gmtime (not_before, &tm);
 	strftime (not_before_str, sizeof(not_before_str), "%a %b %e %H:%M:%S %Y GMT", &tm);
 	gnomint_gmtime (not_after, &tm);
 	strftime (not_after_str, sizeof(not_after_str), "%a %b %e %H:%M:%S %Y GMT", &tm);
 
-	nb_uncertain = ! cp_dates_from_db && gnomint_time_display_is_uncertain (not_before);
-	na_uncertain = ! cp_dates_from_db && gnomint_time_display_is_uncertain (not_after);
+	nb_uncertain = ! cp_have_activation && gnomint_time_display_is_uncertain (not_before);
+	na_uncertain = ! cp_have_expiration && gnomint_time_display_is_uncertain (not_after);
 
 	GnomintPropNode *validity_node = gnomint_prop_node_new(_("Validity"), NULL);
 	g_list_store_append(gnomint_prop_node_get_children(parent), validity_node);

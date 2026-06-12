@@ -44,6 +44,7 @@
 #include "csr_properties.h"
 #include "dialog.h"
 #include "gnomint_time.h"
+#include "tls.h"
 #include "export.h"
 #include "new_ca_window.h"
 #include "new_req_window.h"
@@ -398,10 +399,22 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	 * by the time we see a leaf cert the entire CA chain is already
 	 * cached in ca_effective_expiration. We also cache CAs we process
 	 * so that any cert further down can look us up. */
-	time_t self_expiration = (argv[CA_FILE_CERT_COLUMN_EXPIRATION] &&
-				  argv[CA_FILE_CERT_COLUMN_EXPIRATION][0])
-		? (time_t) g_ascii_strtoll (
-		    argv[CA_FILE_CERT_COLUMN_EXPIRATION], NULL, 10)
+	/* The expiration column is NULL when the date could not be represented
+	 * when the certificate was stored (post-2038 on a 32-bit-time_t build).
+	 * Re-derive it from the PEM so the list agrees with the certificate
+	 * properties dialog — correct on a 64-bit host, capped on a 32-bit one
+	 * (the dialog flags the latter). */
+	gchar *derived_expiration = NULL;
+	const gchar *expiration_str = argv[CA_FILE_CERT_COLUMN_EXPIRATION];
+	if ((! expiration_str || ! expiration_str[0]) && argv[CA_FILE_CERT_COLUMN_PEM]) {
+		gint64 d_act = 0, d_exp = 0;
+		if (tls_cert_pem_get_validity (argv[CA_FILE_CERT_COLUMN_PEM], &d_act, &d_exp) && d_exp)
+			expiration_str = derived_expiration =
+			    g_strdup_printf ("%" G_GINT64_FORMAT, d_exp);
+	}
+
+	time_t self_expiration = (expiration_str && expiration_str[0])
+		? (time_t) g_ascii_strtoll (expiration_str, NULL, 10)
 		: 0;
 	time_t effective_expiration = self_expiration;
 
@@ -483,7 +496,8 @@ int __ca_refresh_model_add_certificate (void *pArg, int argc, char **argv, char 
 	}
 
 	gnomint_cert_row_set_activation (row, argv[CA_FILE_CERT_COLUMN_ACTIVATION]);
-	gnomint_cert_row_set_expiration (row, argv[CA_FILE_CERT_COLUMN_EXPIRATION]);
+	gnomint_cert_row_set_expiration (row, expiration_str);
+	g_free (derived_expiration);
 	gnomint_cert_row_set_pkey_in_db (row, atoi (argv[CA_FILE_CERT_COLUMN_PRIVATE_KEY_IN_DB]) != 0);
 	gnomint_cert_row_set_pem (row, argv[CA_FILE_CERT_COLUMN_PEM]);
 	gnomint_cert_row_set_dn (row, argv[CA_FILE_CERT_COLUMN_DN]);

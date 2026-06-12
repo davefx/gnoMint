@@ -34,6 +34,14 @@ gchar * ca_file_create (const gchar *filename);
 
 gboolean ca_file_open (gchar *file_name, gboolean create);
 
+/* Self-healing for NULL date columns: a certificate's activation/expiration is
+ * stored NULL when the host that stored it could not represent the date (post-
+ * 2038 on a 32-bit time_t). When a host that CAN represent them opens the
+ * database, this re-derives those dates from each certificate's PEM and writes
+ * them back. Dates this host still cannot represent are left NULL. Called
+ * automatically by ca_file_open(); cheap no-op when there are no NULL dates. */
+void ca_file_backfill_null_dates (void);
+
 void ca_file_close (void);
 
 gboolean ca_file_save_as (gchar *new_file_name);
@@ -117,9 +125,13 @@ gchar * ca_file_get_chain_pem_from_id (guint64 cert_id);
 
 /* Reads a certificate's stored notBefore/notAfter from the database as 64-bit
  * Unix timestamps. The DB columns are plain integers, so they hold dates past
- * 2038 even where time_t is 32-bit — unlike GnuTLS's time_t getters. Returns
- * TRUE and fills the (optionally NULL) outputs when cert_id is found. */
-gboolean ca_file_get_stored_cert_dates (guint64 cert_id, gint64 *activation, gint64 *expiration);
+ * 2038 even where time_t is 32-bit — unlike GnuTLS's time_t getters. A column
+ * may be NULL ("not cached — derive from the PEM"); the corresponding
+ * *have_activation / *have_expiration is then set FALSE and the value is left
+ * untouched. Returns TRUE when cert_id exists. Any output pointer may be NULL. */
+gboolean ca_file_get_stored_cert_dates (guint64 cert_id,
+                                        gint64 *activation, gboolean *have_activation,
+                                        gint64 *expiration, gboolean *have_expiration);
 gchar * ca_file_get_pkey_field_from_id (CaFileElementType type, guint64 db_id);
 gboolean ca_file_get_pkey_in_db_from_id (CaFileElementType type, guint64 db_id);
 

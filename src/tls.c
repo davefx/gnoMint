@@ -1212,6 +1212,34 @@ gchar * tls_generate_certificate (TlsCertCreationData * creation_data,
 }
 
 
+gboolean tls_cert_pem_get_validity (const gchar *pem_certificate,
+                                    gint64 *activation, gint64 *expiration)
+{
+	gnutls_x509_crt_t cert;
+	gnutls_datum_t pem_datum;
+
+	if (! pem_certificate)
+		return FALSE;
+
+	pem_datum.data = (unsigned char *) pem_certificate;
+	pem_datum.size = strlen (pem_certificate);
+
+	if (gnutls_x509_crt_init (&cert) < 0)
+		return FALSE;
+	if (gnutls_x509_crt_import (cert, &pem_datum, GNUTLS_X509_FMT_PEM) < 0) {
+		gnutls_x509_crt_deinit (cert);
+		return FALSE;
+	}
+
+	if (activation)
+		*activation = (gint64) gnutls_x509_crt_get_activation_time (cert);
+	if (expiration)
+		*expiration = (gint64) gnutls_x509_crt_get_expiration_time (cert);
+
+	gnutls_x509_crt_deinit (cert);
+	return TRUE;
+}
+
 TlsCert * tls_parse_cert_pem (const char * pem_certificate)
 {
 	gnutls_datum_t pem_datum;
