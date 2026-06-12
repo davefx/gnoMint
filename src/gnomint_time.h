@@ -44,4 +44,17 @@ time_t gnomint_time_max (void);
 // caller can warn the user. On success *overflowed is set to FALSE.
 time_t gnomint_mktime_checked (struct tm *tm, gboolean *overflowed);
 
+// 64-bit-safe replacement for gmtime_r(). Converts a Unix timestamp (seconds
+// since 1970-01-01 UTC, carried as a gint64) into a broken-down UTC time.
+//
+// Unlike gmtime()/gmtime_r(), which take a time_t and therefore truncate at
+// 2038 on 32-bit-time_t platforms (i386), this works for any year because it
+// computes the calendar fields directly from the 64-bit value. gnoMint stores
+// certificate dates as 64-bit integers in its database, so on i386 a date past
+// 2038 read straight from the database can still be displayed correctly even
+// though it could not have been produced through GnuTLS's time_t-based API on
+// that platform. The result pointer is returned for convenience; it always
+// succeeds (no errno). tm_isdst is set to 0 (UTC has no DST).
+struct tm *gnomint_gmtime (gint64 unixtime, struct tm *result);
+
 #endif // _GNOMINT_TIME_H_

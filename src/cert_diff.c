@@ -5,6 +5,7 @@
 #include "cert_diff.h"
 #include "tls.h"
 #include "uint160.h"
+#include "gnomint_time.h"
 
 #include <glib/gi18n.h>
 #include <string.h>
@@ -24,15 +25,11 @@ __append_field (CertDiff *d, const gchar *name,
 }
 
 static gchar *
-__format_time (time_t t)
+__format_time (gint64 t)
 {
 	if (t == 0) return NULL;
 	struct tm tm;
-#ifndef WIN32
-	gmtime_r (&t, &tm);
-#else
-	tm = *gmtime (&t);
-#endif
+	gnomint_gmtime (t, &tm);
 	gchar buf[64];
 	if (strftime (buf, sizeof (buf), "%Y-%m-%d %H:%M:%S GMT", &tm) == 0)
 		return NULL;

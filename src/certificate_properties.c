@@ -39,6 +39,7 @@
 
 #include <glib/gi18n.h>
 #include "dialog.h"
+#include "gnomint_time.h"
 
 typedef struct
 {
@@ -196,23 +197,13 @@ void __certificate_properties_populate (const char *certificate_pem)
 	serial_number = &cert->serial_number;
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certActivationDateLabel");
-#ifndef WIN32
-	gmtime_r (&cert->activation_time, &tim);
+	gnomint_gmtime (cert->activation_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
-#else
-	tim = gmtime (&cert->activation_time);
-	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);
-#endif
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certExpirationDateLabel");
-#ifndef WIN32
-	gmtime_r (&cert->expiration_time, &tim);
+	gnomint_gmtime (cert->expiration_time, &tim);
 	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
-#else
-	tim = gmtime (&cert->expiration_time);
-	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);
-#endif
 	gtk_label_set_text (GTK_LABEL(widget), model_time_str);
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certSNLabel");

@@ -55,3 +55,56 @@ time_t gnomint_mktime_checked (struct tm *tm, gboolean *overflowed)
 
 	return result;
 }
+
+struct tm *gnomint_gmtime (gint64 unixtime, struct tm *result)
+{
+	gint64 days, rem, z, era, doe, yoe, y, doy, mp, d, m;
+	gint64 wday;
+	// Days in the year before the start of each month (non-leap year).
+	static const gint mdays_before[12] =
+		{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+	// Split into whole days and the seconds within the day, handling
+	// negative timestamps (pre-1970) with floored division.
+	days = unixtime / 86400;
+	rem = unixtime % 86400;
+	if (rem < 0) {
+		rem += 86400;
+		days -= 1;
+	}
+
+	result->tm_hour = (gint) (rem / 3600);
+	result->tm_min = (gint) ((rem % 3600) / 60);
+	result->tm_sec = (gint) (rem % 60);
+
+	// 1970-01-01 was a Thursday (tm_wday == 4).
+	wday = (4 + (days % 7) + 7) % 7;
+	result->tm_wday = (gint) wday;
+
+	// Civil-from-days (Howard Hinnant's algorithm), shifting the epoch to
+	// 0000-03-01 so that leap days fall at the end of the 400-year era.
+	z = days + 719468;
+	era = (z >= 0 ? z : z - 146096) / 146097;
+	doe = z - era * 146097;                                   // [0, 146096]
+	yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365; // [0, 399]
+	y = yoe + era * 400;
+	doy = doe - (365 * yoe + yoe / 4 - yoe / 100);            // [0, 365]
+	mp = (5 * doy + 2) / 153;                                 // [0, 11]
+	d = doy - (153 * mp + 2) / 5 + 1;                         // [1, 31]
+	m = mp < 10 ? mp + 3 : mp - 9;                            // [1, 12]
+	y += (m <= 2);
+
+	result->tm_year = (gint) (y - 1900);
+	result->tm_mon = (gint) (m - 1);
+	result->tm_mday = (gint) d;
+
+	// Day of the year, accounting for the leap day once March is reached.
+	result->tm_yday = mdays_before[result->tm_mon] + (result->tm_mday - 1);
+	if (result->tm_mon > 1 &&
+	    ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0))
+		result->tm_yday += 1;
+
+	result->tm_isdst = 0;
+
+	return result;
+}

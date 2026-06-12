@@ -138,12 +138,8 @@ int ca_cli_callback_status (int argc, char **argv)
 
 int __ca_cli_callback_listcert_aux (void *pArg, int argc, char **argv, char **columnNames)
 {
-#ifndef WIN32
 	struct tm tmp;
-#else
-	struct tm *tmp = NULL;
-#endif
-	time_t aux_date;
+	gint64 aux_date;
 	gchar model_time_str[100];
 
 	printf (Q_("CertList ID|%s\t"), argv[CA_FILE_CERT_COLUMN_ID]);
@@ -168,46 +164,31 @@ int __ca_cli_callback_listcert_aux (void *pArg, int argc, char **argv, char **co
 	else
 		printf (Q_("CertList PKeyInDB|N\t\t"));
 
-	aux_date = atol(argv[CA_FILE_CERT_COLUMN_ACTIVATION]);
+	aux_date = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_ACTIVATION], NULL, 10);
 	if (aux_date == 0) {
 		printf (Q_("CertList Activation|\t"));
-	} else {	
-#ifndef WIN32	
-		gmtime_r (&aux_date, &tmp);
+	} else {
+		gnomint_gmtime (aux_date, &tmp);
 		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tmp);
-#else
-		tmp = gmtime (&aux_date);
-		strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tmp);
-#endif
 		printf (Q_("CertList Activation|%s\t"), model_time_str);
 	}
 
-	aux_date = atol(argv[CA_FILE_CERT_COLUMN_EXPIRATION]);
+	aux_date = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_EXPIRATION], NULL, 10);
 	if (aux_date == 0) {
 		printf (Q_("CertList Expiration|\t"));
 	} else {
-#ifndef WIN32
-		gmtime_r (&aux_date, &tmp);
+		gnomint_gmtime (aux_date, &tmp);
 		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tmp);
-#else
-		tmp = gmtime (&aux_date);
-		strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tmp);
-#endif
 		printf (Q_("CertList Expiration|%s\t"), model_time_str);
 	}
 
 	if (argc > CA_FILE_CERT_COLUMN_REVOCATION && argv[CA_FILE_CERT_COLUMN_REVOCATION]) {
-		aux_date = atol(argv[CA_FILE_CERT_COLUMN_REVOCATION]);
+		aux_date = g_ascii_strtoll (argv[CA_FILE_CERT_COLUMN_REVOCATION], NULL, 10);
 		if (aux_date == 0) {
 			printf (Q_("CertList Revocation|\n"));
-		} else {	
-#ifndef WIN32
-			gmtime_r (&aux_date, &tmp);		
+		} else {
+			gnomint_gmtime (aux_date, &tmp);
 			strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tmp);
-#else
-			tmp = gmtime (&aux_date);
-			strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tmp);
-#endif
 			printf (Q_("CertList Revocation|%s\n"), model_time_str);
 		}
 	} else {
@@ -534,11 +515,7 @@ int ca_cli_callback_addca (int argc, char **argv)
 
 	time_t tmp;
 	struct tm * expiration_time;
-#ifndef WIN32
 	struct tm timer;
-#else
-	struct tm *timer = NULL;
-#endif
 	char model_time_str[100];
 
 	ca_creation_data = g_new0 (TlsCreationData, 1);
@@ -722,22 +699,12 @@ int ca_cli_callback_addca (int argc, char **argv)
 		printf (_("\tKey bitlength: %d\n"), ca_creation_data->key_bitlength);
 		printf (_("Validity\n"));
 		printf (_("Validity:\n"));
-#ifndef WIN32
-		gmtime_r (&ca_creation_data->activation, &timer);
+		gnomint_gmtime (ca_creation_data->activation, &timer);
 		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);
-#else
-		timer = gmtime (&ca_creation_data->activation);
-		strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), timer);
-#endif		
 		printf (_("\tActivated on: %s\n"), model_time_str);
-		
-#ifndef WIN32
-		gmtime_r (&ca_creation_data->expiration, &timer);
-		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);	
-#else
-		timer = gmtime (&ca_creation_data->expiration);
-		strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), timer);	
-#endif
+
+		gnomint_gmtime (ca_creation_data->expiration, &timer);
+		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);
 		printf (_("\tExpires on: %s\n"), model_time_str);
 
 		change_data = dialog_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
@@ -1313,11 +1280,7 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	gchar * certificate_pem;
 	
 	TlsCert * cert = NULL;
-#ifndef WIN32
 	struct tm tim;
-#else
-	struct tm *tim = NULL;
-#endif
 	gchar model_time_str[100];
 	gchar *aux;
 	UInt160 *serial_number;
@@ -1351,22 +1314,12 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	printf (_("\tUnique ID: %s\n"), (cert->issuer_key_id ? cert->issuer_key_id : _("None.")));
 	
 	printf (_("Validity:\n"));
-#ifndef WIN32
-	gmtime_r (&cert->activation_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
-#else
-	tim = gmtime (&cert->activation_time);
-	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);	
-#endif
+	gnomint_gmtime (cert->activation_time, &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	printf (_("\tActivated on: %s\n"), model_time_str);
 
-#ifndef WIN32
-	gmtime_r (&cert->expiration_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);	
-#else
-	tim = gmtime (&cert->expiration_time);
-	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), tim);	
-#endif
+	gnomint_gmtime (cert->expiration_time, &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
 	printf (_("\tExpires on: %s\n"), model_time_str);
 
 	printf (_("Fingerprints:\n"));

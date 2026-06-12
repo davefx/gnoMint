@@ -43,6 +43,7 @@
 #include "crl.h"
 #include "csr_properties.h"
 #include "dialog.h"
+#include "gnomint_time.h"
 #include "export.h"
 #include "new_ca_window.h"
 #include "new_req_window.h"
@@ -581,19 +582,14 @@ __ca_format_epoch_to_date (const gchar *epoch_str)
 	if (!epoch_str || !epoch_str[0])
 		return NULL;
 
-	time_t model_time = (time_t) g_ascii_strtoll (epoch_str, NULL, 10);
+	gint64 model_time = g_ascii_strtoll (epoch_str, NULL, 10);
 	if (model_time == 0)
 		return NULL;
 
 	gchar buf[100];
-#ifndef WIN32
 	struct tm model_time_tm;
-	gmtime_r (&model_time, &model_time_tm);
+	gnomint_gmtime (model_time, &model_time_tm);
 	strftime (buf, sizeof (buf), _("%m/%d/%Y %R GMT"), &model_time_tm);
-#else
-	struct tm *model_time_tm = gmtime (&model_time);
-	strftime (buf, sizeof (buf), _("%m/%d/%Y %H:%M GMT"), model_time_tm);
-#endif
 	return g_strdup (buf);
 }
 

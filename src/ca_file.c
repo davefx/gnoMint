@@ -35,6 +35,7 @@
 #include "dialog.h"
 #include "tls.h"
 #include "ca_file.h"
+#include "gnomint_time.h"
 #include "pkey_manage.h"
 
 #include <glib/gi18n.h>
@@ -2881,21 +2882,14 @@ gchar * ca_file_format_subject_with_expiration (const gchar *subject, const gcha
 		return g_strdup(subject);
 	}
 	
-	time_t expiration_timestamp = (time_t) atoll(expiration_str);
+	gint64 expiration_timestamp = g_ascii_strtoll(expiration_str, NULL, 10);
 	struct tm expiration_tm;
 	char date_str[16];  // "YYYY-MM-DD" + null terminator
-	
-#ifndef WIN32
-	if (localtime_r(&expiration_timestamp, &expiration_tm)) {
-#else
-	struct tm *exp_tm_ptr = localtime(&expiration_timestamp);
-	if (exp_tm_ptr) {
-		expiration_tm = *exp_tm_ptr;
-#endif
-		// Format as full date: "YYYY-MM-DD"
-		strftime(date_str, sizeof(date_str), "%Y-%m-%d", &expiration_tm);
-		return g_strdup_printf("%s (expires %s)", subject, date_str);
-	} else {
-		return g_strdup(subject);
-	}
+
+	// gnomint_gmtime() is 64-bit-safe, so a notAfter past 2038 produces the
+	// correct year here even where time_t is 32-bit (see issue #86).
+	gnomint_gmtime(expiration_timestamp, &expiration_tm);
+	// Format as full date: "YYYY-MM-DD"
+	strftime(date_str, sizeof(date_str), "%Y-%m-%d", &expiration_tm);
+	return g_strdup_printf("%s (expires %s)", subject, date_str);
 }
