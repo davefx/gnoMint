@@ -245,8 +245,12 @@ jobs:
           file src/gnomint-cli | grep -q "ELF 32-bit" \
             || (echo "ERROR: expected a 32-bit i386 binary"; exit 1)
 
+      - name: Install
+        run: sudo make install
+
       - name: Run CLI tests (incl. Year-2038 correctness)
         run: |
+          export GSETTINGS_SCHEMA_DIR=/usr/local/share/glib-2.0/schemas
           dbus-run-session -- make check TESTS="check_y2k38 \
             check_cli_email.sh check_cli_wizard.sh check_cli_parity.sh \
             check_cli_info.sh check_cli_lifecycle.sh \

@@ -222,11 +222,7 @@ void certificate_properties_display(guint64 cert_id, const char *certificate_pem
 void __certificate_properties_populate (const char *certificate_pem)
 {
 	GObject *widget = NULL;
-#ifndef WIN32
-	struct tm tim;
-#else
-	struct tm* tim = NULL;
-#endif
+	struct tm tim; /* gnomint_gmtime() fills this directly on every platform */
 	TlsCert * cert = NULL;
 	gchar model_time_str[100];
         gchar * aux;
