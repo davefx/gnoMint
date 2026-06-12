@@ -139,9 +139,6 @@
 /* Use 64-bit file offsets */
 #undef _FILE_OFFSET_BITS
 
-/* Use 64-bit time_t */
-#undef _TIME_BITS
-
 /* Define to empty if 'const' does not conform to ANSI C. */
 #undef const
 

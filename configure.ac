@@ -34,10 +34,23 @@ AC_DISABLE_STATIC
 LT_INIT
 AM_PROG_CC_C_O
 
-# Enable 64-bit time_t to avoid Y2K38 problem
-# This ensures time_t is 64-bit even on 32-bit systems
-AC_DEFINE([_TIME_BITS], [64], [Use 64-bit time_t])
+# Use 64-bit file offsets everywhere (safe, independent of the C library ABI).
 AC_DEFINE([_FILE_OFFSET_BITS], [64], [Use 64-bit file offsets])
+
+# NOTE: We deliberately do NOT define _TIME_BITS=64 here.
+#
+# _TIME_BITS is a glibc ABI switch, not a private compiler flag: it changes the
+# size of time_t for this program. It MUST stay consistent with every linked
+# library (GnuTLS, GLib, SQLite, ...). On platforms where 64-bit time_t is the
+# ABI (amd64, and 32-bit ports such as armhf) the toolchain already sets it, so
+# forcing it here is redundant. On i386 the distribution toolchains (Debian,
+# Ubuntu, Gentoo, openSUSE) keep the legacy 32-bit time_t for binary
+# compatibility, and the system GnuTLS/GLib are built that way. Forcing
+# _TIME_BITS=64 only in gnoMint made time_t 8 bytes here while GnuTLS still
+# expected 4, so gnutls_x509_crt_set_*_time() read the wrong number of bytes off
+# the stack and corrupted following arguments (manifesting as "Error when
+# setting certificate serial number"). See issue #86. Letting the toolchain
+# decide is the only ABI-correct choice.
 
 # Checks for header files.
 m4_warn([obsolete],

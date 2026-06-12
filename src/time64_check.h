@@ -22,20 +22,26 @@
 
 #include <time.h>
 
-// Compile-time check to ensure time_t is 64-bit to prevent Y2K38 problems
-// This ensures gnoMint can handle certificates expiring after 2038-01-19 03:14:07 UTC
+// Compile-time check that time_t is 64-bit, to prevent Y2K38 problems so
+// gnoMint can handle certificates expiring after 2038-01-19 03:14:07 UTC.
+//
+// This is only enforced where 64-bit time_t is actually the ABI: either the
+// platform is natively 64-bit time_t (e.g. amd64, where _TIME_BITS is left
+// undefined and sizeof(time_t) == 8 anyway) or the toolchain has explicitly
+// opted in with _TIME_BITS=64 (e.g. the armhf port). On legacy 32-bit-time_t
+// platforms such as i386 the distribution toolchain keeps time_t at 32 bits for
+// ABI compatibility with the system libraries; forcing 64-bit there would break
+// the GnuTLS ABI (see issue #86 and the note in configure.ac), so we must NOT
+// fail the build in that case.
+#if defined(_TIME_BITS) && _TIME_BITS == 64
 #if defined(__GNUC__) || defined(__clang__)
-_Static_assert(sizeof(time_t) >= 8, 
-    "time_t must be at least 64 bits to avoid Y2K38 problem. "
-    "Please ensure _TIME_BITS=64 and _FILE_OFFSET_BITS=64 are defined.");
+_Static_assert(sizeof(time_t) >= 8,
+    "_TIME_BITS=64 was requested but time_t is not 64-bit on this platform.");
 #elif defined(_MSC_VER)
 // MSVC static assertion
-static_assert(sizeof(time_t) >= 8, 
-    "time_t must be at least 64 bits to avoid Y2K38 problem. "
-    "Please ensure _USE_32BIT_TIME_T is not defined.");
-#else
-// For other compilers, generate a compile-time error if time_t is too small
-typedef char __time_t_must_be_64bit__[sizeof(time_t) >= 8 ? 1 : -1];
+static_assert(sizeof(time_t) >= 8,
+    "_TIME_BITS=64 was requested but time_t is not 64-bit on this platform.");
+#endif
 #endif
 
 #endif // _TIME64_CHECK_H_
