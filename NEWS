@@ -1,3 +1,33 @@
+* Version 1.6.4 "Tempered Anvil" (2026.06.12)
+
+i386 / Year-2038 correctness.
+
+- FIX: Certificate signing crashed on 32-bit (i386) systems. configure.ac
+  forced _TIME_BITS=64, a glibc ABI switch inconsistent with the system
+  GnuTLS (built with 32-bit time_t on i386), corrupting the stack inside
+  gnutls_x509_crt_set_*_time(). The hardcode is removed; gnoMint now uses
+  the platform's native time_t. This completes the partial 1.6.3 fix.
+  (issue #86)
+
+- FEATURE: Correct handling of certificate dates beyond 2038 on every
+  architecture. Dates are stored as 64-bit integers and rendered with a
+  64-bit-safe formatter, so a certificate expiring after 2038-01-19 shows
+  the right date even where time_t is 32-bit. On such platforms gnoMint
+  never caches a wrong date: it warns and clamps when generating a cert,
+  stores NULL (deriving the date from the certificate) when importing one,
+  and a 64-bit host opening the database backfills those dates automatically.
+
+- FIX: All certificate and CRL date input/output is now unconditionally
+  64-bit (g_ascii_strtoll / %lld), independent of time_t — guarding even a
+  future 64-bit-time_t i386, where sizeof(long) stays 32 bits.
+
+- TESTS/CI: New 32-bit i386 multilib build-and-test CI job, plus Year-2038
+  tests (import, list/detail consistency, NULL-date self-healing backfill)
+  run on every platform.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+
 * Version 1.6.3 "Tempered Anvil" (2026.06.11)
 
 i386 crash fix (community contribution).
