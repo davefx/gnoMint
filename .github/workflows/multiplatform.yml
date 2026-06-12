@@ -215,7 +215,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             gcc gcc-multilib make autoconf automake libtool pkg-config intltool \
-            gettext iso-codes openssl gnutls-bin dbus dbus-x11 file sqlite3 \
+            gettext autopoint iso-codes openssl gnutls-bin dbus dbus-x11 file sqlite3 \
             libgtk-4-dev:i386 libglib2.0-dev:i386 \
             libgnutls28-dev:i386 libsqlite3-dev:i386 \
             libgcrypt20-dev:i386 libreadline-dev:i386 \

@@ -603,7 +603,7 @@ __ca_format_epoch_to_date (const gchar *epoch_str)
 	gchar buf[100];
 	struct tm model_time_tm;
 	gnomint_gmtime (model_time, &model_time_tm);
-	strftime (buf, sizeof (buf), _("%m/%d/%Y %R GMT"), &model_time_tm);
+	strftime (buf, sizeof (buf), _("%m/%d/%Y %H:%M GMT"), &model_time_tm);
 	return g_strdup (buf);
 }
 

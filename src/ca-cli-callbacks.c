@@ -164,7 +164,7 @@ static void __ca_cli_format_list_date (const gchar *date_col, const gchar *pem,
 	}
 
 	gnomint_gmtime (t, &tm);
-	n = strftime (out, outsz, _("%m/%d/%Y %R GMT"), &tm);
+	n = strftime (out, outsz, _("%m/%d/%Y %H:%M GMT"), &tm);
 	if (! authoritative && gnomint_time_display_is_uncertain (t) && n < outsz)
 		g_strlcpy (out + n, _(" (after 2038?)"), outsz - n);
 }
@@ -218,7 +218,7 @@ int __ca_cli_callback_listcert_aux (void *pArg, int argc, char **argv, char **co
 			printf (Q_("CertList Revocation|\n"));
 		} else {
 			gnomint_gmtime (aux_date, &tmp);
-			strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tmp);
+			strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &tmp);
 			printf (Q_("CertList Revocation|%s\n"), model_time_str);
 		}
 	} else {
@@ -730,11 +730,11 @@ int ca_cli_callback_addca (int argc, char **argv)
 		printf (_("Validity\n"));
 		printf (_("Validity:\n"));
 		gnomint_gmtime (ca_creation_data->activation, &timer);
-		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);
+		strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &timer);
 		printf (_("\tActivated on: %s\n"), model_time_str);
 
 		gnomint_gmtime (ca_creation_data->expiration, &timer);
-		strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &timer);
+		strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &timer);
 		printf (_("\tExpires on: %s\n"), model_time_str);
 
 		change_data = dialog_ask_for_confirmation (NULL, _("Do you want to change anything? Yes/[No] "), FALSE);
@@ -1359,14 +1359,14 @@ int ca_cli_callback_showcert (int argc, char **argv)
 	
 	printf (_("Validity:\n"));
 	gnomint_gmtime (cert->activation_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &tim);
 	printf (_("\tActivated on: %s\n"), model_time_str);
 	if (! have_act && gnomint_time_display_is_uncertain (cert->activation_time))
 		printf (_("\t  (warning: this 32-bit build cannot tell a real post-2038 date "
 			  "from an overflow; this value may be inaccurate)\n"));
 
 	gnomint_gmtime (cert->expiration_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &tim);
 	printf (_("\tExpires on: %s\n"), model_time_str);
 	if (! have_exp && gnomint_time_display_is_uncertain (cert->expiration_time))
 		printf (_("\t  (warning: this 32-bit build cannot tell a real post-2038 date "

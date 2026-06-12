@@ -247,13 +247,13 @@ void __certificate_properties_populate (const char *certificate_pem)
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certActivationDateLabel");
 	gnomint_gmtime (cert->activation_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &tim);
 	__certificate_properties_set_date_label (GTK_LABEL (widget), model_time_str,
 	    ! cp_have_activation && gnomint_time_display_is_uncertain (cert->activation_time));
 
 	widget = gtk_builder_get_object (certificate_properties_window_gtkb, "certExpirationDateLabel");
 	gnomint_gmtime (cert->expiration_time, &tim);
-	strftime (model_time_str, 100, _("%m/%d/%Y %R GMT"), &tim);
+	strftime (model_time_str, 100, _("%m/%d/%Y %H:%M GMT"), &tim);
 	__certificate_properties_set_date_label (GTK_LABEL (widget), model_time_str,
 	    ! cp_have_expiration && gnomint_time_display_is_uncertain (cert->expiration_time));
 
@@ -592,9 +592,9 @@ void __certificate_properties_fill_cert_validity (GnomintPropNode *parent, gnutl
 		not_after = gnutls_x509_crt_get_expiration_time(*certificate);
 
 	gnomint_gmtime (not_before, &tm);
-	strftime (not_before_str, sizeof(not_before_str), "%a %b %e %H:%M:%S %Y GMT", &tm);
+	strftime (not_before_str, sizeof(not_before_str), "%a %b %d %H:%M:%S %Y GMT", &tm);
 	gnomint_gmtime (not_after, &tm);
-	strftime (not_after_str, sizeof(not_after_str), "%a %b %e %H:%M:%S %Y GMT", &tm);
+	strftime (not_after_str, sizeof(not_after_str), "%a %b %d %H:%M:%S %Y GMT", &tm);
 
 	nb_uncertain = ! cp_have_activation && gnomint_time_display_is_uncertain (not_before);
 	na_uncertain = ! cp_have_expiration && gnomint_time_display_is_uncertain (not_after);
