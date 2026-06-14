@@ -1209,40 +1209,39 @@ gint ca_file_get_number_of_csrs ()
 
 void ca_file_get_next_serial (UInt160 *serial, guint64 ca_id)
 {
-	gchar *serialstr = NULL;
 	gchar **row = NULL;
+	gboolean check_dups = FALSE;
+	gboolean collision;
 
-	row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='ca_last_assigned_serial' AND ca_id=%"
-                                      GNOMINT_GUINT64_FORMAT";", ca_id);
-        if (row) {
-		uint160_read_escaped (serial, row[0], strlen (row[0]));
-		g_strfreev (row);
-	} else {
-		g_error (_("Cannot find last assigned serial number"));
-	}
-	
-
-        row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE "
+	/* Generate a cryptographically random serial (128 bits of CSPRNG entropy,
+	 * per CA/Browser Forum BR 7.1) instead of a predictable sequential
+	 * counter. The legacy 'ca_last_assigned_serial' policy row is left intact
+	 * for database backward-compatibility but is no longer used to derive new
+	 * serials — no schema change, and old databases open unchanged. */
+	row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE "
 				      "name='ca_must_check_serial_dups' AND ca_id=%"GNOMINT_GUINT64_FORMAT";",
                                       ca_id);
-        if (row) {
-                if (atoi(row[0])) {
-                        while (row) {
-                                uint160_inc (serial);
-                                g_strfreev (row);
-                                serialstr = uint160_strdup_printf (serial);
-                                row = __ca_file_get_single_row (ca_db, "SELECT id FROM certificates WHERE serial='%q' AND parent_id=%"GNOMINT_GUINT64_FORMAT";", 
-                                                              serialstr, ca_id);
-                                g_free (serialstr);                                
-                        }
-                } else {
-                        uint160_inc (serial);
-                        g_strfreev (row);
-                }
-        } else {
-                uint160_inc (serial);
-        }
+	if (row) {
+		check_dups = (atoi (row[0]) != 0);
+		g_strfreev (row);
+	}
 
+	do {
+		collision = FALSE;
+		tls_generate_random_serial (serial);
+
+		if (check_dups) {
+			gchar *serialstr = uint160_strdup_printf (serial);
+			gchar **dup = __ca_file_get_single_row (ca_db,
+			    "SELECT id FROM certificates WHERE serial='%q' AND parent_id=%"GNOMINT_GUINT64_FORMAT";",
+			    serialstr, ca_id);
+			g_free (serialstr);
+			if (dup) {
+				collision = TRUE;
+				g_strfreev (dup);
+			}
+		}
+	} while (collision);
 
 	return;
 }
@@ -2800,7 +2799,7 @@ gboolean ca_file_mark_pkey_as_extracted_for_id (CaFileElementType type, const gc
 
 gchar * ca_file_policy_get (guint64 ca_id, gchar *property_name)
 {
-	gchar **row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
+	gchar **row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='%q' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
 					      property_name, ca_id);
 
 	gchar * res;
@@ -2822,7 +2821,7 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, const gchar * 
 	gchar *error = NULL;
 	gchar *sql = NULL;
 
-	aux = __ca_file_get_single_row (ca_db, "SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
+	aux = __ca_file_get_single_row (ca_db, "SELECT id, ca_id, name, value FROM ca_policies WHERE name='%q' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
 				      property_name, ca_id);
 
 	if (! aux) {
@@ -2835,7 +2834,7 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, const gchar * 
 		}
 	} else {
 		g_strfreev (aux);
-		sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%q' WHERE ca_id=%"GNOMINT_GUINT64_FORMAT" AND name='%s';",
+		sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%q' WHERE ca_id=%"GNOMINT_GUINT64_FORMAT" AND name='%q';",
 				       value, ca_id, property_name);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			fprintf (stderr, "%s\n", error);
@@ -2852,7 +2851,7 @@ gboolean ca_file_policy_set (guint64 ca_id, gchar *property_name, const gchar * 
 
 gint ca_file_policy_get_int (guint64 ca_id, gchar *property_name)
 {
-	gchar **row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='%s' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
+	gchar **row = __ca_file_get_single_row (ca_db, "SELECT value FROM ca_policies WHERE name='%q' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
 					      property_name, ca_id);
 
 	gint res;
@@ -2873,7 +2872,7 @@ gboolean ca_file_policy_set_int (guint64 ca_id, gchar *property_name, gint value
 	gchar *error = NULL;
 	gchar *sql = NULL;
 
-	aux = __ca_file_get_single_row (ca_db, "SELECT id, ca_id, name, value FROM ca_policies WHERE name='%s' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
+	aux = __ca_file_get_single_row (ca_db, "SELECT id, ca_id, name, value FROM ca_policies WHERE name='%q' AND ca_id=%"GNOMINT_GUINT64_FORMAT" ;", 
 				      property_name, ca_id);
 
 	if (! aux) {
@@ -2886,7 +2885,7 @@ gboolean ca_file_policy_set_int (guint64 ca_id, gchar *property_name, gint value
 		}
 	} else {
 		g_strfreev (aux);
-		sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%d' WHERE ca_id=%"GNOMINT_GUINT64_FORMAT" AND name='%s';",
+		sql = sqlite3_mprintf ("UPDATE ca_policies SET value='%d' WHERE ca_id=%"GNOMINT_GUINT64_FORMAT" AND name='%q';",
 				       value, ca_id, property_name);
 		if (sqlite3_exec (ca_db, sql, NULL, NULL, &error)) {
 			fprintf (stderr, "%s\n", error);

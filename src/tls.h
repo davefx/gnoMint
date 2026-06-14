@@ -206,6 +206,11 @@ TlsCert * tls_parse_cert_pem (const char * pem_certificate);
 gboolean tls_cert_pem_get_validity (const gchar *pem_certificate,
                                     gint64 *activation, gint64 *expiration);
 
+/* Fills `serial` with a cryptographically random serial number (128 bits of
+ * CSPRNG entropy, positive DER INTEGER) per CA/Browser Forum BR 7.1, replacing
+ * predictable sequential serials. Returns FALSE if the CSPRNG fails. */
+gboolean tls_generate_random_serial (UInt160 *serial);
+
 gboolean tls_is_ca_pem (const char * pem_certificate);
 void tls_cert_free (TlsCert *);
 

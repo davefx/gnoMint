@@ -1,3 +1,31 @@
+* Version 1.6.5 "Tempered Anvil" (unreleased)
+
+Security hardening.
+
+- SECURITY: Certificate serial numbers are now cryptographically random
+  (128 bits of CSPRNG entropy, per CA/Browser Forum Baseline Requirements
+  7.1) instead of a predictable sequential counter. Existing certificates
+  keep their serials, and no database migration is needed. Serials now
+  appear as longer random hex values (e.g. 40:A4:6A:...); the certificate's
+  list "Id" is a separate small number and is unaffected.
+
+- SECURITY: Private keys are now encrypted at rest with PBES2
+  (PBKDF2-SHA256 + AES-256-CBC) instead of the legacy PKCS#12 3DES. This is
+  backward compatible — keys written by older gnoMint versions still open,
+  because GnuTLS auto-detects the encryption scheme. Forward compatibility:
+  opening a new database's keys in another build requires GnuTLS 3.x (or
+  OpenSSL); every gnoMint of the last decade qualifies — Debian's gnomint
+  links GnuTLS >= 3.7.2.
+
+- SECURITY: Passwords are now wiped from memory with a non-elidable routine
+  instead of a memset() the compiler may optimise away.
+
+- Hardening: parameterised the remaining ca_policies name lookups, and
+  replaced a fixed-size sprintf with snprintf.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+
 * Version 1.6.4 "Tempered Anvil" (2026.06.12)
 
 i386 / Year-2038 correctness.

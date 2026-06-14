@@ -464,10 +464,10 @@ gchar * __certificate_properties_dump_key_usage(guint key_usage)
 void __certificate_properties_fill_cert_version(GnomintPropNode *parent, gnutls_x509_crt_t *certificate)
 {
 	gint result;
-	gchar value[4];
+	gchar value[16];
 
 	result = gnutls_x509_crt_get_version(*certificate);
-	sprintf(value, "v%d", result);
+	snprintf(value, sizeof(value), "v%d", result);
 
 	GnomintPropNode *child = gnomint_prop_node_new(_("Version"), value);
 	g_list_store_append(gnomint_prop_node_get_children(parent), child);
