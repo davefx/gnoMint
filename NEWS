@@ -23,6 +23,12 @@ Security hardening.
 - Hardening: parameterised the remaining ca_policies name lookups, and
   replaced a fixed-size sprintf with snprintf.
 
+- BUILD: The minimum GTK is now 4.12 (the code already used
+  gtk_css_provider_load_from_string, introduced in 4.12). The build also caps
+  GDK_VERSION_MAX_ALLOWED at the minimum, so using any GTK API newer than the
+  declared floor is now a compile error — caught on a normal build instead of
+  only on an older-GTK port.
+
 Database-compatible with 1.4.0 — no migration needed.
 
 
