@@ -118,6 +118,7 @@ gnomint_cli_LDADD = \
 
 EXTRA_DIST = \
 	gnomint-upgrade-db \
+	secure_wipe.h \
 	ca_creation.h \
 	ca_file.h \
 	ca.h \

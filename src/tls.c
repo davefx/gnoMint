@@ -32,6 +32,7 @@
 #include "uint160.h"
 #include "time64_check.h"
 #include "tls.h"
+#include <gnutls/crypto.h>   /* gnutls_rnd() for random serial numbers */
 
 void tls_init ()
 {
@@ -327,7 +328,6 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 {
 	gnutls_datum_t pem_datum;
 	gchar *pkcs8_private_key = NULL;
-	size_t pkcs8_private_key_len = 0;
 	gnutls_x509_privkey_t key;
 
 	pem_datum.data = (unsigned char *) pem_private_key;
@@ -343,17 +343,24 @@ gchar * tls_generate_pkcs8_encrypted_private_key (gchar *pem_private_key, gchar 
 		return NULL;
 	}
 
-	/* Calculate pkcs8 length */
-	pkcs8_private_key = NULL;
-	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
-
-	/* Save the private key to a PEM format */
-	pkcs8_private_key = g_new0 (gchar, pkcs8_private_key_len);	
-	if (gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len) < 0) {
+	/* Encrypt with PBES2 + AES-256 (PBKDF2) for the key at rest. GnuTLS
+	 * auto-detects the scheme on import, so keys written by older versions
+	 * with PKCS12-3DES still decrypt.
+	 *
+	 * We use the allocating export2 API rather than the two-call size-query
+	 * pattern: PBES2 embeds a freshly random salt/IV whose DER length can
+	 * differ between the size-query call and the write call, so a buffer
+	 * sized from the first call can be too short for the second (GnuTLS then
+	 * returns GNUTLS_E_SHORT_MEMORY_BUFFER). */
+	gnutls_datum_t out = { NULL, 0 };
+	if (gnutls_x509_privkey_export2_pkcs8 (key, GNUTLS_X509_FMT_PEM, passphrase,
+	                                       GNUTLS_PKCS_USE_PBES2_AES_256, &out) < 0) {
 		gnutls_x509_privkey_deinit (key);
 		return NULL;
 	}
 
+	pkcs8_private_key = g_strndup ((const gchar *) out.data, out.size);
+	gnutls_free (out.data);
 	gnutls_x509_privkey_deinit (key);
 
 	return pkcs8_private_key;
@@ -475,14 +482,17 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
 		return NULL;
 	}
 
-	/* Calculate pkcs8 length */
+	/* Encrypt the private key with PBES2 + AES-256 into DER. The size-query
+	 * call only estimates the length; PBES2 embeds a freshly random salt/IV
+	 * whose DER encoding can be a few bytes longer on the actual write, so we
+	 * pad the buffer generously. The write call then sets the true length. */
 	pkcs8_private_key = g_new0 (gchar, 1);
-	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len);
+	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PBES2_AES_256, pkcs8_private_key, &pkcs8_private_key_len);
 	g_free (pkcs8_private_key);
 
-	/* Save the private key to a DER format */
-	pkcs8_private_key = g_new0 (gchar, pkcs8_private_key_len);	
-	if (gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PKCS12_3DES, pkcs8_private_key, &pkcs8_private_key_len) < 0) {
+	pkcs8_private_key_len += 256;
+	pkcs8_private_key = g_new0 (gchar, pkcs8_private_key_len);
+	if (gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER, passphrase, GNUTLS_PKCS_USE_PBES2_AES_256, pkcs8_private_key, &pkcs8_private_key_len) < 0) {
 		gnutls_x509_privkey_deinit (key);
 		gnutls_x509_crt_deinit (crt);
 		return NULL;
@@ -636,8 +646,25 @@ gnutls_datum_t * tls_generate_pkcs12 (gchar *pem_cert, gchar *pem_private_key, g
         return pkcs12_datum;
 }
 
+gboolean tls_generate_random_serial (UInt160 *serial)
+{
+	/* Per CA/Browser Forum Baseline Requirements 7.1: a serial number must
+	 * contain at least 64 bits of output from a CSPRNG. We use 128 bits and
+	 * force the top byte into 0x40-0x7F so the value is a positive DER
+	 * INTEGER and keeps its full length (no leading-zero shrinkage). This
+	 * replaces the previous predictable sequential serials. */
+	guchar bytes[16];
 
-gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data, 
+	if (gnutls_rnd (GNUTLS_RND_RANDOM, bytes, sizeof (bytes)) < 0)
+		return FALSE;
+
+	bytes[0] = (bytes[0] & 0x7F) | 0x40;
+	uint160_read (serial, bytes, sizeof (bytes));
+	return TRUE;
+}
+
+
+gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data,
 					      gnutls_x509_privkey_t *key,
 					      gchar ** certificate)
 {
@@ -649,7 +676,10 @@ gchar * tls_generate_self_signed_certificate (TlsCreationData * creation_data,
 	size_t serialsize = 0;
 	size_t certificate_len = 0;
 
-	uint160_assign (sn, G_GUINT64_CONSTANT(1));
+	if (! tls_generate_random_serial (sn)) {
+		uint160_free (sn);
+		return g_strdup_printf(_("Error when generating the serial number"));
+	}
 
 	if (gnutls_x509_crt_init (&crt) < 0) {
                 uint160_free (sn);

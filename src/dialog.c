@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "dialog.h"
+#include "secure_wipe.h"
 
 
 #ifdef WIN32
@@ -109,6 +110,7 @@ gchar * dialog_get_password (gchar *info_message,
 
 	do {
 		if (res) {
+			gnomint_secure_wipe (res, strlen (res));
 			g_free (res);
 			res = NULL;
 		}
@@ -120,21 +122,22 @@ gchar * dialog_get_password (gchar *info_message,
 
 		res = g_strdup (password);
 		if (strlen (res) < minimum_length) {
-			fprintf (stderr, _("\nThe password must have, at least, %d characters\n"), minimum_length); 
+			gnomint_secure_wipe (password, strlen (password));
+			fprintf (stderr, _("\nThe password must have, at least, %d characters\n"), minimum_length);
 			continue;
 		}
-		memset (password, 0, strlen (res));
+		gnomint_secure_wipe (password, strlen (password));
 
 		password2 = getpass(confirm_message);
 
 		if (strcmp (res, password2)) {
 			fprintf (stderr, "\n%s\n", distinct_error_message);
-			memset (password, 0, strlen (password2));		
+			gnomint_secure_wipe (password2, strlen (password2));
 		}
 
 	} while (strlen (res) < minimum_length || strcmp (res, password2) );
 
-	memset (password, 0, strlen (password2));		
+	gnomint_secure_wipe (password2, strlen (password2));
 
 	return res;
 }
@@ -355,6 +358,7 @@ _dialog_get_password_response (GtkDialog *dialog,
 	passwordagain = gtk_editable_get_text (GTK_EDITABLE (widget));
 
 	if (strcmp (password, passwordagain)) {
+		gnomint_secure_wipe (password, strlen (password));
 		g_free (password);
 		dialog_error (ctx->distinct_error_message);
 		/* Re-present the dialog so the user can try again */
