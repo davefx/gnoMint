@@ -66,7 +66,8 @@ gnomint_LDADD = \
 	$(LTLIBINTL)
 
 gnomint_LDFLAGS = \
-	-export-dynamic
+	-export-dynamic \
+	$(GUI_SUBSYSTEM_LDFLAGS)
 
 
 

@@ -149,16 +149,22 @@ LIBS=$old_LIBS
 
 AC_SUBST(READLINE_LIBS)
 
-# On Windows (MinGW), inet_pton/inet_ntop live in ws2_32
+# On Windows (MinGW), inet_pton/inet_ntop live in ws2_32.
+# Also link the GUI (only) with -mwindows so it gets the "Windows GUI"
+# PE subsystem and Windows does not open a console window behind it when
+# launched from the Start menu. gnomint-cli must stay a console program.
 case "$host_os" in
   mingw*|msys*|cygwin*)
     WINSOCK_LIBS="-lws2_32"
+    GUI_SUBSYSTEM_LDFLAGS="-mwindows"
     ;;
   *)
     WINSOCK_LIBS=""
+    GUI_SUBSYSTEM_LDFLAGS=""
     ;;
 esac
 AC_SUBST(WINSOCK_LIBS)
+AC_SUBST(GUI_SUBSYSTEM_LDFLAGS)
 
 PKG_CHECK_MODULES(GNOMINTCLI, 
 	glib-2.0 >= $GLIB_REQUIRED \
