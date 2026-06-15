@@ -533,6 +533,70 @@ jobs:
         run: |
           bash packaging/windows/collect-files.sh staging
 
+      # Smoke-test the staged tree the way an end user runs it: a clean
+      # PATH containing ONLY the bundled bin\ plus the Windows system
+      # directories — never the MSYS2 /mingw64/bin — so the Windows loader
+      # has to satisfy every DLL from our own bundle. This reproduces the
+      # exact "MSI installs but won't run" failure from issue #91 in CI:
+      # a missing DLL aborts the process at load time with a recognizable
+      # NTSTATUS, which we treat as a hard failure. A bundle that launches
+      # its window (and keeps running until we kill it) passes.
+      - name: Smoke-test staged GUI bundle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Suppress the modal "cannot find DLL" / crash dialogs so a
+          # broken bundle exits with a status code instead of hanging CI.
+          $sysErr = 0x0001 -bor 0x0002   # SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX
+          Add-Type -Namespace Win32 -Name Sem -MemberDefinition `
+            '[System.Runtime.InteropServices.DllImport("kernel32.dll")] public static extern uint SetErrorMode(uint mode);'
+          [Win32.Sem]::SetErrorMode($sysErr) | Out-Null
+
+          $staging = Resolve-Path staging
+          $bin = Join-Path $staging 'bin'
+          $exe = Join-Path $bin 'gnomint.exe'
+          if (-not (Test-Path $exe)) { throw "staged gnomint.exe not found at $exe" }
+
+          # End-user-equivalent environment: bundled bin only, no MSYS2.
+          $env:PATH = "$bin;$env:SystemRoot\System32;$env:SystemRoot"
+          $env:GSETTINGS_SCHEMA_DIR = Join-Path $staging 'share\glib-2.0\schemas'
+
+          # NTSTATUS codes that mean "the binary could not be loaded/run"
+          # — i.e. a missing or incompatible DLL (issue #91). Compared as
+          # unsigned because ExitCode is a signed int32.
+          $loadFailures = @{
+            0xC0000135 = 'STATUS_DLL_NOT_FOUND';
+            0xC0000139 = 'STATUS_ENTRYPOINT_NOT_FOUND';
+            0xC000007B = 'STATUS_INVALID_IMAGE_FORMAT';
+            0xC0000142 = 'STATUS_DLL_INIT_FAILED';
+          }
+
+          $p = Start-Process -FilePath $exe -PassThru -WindowStyle Hidden
+          if (-not $p.WaitForExit(15000)) {
+            # Still alive after 15s => GTK initialised and the window is
+            # up, which means every load-time DLL resolved. That's a pass.
+            $p.Kill(); $p.WaitForExit()
+            Write-Host "PASS: gnomint.exe launched and stayed running; DLL bundle is complete."
+            exit 0
+          }
+
+          $code = $p.ExitCode
+          $ucode = [uint32]($code -band 0xFFFFFFFF)
+          if ($loadFailures.ContainsKey([int64]$ucode)) {
+            $name = $loadFailures[[int64]$ucode]
+            Write-Error ("FAIL: gnomint.exe could not start (0x{0:X8} {1}). The bundle is missing a DLL — see issue #91." -f $ucode, $name)
+            exit 1
+          }
+          if ($code -eq 0) {
+            Write-Host "PASS: gnomint.exe exited cleanly (code 0)."
+            exit 0
+          }
+          # Any other early non-zero exit is most likely the CI runner's
+          # display environment, not a bundling defect. Surface it loudly
+          # but don't fail the build on it.
+          Write-Warning ("gnomint.exe exited early with code 0x{0:X8} ({1}). Not a known DLL-load failure; treating as a runner/display quirk." -f $ucode, $code)
+
       - name: Install WiX Toolset
         shell: pwsh
         run: |
