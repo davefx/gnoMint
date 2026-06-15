@@ -544,27 +544,33 @@ jobs:
       # -wx 8601 and the >=5 MB size assertion.
       - name: Verify staged bundle is self-contained
         run: |
-          set -uo pipefail
+          # The runner injects 'bash -e -o pipefail'; disable both so a
+          # non-matching glob or a grep with no hits can't abort the step
+          # (an earlier revision died silently this way and skipped the
+          # MSI build). nullglob makes unmatched globs expand to nothing.
+          set +e +o pipefail
+          shopt -s nullglob
           PREFIX=${MINGW_PREFIX:-/mingw64}
 
           # Collect every DLL name imported (recursively) by the executables
           # and the dlopen()ed plugins, then flag any that ships in the MinGW
           # prefix but is missing from our bundle.
-          missing=$(
+          deps=$(
             for f in staging/bin/*.exe \
                      staging/lib/gdk-pixbuf-2.0/2.10.0/loaders/*.dll \
                      staging/lib/gio/modules/*.dll; do
-              [ -f "$f" ] && ntldd -R "$f" 2>/dev/null
-            done | tr -d '\r' | awk '{print $1}' | grep -iE '\.dll$' | sort -u \
-              | while IFS= read -r n; do
-                  if [ -f "$PREFIX/bin/$n" ] && [ ! -f "staging/bin/$n" ]; then
-                    echo "$n"
-                  fi
-                done
+              ntldd -R "$f" 2>/dev/null
+            done | tr -d '\r' | awk '{print $1}' | grep -iE '\.dll$' | sort -u
           )
+          missing=
+          for n in $deps; do
+            if [ -f "$PREFIX/bin/$n" ] && [ ! -f "staging/bin/$n" ]; then
+              missing="$missing $n"
+            fi
+          done
           if [ -n "$missing" ]; then
             echo "ERROR: staged bundle is missing MinGW DLLs (issue #91):" >&2
-            echo "$missing" | sed 's/^/  - /' >&2
+            for n in $missing; do echo "  - $n" >&2; done
             exit 1
           fi
           echo "OK: every MinGW dependency is present in staging/bin."
