@@ -52,7 +52,7 @@ Layered roughly bottom-up:
 
 ## Conventions worth knowing
 
-- **Y2K38**: `configure.ac` defines `_TIME_BITS=64` and `_FILE_OFFSET_BITS=64` so `time_t` is 64-bit even on 32-bit hosts. Certificate validity periods reach well past 2038. Don't introduce `int`/`long` truncation when handling `time_t`; the codebase explicitly supports far-future expirations.
+- **Y2K38**: gnoMint relies on the platform's native 64-bit `time_t`. `configure.ac` defines `_FILE_OFFSET_BITS=64` but deliberately does **not** force `_TIME_BITS=64` — that glibc ABI switch must match every linked library, and forcing it only in gnoMint corrupted the GnuTLS ABI on i386 (issue #86). A conditional static assertion in `src/time64_check.h` checks 64-bit `time_t` only where it is the ABI. On 32-bit-`time_t` platforms (i386) gnoMint warns and clamps new CA expiry to 2038 and still displays stored post-2038 dates. Certificate validity periods reach well past 2038; don't introduce `int`/`long` truncation when handling `time_t`.
 - **Default DB location**: `gnomint-cli` stores the default CA DB at `$XDG_DATA_HOME/gnomint/default.gnomint` (typically `~/.local/share/gnomint/default.gnomint`) and migrates from the legacy `~/.gnomint/default.gnomint` on first run. The GUI uses the same convention.
 - **i18n**: gettext via `intltool`; supported locales are listed as `ALL_LINGUAS` in `configure.ac`. Translations live in `po/`. New user-visible strings should be wrapped in `_()`.
 - **MIME type**: registered as `application/x-gnomint` (see `mime/`); used for the GUI's recent-files filter.

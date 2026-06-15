@@ -12,7 +12,7 @@ a matching readline CLI for scripting and CI.
 
 ![gnoMint main window]({{ site.baseurl }}/assets/screenshots/main-window.png)
 
-gnoMint is a GTK 3 application (with a parallel `gnomint-cli` readline
+gnoMint is a GTK 4 application (with a parallel `gnomint-cli` readline
 front-end) that lets you bootstrap a Certificate Authority, issue and
 revoke certificates, manage CSRs, publish CRLs, and import/export keys
 and PKCS#12 bundles — all stored in a self-contained SQLite database
@@ -32,7 +32,7 @@ file you can carry around or back up like any other document.
 | **Key algorithms** | RSA, DSA, ECDSA (P-256/P-384/P-521), Ed25519 |
 | **Standards** | X.509, PKCS#8, PKCS#10 CSRs, PKCS#12 bundles, X.509 CRLs |
 | **Extensions** | Subject Alternative Names (SAN), Extended Key Usage, Basic Constraints |
-| **Interfaces** | GTK 3 desktop GUI and `gnomint-cli` readline shell |
+| **Interfaces** | GTK 4 desktop GUI and `gnomint-cli` readline shell |
 | **Workflows** | New CA, sign CSR, revoke, renew, bulk-revoke, full-chain export |
 | **Lifetime safety** | 64-bit `time_t` everywhere — Y2K38-safe certificates |
 

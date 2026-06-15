@@ -42,7 +42,7 @@ Two binaries
 
 The build produces two binaries from a shared source tree:
 
-    gnomint       The GTK 3 desktop application.
+    gnomint       The GTK 4 desktop application.
     gnomint-cli   A readline CLI with the same capabilities. Use it
                   in cron jobs, CI pipelines, and anywhere a script
                   is more convenient than clicking.
