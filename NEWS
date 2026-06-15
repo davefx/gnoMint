@@ -1,3 +1,14 @@
+* Version 1.6.6 "Tempered Anvil" (2026.06.15)
+
+Windows polish.
+
+- WINDOWS: Launching gnoMint from the Start menu no longer opens a stray
+  console window behind the GUI. The GUI is now linked with the "Windows
+  GUI" subsystem (-mwindows); gnomint-cli remains a console program.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+
 * Version 1.6.5 "Tempered Anvil" (2026.06.15)
 
 Security hardening and a working Windows installer.

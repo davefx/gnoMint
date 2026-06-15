@@ -1,6 +1,6 @@
 AC_PREREQ([2.69])
 
-AC_INIT([gnoMint],[1.6.5],[<davefx@gmail.com>],[gnomint])
+AC_INIT([gnoMint],[1.6.6],[<davefx@gmail.com>],[gnomint])
 
 PACKAGE_CODENAME="Tempered Anvil"
 AC_DEFINE_UNQUOTED([PACKAGE_CODENAME], ["$PACKAGE_CODENAME"], [Release codename])
