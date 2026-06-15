@@ -441,6 +441,12 @@ int main (int   argc,
     GtkApplication *app;
     int status;
 
+#ifdef _WIN32
+    /* Must run before bindtextdomain/GSettings: redirects schema and
+     * locale lookups to the bundled install tree (issue #91). */
+    gnomint_win32_init_paths ();
+#endif
+
 #ifdef ENABLE_NLS
     bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");

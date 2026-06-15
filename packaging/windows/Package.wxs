@@ -27,21 +27,27 @@
       <Directory Id="DIR_StartMenu" Name="gnoMint" />
     </StandardDirectory>
 
-    <!-- Harvest all files from the staging tree -->
+    <!-- Harvest all files from the staging tree.
+
+         StagingDir MUST be passed as an ABSOLUTE path (-d StagingDir=...).
+         WiX resolves a relative Include glob against the directory of this
+         .wxs file (packaging\windows\), not the build's working directory,
+         so a relative "staging\..." silently harvested nothing and shipped
+         an empty installer — see issue #91. -->
     <ComponentGroup Id="BinFiles" Directory="DIR_bin">
-      <Files Include="staging\bin\**" />
+      <Files Include="$(var.StagingDir)\bin\**" />
     </ComponentGroup>
 
     <ComponentGroup Id="EtcFiles" Directory="DIR_etc">
-      <Files Include="staging\etc\**" />
+      <Files Include="$(var.StagingDir)\etc\**" />
     </ComponentGroup>
 
     <ComponentGroup Id="LibFiles" Directory="DIR_lib">
-      <Files Include="staging\lib\**" />
+      <Files Include="$(var.StagingDir)\lib\**" />
     </ComponentGroup>
 
     <ComponentGroup Id="ShareFiles" Directory="DIR_share">
-      <Files Include="staging\share\**" />
+      <Files Include="$(var.StagingDir)\share\**" />
     </ComponentGroup>
 
     <!-- Start Menu shortcuts -->

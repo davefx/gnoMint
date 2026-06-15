@@ -47,8 +47,12 @@ void dialog_todo_callback (void);
 
 #ifdef _WIN32
 const gchar *gnomint_get_data_dir (void);
+const gchar *gnomint_get_locale_dir (void);
+void gnomint_win32_init_paths (void);
 #undef PACKAGE_DATA_DIR
 #define PACKAGE_DATA_DIR gnomint_get_data_dir()
+#undef PACKAGE_LOCALE_DIR
+#define PACKAGE_LOCALE_DIR gnomint_get_locale_dir()
 #endif
 
 typedef gboolean (* DialogRefreshCallback) (void);

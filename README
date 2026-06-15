@@ -33,6 +33,10 @@ Quick start
 
 See docs/install.md for the full dependency list.
 
+On Windows, install the prebuilt gnomint-<version>.msi from the GitHub
+Releases page instead of building from source; see the "Windows"
+section of docs/install.md.
+
 Two binaries
 ------------
 

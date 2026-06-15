@@ -44,6 +44,34 @@ inside the sandbox. It uses the GNOME 48 runtime for GTK 4.
 
 ---
 
+## Windows
+
+Every release ships a Windows installer, `gnomint-<version>.msi`,
+attached to the corresponding
+[GitHub Release](https://github.com/davefx/gnoMint/releases). It is a
+64-bit build produced with MSYS2/MinGW and packaged with the WiX
+Toolset.
+
+```text
+1. Download gnomint-<version>.msi from the Releases page.
+2. Double-click it and follow the installer.
+3. Launch "gnoMint" from the Start menu (the GUI), or run
+   "gnomint-cli" from any terminal — the installer adds it to PATH.
+4. .gnomint database files are associated with the GUI, so you can
+   open a CA database by double-clicking it.
+```
+
+The installer is self-contained: it bundles GTK 4, GnuTLS, libgcrypt,
+SQLite, the GDK-Pixbuf image loaders, and the icon theme, so no MSYS2
+or separate GTK runtime is required.
+
+> The Windows build is verified in CI by launching the bundled GUI on a
+> clean Windows runner on every change, but it sees far less real-world
+> use than the Linux builds. If something doesn't work, please
+> [open an issue](https://github.com/davefx/gnoMint/issues).
+
+---
+
 ## Building from source
 
 ### Dependencies
