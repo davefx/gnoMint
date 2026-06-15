@@ -1,6 +1,6 @@
-* Version 1.6.5 "Tempered Anvil" (unreleased)
+* Version 1.6.5 "Tempered Anvil" (2026.06.15)
 
-Security hardening.
+Security hardening and a working Windows installer.
 
 - SECURITY: Certificate serial numbers are now cryptographically random
   (128 bits of CSPRNG entropy, per CA/Browser Forum Baseline Requirements
@@ -28,6 +28,16 @@ Security hardening.
   GDK_VERSION_MAX_ALLOWED at the minimum, so using any GTK API newer than the
   declared floor is now a compile error — caught on a normal build instead of
   only on an older-GTK port.
+
+- WINDOWS: The .msi installer now actually runs (issue #91). Previous
+  installers shipped libtool wrapper stubs instead of the real executables,
+  bundled none of the GTK/GnuTLS/SQLite/libgcrypt DLLs, and could not find
+  the GSettings schemas — so the installed program failed to start at all.
+  The packaging now takes the real binaries from .libs, harvests their full
+  DLL dependency closure (plus the GDK-Pixbuf loaders and GIO modules), and
+  the app locates its schemas, data files, and translations relative to the
+  install directory. The build is verified by launching the bundled GUI in
+  CI on each change.
 
 Database-compatible with 1.4.0 — no migration needed.
 
