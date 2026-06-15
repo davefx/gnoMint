@@ -28,6 +28,7 @@
 #include "ca_file.h"
 #include "ca-cli.h"
 #include "preferences.h"
+#include "dialog.h"
 
 gchar * gnomint_current_opened_file = NULL;
 
@@ -40,6 +41,12 @@ int main (int argc, char **argv)
 		{ NULL }
 	};
 	
+
+#ifdef _WIN32
+	/* Must run before bindtextdomain/GSettings: redirects schema and
+	 * locale lookups to the bundled install tree (issue #91). */
+	gnomint_win32_init_paths ();
+#endif
 
 #ifdef ENABLE_NLS
         #include <locale.h>

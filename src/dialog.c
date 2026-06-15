@@ -64,6 +64,38 @@ gnomint_get_data_dir (void)
 	}
 	return data_dir;
 }
+
+const gchar *
+gnomint_get_locale_dir (void)
+{
+	static gchar *locale_dir = NULL;
+	if (!locale_dir) {
+		gchar *install_dir = g_win32_get_package_installation_directory_of_module (NULL);
+		locale_dir = g_build_filename (install_dir, "share", "locale", NULL);
+		g_free (install_dir);
+	}
+	return locale_dir;
+}
+
+/* Point GLib at the bundled GSettings schemas before anything calls
+ * g_settings_new(). The compile-time Unix paths are meaningless on
+ * Windows, and GLib's default schema source comes up empty there, so
+ * without this every run aborts with "No GSettings schemas are installed
+ * on the system" (issue #91). The directory is derived from the install
+ * location, so the bundle stays relocatable; an env var the user already
+ * set is left untouched. */
+void
+gnomint_win32_init_paths (void)
+{
+	gchar *install_dir = g_win32_get_package_installation_directory_of_module (NULL);
+	if (install_dir) {
+		gchar *schema_dir = g_build_filename (install_dir, "share",
+						      "glib-2.0", "schemas", NULL);
+		g_setenv ("GSETTINGS_SCHEMA_DIR", schema_dir, FALSE);
+		g_free (schema_dir);
+		g_free (install_dir);
+	}
+}
 #endif
 
 DialogRefreshCallback dialog_refresh_callback = NULL;
