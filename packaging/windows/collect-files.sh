@@ -48,7 +48,20 @@ harvest_dlls() {
 }
 
 # ── 1. Executables ─────────────────────────────────────────────────
-cp src/gnomint.exe src/gnomint-cli.exe "$STAGING/bin/"
+# gnomint is linked with -export-dynamic, which puts libtool into
+# "wrapper" mode: src/gnomint.exe is then a tiny launcher (it imports
+# only KERNEL32/msvcrt and re-execs a hardcoded build path), while the
+# REAL PE — the one that actually imports libgtk-4, libgnutls, … — lives
+# in src/.libs/.  Shipping the wrapper gave an installer whose exe had no
+# GTK imports, harvested no DLLs, and could not run on any other machine
+# (issue #91).  Always prefer the real binary from .libs when present.
+for prog in gnomint gnomint-cli; do
+    if [ -f "src/.libs/$prog.exe" ]; then
+        cp "src/.libs/$prog.exe" "$STAGING/bin/$prog.exe"
+    else
+        cp "src/$prog.exe" "$STAGING/bin/$prog.exe"
+    fi
+done
 
 # ── 2. GDK-Pixbuf loaders ─────────────────────────────────────────
 # Copy the loaders first so their own DLL dependencies (libjpeg, libpng,
