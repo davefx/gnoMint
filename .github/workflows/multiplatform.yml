@@ -572,8 +572,22 @@ jobs:
             0xC0000142 = 'STATUS_DLL_INIT_FAILED';
           }
 
-          $p = Start-Process -FilePath $exe -PassThru -WindowStyle Hidden
-          if (-not $p.WaitForExit(15000)) {
+          # gnomint.exe is a console-subsystem MinGW binary, so capture
+          # its stdout/stderr — GTK/GLib print the actual reason (missing
+          # schema, failed module load, "cannot open display", …) there.
+          $out = Join-Path $env:RUNNER_TEMP 'gnomint-smoke.out'
+          $err = Join-Path $env:RUNNER_TEMP 'gnomint-smoke.err'
+          $p = Start-Process -FilePath $exe -PassThru -WindowStyle Hidden `
+                 -RedirectStandardOutput $out -RedirectStandardError $err
+          $exited = $p.WaitForExit(15000)
+
+          Write-Host "----- gnomint.exe stdout -----"
+          if (Test-Path $out) { Get-Content $out | Write-Host }
+          Write-Host "----- gnomint.exe stderr -----"
+          if (Test-Path $err) { Get-Content $err | Write-Host }
+          Write-Host "------------------------------"
+
+          if (-not $exited) {
             # Still alive after 15s => GTK initialised and the window is
             # up, which means every load-time DLL resolved. That's a pass.
             $p.Kill(); $p.WaitForExit()
@@ -594,8 +608,8 @@ jobs:
           }
           # Any other early non-zero exit is most likely the CI runner's
           # display environment, not a bundling defect. Surface it loudly
-          # but don't fail the build on it.
-          Write-Warning ("gnomint.exe exited early with code 0x{0:X8} ({1}). Not a known DLL-load failure; treating as a runner/display quirk." -f $ucode, $code)
+          # (with the captured output above) but don't fail the build yet.
+          Write-Warning ("gnomint.exe exited early with code 0x{0:X8} ({1}). See captured output above." -f $ucode, $code)
 
       - name: Install WiX Toolset
         shell: pwsh
