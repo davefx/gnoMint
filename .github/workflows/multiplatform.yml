@@ -598,10 +598,11 @@ jobs:
           $version = "${{ steps.version.outputs.version }}.0"
           # Absolute staging path: WiX resolves the harvest glob relative
           # to the .wxs directory, not here, so a relative path harvests
-          # nothing (issue #91). -wx 8601 makes "missing harvest directory"
-          # a hard error so an empty installer can never ship again.
+          # nothing (issue #91). -wx8601 (attached, no space) promotes the
+          # "missing harvest directory" warning to an error so an empty
+          # installer can never ship again.
           $staging = (Resolve-Path staging).Path
-          & wix build -arch x64 -wx 8601 `
+          & wix build -arch x64 -wx8601 `
             -d ProductVersion=$version `
             -d StagingDir="$staging" `
             -o "gnomint-${{ steps.version.outputs.version }}.msi" `
