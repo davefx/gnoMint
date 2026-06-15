@@ -581,10 +581,30 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.version }}.0"
-          & wix build -arch x64 `
+          # Absolute staging path: WiX resolves the harvest glob relative
+          # to the .wxs directory, not here, so a relative path harvests
+          # nothing (issue #91). -wx 8601 makes "missing harvest directory"
+          # a hard error so an empty installer can never ship again.
+          $staging = (Resolve-Path staging).Path
+          & wix build -arch x64 -wx 8601 `
             -d ProductVersion=$version `
+            -d StagingDir="$staging" `
             -o "gnomint-${{ steps.version.outputs.version }}.msi" `
             packaging/windows/Package.wxs
+          if ($LASTEXITCODE -ne 0) { throw "wix build failed ($LASTEXITCODE)" }
+
+      # Guard against shipping a contents-free installer (issue #91): a
+      # complete MSI is tens of MB once GTK and the DLLs are embedded, so
+      # a sub-megabyte file means the harvest produced nothing.
+      - name: Verify MSI is not empty
+        shell: pwsh
+        run: |
+          $msi = "gnomint-${{ steps.version.outputs.version }}.msi"
+          $sizeMB = [math]::Round((Get-Item $msi).Length / 1MB, 1)
+          Write-Host "MSI size: $sizeMB MB"
+          if ($sizeMB -lt 5) {
+            throw "MSI is only $sizeMB MB — it does not contain the GTK bundle (see issue #91)."
+          }
 
       - name: Upload MSI artifact
         uses: actions/upload-artifact@v4
