@@ -130,11 +130,17 @@ GSettings) lets you collapse expired branches out of the tree.
 ## Y2K38 safety
 
 Certificate validity periods routinely run 10, 20 or 30 years out, well
-past the 2038 wraparound point for 32-bit `time_t`. gnoMint forces
-`_TIME_BITS=64` and `_FILE_OFFSET_BITS=64` at configure time, includes a
-compile-time static assertion that `sizeof(time_t) == 8`, and ships a
-standalone `test_y2k38` harness. You can confidently issue 50-year
-certificates without underflow surprises.
+past the 2038 wraparound point for 32-bit `time_t`. gnoMint relies on the
+platform's native 64-bit `time_t`: it sets `_FILE_OFFSET_BITS=64` but
+deliberately does **not** force `_TIME_BITS=64`, a glibc ABI switch that
+must match every linked library — forcing it only in gnoMint corrupted
+the GnuTLS ABI on i386 (issue #86). A conditional compile-time assertion
+in `src/time64_check.h` verifies `sizeof(time_t) == 8` wherever 64-bit
+`time_t` is the ABI, and a standalone `test_y2k38` harness exercises the
+logic. On any platform with a 64-bit `time_t` you can confidently issue
+50-year certificates; on legacy 32-bit-`time_t` platforms such as i386,
+gnoMint warns and clamps a new certificate's expiry to the 2038 limit
+while still displaying post-2038 dates already stored in a database.
 
 ---
 

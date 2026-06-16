@@ -42,7 +42,7 @@ Two binaries
 
 The build produces two binaries from a shared source tree:
 
-    gnomint       The GTK 3 desktop application.
+    gnomint       The GTK 4 desktop application.
     gnomint-cli   A readline CLI with the same capabilities. Use it
                   in cron jobs, CI pipelines, and anywhere a script
                   is more convenient than clicking.
@@ -50,18 +50,28 @@ The build produces two binaries from a shared source tree:
 Year 2038 (Y2K38) Support
 -------------------------
 
-gnoMint is designed to handle certificates with expiration dates beyond
-January 19, 2038 (the Year 2038 problem). The application uses 64-bit
-time_t values to ensure proper handling of dates far into the future.
+gnoMint handles certificates whose validity extends past the Year 2038
+boundary (2038-01-19 03:14:07 UTC, where a signed 32-bit time_t
+overflows), so CAs and certificates with multi-decade lifetimes work
+correctly.
 
-The following measures have been implemented:
-- Compile-time flags (_TIME_BITS=64, _FILE_OFFSET_BITS=64) to ensure
-  64-bit time_t even on 32-bit systems
-- Static assertions to verify time_t is 64-bit at compile time
-- Support for certificate expiration dates well beyond 2038
+How it works:
+- gnoMint relies on the platform's native 64-bit time_t. It defines
+  _FILE_OFFSET_BITS=64 but deliberately does NOT force _TIME_BITS=64:
+  that is a glibc ABI switch which must match every linked library, and
+  forcing it only in gnoMint corrupted the GnuTLS ABI (see issue #86).
+  Modern targets — amd64, and 32-bit ports such as armhf — already
+  provide a 64-bit time_t through the toolchain.
+- A conditional compile-time assertion (src/time64_check.h) verifies
+  time_t really is 64-bit wherever 64-bit time_t is the ABI.
+- On legacy 32-bit-time_t platforms such as i386, where the distribution
+  keeps time_t at 32 bits for binary compatibility, gnoMint does not
+  force a mismatched ABI. Instead it warns and clamps a new CA's
+  expiration to the 2038 limit, while still correctly displaying any
+  post-2038 dates already stored in a database.
 
-This ensures gnoMint can safely create and manage certificates with
-validity periods extending decades into the future.
+On any platform with a 64-bit time_t, gnoMint can safely issue and
+manage certificates with validity periods reaching decades past 2038.
 
 Issues and patches
 ------------------
