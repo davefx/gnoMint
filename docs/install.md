@@ -21,8 +21,8 @@ sudo apt install gnomint
 sudo dnf install gnomint
 ```
 
-For the latest release (1.5.0 "Belt and Braces" and newer), you'll
-likely want to install via Flatpak or build from source.
+For recent releases (the 1.6.x "Tempered Anvil" series and newer),
+you'll likely want to install via Flatpak or build from source.
 
 ---
 

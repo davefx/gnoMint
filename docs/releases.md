@@ -15,6 +15,164 @@ file.
 
 ---
 
+## 1.6.7 — "Tempered Anvil" (2026-06-16)
+
+Import fix.
+
+Highlights:
+
+- **`Certificates > Import` works again** — the import dialog's OK button
+  maps to `GTK_RESPONSE_OK` (-5), but the handler bailed on
+  `response_id < 0`, treating OK as a cancel, so nothing was ever
+  imported. It now proceeds only on OK.
+  ([#95](https://github.com/davefx/gnoMint/issues/95))
+- **GUI import is now covered by a test** — a `check_workflows` scenario
+  drives the real Import dialog and asserts a certificate is added,
+  closing the gap that let this regress.
+- **Replaced a personal certificate test fixture** (its subject embedded
+  a real name and national ID) with a synthetic one.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
+## 1.6.6 — "Tempered Anvil" (2026-06-15)
+
+Windows polish.
+
+Highlights:
+
+- **No console window behind the GUI** — `gnomint.exe` is now linked with
+  the Windows GUI subsystem (`-mwindows`), so launching from the Start
+  menu no longer pops up a stray console. `gnomint-cli` stays a console
+  program.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
+## 1.6.5 — "Tempered Anvil" (2026-06-15)
+
+Security hardening and a working Windows installer.
+
+Highlights:
+
+- **Cryptographically random serial numbers** — 128 bits of CSPRNG
+  entropy (CA/Browser Forum BR 7.1) instead of a sequential counter;
+  existing serials are unchanged.
+- **Private keys encrypted with PBES2** (PBKDF2-SHA256 + AES-256-CBC)
+  instead of legacy PKCS#12 3DES; backward compatible (GnuTLS
+  auto-detects the scheme).
+- **Passwords wiped from memory** with a non-elidable routine.
+- **Minimum GTK raised to 4.12**, with `GDK_VERSION_MAX_ALLOWED` capped
+  at the floor so using newer API is a compile error.
+- **The Windows `.msi` installer now actually runs** ([#91](https://github.com/davefx/gnoMint/issues/91)) —
+  it ships the real binaries with their full DLL closure (plus pixbuf
+  loaders and GIO modules) and locates its schemas, data, and
+  translations relative to the install directory.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
+## 1.6.4 — "Tempered Anvil" (2026-06-12)
+
+i386 / Year-2038 correctness.
+
+Highlights:
+
+- **i386 signing crash fixed** — `configure.ac` no longer forces
+  `_TIME_BITS=64`, a glibc ABI switch inconsistent with the system GnuTLS
+  on i386 that corrupted the stack in `gnutls_x509_crt_set_*_time()`.
+  gnoMint now uses the platform's native `time_t`. ([#86](https://github.com/davefx/gnoMint/issues/86))
+- **Correct post-2038 dates on every architecture** — stored as 64-bit
+  and rendered with a 64-bit-safe formatter; on 32-bit-`time_t` hosts
+  gnoMint warns and clamps when generating a cert and self-heals stored
+  dates when a 64-bit host opens the database.
+- **All date I/O is unconditionally 64-bit** (`g_ascii_strtoll` / `%lld`).
+- **New 32-bit i386 multilib CI job** plus Year-2038 tests on every
+  platform.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
+## 1.6.3 — "Tempered Anvil" (2026-06-11)
+
+i386 crash fix (community contribution).
+
+Highlights:
+
+- **Segfault on i386 fixed** — four `sqlite3_mprintf` calls in
+  `ca_file.c` used `%ld` for 64-bit `time_t` values, reading only 4 bytes
+  per value and corrupting the stack. Now `%lld` with explicit casts.
+  (PR #85 by tzbkk, reported via Debian CI.)
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
+## 1.6.2 — "Tempered Anvil" (2026-06-11)
+
+New application icon and desktop integration fix.
+
+Highlights:
+
+- **New application icon** — a wax-seal "CA" badge with colored ribbons,
+  rendered from SVG at all sizes; the scalable SVG is installed for sharp
+  rendering at any DPI.
+- **Taskbar icon fixed in GNOME Shell** — the desktop file, appdata, and
+  icon names now use the `org.gnome.gnomint` reverse-DNS name matching
+  the `GtkApplication` ID.
+- **Flatpak manifest** moved from `net.sourceforge.gnomint` to
+  `org.gnome.gnomint`; removed the post-install rename hacks.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
+## 1.6.1 — "Tempered Anvil" (2026-06-10)
+
+Multi-platform CI and the first Windows installer.
+
+Highlights:
+
+- **Multi-platform CI** via GitHub Actions — automated builds and tests
+  on Fedora, Arch Linux, macOS (Homebrew), and Windows (MSYS2/MinGW64)
+  on every push and pull request.
+- **Windows MSI installer** built with WiX v5, bundling both binaries
+  with the MinGW runtime DLLs, GTK 4 theme and icons, GLib schemas,
+  translations, and UI files, plus Start Menu shortcuts and a `.gnomint`
+  file association. (Made fully functional in 1.6.5.)
+- **Windows portability** — winsock2 instead of `arpa/inet.h`, GLib
+  `GRegex` instead of POSIX `regex.h`, a runtime-relative
+  `PACKAGE_DATA_DIR`, and a keyfile GSettings backend.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
 ## 1.6.0 — "Tempered Anvil" (2026-06-08)
 
 The first fully stabilized release of the GTK 4 port. No new
