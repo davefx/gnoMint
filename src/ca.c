@@ -2986,6 +2986,15 @@ __ca_import_dir_select_cb (GObject *source, GAsyncResult *result,
     g_object_unref (G_OBJECT (dialog_gtkb));
 }
 
+#ifdef GNOMINT_UI_TEST
+/* When non-NULL, the import dialog imports this path directly instead of
+ * opening the native GtkFileDialog — which can't be driven headlessly (it
+ * needs the XDG desktop portal). Set only by the test harness; this hook
+ * is never compiled into the shipped binary. See tests/check_workflows.c
+ * (issue #95). */
+const gchar *gnomint_test_import_path = NULL;
+#endif
+
 static void
 __ca_import_file_or_dir_response (GtkDialog *dialog,
                                   gint       response_id,
@@ -3010,6 +3019,17 @@ __ca_import_file_or_dir_response (GtkDialog *dialog,
     gboolean import_file = gtk_check_button_get_active (radiobutton);
 
     gtk_window_destroy (GTK_WINDOW (dialog));
+
+#ifdef GNOMINT_UI_TEST
+    if (gnomint_test_import_path) {
+        if (import_file)
+            import_single_file ((gchar *) gnomint_test_import_path, NULL, NULL);
+        else
+            import_whole_dir ((gchar *) gnomint_test_import_path);
+        g_object_unref (G_OBJECT (dialog_gtkb));
+        return;
+    }
+#endif
 
     GtkWindow *parent = GTK_WINDOW(gtk_builder_get_object (main_window_gtkb, "main_window1"));
 

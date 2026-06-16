@@ -906,6 +906,75 @@ out:
 }
 
 /* ------------------------------------------------------------------ */
+/*  Scenario (issue #95): Certificates > Import actually imports        */
+/*                                                                      */
+/*  on_import1_activate shows the "import a file or a directory?"       */
+/*  GtkDialog; the OK ("Import") button maps to GTK_RESPONSE_OK (-5).   */
+/*  The response handler used to bail on "response_id < 0", treating    */
+/*  OK as a cancel, so Import did nothing. We auto-accept the dialog    */
+/*  with OK and assert a certificate was added. The native file chooser */
+/*  (unavailable headlessly — it needs the XDG portal) is short-        */
+/*  circuited with a preset path via the GNOMINT_UI_TEST hook.          */
+/* ------------------------------------------------------------------ */
+
+extern void on_import1_activate (gpointer sender, gpointer user_data);
+extern const gchar *gnomint_test_import_path;
+
+static int
+scenario_import_certificate (void)
+{
+    int rc = 1;
+
+    fprintf (stderr, "==> scenario: import_certificate\n");
+    if (!test_init_main_window () || !fixture_setup ())
+        return 1;
+
+    if (!ca_open (g_strdup (fixture_path), FALSE)) {
+        fail_test ("import-cert", "ca_open(%s) failed", fixture_path);
+        goto out;
+    }
+
+    int before = ca_file_get_number_of_certs ();
+
+    gnomint_test_import_path = TEST_PEM_PATH;
+    auto_dismiss_start (GTK_RESPONSE_OK);
+    on_import1_activate (NULL, NULL);
+
+    /* Pump the loop until the dialog maps, auto_dismiss answers OK, and the
+     * import lands — or a ~3s wall-clock cap elapses. Polling on the cert
+     * count (rather than g_main_context_pending, which is false between the
+     * 50ms auto_dismiss ticks) keeps this from racing the dialog mapping. */
+    int after = before;
+    for (int i = 0; i < 150 && after <= before; i++) {
+        g_main_context_iteration (NULL, FALSE);
+        g_usleep (20000);   /* 20 ms */
+        after = ca_file_get_number_of_certs ();
+    }
+    auto_dismiss_stop ();
+    drain_events ();
+    gnomint_test_import_path = NULL;
+
+    int crits = critical_messages_check_and_reset ("import-cert");
+
+    if (after <= before) {
+        fail_test ("import-cert",
+                   "Import added no certificate (before=%d after=%d); the OK "
+                   "response was likely treated as cancel (issue #95)",
+                   before, after);
+        goto out;
+    }
+
+    fprintf (stderr, "    imported via GUI dialog: certs %d -> %d (%d crit logs)\n",
+             before, after, crits);
+    rc = (crits == 0) ? 0 : 1;
+
+out:
+    ca_file_close ();
+    fixture_teardown ();
+    return rc;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scenario 8 (issue #19): emailAddress round-trips through cert     */
 /*                          generation, parsing, and properties UI    */
 /* ------------------------------------------------------------------ */
@@ -2233,6 +2302,7 @@ main (int argc, char **argv)
         scenario_sign_csr ();
         scenario_sign_csr_has_san_editor ();
         scenario_revoke_cert ();
+        scenario_import_certificate ();
         scenario_wizard_window ();
         scenario_keylength_selector ();
         scenario_country_search ();
