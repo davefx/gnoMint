@@ -305,7 +305,7 @@ def test_fixture_save_as(h):
 
 def test_fixture_import(h):
     step("Fixture: import")
-    pem = os.path.join(_HERE, "..", "certs", "davefx.pem")
+    pem = os.path.join(_HERE, "..", "certs", "test-cert.pem")
     if not os.path.exists(pem):
         ok("skipped (no test PEM)")
         return

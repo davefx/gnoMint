@@ -18,7 +18,7 @@ EXTRA_DIST =  \
 	intltool-extract.in \
 	intltool-merge.in \
 	intltool-update.in \
-	certs/davefx.pem \
+	certs/test-cert.pem \
 	certs/example-ca.gnomint \
 	packaging/arch/PKGBUILD.in \
 	packaging/debian/control \
