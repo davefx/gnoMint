@@ -2993,7 +2993,13 @@ __ca_import_file_or_dir_response (GtkDialog *dialog,
 {
     GtkBuilder *dialog_gtkb = (GtkBuilder *) user_data;
 
-    if (response_id < 0) {
+    /* The dialog's action widgets use the standard GtkResponseType values,
+     * which are all NEGATIVE (GTK_RESPONSE_OK == -5, GTK_RESPONSE_CANCEL ==
+     * -6). A "response_id < 0" check therefore treated OK as a cancel and
+     * silently closed the dialog, so Import did nothing (issue #95).
+     * Proceed only on the explicit OK response; anything else (Cancel,
+     * close, Escape, delete-event) aborts. */
+    if (response_id != GTK_RESPONSE_OK) {
         gtk_window_destroy (GTK_WINDOW (dialog));
         g_object_unref (G_OBJECT (dialog_gtkb));
         return;
