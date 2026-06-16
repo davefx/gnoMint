@@ -15,6 +15,30 @@ file.
 
 ---
 
+## 1.6.7 — "Tempered Anvil" (2026-06-16)
+
+Import fix.
+
+Highlights:
+
+- **`Certificates > Import` works again** — the import dialog's OK button
+  maps to `GTK_RESPONSE_OK` (-5), but the handler bailed on
+  `response_id < 0`, treating OK as a cancel, so nothing was ever
+  imported. It now proceeds only on OK.
+  ([#95](https://github.com/davefx/gnoMint/issues/95))
+- **GUI import is now covered by a test** — a `check_workflows` scenario
+  drives the real Import dialog and asserts a certificate is added,
+  closing the gap that let this regress.
+- **Replaced a personal certificate test fixture** (its subject embedded
+  a real name and national ID) with a synthetic one.
+
+Database-compatible with 1.4.0 — no migration needed.
+
+See the full [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+for the complete list.
+
+---
+
 ## 1.6.6 — "Tempered Anvil" (2026-06-15)
 
 Windows polish.
