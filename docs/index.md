@@ -19,7 +19,7 @@ and PKCS#12 bundles — all stored in a self-contained SQLite database
 file you can carry around or back up like any other document.
 
 - **Source:** [github.com/davefx/gnoMint](https://github.com/davefx/gnoMint)
-- **Latest release:** 1.4.0 "Lazarus" (2026-05-19) — see [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
+- **Latest release:** 1.6.6 "Tempered Anvil" (2026-06-15) — see [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
 - **License:** GPL v3 or later
 
 ---
