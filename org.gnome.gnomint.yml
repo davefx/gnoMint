@@ -40,4 +40,4 @@ modules:
       - type: git
         url: https://github.com/davefx/gnoMint.git
         tag: v1.6.8
-        commit: b73a01f0079f0eb5403ab844a74337424a376b3e
+        commit: 3b4566950adecaa47acacb6889bd6a564d812f6d
