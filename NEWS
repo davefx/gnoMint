@@ -1,3 +1,21 @@
+* Version 1.6.8 "Tempered Anvil" (2026.06.20)
+
+Flatpak packaging.
+
+- FIX: The MIME definition that registers the *.gnomint file type was
+  installed as mime/gnomint.xml. Flatpak only exports files under
+  share/mime/packages/ when they are named after the application ID, so
+  inside a Flatpak the type was silently dropped and .gnomint files lost
+  their association. It is now installed as org.gnome.gnomint.xml; the
+  application/x-gnomint type itself is unchanged.
+
+- PACKAGING: The Flatpak manifest (org.gnome.gnomint.yml) now builds
+  against the GnuTLS, libgcrypt, libgpg-error and SQLite already shipped
+  by the GNOME 48 runtime instead of bundling its own copies, and relies
+  on the file-chooser portal for file access rather than a broad
+  home-directory permission.
+
+
 * Version 1.6.7 "Tempered Anvil" (2026.06.16)
 
 Import fix.
