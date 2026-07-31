@@ -3,10 +3,6 @@ layout: default
 title: gnoMint
 ---
 
-<p align="center">
-  <img src="{{ site.baseurl }}/assets/gnomint.svg" alt="gnoMint logo" width="160" height="160">
-</p>
-
 # gnoMint
 
 **Certification Authority management made easy.**
@@ -21,10 +17,6 @@ front-end) that lets you bootstrap a Certificate Authority, issue and
 revoke certificates, manage CSRs, publish CRLs, and import/export keys
 and PKCS#12 bundles — all stored in a self-contained SQLite database
 file you can carry around or back up like any other document.
-
-- **Source:** [github.com/davefx/gnoMint](https://github.com/davefx/gnoMint)
-- **Latest release:** 1.6.8 "Tempered Anvil" (2026-06-20) — see [NEWS](https://github.com/davefx/gnoMint/blob/master/NEWS)
-- **License:** GPL v3 or later
 
 ---
 
