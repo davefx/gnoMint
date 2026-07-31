@@ -9,8 +9,8 @@ permalink: /tutorial/
 > Adapted from the original "gnoMint tutorial" by David Marín, written
 > circa 2008 and recovered from
 > [web.archive.org](https://web.archive.org/web/20170624101726/http://gnomint.sourceforge.net/?q=node/20).
-> The text has been lightly updated for gnoMint 1.4.0 — the original
-> screenshots were lost when the SourceForge site went down. The
+> The text has been updated for recent gnoMint releases, with fresh
+> screenshots from the current version. The
 > [user manual]({{ site.baseurl }}/manual) covers the same actions
 > without the worked example.
 
