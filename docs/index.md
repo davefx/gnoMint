@@ -3,6 +3,10 @@ layout: default
 title: gnoMint
 ---
 
+<p align="center">
+  <img src="{{ site.baseurl }}/assets/gnomint.svg" alt="gnoMint logo" width="160" height="160">
+</p>
+
 # gnoMint
 
 **Certification Authority management made easy.**
