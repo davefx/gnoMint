@@ -10,11 +10,14 @@ url: "https://davefx.github.io"
 
 # Shown in the sidebar "Latest release" quick link; bump on each release.
 latest_release: '1.6.8 "Tempered Anvil" (2026-06-20)'
+# Bare version, consumed by the SoftwareApplication structured data.
+software_version: '1.6.8'
 
 remote_theme: pages-themes/minimal@v0.2.0
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 show_downloads: false
 github:

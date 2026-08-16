@@ -15,3 +15,26 @@
   }
   header ul.quick-links li { margin: 0 0 0.9em; }
 </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "gnoMint",
+  "alternateName": "gnoMint X.509 CA Manager",
+  "applicationCategory": "SecurityApplication",
+  "applicationSubCategory": "Certificate Authority manager",
+  "operatingSystem": "Linux, Windows",
+  "description": "gnoMint is a free and open-source graphical X.509 Certificate Authority manager for the Linux desktop, with a Windows installer and a matching readline command-line interface. It creates and manages hierarchical CAs, issues and revokes certificates, handles PKCS#10 certificate signing requests and X.509 CRLs, and imports/exports keys and PKCS#12 bundles, storing everything in a single self-contained SQLite database file. Supported key algorithms: RSA, DSA, ECDSA (P-256/P-384/P-521) and Ed25519.",
+  "url": "{{ '/' | absolute_url }}",
+  "downloadUrl": "https://github.com/davefx/gnoMint/releases",
+  "softwareVersion": "{{ site.software_version }}",
+  "programmingLanguage": "C",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "image": "{{ '/assets/gnomint.svg' | absolute_url }}",
+  "screenshot": "{{ '/assets/screenshots/main-window.png' | absolute_url }}",
+  "author": { "@type": "Person", "name": "David Marín Carreño", "url": "https://github.com/davefx" },
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
