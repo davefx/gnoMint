@@ -123,6 +123,21 @@ desktop-oriented alternative to tools such as XCA or tinyCA.
 
 ---
 
+## Source code
+
+gnoMint is developed in the open on GitHub — **[github.com/davefx/gnoMint](https://github.com/davefx/gnoMint)**.
+
+- [Browse the source](https://github.com/davefx/gnoMint) — the full C code tree
+- [Latest release & downloads](https://github.com/davefx/gnoMint/releases) — tarballs and the Windows installer
+- [Report a bug](https://github.com/davefx/gnoMint/issues) — issue tracker
+- [Send a patch](https://github.com/davefx/gnoMint/pulls) — pull requests welcome
+
+```bash
+git clone https://github.com/davefx/gnoMint.git
+```
+
+---
+
 ## Quick links
 
 - [Features overview]({{ site.baseurl }}/features) — what gnoMint can do
@@ -130,5 +145,3 @@ desktop-oriented alternative to tools such as XCA or tinyCA.
 - [User manual]({{ site.baseurl }}/manual) — task-oriented walkthrough
 - [Tutorial]({{ site.baseurl }}/tutorial) — set up a CA for a small firm + OpenVPN
 - [Release history]({{ site.baseurl }}/releases) — every release since 2006
-- [Report a bug](https://github.com/davefx/gnoMint/issues) on GitHub
-- [Send a patch](https://github.com/davefx/gnoMint/pulls) — pull requests welcome
